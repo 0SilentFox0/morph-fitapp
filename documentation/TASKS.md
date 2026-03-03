@@ -99,6 +99,10 @@
 | DOC-001 | Create documentation folder structure | — | DONE |
 | DOC-002 | Create TASKS.md (Jira-style task list) | — | DONE |
 | DOC-003 | Create prompts tracking (prompts/ folder) | — | DONE |
+| DOC-004 | Create .gitignore | — | DONE |
+| DOC-005 | Create vercel.json for Expo web deployment | — | DONE |
+| DOC-006 | Initialize git, add remote, push to GitHub | — | DONE |
+| DOC-007 | Add DEPLOYMENT.md documentation | — | DONE |
 | **TO DO** | | | |
 | TODO-001 | Replace mock data with real API calls | All endpoints | TO DO |
 | TODO-002 | Date/time picker native modals (DateTimePicker) | — | TO DO |

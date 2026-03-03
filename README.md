@@ -57,6 +57,11 @@ src/
 - **Clients:** Client list, filters, profiles, programs
 - **Stats:** Business analytics, transactions, achievements
 
+## Deployment
+
+- **Web:** See [documentation/DEPLOYMENT.md](documentation/DEPLOYMENT.md) for Vercel setup.
+- **GitHub:** [github.com/0SilentFox0/Morph](https://github.com/0SilentFox0/Morph)
+
 ## Scripts
 
 - `npm start` - Start Expo dev server
@@ -64,3 +69,4 @@ src/
 - `npm run android` - Run on Android
 - `npm run lint` - Run ESLint
 - `npm run format` - Format with Prettier
+- `npm run export:web` - Build web bundle for deployment (`dist/`)
