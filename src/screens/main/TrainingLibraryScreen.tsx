@@ -5,24 +5,64 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Image,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { Card, Tag } from '../../components/ui';
+import { Card, SearchInput, ProgramOptionsMenu } from '../../components/ui';
+import type { ProgramOptionAction } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { mockTrainingPrograms } from '../../mocks';
+import { useProgramsStore } from '../../store/programsStore';
+import type { TrainingProgram } from '../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'TrainingLibrary'>;
 
 export function TrainingLibraryScreen() {
   const navigation = useNavigation<Nav>();
+  const programs = useProgramsStore((s) => s.programs);
+  const searchPrograms = useProgramsStore((s) => s.searchPrograms);
+  const deleteProgram = useProgramsStore((s) => s.deleteProgram);
+
+  const [search, setSearch] = React.useState('');
+  const [optionsProgram, setOptionsProgram] = React.useState<TrainingProgram | null>(null);
+
+  const filteredPrograms = React.useMemo(
+    () => searchPrograms(search),
+    [search, searchPrograms]
+  );
+
+  const handleProgramOption = (action: ProgramOptionAction) => {
+    if (!optionsProgram) return;
+    if (action === 'edit') {
+      navigation.navigate('AddToLibraryForm', { program: optionsProgram });
+    } else if (action === 'create-session') {
+      navigation.navigate('CardioClassForm', { program: optionsProgram });
+    } else if (action === 'delete') {
+      Alert.alert(
+        'Delete program',
+        `Delete "${optionsProgram.name}"? This cannot be undone.`,
+        [
+          { text: 'Cancel', style: 'cancel', onPress: () => setOptionsProgram(null) },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => {
+              deleteProgram(optionsProgram.id);
+              setOptionsProgram(null);
+            },
+          },
+        ]
+      );
+      return;
+    }
+    setOptionsProgram(null);
+  };
 
   return (
     <View style={styles.container}>
@@ -36,16 +76,11 @@ export function TrainingLibraryScreen() {
       />
 
       <View style={styles.searchWrapper}>
-        <TextInput
-          style={styles.search}
+        <SearchInput
+          value={search}
+          onChangeText={setSearch}
           placeholder="Search"
-          placeholderTextColor={colors.textMuted}
-        />
-        <Ionicons
-          name="search"
-          size={20}
-          color={colors.textMuted}
-          style={styles.searchIcon}
+          style={styles.search}
         />
       </View>
 
@@ -54,32 +89,68 @@ export function TrainingLibraryScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {mockTrainingPrograms.map((p) => (
-          <Card key={p.id} style={styles.programCard}>
-            <View style={styles.thumbWrap}>
-              {p.thumbnail ? (
-                <Image source={{ uri: p.thumbnail }} style={styles.thumbImg} resizeMode="cover" />
-              ) : (
-                <View style={styles.thumbPlaceholder} />
-              )}
-            </View>
-            <View style={styles.programContent}>
-              <View style={styles.programHeader}>
-                <Text style={styles.programName}>{p.name}</Text>
-                <TouchableOpacity>
-                  <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
-                </TouchableOpacity>
+        {filteredPrograms.length === 0 ? (
+          <View style={styles.empty}>
+            <Ionicons name="folder-open-outline" size={48} color={colors.textMuted} />
+            <Text style={styles.emptyTitle}>No programs yet</Text>
+            <Text style={styles.emptySub}>
+              {search ? 'No programs match your search.' : 'Add your first program to get started.'}
+            </Text>
+            {!search && (
+              <TouchableOpacity
+                style={styles.emptyBtn}
+                onPress={() => navigation.navigate('AddToLibraryForm')}
+              >
+                <Text style={styles.emptyBtnText}>Add program</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ) : (
+          filteredPrograms.map((p) => (
+            <Card key={p.id} style={styles.programCard}>
+              <View style={styles.thumbWrap}>
+                {p.thumbnail ? (
+                  <Image source={{ uri: p.thumbnail }} style={styles.thumbImg} resizeMode="cover" />
+                ) : (
+                  <View style={styles.thumbPlaceholder} />
+                )}
               </View>
-              <Tag label={p.tag} variant="default" style={styles.tag} />
-              <View style={styles.stats}>
-                <Text style={styles.statText}>{p.views}</Text>
-                <Text style={styles.statText}>{p.likes}</Text>
-                <Text style={styles.statText}>{p.videoCount}m</Text>
+              <View style={styles.programContent}>
+                <View style={styles.programHeader}>
+                  <Text style={styles.programName} numberOfLines={1}>
+                    {p.name}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setOptionsProgram(p)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Ionicons name="ellipsis-horizontal" size={20} color={colors.text} />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.programMeta}>
+                  {p.videoCount} videos{p.price ? ` · ${p.price}` : ''}
+                </Text>
+                <View style={styles.stats}>
+                  <View style={styles.statItem}>
+                    <Ionicons name="eye-outline" size={14} color={colors.textMuted} />
+                    <Text style={styles.statText}>{p.views}</Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Ionicons name="heart-outline" size={14} color={colors.textMuted} />
+                    <Text style={styles.statText}>{p.likes}</Text>
+                  </View>
+                </View>
               </View>
-            </View>
-          </Card>
-        ))}
+            </Card>
+          ))
+        )}
       </ScrollView>
+
+      <ProgramOptionsMenu
+        visible={!!optionsProgram}
+        onClose={() => setOptionsProgram(null)}
+        onSelect={handleProgramOption}
+      />
     </View>
   );
 }
@@ -92,21 +163,9 @@ const styles = StyleSheet.create({
   searchWrapper: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    position: 'relative',
   },
   search: {
-    backgroundColor: colors.Secondary2,
-    borderRadius: 12,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingRight: 40,
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  searchIcon: {
-    position: 'absolute',
-    right: spacing.md,
-    top: 16,
+    height: 40,
   },
   scroll: { flex: 1 },
   scrollContent: {
@@ -116,25 +175,28 @@ const styles = StyleSheet.create({
   programCard: {
     flexDirection: 'row',
     marginBottom: spacing.md,
+    padding: 0,
+    overflow: 'hidden',
   },
   thumbWrap: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: spacing.md,
+    width: 120,
+    height: 120,
+    borderRadius: 0,
     overflow: 'hidden',
   },
   thumbImg: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
   },
   thumbPlaceholder: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     backgroundColor: colors.Secondary1,
   },
   programContent: {
     flex: 1,
+    padding: spacing.md,
+    justifyContent: 'center',
   },
   programHeader: {
     flexDirection: 'row',
@@ -145,18 +207,53 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.base,
     fontWeight: typography.weights.semibold,
     color: colors.text,
+    flex: 1,
   },
-  tag: {
+  programMeta: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
     marginTop: spacing.xs,
-    alignSelf: 'flex-start',
   },
   stats: {
     flexDirection: 'row',
     gap: spacing.md,
     marginTop: spacing.sm,
   },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   statText: {
     fontSize: typography.sizes.sm,
     color: colors.textMuted,
+  },
+  empty: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing['3xl'],
+  },
+  emptyTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.semibold,
+    color: colors.text,
+    marginTop: spacing.md,
+  },
+  emptySub: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+  },
+  emptyBtn: {
+    marginTop: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.Accent1,
+    borderRadius: 24,
+  },
+  emptyBtnText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold,
+    color: colors.text,
   },
 });

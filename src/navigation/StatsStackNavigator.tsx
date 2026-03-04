@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { StatsStackParamList } from './types';
+import { colors } from '../theme/colors';
 
 import { BusinessAnalyticsScreen } from '../screens/stats/BusinessAnalyticsScreen';
 import { TransactionsScreen } from '../screens/stats/TransactionsScreen';
@@ -13,7 +14,11 @@ export function StatsStackNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: 'transparent' },
+        contentStyle: { backgroundColor: colors.screenBg },
+        animation: 'slide_from_right',
+        animationDuration: 250,
+        fullScreenGestureEnabled: true,
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="BusinessAnalytics" component={BusinessAnalyticsScreen} />

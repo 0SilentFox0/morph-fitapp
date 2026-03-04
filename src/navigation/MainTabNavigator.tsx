@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,9 +11,10 @@ import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon } from '../compo
 
 import { HomeStackNavigator } from './HomeStackNavigator';
 import { ClientsStackNavigator } from './ClientsStackNavigator';
-import { ChatPlaceholderScreen } from '../screens/main/ChatPlaceholderScreen';
+import { ChatStackNavigator } from './ChatStackNavigator';
 import { AddPlaceholderScreen } from '../screens/main/AddPlaceholderScreen';
 import { StatsStackNavigator } from './StatsStackNavigator';
+import { useChatStore } from '../store/chatStore';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -45,6 +46,23 @@ function AddButton({ onPress }: { onPress: () => void }) {
 
 const TAB_BAR_BASE_HEIGHT = 60;
 
+function ChatTabIconWithBadge({ color }: { color: string }) {
+  const unreadCount = useChatStore((s) => s.getUnreadCount());
+
+  return (
+    <View style={styles.chatIconWrap}>
+      <ChatTabIcon color={color} />
+      {unreadCount > 0 && (
+        <View style={styles.chatBadge}>
+          <Text style={styles.chatBadgeText}>
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 export function MainTabNavigator() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
@@ -64,6 +82,7 @@ export function MainTabNavigator() {
         tabBarShowLabel: true,
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarIconStyle: styles.tabBarIcon,
+        tabBarItemStyle: styles.tabBarItem,
       }}
     >
       <Tab.Screen
@@ -89,22 +108,24 @@ export function MainTabNavigator() {
       <Tab.Screen
         name="AddTab"
         component={AddPlaceholderScreen}
-        options={{
+        options={({ navigation }) => ({
           tabBarLabel: 'Add',
-          tabBarIcon: () => <AddButton onPress={() => {}} />,
-        }}
+          tabBarIcon: () => <AddButton onPress={() => navigation.navigate('HomeTab', { screen: 'SessionForm' })} />,
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              {...props}
+              onPress={() => navigation.navigate('HomeTab', { screen: 'SessionForm' })}
+              activeOpacity={0.8}
+            />
+          ),
+        })}
       />
       <Tab.Screen
         name="ChatTab"
-        component={ChatPlaceholderScreen}
+        component={ChatStackNavigator}
         options={{
           tabBarLabel: 'Chat',
-          tabBarIcon: ({ color }) => (
-            <View style={styles.chatIconWrap}>
-              <ChatTabIcon color={color} />
-              <View style={styles.chatBadge} />
-            </View>
-          ),
+          tabBarIcon: ({ color }) => <ChatTabIconWithBadge color={color} />,
         }}
       />
       <Tab.Screen
@@ -150,6 +171,10 @@ const styles = StyleSheet.create({
   tabBarIcon: {
     marginBottom: 2,
   },
+  tabBarItem: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   addButton: {
     width: 50,
     height: 50,
@@ -164,11 +189,19 @@ const styles = StyleSheet.create({
   },
   chatBadge: {
     position: 'absolute',
-    top: -1,
-    right: -1,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary7,
+    top: -4,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.Accent1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  chatBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.text,
   },
 });

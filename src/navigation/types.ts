@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Session } from '../mocks';
+import type { Session, TrainingProgram } from '../mocks';
 
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
@@ -32,9 +32,9 @@ export type HomeStackParamList = {
   SessionForm: { session?: Session } | undefined;
   RequestSubmitted: undefined;
   TrainingLibrary: undefined;
-  AddToLibraryForm: undefined;
-  Gallery: undefined;
-  CardioClassForm: undefined;
+  AddToLibraryForm: { program?: TrainingProgram } | undefined;
+  Gallery: { program?: TrainingProgram; draftTitle?: string; draftTag?: string } | undefined;
+  CardioClassForm: { program?: TrainingProgram } | undefined;
 };
 
 export type ClientsStackParamList = {
@@ -51,6 +51,12 @@ export type StatsStackParamList = {
   BusinessAnalytics: undefined;
   Transactions: undefined;
   YouGotPaid: undefined;
+};
+
+export type ChatStackParamList = {
+  ChatList: undefined;
+  ChatThread: { conversationId: string };
+  NewChat: undefined;
 };
 
 export type OnboardingScreenProps<T extends keyof OnboardingStackParamList> =

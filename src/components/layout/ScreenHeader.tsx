@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../theme/colors';
@@ -30,6 +31,7 @@ export function ScreenHeader({
   transparent,
 }: ScreenHeaderProps) {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const handleBack = () => {
     if (onBack) {
@@ -39,8 +41,15 @@ export function ScreenHeader({
     }
   };
 
+  const safePadding = {
+    paddingTop: Math.max(insets.top, spacing.md),
+    paddingBottom: spacing.md,
+    paddingLeft: Math.max(insets.left, spacing.md),
+    paddingRight: Math.max(insets.right, spacing.md),
+  };
+
   return (
-    <View style={[styles.header, transparent && styles.headerTransparent, style]}>
+    <View style={[styles.header, safePadding, transparent && styles.headerTransparent, style]}>
       <View style={styles.left}>
         {showBack && (
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
@@ -61,8 +70,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
     backgroundColor: colors.Secondary1,
   },
   headerTransparent: {

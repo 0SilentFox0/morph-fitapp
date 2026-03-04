@@ -25,6 +25,8 @@ export interface TrainingProgram {
   views: number;
   likes: number;
   thumbnail?: string;
+  /** e.g. "$5/month" */
+  price?: string;
 }
 
 export interface Client {
@@ -160,6 +162,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     views: 24,
     likes: 340,
     thumbnail: TRAINING_IMAGES[0],
+    price: '$5/month',
   },
   {
     id: '2',
@@ -169,6 +172,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     views: 18,
     likes: 210,
     thumbnail: TRAINING_IMAGES[1],
+    price: '$5/month',
   },
   {
     id: '3',
@@ -178,6 +182,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     views: 45,
     likes: 520,
     thumbnail: TRAINING_IMAGES[2],
+    price: '$5/month',
   },
   {
     id: '4',
@@ -187,6 +192,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     views: 62,
     likes: 380,
     thumbnail: TRAINING_IMAGES[3],
+    price: '$5/month',
   },
   {
     id: '5',
@@ -196,6 +202,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     views: 31,
     likes: 195,
     thumbnail: TRAINING_IMAGES[4],
+    price: '$5/month',
   },
 ];
 

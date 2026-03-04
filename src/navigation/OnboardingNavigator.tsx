@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from './types';
+import { colors } from '../theme/colors';
 
 import { ChooseRoleScreen } from '../screens/onboarding/ChooseRoleScreen';
 import { WelcomeTrainerScreen } from '../screens/onboarding/WelcomeTrainerScreen';
@@ -23,7 +24,11 @@ export function OnboardingNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: 'transparent' },
+        contentStyle: { backgroundColor: colors.screenBg },
+        animation: 'slide_from_right',
+        animationDuration: 250,
+        fullScreenGestureEnabled: true,
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="ChooseRole" component={ChooseRoleScreen} />

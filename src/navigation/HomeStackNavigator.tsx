@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from './types';
+import { colors } from '../theme/colors';
 
 import { HomeScreen } from '../screens/main/HomeScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
@@ -19,7 +20,11 @@ export function HomeStackNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: 'transparent' },
+        contentStyle: { backgroundColor: colors.screenBg },
+        animation: 'slide_from_right',
+        animationDuration: 250,
+        fullScreenGestureEnabled: true,
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="Home" component={HomeScreen} />

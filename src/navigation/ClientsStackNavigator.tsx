@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { ClientsStackParamList } from './types';
+import { colors } from '../theme/colors';
 
 import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
 import { FiltersScreen } from '../screens/clients/FiltersScreen';
@@ -17,7 +18,11 @@ export function ClientsStackNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: 'transparent' },
+        contentStyle: { backgroundColor: colors.screenBg },
+        animation: 'slide_from_right',
+        animationDuration: 250,
+        fullScreenGestureEnabled: true,
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="ClientsList" component={ClientsListScreen} />

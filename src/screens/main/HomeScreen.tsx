@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,17 +18,20 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useAppStore } from '../../store/appStore';
-import { mockSessions, mockTrainingPrograms } from '../../mocks';
+import { useProgramsStore } from '../../store/programsStore';
+import { mockSessions } from '../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 
 export function HomeScreen() {
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const userName = useAppStore((state) => state.userName);
+  const programs = useProgramsStore((s) => s.programs);
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md), paddingHorizontal: Math.max(insets.left, spacing.lg), paddingRight: Math.max(insets.right, spacing.lg) }]}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Profile')}
           style={styles.profileLeft}
@@ -93,7 +97,7 @@ export function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
           >
-            {mockTrainingPrograms.map((p) => (
+            {programs.slice(0, 5).map((p) => (
               <TouchableOpacity
                 key={p.id}
                 style={styles.programCard}

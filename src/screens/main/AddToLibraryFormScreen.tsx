@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
@@ -8,19 +8,66 @@ import { Input, Button } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { useProgramsStore } from '../../store/programsStore';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
+type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
 
 const ACCESS_OPTIONS = ['Public', 'For Subscribers Only', 'Private (hidden)'];
+const TAG_OPTIONS = ['HIIT', 'Cardio', 'Strength', 'Yoga', 'Mobility', 'Pilates'];
 
 export function AddToLibraryFormScreen() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const program = route.params?.program;
+  const isEdit = !!program;
+
+  const addProgram = useProgramsStore((s) => s.addProgram);
+  const updateProgram = useProgramsStore((s) => s.updateProgram);
+
+  const [title, setTitle] = React.useState(program?.name ?? '');
+  const [tag, setTag] = React.useState(program?.tag ?? 'HIIT');
+  const [description, setDescription] = React.useState('');
   const [access, setAccess] = React.useState('Public');
   const [freePreview, setFreePreview] = React.useState(true);
 
+  const handleContinue = () => {
+    if (isEdit && program) {
+      updateProgram(program.id, {
+        name: title || program.name,
+        tag: tag || program.tag,
+      });
+      navigation.goBack();
+    } else {
+      navigation.navigate('Gallery', { draftTitle: title || 'New Program', draftTag: tag || 'HIIT' });
+    }
+  };
+
+  const handleSaveDraft = () => {
+    if (isEdit && program) {
+      updateProgram(program.id, {
+        name: title || program.name,
+        tag: tag || program.tag,
+      });
+      navigation.goBack();
+    } else {
+      addProgram({
+        name: title || 'New Program',
+        tag: tag || 'HIIT',
+        videoCount: 0,
+        views: 0,
+        likes: 0,
+        price: '$5/month',
+      });
+      navigation.navigate('TrainingLibrary');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Add to Library" />
+      <ScreenHeader
+        title={isEdit ? (title || program?.name || 'Edit') : 'Add to Library'}
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -28,9 +75,31 @@ export function AddToLibraryFormScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.sectionTitle}>About</Text>
-        <Input placeholder="Program Title" />
+        <Input
+          placeholder="Program Title"
+          value={title}
+          onChangeText={setTitle}
+        />
+        <View style={styles.dropdownRow}>
+          <Text style={styles.dropdownLabel}>Type</Text>
+          <View style={styles.tagRow}>
+            {TAG_OPTIONS.map((opt) => (
+              <TouchableOpacity
+                key={opt}
+                onPress={() => setTag(opt)}
+                style={[styles.tagChip, tag === opt && styles.tagChipActive]}
+              >
+                <Text style={[styles.tagChipText, tag === opt && styles.tagChipTextActive]}>
+                  {opt}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
         <Input
           placeholder="Write a short description for your clients..."
+          value={description}
+          onChangeText={setDescription}
           multiline
           numberOfLines={4}
         />
@@ -75,10 +144,18 @@ export function AddToLibraryFormScreen() {
         ))}
 
         <Button
-          title="Continue"
-          onPress={() => navigation.navigate('Gallery')}
+          title={isEdit ? 'Save' : 'Continue'}
+          onPress={isEdit ? handleSaveDraft : handleContinue}
           style={styles.button}
         />
+        {!isEdit && (
+          <Button
+            title="Save as Draft"
+            onPress={handleSaveDraft}
+            variant="secondary"
+            style={styles.buttonSecondary}
+          />
+        )}
       </ScrollView>
     </View>
   );
@@ -100,6 +177,38 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.md,
     marginTop: spacing.sm,
+  },
+  dropdownRow: {
+    marginBottom: spacing.md,
+  },
+  dropdownLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  tagChip: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: 20,
+    backgroundColor: colors.Secondary2,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  tagChipActive: {
+    backgroundColor: colors.Accent1,
+    borderColor: colors.Accent1,
+  },
+  tagChipText: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+  },
+  tagChipTextActive: {
+    color: colors.text,
   },
   uploadArea: {
     backgroundColor: colors.Secondary2,
@@ -152,5 +261,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: spacing.lg,
+  },
+  buttonSecondary: {
+    marginTop: spacing.md,
   },
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'CardioClassForm'>;
+type Route = RouteProp<HomeStackParamList, 'CardioClassForm'>;
 
 const CLIENTS = [
   'Darrell Steward',
@@ -23,11 +24,13 @@ const CLIENTS = [
 
 export function CardioClassFormScreen() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const program = route.params?.program;
 
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Cardio Class"
+        title={program?.name ?? 'Cardio Class'}
         rightElement={
           <TouchableOpacity>
             <Ionicons name="share-outline" size={24} color={colors.text} />
@@ -41,8 +44,8 @@ export function CardioClassFormScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.sectionTitle}>About</Text>
-        <Input placeholder="Cardio Class" defaultValue="Cardio Class" />
-        <Input placeholder="Cardio" defaultValue="Cardio" />
+        <Input placeholder="Cardio Class" defaultValue={program?.name ?? 'Cardio Class'} />
+        <Input placeholder="Cardio" defaultValue={program?.tag ?? 'Cardio'} />
         <Input
           placeholder="Lorem ipsum dolor sit amet..."
           defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."

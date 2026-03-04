@@ -5,30 +5,36 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { Button } from '../../components/ui';
+import { Button, SearchInput } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { useProgramsStore } from '../../store/programsStore';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Gallery'>;
+type Route = RouteProp<HomeStackParamList, 'Gallery'>;
 
 const GALLERY_ITEMS = Array.from({ length: 12 }, (_, i) => ({
   id: String(i),
-  name: 'Name',
+  name: `Video ${i + 1}`,
   duration: '12m',
-  tag: 'HIT',
+  tag: 'HIIT',
 }));
 
 export function GalleryScreen() {
   const navigation = useNavigation<Nav>();
-  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const route = useRoute<Route>();
+  const { draftTitle, draftTag } = route.params ?? {};
+  const addProgram = useProgramsStore((s) => s.addProgram);
+
+  const [selected, setSelected] = React.useState<Set<string>>(new Set(['0', '1']));
+  const [search, setSearch] = React.useState('');
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -37,6 +43,30 @@ export function GalleryScreen() {
       else next.add(id);
       return next;
     });
+  };
+
+  const handleContinue = () => {
+    const newProgram = addProgram({
+      name: draftTitle ?? 'New Program',
+      tag: draftTag ?? 'HIIT',
+      videoCount: selected.size,
+      views: 0,
+      likes: 0,
+      price: '$5/month',
+    });
+    navigation.navigate('CardioClassForm', { program: newProgram });
+  };
+
+  const handleSaveDraft = () => {
+    addProgram({
+      name: draftTitle ?? 'New Program',
+      tag: draftTag ?? 'HIIT',
+      videoCount: selected.size,
+      views: 0,
+      likes: 0,
+      price: '$5/month',
+    });
+    navigation.navigate('TrainingLibrary');
   };
 
   return (
@@ -51,16 +81,11 @@ export function GalleryScreen() {
       />
 
       <View style={styles.searchWrapper}>
-        <TextInput
-          style={styles.search}
+        <SearchInput
+          value={search}
+          onChangeText={setSearch}
           placeholder="Search"
-          placeholderTextColor={colors.textMuted}
-        />
-        <Ionicons
-          name="search"
-          size={20}
-          color={colors.textMuted}
-          style={styles.searchIcon}
+          style={styles.search}
         />
       </View>
 
@@ -90,10 +115,14 @@ export function GalleryScreen() {
 
         <Button
           title="Continue"
-          onPress={() => navigation.navigate('CardioClassForm')}
+          onPress={handleContinue}
           style={styles.button}
         />
-        <Button title="Save as Draft" onPress={() => navigation.goBack()} variant="secondary" />
+        <Button
+          title="Save as Draft"
+          onPress={handleSaveDraft}
+          variant="secondary"
+        />
       </ScrollView>
     </View>
   );
@@ -107,21 +136,9 @@ const styles = StyleSheet.create({
   searchWrapper: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    position: 'relative',
   },
   search: {
-    backgroundColor: colors.Secondary2,
-    borderRadius: 12,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingRight: 40,
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  searchIcon: {
-    position: 'absolute',
-    right: spacing.md,
-    top: 16,
+    height: 40,
   },
   scroll: { flex: 1 },
   scrollContent: {
