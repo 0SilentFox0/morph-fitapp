@@ -2,6 +2,8 @@
 
 Specs for backend implementation. Each file describes routes, request/response shapes, and what the frontend expects.
 
+**Database:** [DB_STRUCTURE.md](DB_STRUCTURE.md) — Tables, columns, relationships, indexes
+
 **Conventions:**
 - Base URL: `{API_BASE}/` (e.g. `https://api.fitconnect.app/v1`)
 - Auth: Bearer token in `Authorization` header (when implemented)
@@ -18,3 +20,4 @@ Specs for backend implementation. Each file describes routes, request/response s
 | [analytics.md](analytics.md) | Analytics & stats | ANLY-*, HOME-004–005 |
 | [user.md](user.md) | User profile & auth | HOME-003, ONB-012, LOGIC-016 |
 | [chat.md](chat.md) | Chat & messaging | CHAT-*, LOGIC-018, BCHAT-* |
+| [DB_STRUCTURE.md](DB_STRUCTURE.md) | Database schema | All APIs |
