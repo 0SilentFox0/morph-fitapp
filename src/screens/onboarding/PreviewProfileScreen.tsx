@@ -90,7 +90,7 @@ export function PreviewProfileScreen() {
 
         <Button
           title="Publish Profile"
-          onPress={() => navigation.replace('YoureAllSet')}
+          onPress={() => navigation.navigate('YoureAllSet')}
           style={styles.publishBtn}
         />
         <Button

@@ -41,14 +41,14 @@ export function ProfilePhotoScreen() {
         </Text>
       </ScrollView>
       <View style={styles.footer}>
-        <Text style={styles.skip} onPress={() => navigation.replace('PreviewProfile')}>
+        <Text style={styles.skip} onPress={() => navigation.navigate('PreviewProfile')}>
           Skip
         </Text>
         <View style={styles.navButtons}>
           <IconButton icon="arrow-back" onPress={() => navigation.goBack()} />
           <IconButton
             icon="arrow-forward"
-            onPress={() => navigation.replace('PreviewProfile')}
+            onPress={() => navigation.navigate('PreviewProfile')}
             variant="primary"
           />
         </View>

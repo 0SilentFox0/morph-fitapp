@@ -18,12 +18,12 @@ export function HaveProgramsScreen() {
 
   const handleUpload = () => {
     setField('hasPrograms', true);
-    navigation.replace('AddToLibrary');
+    navigation.navigate('AddToLibrary');
   };
 
   const handleLater = () => {
     setField('hasPrograms', false);
-    navigation.replace('WhereTrain');
+    navigation.navigate('WhereTrain');
   };
 
   return (

@@ -20,10 +20,10 @@ export function ChooseRoleScreen() {
   const handleApply = () => {
     setUserRole(selected);
     if (selected === 'trainer') {
-      navigation.replace('WelcomeTrainer');
+      navigation.navigate('WelcomeTrainer');
     } else {
       // Client flow - for now go to main app
-      navigation.replace('YoureAllSet');
+      navigation.navigate('YoureAllSet');
     }
   };
 

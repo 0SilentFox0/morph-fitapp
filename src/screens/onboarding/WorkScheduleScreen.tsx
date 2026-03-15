@@ -64,14 +64,14 @@ export function WorkScheduleScreen() {
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <Text style={styles.skip} onPress={() => navigation.replace('ProfilePhoto')}>
+        <Text style={styles.skip} onPress={() => navigation.navigate('ProfilePhoto')}>
           Skip
         </Text>
         <View style={styles.navButtons}>
           <IconButton icon="arrow-back" onPress={() => navigation.goBack()} />
           <IconButton
             icon="arrow-forward"
-            onPress={() => navigation.replace('ProfilePhoto')}
+            onPress={() => navigation.navigate('ProfilePhoto')}
             variant="primary"
           />
         </View>

@@ -37,7 +37,7 @@ export function WelcomeTrainerScreen() {
         </Text>
         <Button
           title="Apply"
-          onPress={() => navigation.replace('WhatsYourName')}
+          onPress={() => navigation.navigate('WhatsYourName')}
           style={styles.button}
         />
       </ScrollView>

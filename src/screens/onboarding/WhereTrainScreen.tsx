@@ -63,14 +63,14 @@ export function WhereTrainScreen() {
         })}
       </ScrollView>
       <View style={styles.footer}>
-        <Text style={styles.skip} onPress={() => navigation.replace('WorkSchedule')}>
+        <Text style={styles.skip} onPress={() => navigation.navigate('WorkSchedule')}>
           Skip
         </Text>
         <View style={styles.navButtons}>
           <IconButton icon="arrow-back" onPress={() => navigation.goBack()} />
           <IconButton
             icon="arrow-forward"
-            onPress={() => navigation.replace('WorkSchedule')}
+            onPress={() => navigation.navigate('WorkSchedule')}
             variant="primary"
           />
         </View>

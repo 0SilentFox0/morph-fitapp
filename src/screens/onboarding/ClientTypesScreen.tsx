@@ -70,14 +70,14 @@ export function ClientTypesScreen() {
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <Text style={styles.skip} onPress={() => navigation.replace('HavePrograms')}>
+        <Text style={styles.skip} onPress={() => navigation.navigate('HavePrograms')}>
           Skip
         </Text>
         <View style={styles.navButtons}>
           <IconButton icon="arrow-back" onPress={() => navigation.goBack()} />
           <IconButton
             icon="arrow-forward"
-            onPress={() => navigation.replace('HavePrograms')}
+            onPress={() => navigation.navigate('HavePrograms')}
             variant="primary"
           />
         </View>

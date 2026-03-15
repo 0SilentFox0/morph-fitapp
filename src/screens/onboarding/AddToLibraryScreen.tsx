@@ -28,7 +28,7 @@ export function AddToLibraryScreen() {
     <View style={styles.container}>
       <ScreenHeader
         title="Add to Library"
-        onBack={() => navigation.replace('WhereTrain')}
+        onBack={() => navigation.navigate('WhereTrain')}
       />
       <ProgressIndicator total={6} current={2} />
       <ScrollView
@@ -89,7 +89,7 @@ export function AddToLibraryScreen() {
 
         <Button
           title="Continue"
-          onPress={() => navigation.replace('WhereTrain')}
+          onPress={() => navigation.navigate('WhereTrain')}
           style={styles.button}
         />
       </ScrollView>

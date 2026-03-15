@@ -18,11 +18,11 @@ export function WhatsYourNameScreen() {
   const { name, setField } = useOnboardingStore();
 
   const handleNext = () => {
-    navigation.replace('Experience');
+    navigation.navigate('Experience');
   };
 
   const handleSkip = () => {
-    navigation.replace('Experience');
+    navigation.navigate('Experience');
   };
 
   return (
