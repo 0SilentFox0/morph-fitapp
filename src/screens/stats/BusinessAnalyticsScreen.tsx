@@ -31,9 +31,9 @@ const statusColors = {
 };
 
 const chartConfig = {
-  backgroundColor: colors.Secondary2,
-  backgroundGradientFrom: colors.Secondary2,
-  backgroundGradientTo: colors.Secondary1,
+  backgroundColor: colors.neutral2,
+  backgroundGradientFrom: colors.neutral2,
+  backgroundGradientTo: colors.neutral1,
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(166, 95, 98, ${opacity})`,
   labelColor: () => colors.neutral9,
@@ -249,14 +249,14 @@ const styles = StyleSheet.create({
   },
   chartTabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: colors.Accent1,
+    borderBottomColor: colors.accent,
   },
   chartTabText: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
   },
   chartTabTextActive: {
-    color: colors.Accent1,
+    color: colors.accent,
     fontWeight: typography.weights.semibold,
   },
   timeframeRow: {
@@ -268,20 +268,20 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 8,
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.border,
   },
   timeframeBtnActive: {
-    backgroundColor: colors.Secondary1,
-    borderColor: colors.Accent1,
+    backgroundColor: colors.neutral1,
+    borderColor: colors.accent,
   },
   timeframeText: {
     fontSize: typography.sizes.sm,
     color: colors.text,
   },
   timeframeTextActive: {
-    color: colors.Accent1,
+    color: colors.accent,
   },
   chartContainer: {
     marginTop: spacing.sm,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: typography.sizes.sm,
-    color: colors.Accent1,
+    color: colors.accent,
   },
   transactionsActions: {
     flexDirection: 'row',
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   search: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,

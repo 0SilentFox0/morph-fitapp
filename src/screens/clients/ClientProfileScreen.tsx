@@ -134,10 +134,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 20,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   programTabActive: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
   },
   programTabText: {
     fontSize: typography.sizes.sm,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
     marginRight: spacing.md,
   },
   exerciseInfo: {

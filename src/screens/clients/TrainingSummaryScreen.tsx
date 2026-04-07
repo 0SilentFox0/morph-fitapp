@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 8,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   timeframeBtnActive: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
   },
   timeframeText: {
     fontSize: typography.sizes.sm,
@@ -178,12 +178,12 @@ const styles = StyleSheet.create({
   },
   chartPlaceholder: {
     height: 200,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     marginBottom: spacing.lg,
   },
   table: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: spacing.lg,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   tableRowHighlight: {
-    backgroundColor: colors.Accent2,
+    backgroundColor: colors.primary2,
   },
   tableCell: {
     flex: 1,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     padding: spacing.md,
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
@@ -224,14 +224,14 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: colors.Accent1,
+    borderBottomColor: colors.accent,
   },
   tabText: {
     fontSize: typography.sizes.base,
     color: colors.textSecondary,
   },
   tabTextActive: {
-    color: colors.Accent1,
+    color: colors.accent,
     fontWeight: typography.weights.semibold,
   },
 });

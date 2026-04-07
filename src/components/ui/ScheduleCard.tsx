@@ -101,7 +101,7 @@ export function ScheduleCard({
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 14,
     overflow: 'hidden',
     marginBottom: spacing.sm,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 20,

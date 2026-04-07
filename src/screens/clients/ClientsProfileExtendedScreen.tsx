@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
     marginRight: spacing.md,
   },
   historyInfo: {

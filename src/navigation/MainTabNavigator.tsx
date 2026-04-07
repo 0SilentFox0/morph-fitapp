@@ -12,7 +12,7 @@ import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon } from '../compo
 import { HomeStackNavigator } from './HomeStackNavigator';
 import { ClientsStackNavigator } from './ClientsStackNavigator';
 import { ChatStackNavigator } from './ChatStackNavigator';
-import { AddPlaceholderScreen } from '../screens/main/AddPlaceholderScreen';
+import { AddPlaceholderScreen } from '../screens/home';
 import { StatsStackNavigator } from './StatsStackNavigator';
 import { useChatStore } from '../store/chatStore';
 
@@ -77,7 +77,7 @@ export function MainTabNavigator() {
           { height: tabBarHeight, paddingBottom: insets.bottom },
         ],
         tabBarBackground: () => <TabBarBackground />,
-        tabBarActiveTintColor: colors.Accent1,
+        tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.neutral8,
         tabBarShowLabel: true,
         tabBarLabelStyle: styles.tabBarLabel,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,

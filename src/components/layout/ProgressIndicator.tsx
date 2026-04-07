@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   dotFilled: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
     width: 16,
   },
 });

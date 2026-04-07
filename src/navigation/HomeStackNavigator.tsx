@@ -3,15 +3,17 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from './types';
 import { colors } from '../theme/colors';
 
-import { HomeScreen } from '../screens/main/HomeScreen';
-import { ProfileScreen } from '../screens/main/ProfileScreen';
-import { ScheduleScreen } from '../screens/main/ScheduleScreen';
-import { SessionFormScreen } from '../screens/main/SessionFormScreen';
-import { RequestSubmittedScreen } from '../screens/main/RequestSubmittedScreen';
-import { TrainingLibraryScreen } from '../screens/main/TrainingLibraryScreen';
-import { AddToLibraryFormScreen } from '../screens/main/AddToLibraryFormScreen';
-import { GalleryScreen } from '../screens/main/GalleryScreen';
-import { CardioClassFormScreen } from '../screens/main/CardioClassFormScreen';
+import {
+  HomeScreen,
+  ProfileScreen,
+  ScheduleScreen,
+  SessionFormScreen,
+  RequestSubmittedScreen,
+  TrainingLibraryScreen,
+  AddToLibraryFormScreen,
+  GalleryScreen,
+  CardioClassFormScreen,
+} from '../screens/home';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 

@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'transparent',

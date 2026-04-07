@@ -129,10 +129,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 20,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   filterBtnActive: {
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
   },
   filterText: {
     fontSize: typography.sizes.sm,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   search: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,

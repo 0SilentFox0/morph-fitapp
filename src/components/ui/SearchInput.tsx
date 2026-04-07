@@ -38,7 +38,7 @@ export function SearchInput({
 const styles = StyleSheet.create({
   wrapper: {
     height: 40,
-    backgroundColor: colors.Secondary1,
+    backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.neutral5,
     borderRadius: 8,

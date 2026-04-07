@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   bubbleSent: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
     borderBottomRightRadius: 4,
     borderBottomLeftRadius: 16,
   },
   bubbleReceived: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderBottomRightRadius: 16,
   },
   text: {

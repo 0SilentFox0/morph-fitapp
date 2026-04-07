@@ -72,12 +72,12 @@ function getVariantStyles(variant: ButtonVariant) {
   switch (variant) {
     case 'primary':
       return {
-        container: { backgroundColor: colors.Accent1 },
+        container: { backgroundColor: colors.accent },
         text: { color: '#FFFFFF' },
       };
     case 'secondary':
       return {
-        container: { backgroundColor: colors.Secondary2 },
+        container: { backgroundColor: colors.neutral2 },
         text: { color: colors.text },
       };
     case 'outline':
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   base: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: 12,
+    borderRadius: 80,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,

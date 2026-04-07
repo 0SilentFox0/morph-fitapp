@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   videoArea: {
     width: '100%',
     aspectRatio: 16 / 9,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     marginBottom: spacing.lg,
   },
@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 20,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   setTabActive: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
   },
   setTabText: {
     fontSize: typography.sizes.sm,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
