@@ -2,7 +2,8 @@
 
 Specs for backend implementation. Each file describes routes, request/response shapes, and what the frontend expects.
 
-**Database:** [DB_STRUCTURE.md](DB_STRUCTURE.md) — Tables, columns, relationships, indexes
+**Database:** [DB_STRUCTURE.md](DB_STRUCTURE.md) — Tables, columns, relationships, TASKS/Figma mapping  
+**Schema tree (diagram):** [DB_SCHEMA_TREE.md](DB_SCHEMA_TREE.md) — Mermaid ER + ASCII hierarchy
 
 **Conventions:**
 - Base URL: `{API_BASE}/` (e.g. `https://api.fitconnect.app/v1`)

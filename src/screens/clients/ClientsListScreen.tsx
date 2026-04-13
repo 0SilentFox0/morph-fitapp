@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   search: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     borderRadius: 12,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,

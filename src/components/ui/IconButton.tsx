@@ -40,11 +40,11 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primary: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
   },
 });

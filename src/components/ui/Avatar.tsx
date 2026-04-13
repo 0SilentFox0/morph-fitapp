@@ -48,10 +48,10 @@ export function Avatar({ uri, name = '?', size = 40 }: AvatarProps) {
 
 const styles = StyleSheet.create({
   avatar: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   placeholder: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },

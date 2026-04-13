@@ -33,14 +33,14 @@ export function Tag({ label, variant = 'default', style }: TagProps) {
 
 const styles = StyleSheet.create({
   tag: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
     borderRadius: 8,
     alignSelf: 'flex-start',
   },
   tagAccent: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
   },
   text: {
     fontSize: typography.sizes.xs,

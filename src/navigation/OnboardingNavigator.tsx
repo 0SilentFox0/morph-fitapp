@@ -3,19 +3,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from './types';
 import { colors } from '../theme/colors';
 
-import { ChooseRoleScreen } from '../screens/onboarding/ChooseRoleScreen';
-import { WelcomeTrainerScreen } from '../screens/onboarding/WelcomeTrainerScreen';
-import { WhatsYourNameScreen } from '../screens/onboarding/WhatsYourNameScreen';
-import { ExperienceScreen } from '../screens/onboarding/ExperienceScreen';
-import { TrainingTypesScreen } from '../screens/onboarding/TrainingTypesScreen';
-import { ClientTypesScreen } from '../screens/onboarding/ClientTypesScreen';
-import { HaveProgramsScreen } from '../screens/onboarding/HaveProgramsScreen';
-import { AddToLibraryScreen } from '../screens/onboarding/AddToLibraryScreen';
-import { WhereTrainScreen } from '../screens/onboarding/WhereTrainScreen';
-import { WorkScheduleScreen } from '../screens/onboarding/WorkScheduleScreen';
-import { ProfilePhotoScreen } from '../screens/onboarding/ProfilePhotoScreen';
-import { PreviewProfileScreen } from '../screens/onboarding/PreviewProfileScreen';
-import { YoureAllSetScreen } from '../screens/onboarding/YoureAllSetScreen';
+import {
+  ChooseRoleScreen,
+  WelcomeTrainerScreen,
+  WhatsYourNameScreen,
+  ExperienceScreen,
+  TrainingTypesScreen,
+  ClientTypesScreen,
+  HaveProgramsScreen,
+  AddToLibraryScreen,
+  WhereTrainScreen,
+  WorkScheduleScreen,
+  ProfilePhotoScreen,
+  PreviewProfileScreen,
+  YoureAllSetScreen,
+} from '../screens/onboarding';
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 

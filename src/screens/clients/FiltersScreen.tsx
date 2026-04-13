@@ -118,10 +118,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 20,
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.neutral2,
   },
   optionSelected: {
-    backgroundColor: colors.Accent1,
+    backgroundColor: colors.accent,
   },
   optionText: {
     fontSize: typography.sizes.sm,
@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: {
-    borderColor: colors.Accent1,
-    backgroundColor: colors.Accent1,
+    borderColor: colors.accent,
+    backgroundColor: colors.accent,
   },
   checkmark: {
     color: '#FFFFFF',
