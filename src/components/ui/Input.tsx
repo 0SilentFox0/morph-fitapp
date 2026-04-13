@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  StyleSheet,
-  TextInputProps,
-  ViewStyle,
-} from 'react-native';
+import { TextInput, View, Text, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
@@ -40,7 +33,7 @@ export function Input({
             rightIcon ? styles.inputWithRightIcon : undefined,
             style,
           ]}
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={colors.neutral9}
           {...props}
         />
         {rightIcon ? <View style={styles.rightIcon}>{rightIcon}</View> : null}
@@ -62,10 +55,10 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.Secondary2,
+    backgroundColor: colors.Secondary1,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#434343',
   },
   inputError: {
     borderColor: colors.Error,

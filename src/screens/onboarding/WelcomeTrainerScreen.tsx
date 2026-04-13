@@ -8,6 +8,7 @@ import { Button } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { LinearGradient } from 'react-native-svg';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'WelcomeTrainer'>;
 
@@ -20,27 +21,28 @@ export function WelcomeTrainerScreen() {
         <Ionicons name="flash" size={24} color={colors.text} />
         <Text style={styles.logoText}>FITNESS</Text>
       </View>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.title}>Welcome, Trainer!</Text>
-        <Text style={styles.subtitle}>
-          Let's set up your profile to start working
-        </Text>
-        <View style={styles.iconCard}>
-          <Ionicons name="sparkles" size={64} color={colors.Accent1} />
+      <View style={styles.body}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.title}>Welcome, Trainer!</Text>
+          <Text style={styles.subtitle}>Let's set up your profile to start working</Text>
+          <View style={styles.iconCard}>
+            <Ionicons name="sparkles" size={64} color={colors.Accent1} />
+            <Text style={styles.hint}>Clients will discover your profile when it's ready</Text>
+          </View>
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <Button
+            title="Apply"
+            onPress={() => navigation.navigate('WhatsYourName')}
+            style={styles.button}
+          />
         </View>
-        <Text style={styles.hint}>
-          Clients will discover your profile when it's ready
-        </Text>
-        <Button
-          title="Apply"
-          onPress={() => navigation.navigate('WhatsYourName')}
-          style={styles.button}
-        />
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
-    paddingTop: 60,
+    paddingTop: 80,
   },
   logo: {
     flexDirection: 'row',
@@ -57,9 +59,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.xl,
+    marginHorizontal: 'auto',
   },
   logoText: {
-    fontSize: typography.sizes.lg,
+    fontSize: typography.sizes.xl,
     fontWeight: typography.weights.bold,
     color: colors.text,
   },
@@ -70,31 +73,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing['2xl'],
   },
+  body: {
+    flex: 1,
+  },
   title: {
     fontSize: typography.sizes['2xl'],
-    fontWeight: typography.weights.bold,
+    fontWeight: typography.weights.heavy,
     color: colors.text,
     marginBottom: spacing.sm,
+    marginHorizontal: 'auto',
   },
   subtitle: {
     fontSize: typography.sizes.base,
     color: colors.textSecondary,
     marginBottom: spacing.xl,
+    marginHorizontal: 'auto',
   },
   iconCard: {
-    backgroundColor: colors.Secondary2,
+    backgroundColor: '#191919',
     borderRadius: 16,
     padding: spacing['2xl'],
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.lg,
+    height: 450,
   },
   hint: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
-    marginBottom: spacing.xl,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
   button: {
     marginTop: spacing.lg,
+  },
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing['2xl'],
   },
 });

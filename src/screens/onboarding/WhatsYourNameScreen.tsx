@@ -38,9 +38,7 @@ export function WhatsYourNameScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>What's your name?</Text>
-        <Text style={styles.subtitle}>
-          Let clients know how to address you
-        </Text>
+        <Text style={styles.subtitle}>Let clients know how to address you</Text>
         <Input
           placeholder="Your name"
           value={name}
@@ -49,11 +47,13 @@ export function WhatsYourNameScreen() {
         />
       </ScrollView>
       <View style={styles.footer}>
+        <View style={styles.navButtons}>
+          <IconButton icon="arrow-back" onPress={() => navigation.goBack()} />
+        </View>
         <Text style={styles.skip} onPress={handleSkip}>
           Skip
         </Text>
         <View style={styles.navButtons}>
-          <IconButton icon="arrow-back" onPress={() => navigation.goBack()} />
           <IconButton icon="arrow-forward" onPress={handleNext} variant="primary" />
         </View>
       </View>
@@ -72,10 +72,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
+    marginHorizontal: 'auto',
   },
   logoText: {
-    fontSize: typography.sizes.lg,
+    fontSize: typography.sizes.xl,
     fontWeight: typography.weights.bold,
     color: colors.text,
   },
@@ -85,17 +86,20 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
+    marginTop: spacing['2xl'],
   },
   title: {
     fontSize: typography.sizes['2xl'],
-    fontWeight: typography.weights.bold,
+    fontWeight: typography.weights.heavy,
     color: colors.text,
     marginBottom: spacing.sm,
+    marginHorizontal: 'auto',
   },
   subtitle: {
     fontSize: typography.sizes.base,
     color: colors.textSecondary,
     marginBottom: spacing.xl,
+    marginHorizontal: 'auto',
   },
   footer: {
     flexDirection: 'row',
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
   },
   skip: {
     fontSize: typography.sizes.base,
-    color: colors.textSecondary,
+    color: colors.neutral9,
   },
   navButtons: {
     flexDirection: 'row',

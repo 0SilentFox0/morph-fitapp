@@ -1,11 +1,13 @@
 export const colors = {
-  Accent1: '#A65F62',
+  Accent1: '#AE451F',
   Accent2: '#291113',
+  SelectedCards: '#310D00',
   /** Active day cell (Figma primary-3, node 1-11030) */
   primary3: '#401F21',
   primary7: '#BC8184', // notification dot, lighter accent
   Secondary1: '#141414',
   Secondary2: '#1D1D1D',
+  Secondary3: '#1A0702',
   /** Figma app background (node 1-10851) */
   screenBg: '#0D0D0D',
   /** Top-right corner shadow (Figma error-4) */
@@ -14,7 +16,7 @@ export const colors = {
   Warning: '#E89A3C',
   Error: '#F37370',
   text: '#FFFFFF',
-  textSecondary: '#9CA3AF',
+  textSecondary: '#ACACAC',
   textMuted: '#6B7280',
   border: '#2D2D2D',
   // Figma neutrals

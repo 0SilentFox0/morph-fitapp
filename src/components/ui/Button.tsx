@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   base: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: 12,
+    borderRadius: 80,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,
