@@ -13,8 +13,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Card, SearchInput, ProgramOptionsMenu } from '../../../components/ui';
-import type { ProgramOptionAction } from '../../../components/ui';
+import { Card, SearchInput } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
@@ -30,38 +29,29 @@ export function TrainingLibraryScreen() {
   const deleteProgram = useProgramsStore((s) => s.deleteProgram);
 
   const [search, setSearch] = React.useState('');
-  const [optionsProgram, setOptionsProgram] = React.useState<TrainingProgram | null>(null);
 
   const filteredPrograms = React.useMemo(
     () => searchPrograms(search),
-    [search, searchPrograms]
+    [search, searchPrograms],
   );
 
-  const handleProgramOption = (action: ProgramOptionAction) => {
-    if (!optionsProgram) return;
-    if (action === 'edit') {
-      navigation.navigate('AddToLibraryForm', { program: optionsProgram });
-    } else if (action === 'create-session') {
-      navigation.navigate('CardioClassForm', { program: optionsProgram });
-    } else if (action === 'delete') {
-      Alert.alert(
-        'Delete program',
-        `Delete "${optionsProgram.name}"? This cannot be undone.`,
-        [
-          { text: 'Cancel', style: 'cancel', onPress: () => setOptionsProgram(null) },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: () => {
-              deleteProgram(optionsProgram.id);
-              setOptionsProgram(null);
-            },
-          },
-        ]
-      );
-      return;
-    }
-    setOptionsProgram(null);
+  const handleEdit = (p: TrainingProgram) => {
+    navigation.navigate('AddToLibraryForm', { program: p });
+  };
+
+  const handleCreateSession = (p: TrainingProgram) => {
+    navigation.navigate('SessionForm', {});
+  };
+
+  const handleDelete = (p: TrainingProgram) => {
+    Alert.alert(
+      'Delete program',
+      `Delete "${p.name}"? This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => deleteProgram(p.id) },
+      ],
+    );
   };
 
   return (
@@ -116,19 +106,11 @@ export function TrainingLibraryScreen() {
                 )}
               </View>
               <View style={styles.programContent}>
-                <View style={styles.programHeader}>
-                  <Text style={styles.programName} numberOfLines={1}>
-                    {p.name}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setOptionsProgram(p)}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <Ionicons name="ellipsis-horizontal" size={20} color={colors.text} />
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.programName} numberOfLines={1}>
+                  {p.name}
+                </Text>
                 <Text style={styles.programMeta}>
-                  {p.videoCount} videos{p.price ? ` · ${p.price}` : ''}
+                  {`${p.videoCount} videos`}{p.price ? ` \u00B7 ${p.price}` : ''}
                 </Text>
                 <View style={styles.stats}>
                   <View style={styles.statItem}>
@@ -140,17 +122,23 @@ export function TrainingLibraryScreen() {
                     <Text style={styles.statText}>{p.likes}</Text>
                   </View>
                 </View>
+                <View style={styles.actions}>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleEdit(p)}>
+                    <Ionicons name="create-outline" size={16} color={colors.neutral9} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleCreateSession(p)}>
+                    <Ionicons name="calendar-outline" size={16} color={colors.neutral9} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleDelete(p)}>
+                    <Ionicons name="trash-outline" size={16} color={colors.Error} />
+                  </TouchableOpacity>
+                </View>
               </View>
             </Card>
           ))
         )}
       </ScrollView>
 
-      <ProgramOptionsMenu
-        visible={!!optionsProgram}
-        onClose={() => setOptionsProgram(null)}
-        onSelect={handleProgramOption}
-      />
     </View>
   );
 }
@@ -195,29 +183,37 @@ const styles = StyleSheet.create({
   },
   programContent: {
     flex: 1,
-    padding: spacing.md,
+    padding: spacing.sm,
+    paddingLeft: spacing.md,
     justifyContent: 'center',
   },
-  programHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   programName: {
-    fontSize: typography.sizes.base,
+    fontSize: typography.sizes.sm,
     fontWeight: typography.weights.semibold,
     color: colors.text,
-    flex: 1,
   },
   programMeta: {
-    fontSize: typography.sizes.sm,
+    fontSize: typography.sizes.xs,
     color: colors.textMuted,
-    marginTop: spacing.xs,
+    marginTop: 2,
   },
   stats: {
     flexDirection: 'row',
     gap: spacing.md,
+    marginTop: spacing.xs,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
     marginTop: spacing.sm,
+  },
+  actionBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    backgroundColor: colors.neutral3,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statItem: {
     flexDirection: 'row',

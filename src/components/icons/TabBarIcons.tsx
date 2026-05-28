@@ -5,7 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 const SIZE = 32;
 
 export function HomeTabIcon({ color, focused }: { color: string; focused: boolean }) {
-  const fillColor = focused ? '#E6CCCE' : color;
+  const fillColor = focused ? '#FFFFFF' : color;
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">

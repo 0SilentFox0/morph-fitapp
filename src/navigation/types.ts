@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Session, TrainingProgram } from '../mocks';
+import type { Session, TrainingProgram, ProgramExercise } from '../mocks';
 
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
@@ -32,8 +32,14 @@ export type HomeStackParamList = {
   SessionForm: { session?: Session } | undefined;
   RequestSubmitted: undefined;
   TrainingLibrary: undefined;
-  AddToLibraryForm: { program?: TrainingProgram } | undefined;
-  Gallery: { program?: TrainingProgram; draftTitle?: string; draftTag?: string } | undefined;
+  AddToLibraryForm: { program?: TrainingProgram; selectedExercises?: ProgramExercise[] } | undefined;
+  Gallery: {
+    program?: TrainingProgram;
+    draftTitle?: string;
+    draftTag?: string;
+    draftDescription?: string;
+    existingExercises?: ProgramExercise[];
+  } | undefined;
   CardioClassForm: { program?: TrainingProgram } | undefined;
 };
 

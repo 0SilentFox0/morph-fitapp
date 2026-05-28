@@ -15,6 +15,23 @@ export interface Session {
   time: string;
   status: SessionStatus;
   participants: { id: string; name: string; avatar?: string }[];
+  programId?: string;
+}
+
+export type SetNote = 'regular' | 'failure' | 'dropset' | 'short_rest' | 'long_rest';
+
+export interface ExerciseSet {
+  weight: number;
+  reps: number;
+  note?: SetNote;
+}
+
+export interface ProgramExercise {
+  id: number;
+  name: string;
+  category: string;
+  imageUrl: string | null;
+  sets: ExerciseSet[];
 }
 
 export interface TrainingProgram {
@@ -27,6 +44,8 @@ export interface TrainingProgram {
   thumbnail?: string;
   /** e.g. "$5/month" */
   price?: string;
+  description?: string;
+  exercises?: ProgramExercise[];
 }
 
 export interface Client {

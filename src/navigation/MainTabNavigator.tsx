@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -39,7 +39,7 @@ function AddButton({ onPress }: { onPress: () => void }) {
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Ionicons name="add" size={24} color={colors.text} />
+      <Ionicons name="add" size={20} color={colors.text} />
     </TouchableOpacity>
   );
 }
@@ -52,13 +52,7 @@ function ChatTabIconWithBadge({ color }: { color: string }) {
   return (
     <View style={styles.chatIconWrap}>
       <ChatTabIcon color={color} />
-      {unreadCount > 0 && (
-        <View style={styles.chatBadge}>
-          <Text style={styles.chatBadgeText}>
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </Text>
-        </View>
-      )}
+      {unreadCount > 0 && <View style={styles.chatBadge} />}
     </View>
   );
 }
@@ -77,7 +71,7 @@ export function MainTabNavigator() {
           { height: tabBarHeight, paddingBottom: insets.bottom },
         ],
         tabBarBackground: () => <TabBarBackground />,
-        tabBarActiveTintColor: colors.accent,
+        tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.neutral8,
         tabBarShowLabel: true,
         tabBarLabelStyle: styles.tabBarLabel,
@@ -109,7 +103,7 @@ export function MainTabNavigator() {
         name="AddTab"
         component={AddPlaceholderScreen}
         options={({ navigation }) => ({
-          tabBarLabel: 'Add',
+          tabBarLabel: () => null,
           tabBarIcon: () => <AddButton onPress={() => navigation.navigate('HomeTab', { screen: 'SessionForm' })} />,
           tabBarButton: (props) => (
             <TouchableOpacity
@@ -152,7 +146,6 @@ const styles = StyleSheet.create({
     elevation: 0,
     shadowOpacity: 0,
     paddingTop: 8,
-    overflow: 'hidden',
   },
   tabBarBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -176,9 +169,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 56,
+    height: 56,
+    borderRadius: 96,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
@@ -189,19 +182,11 @@ const styles = StyleSheet.create({
   },
   chatBadge: {
     position: 'absolute',
-    top: -4,
-    right: -6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  chatBadgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.text,
+    top: 4,
+    right: 2,
+    width: 8,
+    height: 8,
+    borderRadius: 80,
+    backgroundColor: colors.primary7,
   },
 });

@@ -6,21 +6,55 @@ import type { OnboardingStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'ChooseRole'>;
 
+const RoleCard = ({
+  role,
+  selected,
+  setUserRole,
+  icon,
+}: {
+  role: 'client' | 'trainer';
+  selected: boolean;
+  setUserRole: (role: 'client' | 'trainer') => void;
+  icon: keyof typeof Ionicons.glyphMap;
+}) => {
+  return (
+    <TouchableOpacity
+      onPress={() => setUserRole(role)}
+      activeOpacity={0.8}
+      accessibilityRole="radio"
+      accessibilityState={{ checked: selected }}
+    >
+      <View style={[styles.roleCard, selected && styles.roleCardSelected]}>
+        <View style={styles.roleTop}>
+          <View style={[styles.iconBox, selected && styles.iconBoxSelected]}>
+            <Ionicons name={icon} size={24} color={colors.text} />
+          </View>
+          <View style={styles.roleContent}>
+            <Text style={styles.roleTitle}>I'm a {role}</Text>
+            <Text style={styles.roleSubtitle}>
+              {role === 'client' ? 'Looking for a trainer' : 'Want to work as a trainer'}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 export function ChooseRoleScreen() {
   const navigation = useNavigation<Nav>();
   const { setUserRole } = useAppStore();
   const [selected, setSelected] = React.useState<'client' | 'trainer'>('trainer');
 
-  const handleApply = () => {
-    setUserRole(selected);
-    if (selected === 'trainer') {
+  const handleApply = (role: 'client' | 'trainer') => {
+    setUserRole(role);
+    if (role === 'trainer') {
       navigation.navigate('WelcomeTrainer');
     } else {
       navigation.navigate('YoureAllSet');
@@ -34,52 +68,21 @@ export function ChooseRoleScreen() {
       showFooter={false}
     >
       <View style={styles.cardsContainer}>
-        <TouchableOpacity
-          onPress={() => setSelected('client')}
-          activeOpacity={0.8}
-          accessibilityRole="radio"
-          accessibilityState={{ checked: selected === 'client' }}
-        >
-          <View style={[styles.roleCard, selected === 'client' && styles.roleCardSelected]}>
-            <View style={styles.roleTop}>
-              <View style={[styles.iconBox, selected === 'client' && styles.iconBoxSelected]}>
-                <Ionicons name="person-outline" size={24} color={colors.text} />
-              </View>
-              <View style={styles.roleContent}>
-                <Text style={styles.roleTitle}>I'm a client</Text>
-                <Text style={styles.roleSubtitle}>Looking for a trainer</Text>
-              </View>
-            </View>
-            <View style={styles.radioOuter}>
-              {selected === 'client' && <View style={styles.radioInner} />}
-            </View>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setSelected('trainer')}
-          activeOpacity={0.8}
-          accessibilityRole="radio"
-          accessibilityState={{ checked: selected === 'trainer' }}
-        >
-          <View style={[styles.roleCard, selected === 'trainer' && styles.roleCardSelected]}>
-            <View style={styles.roleTop}>
-              <View style={[styles.iconBox, selected === 'trainer' && styles.iconBoxSelected]}>
-                <Ionicons name="briefcase-outline" size={24} color={colors.text} />
-              </View>
-              <View style={styles.roleContent}>
-                <Text style={styles.roleTitle}>I'm a trainer</Text>
-                <Text style={styles.roleSubtitle}>Want to work as a trainer</Text>
-              </View>
-            </View>
-            <View style={styles.radioOuter}>
-              {selected === 'trainer' && <View style={styles.radioInner} />}
-            </View>
-          </View>
-        </TouchableOpacity>
+        <RoleCard
+          role="trainer"
+          selected={selected === 'trainer'}
+          setUserRole={() => setSelected('trainer')}
+          icon="briefcase-outline"
+        />
+        <RoleCard
+          role="client"
+          selected={selected === 'client'}
+          setUserRole={() => setSelected('client')}
+          icon="person-outline"
+        />
       </View>
 
-      <Button title="Continue" onPress={handleApply} style={styles.button} />
+      <Button title="Continue" onPress={() => handleApply(selected)} style={styles.button} />
     </OnboardingLayout>
   );
 }
@@ -95,7 +98,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    minHeight: 138,
   },
   roleCardSelected: {
     backgroundColor: colors.primary2,

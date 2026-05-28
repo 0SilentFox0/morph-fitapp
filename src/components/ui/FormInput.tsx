@@ -36,23 +36,22 @@ export function FormInput({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: 12,
   },
   label: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   input: {
-    height: 40,
+    height: 36,
     backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.neutral5,
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    lineHeight: 24,
+    paddingVertical: 0,
+    fontSize: 14,
     fontWeight: typography.weights.normal as '400',
     color: colors.text,
   },

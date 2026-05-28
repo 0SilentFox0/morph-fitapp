@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from './Avatar';
-import { Tag } from './Tag';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
@@ -33,6 +32,8 @@ export function ScheduleCard({
 }: ScheduleCardProps) {
   const barColor = statusBarColor[session.status];
   const iconColor = statusIconColor[session.status];
+  const statusLabel =
+    session.status.charAt(0).toUpperCase() + session.status.slice(1);
 
   return (
     <TouchableOpacity
@@ -49,7 +50,7 @@ export function ScheduleCard({
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons
-              name="ellipsis-vertical"
+              name="ellipsis-horizontal"
               size={20}
               color={colors.text}
             />
@@ -61,36 +62,40 @@ export function ScheduleCard({
             {session.date}: {session.time}
           </Text>
         </View>
-        <View style={styles.tagsRow}>
-          {session.participants.length === 1 ? (
-            <View style={styles.participantTag}>
-              <Avatar name={session.participants[0].name} size={18} />
-              <Text style={styles.participantName}>
-                {session.participants[0].name}
+        <View style={styles.bottomRow}>
+          <View style={styles.bottomLeft}>
+            {session.participants.length === 1 ? (
+              <View style={styles.participantTag}>
+                <Avatar name={session.participants[0].name} size={18} />
+                <Text style={styles.participantName}>
+                  {session.participants[0].name}
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.participantsRow}>
+                {session.participants.slice(0, 3).map((p) => (
+                  <Avatar key={p.id} name={p.name} size={24} />
+                ))}
+                {session.participants.length > 3 && (
+                  <Text style={styles.moreCount}>
+                    +{session.participants.length - 3}
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
+          <View style={styles.bottomRight}>
+            <View style={styles.typeTag}>
+              <Text style={styles.typeTagText}>{session.type}</Text>
+            </View>
+            <View style={styles.paymentBadge}>
+              <View style={styles.paymentIconCircle}>
+                <Ionicons name="cash" size={8} color={iconColor} />
+              </View>
+              <Text style={[styles.statusText, { color: iconColor }]}>
+                $ {statusLabel}
               </Text>
             </View>
-          ) : (
-            <View style={styles.participantsRow}>
-              {session.participants.slice(0, 3).map((p) => (
-                <Avatar key={p.id} name={p.name} size={24} />
-              ))}
-              {session.participants.length > 3 && (
-                <Text style={styles.moreCount}>
-                  +{session.participants.length - 3}
-                </Text>
-              )}
-            </View>
-          )}
-          <Tag label={session.type} variant="default" style={styles.typeTag} />
-        </View>
-        <View style={styles.statusRow}>
-          <View style={styles.paymentBadge}>
-            <View style={[styles.paymentIconCircle, { backgroundColor: 'rgba(255,255,255,0.05)' }]}>
-              <Ionicons name="cash" size={10} color={iconColor} />
-            </View>
-            <Text style={[styles.statusText, { color: iconColor }]}>
-              $ {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
-            </Text>
           </View>
         </View>
       </View>
@@ -102,61 +107,72 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     backgroundColor: colors.neutral2,
-    borderRadius: 14,
-    overflow: 'hidden',
+    borderTopRightRadius: 14,
+    borderBottomRightRadius: 14,
     marginBottom: spacing.sm,
     flexShrink: 0,
   },
   leftBar: {
     width: 2,
-    alignSelf: 'stretch',
+    borderTopLeftRadius: 2,
+    borderBottomLeftRadius: 2,
   },
   content: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingLeft: 12,
+    paddingRight: 12,
+    gap: 8,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
   },
   title: {
     fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold,
+    fontWeight: typography.weights.normal,
     color: colors.text,
+    lineHeight: 22,
     flex: 1,
   },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginBottom: 6,
   },
   dateText: {
     fontSize: typography.sizes.xs,
     color: colors.neutral9,
+    lineHeight: 20,
   },
-  tagsRow: {
+  bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-    marginBottom: 4,
+    justifyContent: 'space-between',
+  },
+  bottomLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bottomRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   participantTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.neutral1,
-    paddingVertical: 4,
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingVertical: 2,
     paddingHorizontal: 8,
-    borderRadius: 20,
+    borderRadius: 80,
   },
   participantName: {
-    fontSize: typography.sizes.xs,
-    color: colors.text,
+    fontSize: typography.sizes.sm,
+    color: colors.neutral9,
+    lineHeight: 22,
   },
   participantsRow: {
     flexDirection: 'row',
@@ -169,27 +185,34 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
   },
   typeTag: {
-    alignSelf: 'flex-start',
-  },
-  statusRow: {
-    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 80,
+    height: 28,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+  },
+  typeTagText: {
+    fontSize: typography.sizes.xs,
+    color: colors.text,
+    lineHeight: 20,
   },
   paymentBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 6,
   },
   paymentIconCircle: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 16,
+    height: 16,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255,255,255,0.05)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   statusText: {
     fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.medium,
+    lineHeight: 20,
   },
 });
