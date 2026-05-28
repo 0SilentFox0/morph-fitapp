@@ -21,6 +21,7 @@ import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
+import type { Session } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 
@@ -47,6 +48,15 @@ export function HomeScreen() {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 800);
   };
+
+  const handleSessionPress = React.useCallback(
+    (session: Session) => navigation.navigate('SessionForm', { session }),
+    [navigation],
+  );
+  const handleSessionOptions = React.useCallback(
+    (_session: Session) => navigation.navigate('Schedule'),
+    [navigation],
+  );
 
   return (
     <View style={styles.container}>
@@ -217,8 +227,8 @@ export function HomeScreen() {
               <ScheduleCard
                 key={session.id}
                 session={session}
-                onPress={() => navigation.navigate('SessionForm', { session })}
-                onOptionsPress={() => navigation.navigate('Schedule')}
+                onPress={handleSessionPress}
+                onOptionsPress={handleSessionOptions}
               />
             ))
           ) : (

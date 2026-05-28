@@ -69,6 +69,12 @@ export function ScheduleScreen() {
   const [optionsSession, setOptionsSession] = React.useState<Session | null>(null);
   const [viewMode, setViewMode] = React.useState<ScheduleViewMode>('day');
 
+  const handleSessionPress = React.useCallback(
+    (s: Session) => navigation.navigate('SessionForm', { session: s }),
+    [navigation],
+  );
+  const handleSessionOptions = React.useCallback((s: Session) => setOptionsSession(s), []);
+
   const panResponder = React.useMemo(
     () =>
       PanResponder.create({
@@ -310,8 +316,8 @@ export function ScheduleScreen() {
                 <ScheduleCard
                   key={session.id}
                   session={session}
-                  onPress={() => navigation.navigate('SessionForm', { session })}
-                  onOptionsPress={() => setOptionsSession(session)}
+                  onPress={handleSessionPress}
+                  onOptionsPress={handleSessionOptions}
                 />
               )))}
         {viewMode === 'week' && (
@@ -325,8 +331,8 @@ export function ScheduleScreen() {
                   <ScheduleCard
                     key={s.id}
                     session={s}
-                    onPress={() => navigation.navigate('SessionForm', { session: s })}
-                    onOptionsPress={() => setOptionsSession(s)}
+                    onPress={handleSessionPress}
+                    onOptionsPress={handleSessionOptions}
                   />
                 ))}
               </View>

@@ -9,8 +9,8 @@ import type { Session, SessionStatus } from '../../mocks';
 
 interface ScheduleCardProps {
   session: Session;
-  onPress?: () => void;
-  onOptionsPress?: () => void;
+  onPress?: (session: Session) => void;
+  onOptionsPress?: (session: Session) => void;
 }
 
 const statusBarColor: Record<SessionStatus, string> = {
@@ -25,7 +25,7 @@ const statusIconColor: Record<SessionStatus, string> = {
   canceled: colors.Error,
 };
 
-export function ScheduleCard({
+function ScheduleCardImpl({
   session,
   onPress,
   onOptionsPress,
@@ -34,11 +34,13 @@ export function ScheduleCard({
   const iconColor = statusIconColor[session.status];
   const statusLabel =
     session.status.charAt(0).toUpperCase() + session.status.slice(1);
+  const handlePress = onPress ? () => onPress(session) : undefined;
+  const handleOptionsPress = onOptionsPress ? () => onOptionsPress(session) : undefined;
 
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.8}
     >
       <View style={[styles.leftBar, { backgroundColor: barColor }]} />
@@ -46,7 +48,7 @@ export function ScheduleCard({
         <View style={styles.topRow}>
           <Text style={styles.title}>{session.title}</Text>
           <TouchableOpacity
-            onPress={onOptionsPress}
+            onPress={handleOptionsPress}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons
@@ -216,3 +218,5 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+export const ScheduleCard = React.memo(ScheduleCardImpl);

@@ -37,7 +37,7 @@ const SET_NOTES: { key: SetNote; label: string; icon: string }[] = [
   { key: 'long_rest', label: 'Long rest', icon: 'time-outline' },
 ];
 
-function ExerciseCard({ exercise }: { exercise: ProgramExercise }) {
+const ExerciseCard = React.memo(function ExerciseCard({ exercise }: { exercise: ProgramExercise }) {
   const removeExercise = useDraftProgramStore((s) => s.removeExercise);
   const addSet = useDraftProgramStore((s) => s.addSet);
   const removeSet = useDraftProgramStore((s) => s.removeSet);
@@ -143,7 +143,7 @@ function ExerciseCard({ exercise }: { exercise: ProgramExercise }) {
       </TouchableOpacity>
     </View>
   );
-}
+});
 
 export function AddToLibraryFormScreen() {
   const navigation = useNavigation<Nav>();
