@@ -5,10 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Modal,
   FlatList,
-  Image,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,20 +20,10 @@ import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useShallow } from 'zustand/react/shallow';
-import type { ProgramExercise, ExerciseSet, SetNote } from '../../../mocks';
+import { TRAINING_TYPES, SET_NOTES } from '../../../constants';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
-
-const TAG_OPTIONS = ['HIIT', 'Cardio', 'Strength', 'Yoga', 'Mobility', 'Pilates'];
-
-const SET_NOTES: { key: SetNote; label: string; icon: string }[] = [
-  { key: 'regular', label: 'Regular', icon: 'checkmark-circle-outline' },
-  { key: 'failure', label: 'To failure', icon: 'flame-outline' },
-  { key: 'dropset', label: 'Drop set', icon: 'trending-down-outline' },
-  { key: 'short_rest', label: 'Short rest', icon: 'timer-outline' },
-  { key: 'long_rest', label: 'Long rest', icon: 'time-outline' },
-];
 
 
 export function AddToLibraryFormScreen() {
@@ -219,7 +207,7 @@ export function AddToLibraryFormScreen() {
         >
           <View style={styles.modalContent}>
             <FlatList
-              data={TAG_OPTIONS}
+              data={TRAINING_TYPES}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity

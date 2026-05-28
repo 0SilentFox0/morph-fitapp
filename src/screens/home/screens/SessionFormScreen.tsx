@@ -17,6 +17,8 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { useProgramsStore } from '../../../store/programsStore';
+import { TRAINING_TYPES } from '../../../constants';
+import { formatDate, formatTime } from '../../../utils';
 import { TypePickerModal } from './SessionForm/TypePickerModal';
 import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
 import { ParticipantsSection } from './SessionForm/ParticipantsSection';
@@ -24,21 +26,6 @@ import { DateTimePickerSection } from './SessionForm/DateTimePickerSection';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;
-
-const TYPE_OPTIONS = ['Cardio', 'HIIT', 'Strength', 'Yoga', 'Mobility', 'Pilates'];
-
-const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-function formatDate(d: Date): string {
-  return `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-function formatTime(d: Date): string {
-  const m = d.getMinutes().toString().padStart(2, '0');
-  const ampm = d.getHours() >= 12 ? 'pm' : 'am';
-  const h = d.getHours() % 12 || 12;
-  return `${h}:${m}${ampm}`;
-}
 
 function participantIdForName(name: string): string {
   return `p-${name.replace(/\s+/g, '-').toLowerCase()}`;
@@ -214,7 +201,7 @@ export function SessionFormScreen() {
       <TypePickerModal
         visible={typePickerVisible}
         onClose={() => setTypePickerVisible(false)}
-        options={TYPE_OPTIONS}
+        options={TRAINING_TYPES}
         value={type}
         onChange={setType}
       />
