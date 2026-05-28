@@ -1,9 +1,17 @@
 import { create } from 'zustand';
-import type { TrainingProgram } from '../mocks';
+import type { TrainingProgram, ProgramExercise } from '../mocks';
+
+export interface DraftProgramData {
+  title: string;
+  tag: string;
+  description: string;
+  exercises: ProgramExercise[];
+}
 
 interface ProgramsState {
   programs: TrainingProgram[];
   addProgram: (program: Omit<TrainingProgram, 'id'>) => TrainingProgram;
+  addProgramFromDraft: (draft: DraftProgramData) => TrainingProgram;
   updateProgram: (id: string, updates: Partial<TrainingProgram>) => void;
   deleteProgram: (id: string) => void;
   getProgram: (id: string) => TrainingProgram | undefined;
@@ -42,6 +50,19 @@ export const useProgramsStore = create<ProgramsState>((set, get) => ({
     };
     set((state) => ({ programs: [newProgram, ...state.programs] }));
     return newProgram;
+  },
+
+  addProgramFromDraft: (draft) => {
+    return get().addProgram({
+      name: draft.title || 'New Program',
+      tag: draft.tag || 'HIIT',
+      description: draft.description,
+      exercises: draft.exercises,
+      videoCount: draft.exercises.length,
+      views: 0,
+      likes: 0,
+      price: '$5/month',
+    });
   },
 
   updateProgram: (id, updates) => {

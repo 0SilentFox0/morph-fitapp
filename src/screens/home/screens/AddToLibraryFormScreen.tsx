@@ -151,22 +151,32 @@ export function AddToLibraryFormScreen() {
   const program = route.params?.program;
   const isEdit = !!program;
 
-  const addProgram = useProgramsStore((s) => s.addProgram);
+  const addProgramFromDraft = useProgramsStore((s) => s.addProgramFromDraft);
   const updateProgram = useProgramsStore((s) => s.updateProgram);
 
-  const { title, setTitle, tag, setTag, description, setDescription, exercises, resetDraft } =
-    useDraftProgramStore(
-      useShallow((s) => ({
-        title: s.title,
-        setTitle: s.setTitle,
-        tag: s.tag,
-        setTag: s.setTag,
-        description: s.description,
-        setDescription: s.setDescription,
-        exercises: s.exercises,
-        resetDraft: s.reset,
-      })),
-    );
+  const {
+    title,
+    setTitle,
+    tag,
+    setTag,
+    description,
+    setDescription,
+    exercises,
+    setExercises,
+    resetDraft,
+  } = useDraftProgramStore(
+    useShallow((s) => ({
+      title: s.title,
+      setTitle: s.setTitle,
+      tag: s.tag,
+      setTag: s.setTag,
+      description: s.description,
+      setDescription: s.setDescription,
+      exercises: s.exercises,
+      setExercises: s.setExercises,
+      resetDraft: s.reset,
+    })),
+  );
 
   const [showTagModal, setShowTagModal] = React.useState(false);
 
@@ -174,10 +184,10 @@ export function AddToLibraryFormScreen() {
     if (isEdit && program) {
       setTitle(program.name);
       setTag(program.tag);
-      useDraftProgramStore.getState().setDescription(program.description ?? '');
-      useDraftProgramStore.getState().setExercises(program.exercises ?? []);
+      setDescription(program.description ?? '');
+      setExercises(program.exercises ?? []);
     }
-  }, []);
+  }, [isEdit, program?.id, setTitle, setTag, setDescription, setExercises]);
 
   const handleContinue = () => {
     if (isEdit && program) {
@@ -205,16 +215,7 @@ export function AddToLibraryFormScreen() {
         videoCount: exercises.length,
       });
     } else {
-      addProgram({
-        name: title || 'New Program',
-        tag,
-        description,
-        exercises,
-        videoCount: exercises.length,
-        views: 0,
-        likes: 0,
-        price: '$5/month',
-      });
+      addProgramFromDraft({ title, tag, description, exercises });
     }
     resetDraft();
     navigation.navigate('TrainingLibrary');
