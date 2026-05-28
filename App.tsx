@@ -5,6 +5,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { ScreenBackground } from './src/components/layout';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { ThemeProvider } from './src/theme/ThemeContext';
 import { colors } from './src/theme/colors';
 
@@ -27,10 +28,12 @@ export default function App() {
       <SafeAreaProvider>
         <View style={{ flex: 1, backgroundColor: colors.screenBg }}>
           <ScreenBackground>
-            <NavigationContainer theme={AppTheme}>
-              <StatusBar style="light" />
-              <RootNavigator />
-            </NavigationContainer>
+            <ErrorBoundary>
+              <NavigationContainer theme={AppTheme}>
+                <StatusBar style="light" />
+                <RootNavigator />
+              </NavigationContainer>
+            </ErrorBoundary>
           </ScreenBackground>
         </View>
       </SafeAreaProvider>
