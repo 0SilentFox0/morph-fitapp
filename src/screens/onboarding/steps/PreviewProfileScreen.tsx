@@ -10,6 +10,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { useShallow } from 'zustand/react/shallow';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'PreviewProfile'>;
@@ -47,7 +48,27 @@ export function PreviewProfileScreen() {
     hasCertifications,
     freePreview,
     accessSetting,
-  } = useOnboardingStore();
+  } = useOnboardingStore(
+    useShallow((s) => ({
+      name: s.name,
+      trainingTypes: s.trainingTypes,
+      clientTypes: s.clientTypes,
+      locations: s.locations,
+      experienceYears: s.experienceYears,
+      workDays: s.workDays,
+      workTimeStart: s.workTimeStart,
+      workTimeEnd: s.workTimeEnd,
+      sameSlotsEveryWeek: s.sameSlotsEveryWeek,
+      certifications: s.certifications,
+      profilePhotoUri: s.profilePhotoUri,
+      hasPrograms: s.hasPrograms,
+      programTitle: s.programTitle,
+      programDescription: s.programDescription,
+      hasCertifications: s.hasCertifications,
+      freePreview: s.freePreview,
+      accessSetting: s.accessSetting,
+    })),
+  );
 
   const displayName = name.trim() || 'Trainer';
   const displayLocation = locations.length ? locations.join(', ') : 'Not set';

@@ -9,6 +9,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { useShallow } from 'zustand/react/shallow';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Experience'>;
@@ -23,7 +24,17 @@ const EXPERIENCE_VALUES = ['1-3 years', '4-6 years', '7-9 years', '10+ years'];
 
 export function ExperienceScreen() {
   const navigation = useNavigation<Nav>();
-  const { experienceYears, hasCertifications, certifications, setField, addCertification, removeCertification } = useOnboardingStore();
+  const { experienceYears, hasCertifications, certifications, setField, addCertification, removeCertification } =
+    useOnboardingStore(
+      useShallow((s) => ({
+        experienceYears: s.experienceYears,
+        hasCertifications: s.hasCertifications,
+        certifications: s.certifications,
+        setField: s.setField,
+        addCertification: s.addCertification,
+        removeCertification: s.removeCertification,
+      })),
+    );
 
   const handleUpload = async () => {
     try {

@@ -9,6 +9,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { useShallow } from 'zustand/react/shallow';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'WorkSchedule'>;
@@ -29,7 +30,17 @@ function dateToTime(d: Date): string {
 
 export function WorkScheduleScreen() {
   const navigation = useNavigation<Nav>();
-  const { workDays, workTimeStart, workTimeEnd, sameSlotsEveryWeek, setField, toggleWorkDay } = useOnboardingStore();
+  const { workDays, workTimeStart, workTimeEnd, sameSlotsEveryWeek, setField, toggleWorkDay } =
+    useOnboardingStore(
+      useShallow((s) => ({
+        workDays: s.workDays,
+        workTimeStart: s.workTimeStart,
+        workTimeEnd: s.workTimeEnd,
+        sameSlotsEveryWeek: s.sameSlotsEveryWeek,
+        setField: s.setField,
+        toggleWorkDay: s.toggleWorkDay,
+      })),
+    );
   const [showStartPicker, setShowStartPicker] = React.useState(false);
   const [showEndPicker, setShowEndPicker] = React.useState(false);
 

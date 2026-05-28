@@ -49,7 +49,7 @@ const RoleCard = ({
 
 export function ChooseRoleScreen() {
   const navigation = useNavigation<Nav>();
-  const { setUserRole } = useAppStore();
+  const setUserRole = useAppStore((s) => s.setUserRole);
   const [selected, setSelected] = React.useState<'client' | 'trainer'>('trainer');
 
   const handleApply = (role: 'client' | 'trainer') => {

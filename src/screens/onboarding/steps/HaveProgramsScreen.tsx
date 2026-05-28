@@ -13,7 +13,7 @@ type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'HavePrograms'>;
 
 export function HaveProgramsScreen() {
   const navigation = useNavigation<Nav>();
-  const { setField } = useOnboardingStore();
+  const setField = useOnboardingStore((s) => s.setField);
 
   const handleUpload = () => {
     setField('hasPrograms', true);

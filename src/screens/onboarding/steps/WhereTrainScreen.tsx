@@ -15,7 +15,8 @@ const LOCATIONS = ['Online', "In-person at client's home", 'At the gym', 'Outdoo
 
 export function WhereTrainScreen() {
   const navigation = useNavigation<Nav>();
-  const { locations, toggleLocation } = useOnboardingStore();
+  const locations = useOnboardingStore((s) => s.locations);
+  const toggleLocation = useOnboardingStore((s) => s.toggleLocation);
   const [showWarning, setShowWarning] = React.useState(false);
 
   const handleNext = () => {

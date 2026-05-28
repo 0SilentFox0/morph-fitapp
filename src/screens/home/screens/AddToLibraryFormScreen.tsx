@@ -21,6 +21,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
+import { useShallow } from 'zustand/react/shallow';
 import type { ProgramExercise, ExerciseSet, SetNote } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
@@ -153,14 +154,19 @@ export function AddToLibraryFormScreen() {
   const addProgram = useProgramsStore((s) => s.addProgram);
   const updateProgram = useProgramsStore((s) => s.updateProgram);
 
-  const title = useDraftProgramStore((s) => s.title);
-  const setTitle = useDraftProgramStore((s) => s.setTitle);
-  const tag = useDraftProgramStore((s) => s.tag);
-  const setTag = useDraftProgramStore((s) => s.setTag);
-  const description = useDraftProgramStore((s) => s.description);
-  const setDescription = useDraftProgramStore((s) => s.setDescription);
-  const exercises = useDraftProgramStore((s) => s.exercises);
-  const resetDraft = useDraftProgramStore((s) => s.reset);
+  const { title, setTitle, tag, setTag, description, setDescription, exercises, resetDraft } =
+    useDraftProgramStore(
+      useShallow((s) => ({
+        title: s.title,
+        setTitle: s.setTitle,
+        tag: s.tag,
+        setTag: s.setTag,
+        description: s.description,
+        setDescription: s.setDescription,
+        exercises: s.exercises,
+        resetDraft: s.reset,
+      })),
+    );
 
   const [showTagModal, setShowTagModal] = React.useState(false);
 

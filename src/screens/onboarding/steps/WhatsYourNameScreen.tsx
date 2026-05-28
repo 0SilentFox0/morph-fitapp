@@ -15,7 +15,8 @@ type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'WhatsYourName'>;
 
 export function WhatsYourNameScreen() {
   const navigation = useNavigation<Nav>();
-  const { name, setField } = useOnboardingStore();
+  const name = useOnboardingStore((s) => s.name);
+  const setField = useOnboardingStore((s) => s.setField);
   const setUserName = useAppStore((s) => s.setUserName);
   const [touched, setTouched] = React.useState(false);
 

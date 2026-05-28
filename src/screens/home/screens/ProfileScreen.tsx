@@ -9,6 +9,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export function ProfileScreen() {
   const navigation = useNavigation();
@@ -25,7 +26,20 @@ export function ProfileScreen() {
     workTimeStart,
     workTimeEnd,
     certifications,
-  } = useOnboardingStore();
+  } = useOnboardingStore(
+    useShallow((s) => ({
+      name: s.name,
+      profilePhotoUri: s.profilePhotoUri,
+      trainingTypes: s.trainingTypes,
+      clientTypes: s.clientTypes,
+      locations: s.locations,
+      experienceYears: s.experienceYears,
+      workDays: s.workDays,
+      workTimeStart: s.workTimeStart,
+      workTimeEnd: s.workTimeEnd,
+      certifications: s.certifications,
+    })),
+  );
 
   const displayName = userName || name || 'Trainer';
   const displayLocation = locations.length ? locations.join(', ') : 'Not set';

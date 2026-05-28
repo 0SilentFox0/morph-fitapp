@@ -15,7 +15,8 @@ const TRAINING_TYPES = ['Strength', 'Yoga', 'Cardio', 'HIIT', 'Mobility', 'Pilat
 
 export function TrainingTypesScreen() {
   const navigation = useNavigation<Nav>();
-  const { trainingTypes, toggleTrainingType } = useOnboardingStore();
+  const trainingTypes = useOnboardingStore((s) => s.trainingTypes);
+  const toggleTrainingType = useOnboardingStore((s) => s.toggleTrainingType);
   const [showWarning, setShowWarning] = React.useState(false);
 
   const handleNext = () => {

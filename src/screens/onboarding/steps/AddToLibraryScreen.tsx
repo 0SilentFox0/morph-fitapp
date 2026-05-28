@@ -9,6 +9,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { useShallow } from 'zustand/react/shallow';
 import type { AccessSetting } from '../../../store/onboardingStore';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'AddToLibrary'>;
@@ -21,7 +22,16 @@ const ACCESS_OPTIONS: { value: AccessSetting; label: string }[] = [
 
 export function AddToLibraryScreen() {
   const navigation = useNavigation<Nav>();
-  const { programTitle, programDescription, freePreview, accessSetting, setField } = useOnboardingStore();
+  const { programTitle, programDescription, freePreview, accessSetting, setField } =
+    useOnboardingStore(
+      useShallow((s) => ({
+        programTitle: s.programTitle,
+        programDescription: s.programDescription,
+        freePreview: s.freePreview,
+        accessSetting: s.accessSetting,
+        setField: s.setField,
+      })),
+    );
   const [titleError, setTitleError] = React.useState('');
 
   const handleContinue = () => {

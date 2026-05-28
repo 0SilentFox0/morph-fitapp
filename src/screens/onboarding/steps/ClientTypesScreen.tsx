@@ -15,7 +15,8 @@ const CLIENT_TYPES = ['Beginners', 'Pro', 'Women', 'Men', '50+', 'Strength', 'Ot
 
 export function ClientTypesScreen() {
   const navigation = useNavigation<Nav>();
-  const { clientTypes, toggleClientType } = useOnboardingStore();
+  const clientTypes = useOnboardingStore((s) => s.clientTypes);
+  const toggleClientType = useOnboardingStore((s) => s.toggleClientType);
   const [showWarning, setShowWarning] = React.useState(false);
 
   const handleNext = () => {

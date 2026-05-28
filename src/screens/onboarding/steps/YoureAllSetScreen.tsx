@@ -10,7 +10,8 @@ import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 export function YoureAllSetScreen() {
-  const { setOnboarded, addPoints } = useAppStore();
+  const setOnboarded = useAppStore((s) => s.setOnboarded);
+  const addPoints = useAppStore((s) => s.addPoints);
   const resetOnboarding = useOnboardingStore((s) => s.reset);
 
   const handleComplete = () => {

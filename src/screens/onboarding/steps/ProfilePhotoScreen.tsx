@@ -15,7 +15,8 @@ type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'ProfilePhoto'>;
 
 export function ProfilePhotoScreen() {
   const navigation = useNavigation<Nav>();
-  const { profilePhotoUri, setField } = useOnboardingStore();
+  const profilePhotoUri = useOnboardingStore((s) => s.profilePhotoUri);
+  const setField = useOnboardingStore((s) => s.setField);
 
   const handlePickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
