@@ -1,4 +1,4 @@
-const BASE_URL = 'https://wger.de/api/v2';
+import { apiFetch } from './apiClient';
 
 export interface ExerciseCategory {
   id: number;
@@ -60,18 +60,32 @@ function mapExercise(raw: ApiExerciseInfo): Exercise | null {
   };
 }
 
+interface ExercisesPage {
+  results: ApiExerciseInfo[];
+  count?: number;
+  next?: string | null;
+}
+
+interface CategoriesPage {
+  results: ExerciseCategory[];
+}
+
+interface SearchSuggestion {
+  data: { id: number; name: string };
+}
+
+interface SearchPage {
+  suggestions?: SearchSuggestion[];
+}
+
 export async function fetchExercises(
   limit = 20,
   offset = 0,
 ): Promise<{ exercises: Exercise[]; total: number; hasMore: boolean }> {
-  const res = await fetch(
-    `${BASE_URL}/exerciseinfo/?format=json&limit=${limit}&offset=${offset}`,
-    { headers: { Accept: 'application/json' } },
+  const data = await apiFetch<ExercisesPage>(
+    `/exerciseinfo/?format=json&limit=${limit}&offset=${offset}`,
   );
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-
-  const data = await res.json();
-  const exercises = (data.results as ApiExerciseInfo[])
+  const exercises = data.results
     .map(mapExercise)
     .filter((e): e is Exercise => e !== null);
 
@@ -83,29 +97,18 @@ export async function fetchExercises(
 }
 
 export async function fetchCategories(): Promise<ExerciseCategory[]> {
-  const res = await fetch(`${BASE_URL}/exercisecategory/?format=json`, {
-    headers: { Accept: 'application/json' },
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-
-  const data = await res.json();
-  return data.results as ExerciseCategory[];
+  const data = await apiFetch<CategoriesPage>(`/exercisecategory/?format=json`);
+  return data.results ?? [];
 }
 
 export async function searchExercises(
   term: string,
 ): Promise<{ name: string; id: number }[]> {
-  const res = await fetch(
-    `${BASE_URL}/exercise/search/?format=json&language=english&term=${encodeURIComponent(term)}`,
-    { headers: { Accept: 'application/json' } },
+  const data = await apiFetch<SearchPage>(
+    `/exercise/search/?format=json&language=english&term=${encodeURIComponent(term)}`,
   );
-  if (!res.ok) return [];
-
-  const data = await res.json();
-  return (data.suggestions ?? []).map(
-    (s: { data: { id: number; name: string } }) => ({
-      id: s.data.id,
-      name: s.data.name,
-    }),
-  );
+  return (data.suggestions ?? []).map((s) => ({
+    id: s.data.id,
+    name: s.data.name,
+  }));
 }
