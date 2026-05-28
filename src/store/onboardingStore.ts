@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { zustandStorage } from '../services/storage';
 
 export type AccessSetting = 'public' | 'subscribers' | 'private';
 
@@ -58,40 +60,67 @@ const initialState = {
   profilePhotoUri: null as string | null,
 };
 
-export const useOnboardingStore = create<OnboardingState>((set) => ({
-  ...initialState,
-  setField: (key, value) => set({ [key]: value }),
-  toggleTrainingType: (type) =>
-    set((state) => ({
-      trainingTypes: state.trainingTypes.includes(type)
-        ? state.trainingTypes.filter((t) => t !== type)
-        : [...state.trainingTypes, type],
-    })),
-  toggleClientType: (type) =>
-    set((state) => ({
-      clientTypes: state.clientTypes.includes(type)
-        ? state.clientTypes.filter((t) => t !== type)
-        : [...state.clientTypes, type],
-    })),
-  toggleLocation: (location) =>
-    set((state) => ({
-      locations: state.locations.includes(location)
-        ? state.locations.filter((l) => l !== location)
-        : [...state.locations, location],
-    })),
-  toggleWorkDay: (day) =>
-    set((state) => ({
-      workDays: state.workDays.includes(day)
-        ? state.workDays.filter((d) => d !== day)
-        : [...state.workDays, day],
-    })),
-  addCertification: (cert) =>
-    set((state) => ({
-      certifications: [...state.certifications, cert],
-    })),
-  removeCertification: (uri) =>
-    set((state) => ({
-      certifications: state.certifications.filter((c) => c.uri !== uri),
-    })),
-  reset: () => set(initialState),
-}));
+export const useOnboardingStore = create<OnboardingState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+      setField: (key, value) => set({ [key]: value }),
+      toggleTrainingType: (type) =>
+        set((state) => ({
+          trainingTypes: state.trainingTypes.includes(type)
+            ? state.trainingTypes.filter((t) => t !== type)
+            : [...state.trainingTypes, type],
+        })),
+      toggleClientType: (type) =>
+        set((state) => ({
+          clientTypes: state.clientTypes.includes(type)
+            ? state.clientTypes.filter((t) => t !== type)
+            : [...state.clientTypes, type],
+        })),
+      toggleLocation: (location) =>
+        set((state) => ({
+          locations: state.locations.includes(location)
+            ? state.locations.filter((l) => l !== location)
+            : [...state.locations, location],
+        })),
+      toggleWorkDay: (day) =>
+        set((state) => ({
+          workDays: state.workDays.includes(day)
+            ? state.workDays.filter((d) => d !== day)
+            : [...state.workDays, day],
+        })),
+      addCertification: (cert) =>
+        set((state) => ({
+          certifications: [...state.certifications, cert],
+        })),
+      removeCertification: (uri) =>
+        set((state) => ({
+          certifications: state.certifications.filter((c) => c.uri !== uri),
+        })),
+      reset: () => set(initialState),
+    }),
+    {
+      name: 'onboarding-storage',
+      storage: zustandStorage,
+      partialize: (state) => ({
+        name: state.name,
+        experienceYears: state.experienceYears,
+        hasCertifications: state.hasCertifications,
+        certifications: state.certifications,
+        trainingTypes: state.trainingTypes,
+        clientTypes: state.clientTypes,
+        hasPrograms: state.hasPrograms,
+        programTitle: state.programTitle,
+        programDescription: state.programDescription,
+        freePreview: state.freePreview,
+        accessSetting: state.accessSetting,
+        locations: state.locations,
+        workDays: state.workDays,
+        workTimeStart: state.workTimeStart,
+        workTimeEnd: state.workTimeEnd,
+        sameSlotsEveryWeek: state.sameSlotsEveryWeek,
+        profilePhotoUri: state.profilePhotoUri,
+      }),
+    },
+  ),
+);
