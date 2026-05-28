@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Input, Button, Avatar } from '../../../components/ui';
@@ -11,6 +13,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { mockClients } from '../../../mocks';
+import { cardioClassSchema, type CardioClassFormValues } from '../../../schemas/cardio-class';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'CardioClassForm'>;
 type Route = RouteProp<HomeStackParamList, 'CardioClassForm'>;
@@ -21,48 +24,57 @@ export function CardioClassFormScreen() {
   const program = route.params?.program;
   const addSession = useSessionsStore((s) => s.addSession);
 
-  const [title, setTitle] = React.useState(program?.name ?? 'Cardio Class');
-  const [type, setType] = React.useState(program?.tag ?? 'Cardio');
-  const [description, setDescription] = React.useState('');
-  const [date, setDate] = React.useState('');
-  const [time, setTime] = React.useState('');
-  const [price, setPrice] = React.useState('40');
-  const [selectedClients, setSelectedClients] = React.useState<Set<string>>(new Set());
-  const [titleError, setTitleError] = React.useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useForm<CardioClassFormValues>({
+    resolver: zodResolver(cardioClassSchema),
+    defaultValues: {
+      title: program?.name ?? 'Cardio Class',
+      type: program?.tag ?? 'Cardio',
+      description: '',
+      date: '',
+      time: '',
+      price: '40',
+      clientIds: [],
+    },
+    mode: 'onBlur',
+  });
+
+  const clientIds = watch('clientIds');
 
   const toggleClient = (id: string) => {
-    setSelectedClients((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    const next = clientIds.includes(id)
+      ? clientIds.filter((c) => c !== id)
+      : [...clientIds, id];
+    setValue('clientIds', next, { shouldValidate: false, shouldDirty: true });
   };
 
-  const handleApply = () => {
-    if (title.trim().length < 2) {
-      setTitleError('Title must be at least 2 characters');
-      return;
-    }
-    const participants = mockClients.filter((c) => selectedClients.has(c.id)).map((c) => ({
-      id: c.id,
-      name: c.name,
-    }));
+  const onSubmit = (data: CardioClassFormValues) => {
+    const participants = mockClients
+      .filter((c) => data.clientIds.includes(c.id))
+      .map((c) => ({ id: c.id, name: c.name }));
+
     addSession({
-      title: title.trim(),
-      type,
-      date: date || 'Today',
-      time: time || '12:00',
+      title: data.title.trim(),
+      type: data.type,
+      date: data.date || 'Today',
+      time: data.time || '12:00',
       status: 'pending',
       participants,
     });
     navigation.goBack();
   };
 
+  const titleValue = watch('title');
+
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title={title || 'Cardio Class'}
+        title={titleValue || 'Cardio Class'}
         rightElement={
           <TouchableOpacity accessibilityRole="button" accessibilityLabel="Share">
             <Ionicons name="share-outline" size={24} color={colors.text} />
@@ -77,44 +89,86 @@ export function CardioClassFormScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.sectionTitle}>About</Text>
-        <Input
-          placeholder="Class name"
-          value={title}
-          onChangeText={(t) => { setTitle(t); setTitleError(''); }}
-          accessibilityLabel="Class name"
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Class name"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              accessibilityLabel="Class name"
+            />
+          )}
         />
-        {titleError ? <Text style={styles.errorText}>{titleError}</Text> : null}
-        <Input placeholder="Type" value={type} onChangeText={setType} accessibilityLabel="Type" />
-        <Input
-          placeholder="Description..."
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-          accessibilityLabel="Description"
+        {errors.title ? <Text style={styles.errorText}>{errors.title.message}</Text> : null}
+
+        <Controller
+          control={control}
+          name="type"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Type"
+              value={value}
+              onChangeText={onChange}
+              accessibilityLabel="Type"
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Description..."
+              value={value ?? ''}
+              onChangeText={onChange}
+              multiline
+              numberOfLines={4}
+              accessibilityLabel="Description"
+            />
+          )}
         />
 
         <Text style={styles.sectionTitle}>Preview</Text>
-        <TouchableOpacity style={styles.uploadArea} accessibilityRole="button" accessibilityLabel="Upload photo">
+        <TouchableOpacity
+          style={styles.uploadArea}
+          accessibilityRole="button"
+          accessibilityLabel="Upload photo"
+        >
           <Ionicons name="camera" size={40} color={colors.textMuted} />
           <Text style={styles.uploadText}>Tap to upload photo</Text>
           <Text style={styles.uploadHint}>Recommended size: square, min 500x500px</Text>
         </TouchableOpacity>
 
         <Text style={styles.sectionTitle}>Date and time</Text>
-        <Input
-          placeholder="Date (e.g. 04/10/2026)"
-          value={date}
-          onChangeText={setDate}
-          rightIcon={<Ionicons name="calendar" size={20} color={colors.textMuted} />}
-          accessibilityLabel="Date"
+        <Controller
+          control={control}
+          name="date"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Date (e.g. 04/10/2026)"
+              value={value ?? ''}
+              onChangeText={onChange}
+              rightIcon={<Ionicons name="calendar" size={20} color={colors.textMuted} />}
+              accessibilityLabel="Date"
+            />
+          )}
         />
-        <Input
-          placeholder="Time (e.g. 14:00)"
-          value={time}
-          onChangeText={setTime}
-          rightIcon={<Ionicons name="time" size={20} color={colors.textMuted} />}
-          accessibilityLabel="Time"
+        <Controller
+          control={control}
+          name="time"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Time (e.g. 14:00)"
+              value={value ?? ''}
+              onChangeText={onChange}
+              rightIcon={<Ionicons name="time" size={20} color={colors.textMuted} />}
+              accessibilityLabel="Time"
+            />
+          )}
         />
 
         <Text style={styles.sectionTitle}>Clients</Text>
@@ -124,7 +178,7 @@ export function CardioClassFormScreen() {
           contentContainerStyle={styles.clientsRow}
         >
           {mockClients.map((client) => {
-            const isSelected = selectedClients.has(client.id);
+            const isSelected = clientIds.includes(client.id);
             return (
               <TouchableOpacity
                 key={client.id}
@@ -134,7 +188,9 @@ export function CardioClassFormScreen() {
                 accessibilityState={{ checked: isSelected }}
                 accessibilityLabel={client.name}
               >
-                <View style={[styles.clientAvatarWrap, isSelected && styles.clientAvatarSelected]}>
+                <View
+                  style={[styles.clientAvatarWrap, isSelected && styles.clientAvatarSelected]}
+                >
                   <Avatar name={client.name} size={48} />
                 </View>
                 <Text style={styles.clientName} numberOfLines={1}>
@@ -146,15 +202,22 @@ export function CardioClassFormScreen() {
         </ScrollView>
 
         <Text style={styles.sectionTitle}>Price per class</Text>
-        <Input
-          placeholder="$ 40"
-          value={`$ ${price}`}
-          onChangeText={(v) => setPrice(v.replace(/[^0-9]/g, ''))}
-          keyboardType="numeric"
-          accessibilityLabel="Price"
+        <Controller
+          control={control}
+          name="price"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="$ 40"
+              value={`$ ${value}`}
+              onChangeText={(v) => onChange(v.replace(/[^0-9]/g, ''))}
+              keyboardType="numeric"
+              accessibilityLabel="Price"
+            />
+          )}
         />
+        {errors.price ? <Text style={styles.errorText}>{errors.price.message}</Text> : null}
 
-        <Button title="Apply" onPress={handleApply} style={styles.button} />
+        <Button title="Apply" onPress={handleSubmit(onSubmit)} style={styles.button} />
       </ScrollView>
     </View>
   );
