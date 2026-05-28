@@ -1,118 +1,26 @@
-# Programs API (Training Library)
+# Programs — Technical API Specification
 
-**Related tasks:** TLIB-002, TLIB-003, TLIB-004, LOGIC-006–009
+> **Status:** TBD — placeholder. Detailed API endpoints (routes, request/response shapes, validation rules, error codes, DB transactions, query examples) will be written here when implementing this module.
+>
+> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/programs.md`](features/programs.md).
 
-## Routes
+## Scope
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/programs` | List programs |
-| GET | `/programs/:id` | Get single program |
-| GET | `/programs/:id/videos` | List videos in program |
-| POST | `/programs` | Create program |
-| PATCH | `/programs/:id` | Update program |
-| DELETE | `/programs/:id` | Delete program |
+This file will contain:
 
----
+- REST endpoints (method, path, auth, query params).
+- Request body shapes (JSON schemas).
+- Response body shapes (JSON schemas, examples).
+- Validation rules per field.
+- Error codes (Problem Details format, see [`TECH_TASK.md`](TECH_TASK.md) §4.5).
+- DB-level transactions and locking.
+- Idempotency requirements (where applicable).
+- Rate limiting overrides (where applicable).
+- WebSocket events emitted (where applicable).
+- Background jobs triggered (where applicable).
 
-## GET /programs
+## See also
 
-**Query params:**
-- `q` (optional): search by name
-
-**Response 200:**
-```json
-{
-  "programs": [
-    {
-      "id": "string",
-      "name": "string",
-      "tag": "string",
-      "videoCount": 10,
-      "views": 24,
-      "likes": 340,
-      "thumbnail": "url | null"
-    }
-  ]
-}
-```
-
----
-
-## GET /programs/:id
-
-**Response 200:**
-```json
-{
-  "id": "string",
-  "name": "string",
-  "tag": "string",
-  "videoCount": 10,
-  "views": 24,
-  "likes": 340,
-  "thumbnail": "url | null"
-}
-```
-
----
-
-## GET /programs/:id/videos
-
-Used for Gallery screen (TLIB-004).
-
-**Response 200:**
-```json
-{
-  "videos": [
-    {
-      "id": "string",
-      "title": "string",
-      "thumbnail": "url | null",
-      "duration": 120
-    }
-  ]
-}
-```
-
----
-
-## POST /programs
-
-**Request body:**
-```json
-{
-  "name": "string",
-  "tag": "string",
-  "thumbnail": "url | null",
-  "videos": [
-    { "title": "string", "thumbnail": "url | null", "duration": 120 }
-  ]
-}
-```
-
-**Response 201:**
-```json
-{
-  "id": "string",
-  "name": "string",
-  "tag": "string",
-  "videoCount": 10,
-  "views": 0,
-  "likes": 0,
-  "thumbnail": "url | null"
-}
-```
-
----
-
-## PATCH /programs/:id
-
-**Request body:** Partial update (name, tag, thumbnail, videos).
-
-**Response 200:** Same shape as GET /programs/:id.
-
----
-
-## DELETE /programs/:id
-
-**Response 204:** No body.
+- [`TECH_TASK.md`](TECH_TASK.md) — umbrella tech task: architecture, conventions, NFR, security, real-time, roadmap.
+- [`features/programs.md`](features/programs.md) — feature-level specs (user stories, acceptance criteria, edge cases).
+- [`DB_STRUCTURE.md`](DB_STRUCTURE.md) — database schema.

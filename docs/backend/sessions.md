@@ -1,126 +1,26 @@
-# Sessions API
+# Sessions & Calendar — Technical API Specification
 
-**Related tasks:** SCHED-005, SCHED-008, SCHED-009, SCHED-010, SFORM-004, LOGIC-001–005
+> **Status:** TBD — placeholder. Detailed API endpoints (routes, request/response shapes, validation rules, error codes, DB transactions, query examples) will be written here when implementing this module.
+>
+> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/sessions.md`](features/sessions.md).
 
-## Routes
+## Scope
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/sessions` | List sessions (with filters) |
-| GET | `/sessions/:id` | Get single session |
-| POST | `/sessions` | Create session |
-| PATCH | `/sessions/:id` | Update session |
-| DELETE | `/sessions/:id` | Delete session |
-| GET | `/sessions/:id/summary` | Get training summary for session |
+This file will contain:
 
----
+- REST endpoints (method, path, auth, query params).
+- Request body shapes (JSON schemas).
+- Response body shapes (JSON schemas, examples).
+- Validation rules per field.
+- Error codes (Problem Details format, see [`TECH_TASK.md`](TECH_TASK.md) §4.5).
+- DB-level transactions and locking.
+- Idempotency requirements (where applicable).
+- Rate limiting overrides (where applicable).
+- WebSocket events emitted (where applicable).
+- Background jobs triggered (where applicable).
 
-## GET /sessions
+## See also
 
-**Query params:**
-- `q` (optional): search by title
-- `date` (optional): filter by date `YYYY-MM-DD`
-- `from` (optional): start date `YYYY-MM-DD`
-- `to` (optional): end date `YYYY-MM-DD`
-
-**Response 200:**
-```json
-{
-  "sessions": [
-    {
-      "id": "string",
-      "title": "string",
-      "type": "Cardio | HIIT | Strength | Yoga | Mobility | Pilates",
-      "date": "YYYY-MM-DD",
-      "time": "HH:mm",
-      "status": "completed | pending | canceled",
-      "participants": [
-        { "id": "string", "name": "string", "avatar": "url | null" }
-      ]
-    }
-  ]
-}
-```
-
----
-
-## GET /sessions/:id
-
-**Response 200:**
-```json
-{
-  "id": "string",
-  "title": "string",
-  "type": "string",
-  "date": "YYYY-MM-DD",
-  "time": "HH:mm",
-  "status": "completed | pending | canceled",
-  "participants": [
-    { "id": "string", "name": "string", "avatar": "url | null" }
-  ]
-}
-```
-
----
-
-## POST /sessions
-
-**Request body:**
-```json
-{
-  "title": "string",
-  "type": "string",
-  "date": "YYYY-MM-DD",
-  "time": "HH:mm",
-  "participantIds": ["string"]
-}
-```
-
-**Response 201:**
-```json
-{
-  "id": "string",
-  "title": "string",
-  "type": "string",
-  "date": "YYYY-MM-DD",
-  "time": "HH:mm",
-  "status": "pending",
-  "participants": [
-    { "id": "string", "name": "string", "avatar": "url | null" }
-  ]
-}
-```
-
----
-
-## PATCH /sessions/:id
-
-**Request body:** Same as POST, all fields optional (partial update).
-
-**Response 200:** Same shape as GET /sessions/:id.
-
----
-
-## DELETE /sessions/:id
-
-**Response 204:** No body.
-
----
-
-## GET /sessions/:id/summary
-
-Used for Training Summary screen (CLNT-009).
-
-**Response 200:**
-```json
-{
-  "sessionId": "string",
-  "title": "string",
-  "date": "YYYY-MM-DD",
-  "time": "HH:mm",
-  "clientName": "string",
-  "exercises": [
-    { "id": "string", "name": "string", "sets": 3, "reps": "12" }
-  ]
-}
-```
+- [`TECH_TASK.md`](TECH_TASK.md) — umbrella tech task: architecture, conventions, NFR, security, real-time, roadmap.
+- [`features/sessions.md`](features/sessions.md) — feature-level specs (user stories, acceptance criteria, edge cases).
+- [`DB_STRUCTURE.md`](DB_STRUCTURE.md) — database schema.

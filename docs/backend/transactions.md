@@ -1,39 +1,26 @@
-# Transactions API
+# Transactions — Technical API Specification
 
-**Related tasks:** ANLY-007, ANLY-008, ANLY-009, ANLY-010, LOGIC-015
+> **Status:** TBD — placeholder. Detailed API endpoints (routes, request/response shapes, validation rules, error codes, DB transactions, query examples) will be written here when implementing this module.
+>
+> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/transactions.md`](features/transactions.md).
 
-## Routes
+## Scope
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/transactions` | List transactions |
-| GET | `/transactions/:id` | Get single transaction (if needed) |
+This file will contain:
 
----
+- REST endpoints (method, path, auth, query params).
+- Request body shapes (JSON schemas).
+- Response body shapes (JSON schemas, examples).
+- Validation rules per field.
+- Error codes (Problem Details format, see [`TECH_TASK.md`](TECH_TASK.md) §4.5).
+- DB-level transactions and locking.
+- Idempotency requirements (where applicable).
+- Rate limiting overrides (where applicable).
+- WebSocket events emitted (where applicable).
+- Background jobs triggered (where applicable).
 
-## GET /transactions
+## See also
 
-**Query params:**
-- `q` (optional): search by client name
-- `from` (optional): start date `YYYY-MM-DD`
-- `to` (optional): end date `YYYY-MM-DD`
-- `type` (optional): `Training | Subscription`
-- `status` (optional): `completed | pending | canceled`
-
-**Response 200:**
-```json
-{
-  "transactions": [
-    {
-      "id": "string",
-      "clientName": "string",
-      "date": "YYYY-MM-DD",
-      "amount": "string",
-      "type": "Training | Subscription",
-      "status": "completed | pending | canceled"
-    }
-  ]
-}
-```
-
-**Note:** `amount` is displayed as-is (e.g. `"$65"`, `"$400"`). Backend can return numeric + currency or formatted string.
+- [`TECH_TASK.md`](TECH_TASK.md) — umbrella tech task: architecture, conventions, NFR, security, real-time, roadmap.
+- [`features/transactions.md`](features/transactions.md) — feature-level specs (user stories, acceptance criteria, edge cases).
+- [`DB_STRUCTURE.md`](DB_STRUCTURE.md) — database schema.

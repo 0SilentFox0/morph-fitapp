@@ -1,91 +1,26 @@
-# Analytics API
+# Analytics — Technical API Specification
 
-**Related tasks:** HOME-004, HOME-005, ANLY-001–006, ANLY-011
+> **Status:** TBD — placeholder. Detailed API endpoints (routes, request/response shapes, validation rules, error codes, DB transactions, query examples) will be written here when implementing this module.
+>
+> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/analytics.md`](features/analytics.md).
 
-## Routes
+## Scope
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/analytics/revenue` | Revenue stat (home) |
-| GET | `/analytics/profile-views` | Profile views stat (home) |
-| GET | `/analytics/summary` | Summary cards (Total Earnings, Subscriptions, Trainings) |
-| GET | `/analytics/income-over-time` | Line chart data |
-| GET | `/analytics/revenue-by-source` | Bar chart data (subscriptions vs trainings) |
+This file will contain:
 
----
+- REST endpoints (method, path, auth, query params).
+- Request body shapes (JSON schemas).
+- Response body shapes (JSON schemas, examples).
+- Validation rules per field.
+- Error codes (Problem Details format, see [`TECH_TASK.md`](TECH_TASK.md) §4.5).
+- DB-level transactions and locking.
+- Idempotency requirements (where applicable).
+- Rate limiting overrides (where applicable).
+- WebSocket events emitted (where applicable).
+- Background jobs triggered (where applicable).
 
-## GET /analytics/revenue
+## See also
 
-**Query params:**
-- `period` (optional): `week | month | year`
-
-**Response 200:**
-```json
-{
-  "value": 428,
-  "change": 12.5,
-  "period": "month"
-}
-```
-
----
-
-## GET /analytics/profile-views
-
-**Response 200:**
-```json
-{
-  "value": 156,
-  "change": -3.2
-}
-```
-
----
-
-## GET /analytics/summary
-
-**Query params:**
-- `period` (optional): `week | month | custom`
-- `from`, `to` (optional): for custom period
-
-**Response 200:**
-```json
-{
-  "totalEarnings": 428,
-  "fromSubscriptions": 180,
-  "fromTrainings": 248
-}
-```
-
----
-
-## GET /analytics/income-over-time
-
-**Query params:**
-- `period`: `week | month`
-- `from`, `to` (optional): for custom
-
-**Response 200:**
-```json
-{
-  "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  "datasets": [
-    { "data": [120, 85, 95, 140, 110, 75, 98] }
-  ]
-}
-```
-
----
-
-## GET /analytics/revenue-by-source
-
-**Query params:**
-- `period`: `week | month`
-
-**Response 200:**
-```json
-{
-  "subscriptions": 180,
-  "trainings": 248
-}
-```
+- [`TECH_TASK.md`](TECH_TASK.md) — umbrella tech task: architecture, conventions, NFR, security, real-time, roadmap.
+- [`features/analytics.md`](features/analytics.md) — feature-level specs (user stories, acceptance criteria, edge cases).
+- [`DB_STRUCTURE.md`](DB_STRUCTURE.md) — database schema.

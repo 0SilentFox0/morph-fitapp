@@ -1,8 +1,8 @@
-# Chat & Messaging — Technical API Specification
+# Exercises — Technical API Specification
 
 > **Status:** TBD — placeholder. Detailed API endpoints (routes, request/response shapes, validation rules, error codes, DB transactions, query examples) will be written here when implementing this module.
 >
-> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/chat.md`](features/chat.md).
+> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/exercises.md`](features/exercises.md).
 
 ## Scope
 
@@ -22,5 +22,5 @@ This file will contain:
 ## See also
 
 - [`TECH_TASK.md`](TECH_TASK.md) — umbrella tech task: architecture, conventions, NFR, security, real-time, roadmap.
-- [`features/chat.md`](features/chat.md) — feature-level specs (user stories, acceptance criteria, edge cases).
+- [`features/exercises.md`](features/exercises.md) — feature-level specs (user stories, acceptance criteria, edge cases).
 - [`DB_STRUCTURE.md`](DB_STRUCTURE.md) — database schema.

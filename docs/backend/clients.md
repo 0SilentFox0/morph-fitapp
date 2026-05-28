@@ -1,121 +1,26 @@
-# Clients API
+# Clients (CRM) — Technical API Specification
 
-**Related tasks:** CLNT-002, CLNT-003, CLNT-004, CLNT-005, CLNT-006, CLNT-008, LOGIC-010–014
+> **Status:** TBD — placeholder. Detailed API endpoints (routes, request/response shapes, validation rules, error codes, DB transactions, query examples) will be written here when implementing this module.
+>
+> **Feature-level business logic, user stories, acceptance criteria, edge cases:** see [`features/clients.md`](features/clients.md).
 
-## Routes
+## Scope
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/clients` | List clients |
-| GET | `/clients/:id` | Get client profile |
-| GET | `/clients/:id/programs` | Get client's programs |
-| POST | `/clients` | Create client |
-| PATCH | `/clients/:id` | Update client |
-| DELETE | `/clients/:id` | Delete client |
-| GET | `/exercises/:id` | Get exercise detail |
+This file will contain:
 
----
+- REST endpoints (method, path, auth, query params).
+- Request body shapes (JSON schemas).
+- Response body shapes (JSON schemas, examples).
+- Validation rules per field.
+- Error codes (Problem Details format, see [`TECH_TASK.md`](TECH_TASK.md) §4.5).
+- DB-level transactions and locking.
+- Idempotency requirements (where applicable).
+- Rate limiting overrides (where applicable).
+- WebSocket events emitted (where applicable).
+- Background jobs triggered (where applicable).
 
-## GET /clients
+## See also
 
-**Query params:**
-- `q` (optional): search by name
-- `training` (optional): filter by training type
-- `payment` (optional): filter by payment status
-
-**Response 200:**
-```json
-{
-  "clients": [
-    {
-      "id": "string",
-      "name": "string",
-      "avatar": "url | null",
-      "lastSession": "Dec 5, 14:00",
-      "tag": "Personal | Group"
-    }
-  ]
-}
-```
-
----
-
-## GET /clients/:id
-
-**Response 200:**
-```json
-{
-  "id": "string",
-  "name": "string",
-  "avatar": "url | null",
-  "tag": "Personal | Group",
-  "lastSession": "string",
-  "nextSession": "string | null"
-}
-```
-
----
-
-## GET /clients/:id/programs
-
-**Response 200:**
-```json
-{
-  "programs": [
-    {
-      "id": "string",
-      "name": "string",
-      "exercises": [
-        { "id": "string", "name": "string", "sets": 3, "reps": "12" }
-      ]
-    }
-  ]
-}
-```
-
----
-
-## POST /clients
-
-**Request body:**
-```json
-{
-  "name": "string",
-  "avatar": "url | null",
-  "tag": "Personal | Group"
-}
-```
-
-**Response 201:** Same shape as GET /clients/:id.
-
----
-
-## PATCH /clients/:id
-
-**Request body:** Partial update (name, avatar, tag).
-
-**Response 200:** Same shape as GET /clients/:id.
-
----
-
-## DELETE /clients/:id
-
-**Response 204:** No body.
-
----
-
-## GET /exercises/:id
-
-Used for Exercise detail screen (CLNT-006).
-
-**Response 200:**
-```json
-{
-  "id": "string",
-  "name": "string",
-  "description": "string",
-  "sets": 3,
-  "reps": "12",
-  "videoUrl": "url | null"
-}
-```
+- [`TECH_TASK.md`](TECH_TASK.md) — umbrella tech task: architecture, conventions, NFR, security, real-time, roadmap.
+- [`features/clients.md`](features/clients.md) — feature-level specs (user stories, acceptance criteria, edge cases).
+- [`DB_STRUCTURE.md`](DB_STRUCTURE.md) — database schema.
