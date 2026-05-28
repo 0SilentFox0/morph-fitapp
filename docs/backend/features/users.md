@@ -1,6 +1,6 @@
 # Features — Users & Profile
 
-**Модуль:** Users & Profile · **Phase:** 0 · **Файлів-сусідів:** [`../users.md`](../users.md) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md)
+**Модуль:** Users & Profile · **Phase:** 0 · **Файлів-сусідів:** `users.md` (TBD) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md)
 
 1 фіча, що покриває керування власним профілем і перегляд чужих профілів.
 
@@ -53,7 +53,7 @@
 
 ### Технічна спека
 
-- API: [`../users.md`](../users.md) § `GET /me`, `PATCH /me`, `GET /users/{id}`, `POST /me/avatar`, `PATCH /me/settings`
+- API: `users.md` (TBD) § `GET /me`, `PATCH /me`, `GET /users/{id}`, `POST /me/avatar`, `PATCH /me/settings`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `users` (всі поля профіля + `timezone`, `locale`, `notification_preferences jsonb`)
 - Events: `ProfileUpdated`, `AvatarChanged`, `SettingsUpdated`
 - Залежності: Files (для аватара upload pipeline)

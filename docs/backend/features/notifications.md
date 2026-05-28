@@ -1,6 +1,6 @@
 # Features — Notifications (Push & In-App)
 
-**Модуль:** Notifications · **Phase:** 0 (registration + scaffold), 2 (chat push), 3 (packages/transactions push) · **Файлів-сусідів:** [`../notifications.md`](../notifications.md) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md)
+**Модуль:** Notifications · **Phase:** 0 (registration + scaffold), 2 (chat push), 3 (packages/transactions push) · **Файлів-сусідів:** `notifications.md` (TBD) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md)
 
 2 фічі — підсистема push-доставки і in-app notification feed.
 
@@ -87,7 +87,7 @@ Push'і — лише сповіщення; **state of truth** залишаєть
 
 ### Зв'язок з технічною спекою
 
-- API: [`../notifications.md`](../notifications.md) § `POST /me/device-tokens`, `DELETE /me/device-tokens/{id}`, `PATCH /me/settings` (notification_preferences)
+- API: `notifications.md` (TBD) § `POST /me/device-tokens`, `DELETE /me/device-tokens/{id}`, `PATCH /me/settings` (notification_preferences)
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `device_tokens`, `notifications`
 - Events / Listeners (приклади): `MessageSent` → `NotifyOnMessageSent`, `SessionCreated` → `NotifyOnSessionCreated`, `PackageExhausted` → `NotifyOnPackageExhausted`, `TransactionCreated` → `NotifyOnTransactionCreated`
 - Jobs: `SendPushJob` (queue `critical`), `SessionRemindersJob` (scheduled every 5 min)
@@ -146,7 +146,7 @@ Push'і — лише сповіщення; **state of truth** залишаєть
 
 ### Технічна спека
 
-- API: [`../notifications.md`](../notifications.md) § `GET /me/notifications`, `PATCH /me/notifications/{id}`, `POST /me/notifications/mark-all-read`
+- API: `notifications.md` (TBD) § `GET /me/notifications`, `PATCH /me/notifications/{id}`, `POST /me/notifications/mark-all-read`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `notifications` (з `type`, `recipient_id`, `payload jsonb`, `read_at`, `delivered_at`, `created_at`)
 - Events: `NotificationDelivered` (broadcast)
 - Jobs: `NotificationsRetentionJob` (scheduled weekly, retention 90 днів)

@@ -1,6 +1,6 @@
 # Features — Onboarding
 
-**Модуль:** Onboarding · **Phase:** 1 · **Файлів-сусідів:** [`../onboarding.md`](../onboarding.md) (technical), [`../../flows/onboarding.md`](../../flows/onboarding.md)
+**Модуль:** Onboarding · **Phase:** 1 · **Файлів-сусідів:** `onboarding.md` (TBD) (technical), [`../../flows/onboarding.md`](../../flows/onboarding.md)
 
 3 фічі. Onboarding виконується після `AUTH-001`/`AUTH-002` (registration/OAuth) і завершується перед першим використанням додатка.
 
@@ -93,7 +93,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../onboarding.md`](../onboarding.md) § `PATCH /me/onboarding/step`, `GET /me/onboarding/state`, `GET /me/onboarding/preview`, `POST /me/onboarding/complete`
+- API: `onboarding.md` (TBD) § `PATCH /me/onboarding/step`, `GET /me/onboarding/state`, `GET /me/onboarding/preview`, `POST /me/onboarding/complete`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `users` (всі trainer-specific поля); `onboarding_progress` (новий: `user_id`, `steps jsonb` зі статусами per step, `current_step`, `updated_at`)
 - Events: `OnboardingStepCompleted`, `OnboardingCompleted`
 - Listeners: на `OnboardingCompleted` → `NotifyTrainerWelcomeEmail` job (queue `default`)
@@ -137,7 +137,7 @@
 
 ### Технічна спека
 
-- API: [`../onboarding.md`](../onboarding.md) § `PATCH /me/onboarding/step` (з client-specific step schemas), `POST /invitations/{code}/accept` (можна викликати з invitation step, виносить логіку у [`features/clients.md`](clients.md) → `CLT-002`)
+- API: `onboarding.md` (TBD) § `PATCH /me/onboarding/step` (з client-specific step schemas), `POST /invitations/{code}/accept` (можна викликати з invitation step, виносить логіку у [`features/clients.md`](clients.md) → `CLT-002`)
 - DB: `users` (з `goals jsonb`, `fitness_level enum`), `body_measurements` (initial entry), `clients` (link на акцепт invitation), `client_invitations`
 
 ---
@@ -182,7 +182,7 @@
 
 ### Технічна спека
 
-- API: [`../onboarding.md`](../onboarding.md) § `POST /me/onboarding/skip-step`, `GET /me/onboarding/state`, `GET /me/onboarding/preview`
+- API: `onboarding.md` (TBD) § `POST /me/onboarding/skip-step`, `GET /me/onboarding/state`, `GET /me/onboarding/preview`
 - DB: `onboarding_progress.steps jsonb` — per-step `{ status: completed|skipped|pending, completed_at, skipped_at, data: {...} }`
 - Config: `config/onboarding.php` — required-vs-optional lists per role
 

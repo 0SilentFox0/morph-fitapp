@@ -1,6 +1,6 @@
 # Features — Transactions
 
-**Модуль:** Transactions · **Phase:** 3 · **Файлів-сусідів:** [`../transactions.md`](../transactions.md) (technical)
+**Модуль:** Transactions · **Phase:** 3 · **Файлів-сусідів:** `transactions.md` (TBD) (technical)
 
 4 фічі. **Без прямих оплат** — тільки ручний облік. Тренер вводить факт оплати після того, як отримав кошти зовні (cash, transfer, card terminal, інший сервіс). Прив'язка до пакета (PKG-002) clear's debt (PKG-004).
 
@@ -56,7 +56,7 @@ Manual create/edit/delete record'ів про отриману оплату. Stat
 
 ### Технічна спека
 
-- API: [`../transactions.md`](../transactions.md) § `POST /transactions`, `PATCH /transactions/{id}`, `DELETE /transactions/{id}`, `GET /transactions/{id}`
+- API: `transactions.md` (TBD) § `POST /transactions`, `PATCH /transactions/{id}`, `DELETE /transactions/{id}`, `GET /transactions/{id}`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `transactions` (з `trainer_id`, `client_id` FK SET NULL, `client_package_id` FK SET NULL, `amount numeric(10,2)`, `currency varchar(3)`, `method enum`, `status enum: paid|pending|canceled`, `paid_at`, `note text`, `deleted_at`)
 - Events: `TransactionCreated`, `TransactionUpdated`, `TransactionStatusChanged`, `TransactionDeleted`
 - Listeners: `ClearDebtOnTransactionPaidListener`, `ReEvaluateDebtOnTransactionDeletedListener`
@@ -186,7 +186,7 @@ List transactions з фільтрами (client, status, method, period, amount 
 
 ### Технічна спека
 
-- API: [`../transactions.md`](../transactions.md) § `POST /withdrawals`, `GET /withdrawals`, `PATCH /withdrawals/{id}`, `DELETE /withdrawals/{id}`, `GET /me/balance`
+- API: `transactions.md` (TBD) § `POST /withdrawals`, `GET /withdrawals`, `PATCH /withdrawals/{id}`, `DELETE /withdrawals/{id}`, `GET /me/balance`
 - DB: `withdrawals` (з `trainer_id`, `amount`, `currency`, `withdrawn_at`, `note`, `deleted_at`)
 - Service: `BalanceCalculator` (sum transactions paid − sum withdrawals per currency)
 

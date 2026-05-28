@@ -1,6 +1,6 @@
 # Features — Workout Tracking
 
-**Модуль:** Workout Tracking · **Phase:** 2 · **Файлів-сусідів:** [`../workout-tracking.md`](../workout-tracking.md) (technical)
+**Модуль:** Workout Tracking · **Phase:** 2 · **Файлів-сусідів:** `workout-tracking.md` (TBD) (technical)
 
 5 фіч. Real-time двостороння синхронізація логів тренування між тренером і клієнтом під час сесії. Найскладніший модуль системи з точки зору concurrent state.
 
@@ -103,7 +103,7 @@ Live workout session — це активний log виконання вправ
 
 ### Зв'язок з технічною спекою
 
-- API: [`../workout-tracking.md`](../workout-tracking.md) § `POST /sessions/{id}/workout-log/start`, `POST /sessions/{id}/workout-log/finish`, `GET /sessions/{id}/workout-log` (current state)
+- API: `workout-tracking.md` (TBD) § `POST /sessions/{id}/workout-log/start`, `POST /sessions/{id}/workout-log/finish`, `GET /sessions/{id}/workout-log` (current state)
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `workout_logs` (з `session_id` UNIQUE, `started_at`, `started_by_user_id`, `finished_at`, `finished_by_user_id`); `workout_log_exercises` (snapshot from program_exercises на start)
 - Events: `WorkoutSessionStarted`, `WorkoutSessionFinished` (broadcast on `private-session.{id}`)
 - Listeners: `TransitionSessionToInProgressListener`, `TransitionSessionToCompletedListener`, `DetectPersonalRecordsOnFinishListener`
@@ -176,7 +176,7 @@ Live workout session — це активний log виконання вправ
 
 ### Зв'язок з технічною спекою
 
-- API: [`../workout-tracking.md`](../workout-tracking.md) § `POST /workout-logs/{id}/sets`, `PATCH /workout-log-sets/{id}` (alias на UPSERT), `DELETE /workout-log-sets/{id}`, `POST /workout-logs/{id}/exercises` (ad-hoc)
+- API: `workout-tracking.md` (TBD) § `POST /workout-logs/{id}/sets`, `PATCH /workout-log-sets/{id}` (alias на UPSERT), `DELETE /workout-log-sets/{id}`, `POST /workout-logs/{id}/exercises` (ad-hoc)
 - DB: `workout_log_sets` (з `workout_log_id` FK CASCADE, `workout_log_exercise_id` FK, `set_index`, `reps`, `weight_kg numeric`, `rest_seconds`, `performed_at`, `actor_id`, `client_uuid UUID UNIQUE per workout_log`, `version int`, `deleted_at`)
 - UNIQUE: `(workout_log_id, client_uuid)` для idempotency
 - Events: `WorkoutLogSetCreated`, `WorkoutLogSetUpdated`, `WorkoutLogSetDeleted`
@@ -348,7 +348,7 @@ Backend гарантує idempotency через:
 
 ### Технічна спека
 
-- API: [`../workout-tracking.md`](../workout-tracking.md) § `GET /clients/{id}/workout-logs`, `GET /me/workout-logs`, `GET /workout-logs/{id}`
+- API: `workout-tracking.md` (TBD) § `GET /clients/{id}/workout-logs`, `GET /me/workout-logs`, `GET /workout-logs/{id}`
 - DB: queries з aggregation; cache можна додати на per-workout summary (post-MVP)
 
 ---

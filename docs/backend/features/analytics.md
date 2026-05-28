@@ -1,6 +1,6 @@
 # Features — Analytics
 
-**Модуль:** Analytics · **Phase:** 3 · **Файлів-сусідів:** [`../analytics.md`](../analytics.md) (technical)
+**Модуль:** Analytics · **Phase:** 3 · **Файлів-сусідів:** `analytics.md` (TBD) (technical)
 
 1 фіча. Read-only dashboard для тренера: income chart, revenue by source, trainings count, active subscriptions, profile views. Базується на агрегаціях з transactions/sessions/profile_view_events.
 
@@ -56,7 +56,7 @@
 
 ### Технічна спека
 
-- API: [`../analytics.md`](../analytics.md) § `GET /analytics/summary`, `GET /analytics/income-over-time`, `GET /analytics/revenue-by-source`, `GET /analytics/profile-views`, `GET /analytics/sessions-by-status`, `GET /analytics/subscriptions-active`
+- API: `analytics.md` (TBD) § `GET /analytics/summary`, `GET /analytics/income-over-time`, `GET /analytics/revenue-by-source`, `GET /analytics/profile-views`, `GET /analytics/sessions-by-status`, `GET /analytics/subscriptions-active`
 - DB: 
   - `transactions` (для earnings) — index `(trainer_id, paid_at, status, currency)`
   - `sessions` (для sessions count) — index `(trainer_id, status, start_at)`

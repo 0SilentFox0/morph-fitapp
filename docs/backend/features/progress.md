@@ -1,6 +1,6 @@
 # Features — Progress Metrics
 
-**Модуль:** Progress Metrics · **Phase:** 3 · **Файлів-сусідів:** [`../progress.md`](../progress.md) (technical)
+**Модуль:** Progress Metrics · **Phase:** 3 · **Файлів-сусідів:** `progress.md` (TBD) (technical)
 
 4 фічі. Tracking фізичного прогресу клієнтів — вимірювання тіла, графіки, автоматичні Personal Records з workout log, експорт.
 
@@ -55,7 +55,7 @@
 
 ### Технічна спека
 
-- API: [`../progress.md`](../progress.md) § `POST /clients/{id}/body-measurements`, `POST /me/body-measurements`, `GET /clients/{id}/body-measurements?metric_type=&from=&to=&cursor=`, `GET /me/body-measurements`, `PATCH /body-measurements/{id}`, `DELETE /body-measurements/{id}`
+- API: `progress.md` (TBD) § `POST /clients/{id}/body-measurements`, `POST /me/body-measurements`, `GET /clients/{id}/body-measurements?metric_type=&from=&to=&cursor=`, `GET /me/body-measurements`, `PATCH /body-measurements/{id}`, `DELETE /body-measurements/{id}`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `body_measurements` (long format: `client_id`, `metric_type enum: weight|height|body_fat_percent|chest|waist|hips|biceps|thigh`, `value numeric(7,2)`, `unit varchar(8)`, `measured_at`, `recorded_by_user_id`, `deleted_at`)
 - Index: `(client_id, metric_type, measured_at DESC)`
 - Events: `BodyMeasurementRecorded`, `BodyMeasurementUpdated`, `BodyMeasurementDeleted`
@@ -172,7 +172,7 @@ Time-series charts per metric. Backend агрегує (downsamples для дов
 
 ### Зв'язок з технічною спекою
 
-- API: [`../progress.md`](../progress.md) § `GET /clients/{id}/personal-records`, `GET /me/personal-records`, `GET /personal-records/{id}` (detail)
+- API: `progress.md` (TBD) § `GET /clients/{id}/personal-records`, `GET /me/personal-records`, `GET /personal-records/{id}` (detail)
 - DB: `personal_records` (з `client_id` FK CASCADE, `exercise_id` FK CASCADE, `weight_kg`, `reps`, `estimated_1rm numeric(7,2) GENERATED ALWAYS AS (weight_kg * (1 + reps::numeric / 30)) STORED`, `achieved_at`, `workout_log_set_id` FK SET NULL); UNIQUE on `(client_id, exercise_id)`
 - Events: `PersonalRecordSet` (broadcast on `private-user.{client_id}` + push)
 - Listeners: `DetectPRListener` (on `WorkoutLogSetCreated`, `WorkoutLogSetUpdated`), `RecomputePROnDeleteListener` (on `WorkoutLogSetDeleted`)
@@ -219,7 +219,7 @@ Time-series charts per metric. Backend агрегує (downsamples для дов
 
 ### Технічна спека
 
-- API: [`../progress.md`](../progress.md) § `POST /clients/{id}/progress/export`, `POST /me/progress/export`, `GET /me/exports/{id}` (shared з [`AUTH-005`](auth.md))
+- API: `progress.md` (TBD) § `POST /clients/{id}/progress/export`, `POST /me/progress/export`, `GET /me/exports/{id}` (shared з [`AUTH-005`](auth.md))
 - Jobs: `BuildProgressExportJob` (queue `low`)
 - DB: `data_exports` table (shared, з AUTH-005)
 - Storage: S3 private; signed URL TTL 7 днів

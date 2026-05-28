@@ -1,6 +1,6 @@
 # Features — Packages & Subscriptions
 
-**Модуль:** Packages & Subscriptions · **Phase:** 3 · **Файлів-сусідів:** [`../packages.md`](../packages.md) (technical)
+**Модуль:** Packages & Subscriptions · **Phase:** 3 · **Файлів-сусідів:** `packages.md` (TBD) (technical)
 
 4 фічі. Покриває облік пакетів тренувань і підписок — без прямих оплат (див. [`features/transactions.md`](transactions.md) для оплат).
 
@@ -51,7 +51,7 @@
 
 ### Технічна спека
 
-- API: [`../packages.md`](../packages.md) § `GET /packages/templates`, `POST /packages/templates`, `PATCH /packages/templates/{id}`, `DELETE /packages/templates/{id}`, `POST /packages/templates/{id}/archive`
+- API: `packages.md` (TBD) § `GET /packages/templates`, `POST /packages/templates`, `PATCH /packages/templates/{id}`, `DELETE /packages/templates/{id}`, `POST /packages/templates/{id}/archive`
 - DB: `package_templates` (з `trainer_id`, `name`, `kind enum: count_based|time_based|hybrid`, `sessions_count int nullable`, `validity_days int nullable`, `price numeric(10,2)`, `currency varchar(3)`, `auto_renew_default boolean`, `archived_at`)
 
 ---
@@ -131,7 +131,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../packages.md`](../packages.md) § `POST /client-packages`, `GET /clients/{id}/packages`, `GET /me/packages` (client view), `PATCH /client-packages/{id}` (limited edits — admin only), `POST /client-packages/{id}/archive`
+- API: `packages.md` (TBD) § `POST /client-packages`, `GET /clients/{id}/packages`, `GET /me/packages` (client view), `PATCH /client-packages/{id}` (limited edits — admin only), `POST /client-packages/{id}/archive`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `client_packages` (з `client_id` FK, `template_id` FK SET NULL, `kind`, `sessions_count`, `remaining_sessions`, `validity_days`, `expires_at`, `price`, `currency`, `status enum: active|exhausted|expired|archived`, `assigned_at`, `archived_at`, `auto_renew`, `expiry_reminded_at`, `debt_since`)
 - Events: `PackageAssigned`, `PackageDecremented`, `PackageRestored` (на reverse), `PackageExhausted`, `PackageExpired`, `PackageArchived`
 - Listeners: `DecrementPackageOnSessionCompletedListener`, `RestorePackageOnSessionReversedListener`, `EmitPushOnPackageStatusChangeListener`
@@ -248,7 +248,7 @@ Subscription = recurring `ClientPackage` створюється автомати
 
 ### Технічна спека
 
-- API: [`../packages.md`](../packages.md) § `GET /me/packages/in-debt`
+- API: `packages.md` (TBD) § `GET /me/packages/in-debt`
 - DB: `client_packages.debt_since timestamp nullable`; index `(trainer_id, debt_since)` для quick filter
 - Jobs: `PackageDebtCheckJob` (scheduled daily 10:00)
 - Events: `DebtDetected`, `DebtCleared`

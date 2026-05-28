@@ -1,6 +1,6 @@
 # FitConnect — Технічне завдання для бекенду
 
-> **Парасольковий документ.** Опис архітектури, конвенцій, нефункціональних вимог, безпеки, real-time, DevOps, roadmap. Деталі кожної фічі — у `docs/backend/features/{module}.md`. Технічні API/DB-специфікації по модулях — у `docs/backend/{module}.md`.
+> **Парасольковий документ.** Опис архітектури, конвенцій, нефункціональних вимог, безпеки, real-time, DevOps, roadmap. Деталі кожної фічі (включно з технічними hints — API endpoints, DB, events, jobs) — у `docs/backend/features/{module}.md`.
 
 **Версія:** 0.1 (draft)
 **Дата:** 2026-05-28
@@ -195,7 +195,7 @@ Clients ─────────┐                     │              │
 ### 4.2 Authentication
 
 - Header: `Authorization: Bearer <access_token>`.
-- Token формат: Laravel Sanctum personal access token або custom JWT-like (формат уточнити у `auth.md`).
+- Token формат: Laravel Sanctum personal access token або custom JWT-like (формат уточнити при реалізації Auth-модуля).
 - Access token TTL: **15 хвилин**.
 - Refresh token TTL: **30 днів**, rotation при кожному refresh, попередній token invalidate.
 - Logout — invalidate поточний refresh-token. `Logout all sessions` — invalidate всі refresh-tokens юзера.
@@ -703,8 +703,7 @@ Phase 3:  packages → transactions
 | [`README.md`](README.md) | Індекс і конвенції папки `docs/backend/` |
 | [`DB_STRUCTURE.md`](DB_STRUCTURE.md) | Повна схема БД, таблиці, FK, індекси |
 | [`DB_SCHEMA_TREE.md`](DB_SCHEMA_TREE.md) | Mermaid ER + ASCII tree |
-| `features/*.md` | Feature-level специфікації по модулях |
-| `auth.md`, `sessions.md`, ... (per-domain) | Technical specs: API endpoints, request/response shapes, DB transactions |
+| `features/*.md` | Feature-level специфікації по модулях (user stories, AC, edge cases, permissions, technical hints) |
 | [`../TASKS.md`](../TASKS.md) | Jira-style завдання фронту, що відповідають API |
 | [`../PROGRESS.md`](../PROGRESS.md) | Прогрес-трекер по флоу |
 | [`../../TECH_DOC.md`](../../TECH_DOC.md) | Загальний technical document (потребує оновлення в частині backend → PHP) |

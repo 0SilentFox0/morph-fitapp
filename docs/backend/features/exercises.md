@@ -1,6 +1,6 @@
 # Features — Exercises
 
-**Модуль:** Exercises · **Phase:** 1 · **Файлів-сусідів:** [`../exercises.md`](../exercises.md) (technical)
+**Модуль:** Exercises · **Phase:** 1 · **Файлів-сусідів:** `exercises.md` (TBD) (technical)
 
 2 фічі. Exercises — будівельні блоки тренувальних програм.
 
@@ -51,7 +51,7 @@
 
 ### Технічна спека
 
-- API: [`../exercises.md`](../exercises.md) § `GET /exercises?q=&muscle_group=&cursor=`, `POST /exercises`, `PATCH /exercises/{id}`, `DELETE /exercises/{id}`
+- API: `exercises.md` (TBD) § `GET /exercises?q=&muscle_group=&cursor=`, `POST /exercises`, `PATCH /exercises/{id}`, `DELETE /exercises/{id}`
 - DB: `exercises` (з `trainer_id`, `name`, `description text`, `muscle_groups jsonb`, `equipment jsonb`, `video_file_id` FK nullable, `archived_at`)
 - Index: `(trainer_id, name)`, GIN on `muscle_groups`
 - Events: `ExerciseCreated`, `ExerciseUpdated`, `ExerciseDeleted`
@@ -97,7 +97,7 @@
 
 ### Технічна спека
 
-- API: [`../exercises.md`](../exercises.md) § `POST /programs/{programId}/exercises`, `PATCH /program-exercises/{id}`, `DELETE /program-exercises/{id}`, `POST /programs/{programId}/exercises/reorder`
+- API: `exercises.md` (TBD) § `POST /programs/{programId}/exercises`, `PATCH /program-exercises/{id}`, `DELETE /program-exercises/{id}`, `POST /programs/{programId}/exercises/reorder`
 - DB: `program_exercises` (з `program_id` FK CASCADE, `exercise_id` FK SET NULL, `order int`, `sets`, `reps`, `weight_kg numeric(6,2)`, `rest_seconds`, `notes text`, `name_snapshot`, `created_at`)
 - UNIQUE: `(program_id, order)` (deferred constraint для reorder transaction)
 - Events: `ProgramExerciseAdded`, `ProgramExerciseUpdated`, `ProgramExerciseRemoved`, `ProgramExercisesReordered`

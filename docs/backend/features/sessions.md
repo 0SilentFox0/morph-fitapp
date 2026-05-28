@@ -1,6 +1,6 @@
 # Features — Sessions & Calendar
 
-**Модуль:** Sessions & Calendar · **Phase:** 1 (basic), 2 (calendar sync, real-time hooks) · **Файлів-сусідів:** [`../sessions.md`](../sessions.md) (technical)
+**Модуль:** Sessions & Calendar · **Phase:** 1 (basic), 2 (calendar sync, real-time hooks) · **Файлів-сусідів:** `sessions.md` (TBD) (technical)
 
 7 фіч. Sessions — центральна доменна сутність системи, навколо якої вʼяжуться програми, пакети, оплати, workout tracking, чат.
 
@@ -88,7 +88,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../sessions.md`](../sessions.md) § `POST /sessions`, `GET /sessions/{id}`, `PATCH /sessions/{id}`, `POST /sessions/{id}/cancel`, `POST /sessions/{id}/reschedule`, `DELETE /sessions/{id}`
+- API: `sessions.md` (TBD) § `POST /sessions`, `GET /sessions/{id}`, `PATCH /sessions/{id}`, `POST /sessions/{id}/cancel`, `POST /sessions/{id}/reschedule`, `DELETE /sessions/{id}`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `sessions` (з `trainer_id`, `title`, `start_at`, `end_at`, `type enum`, `status enum`, `cancellation_reason text`, `notes`, `program_id` FK nullable, `client_package_id` FK nullable, `series_id` FK nullable для recurring); `session_participants` (з `session_id`, `client_id`)
 - Indexes: `(trainer_id, start_at)`, GIST index `tstzrange(start_at, end_at)` для overlap queries
 - Events: `SessionCreated`, `SessionUpdated`, `SessionCanceled`, `SessionRescheduled`, `SessionDeleted`
@@ -133,7 +133,7 @@
 
 ### Технічна спека
 
-- API: [`../sessions.md`](../sessions.md) § `GET /sessions?from=&to=&status=&type=&client_id=&q=&group_by=&cursor=`, `GET /me/sessions`
+- API: `sessions.md` (TBD) § `GET /sessions?from=&to=&status=&type=&client_id=&q=&group_by=&cursor=`, `GET /me/sessions`
 - DB: queries з range overlap (`start_at >= from AND start_at < to`); index `(trainer_id, start_at)`
 - Cache: per `(trainer_id, from, to, hash(filters))` — TTL 60s (frequent reads + cheap invalidation on SessionUpdated)
 
@@ -208,7 +208,7 @@ planned ──(start)──► in_progress ──(finish)──► completed
 
 ### Зв'язок з технічною спекою
 
-- API: [`../sessions.md`](../sessions.md) § `POST /sessions/{id}/status`, `POST /sessions/{id}/cancel`, `POST /sessions/{id}/no-show`
+- API: `sessions.md` (TBD) § `POST /sessions/{id}/status`, `POST /sessions/{id}/cancel`, `POST /sessions/{id}/no-show`
 - DB: `sessions.status enum: planned, in_progress, completed, canceled, no_show`, `sessions.status_changed_at`, `sessions.cancellation_reason`
 - Events: `SessionStatusChanged`, `SessionCompleted`, `SessionCanceled`, `SessionNoShow`
 - Jobs: `AutoStartSessionsJob` (every 5 min), `AutoNoShowSessionsJob` (every 30 min)
@@ -275,7 +275,7 @@ Trainer створює recurring series (напр. "every Mon/Wed/Fri at 18:00 f
 
 ### Зв'язок з технічною спекою
 
-- API: [`../sessions.md`](../sessions.md) § `POST /sessions/recurring`, `GET /session-series/{id}`, `PATCH /session-series/{id}`, `DELETE /session-series/{id}`
+- API: `sessions.md` (TBD) § `POST /sessions/recurring`, `GET /session-series/{id}`, `PATCH /session-series/{id}`, `DELETE /session-series/{id}`
 - DB: `session_series` (з `template jsonb`, `recurrence_rule jsonb`, `timezone`, `materialized_until`, `deleted_at`); `sessions.series_id` FK SET NULL; `sessions.series_overridden boolean`
 - Jobs: `MaterializeRecurringSessionsJob` (scheduled daily 02:00, look-ahead 30 days)
 - Events: `SessionSeriesCreated`, `SessionSeriesUpdated`, `SessionSeriesDeleted`

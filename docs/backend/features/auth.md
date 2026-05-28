@@ -1,6 +1,6 @@
 # Features — Auth & Identity
 
-**Модуль:** Auth & Identity · **Phase:** 0 · **Файлів-сусідів:** [`../auth.md`](../auth.md) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) (tables)
+**Модуль:** Auth & Identity · **Phase:** 0 · **Файлів-сусідів:** `auth.md` (TBD) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) (tables)
 
 5 фіч, що покривають усі сценарії автентифікації та керування ідентичністю користувача.
 
@@ -82,7 +82,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../auth.md`](../auth.md) § `POST /auth/register`, `POST /auth/login`, `POST /auth/verify-email`, `POST /auth/resend-verification`
+- API: `auth.md` (TBD) § `POST /auth/register`, `POST /auth/login`, `POST /auth/verify-email`, `POST /auth/resend-verification`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `users`, `email_verifications`, `audit_logs`
 - Events: `UserRegistered`, `EmailVerified`, `UserLoggedIn`, `UserLockedOut`
 - Jobs: `SendEmailVerificationJob` (queue `critical`)
@@ -154,7 +154,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../auth.md`](../auth.md) § `POST /auth/oauth/{provider}`, `GET /auth/oauth/providers`, `DELETE /me/oauth/{provider}`
+- API: `auth.md` (TBD) § `POST /auth/oauth/{provider}`, `GET /auth/oauth/providers`, `DELETE /me/oauth/{provider}`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `users`, `oauth_identities`
 - Events: `OAuthLoggedIn`, `OAuthLinked`, `OAuthUnlinked`
 - Config: `config/services.php` для credentials Google/Apple/Facebook; secrets у `.env`
@@ -221,7 +221,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../auth.md`](../auth.md) § `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/logout-all`, `GET /me/sessions`, `DELETE /me/sessions/{id}`
+- API: `auth.md` (TBD) § `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/logout-all`, `GET /me/sessions`, `DELETE /me/sessions/{id}`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `refresh_tokens` (з полями `replaced_by_id`, `revoked_at`, `device_label`, `last_used_at`, `ip`, `user_agent`)
 - Events: `TokenRefreshed`, `LoggedOut`, `LoggedOutEverywhere`, `SuspiciousActivityDetected`
 - Jobs: `RefreshTokenCleanupJob` (scheduled daily 04:00)
@@ -266,7 +266,7 @@
 
 ### Технічна спека
 
-- API: [`../auth.md`](../auth.md) § `POST /me/password`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `POST /me/email`, `POST /auth/confirm-email-change`
+- API: `auth.md` (TBD) § `POST /me/password`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `POST /me/email`, `POST /auth/confirm-email-change`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `password_resets`, `email_change_requests`
 - Events: `PasswordChanged`, `EmailChanged`, `PasswordResetRequested`
 - Jobs: `SendPasswordResetEmailJob`, `SendEmailChangeConfirmationJob`, `NotifyOldEmailAboutChangeJob`
@@ -349,7 +349,7 @@ GDPR "right to erasure" + "right to export". Користувач може:
 
 ### Зв'язок з технічною спекою
 
-- API: [`../auth.md`](../auth.md) § `POST /me/export`, `GET /me/exports/{id}`, `DELETE /me/account`, `POST /me/account/restore`
+- API: `auth.md` (TBD) § `POST /me/export`, `GET /me/exports/{id}`, `DELETE /me/account`, `POST /me/account/restore`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `users` (з `deleted_at`, `deletion_scheduled_at`), `data_exports`
 - Events: `AccountDeletionRequested`, `AccountRestored`, `AccountHardDeleted`, `DataExportReady`
 - Jobs: `BuildDataExportJob` (queue `low`), `HardDeleteScheduledAccountsJob` (scheduled daily 03:30), `NotifyTrainerAboutClientDeletionJob`

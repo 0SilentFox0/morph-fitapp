@@ -1,6 +1,6 @@
 # Features — Files & Media
 
-**Модуль:** Files & Media · **Phase:** 0 · **Файлів-сусідів:** [`../files.md`](../files.md) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md)
+**Модуль:** Files & Media · **Phase:** 0 · **Файлів-сусідів:** `files.md` (TBD) (technical), [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md)
 
 1 фіча, що покриває весь pipeline завантаження, обробки і delivery медіа-файлів (аватари, exercise videos, chat media).
 
@@ -98,7 +98,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../files.md`](../files.md) § `POST /files/upload-url`, `POST /files/{id}/complete`, `GET /files/{id}/signed-url`, `DELETE /files/{id}`
+- API: `files.md` (TBD) § `POST /files/upload-url`, `POST /files/{id}/complete`, `GET /files/{id}/signed-url`, `DELETE /files/{id}`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `media_files` (з `purpose`, `mime`, `size`, `s3_key`, `status`, `thumbnails jsonb`, `context jsonb`, `owner_id`, `conversation_id`, `exercise_id`, `message_id` — soft FK)
 - Events: `FileUploadRequested`, `FileReady`, `FileFailed`, `FileDeleted`
 - Jobs: `GenerateThumbnailsJob` (queue `default`), `FilesCleanupJob` (scheduled daily 04:30), `OrphanFileCleanupJob` (queue `low`)

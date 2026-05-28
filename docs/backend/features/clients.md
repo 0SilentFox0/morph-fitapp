@@ -1,6 +1,6 @@
 # Features — Clients (CRM)
 
-**Модуль:** Clients (CRM) · **Phase:** 1 · **Файлів-сусідів:** [`../clients.md`](../clients.md) (technical)
+**Модуль:** Clients (CRM) · **Phase:** 1 · **Файлів-сусідів:** `clients.md` (TBD) (technical)
 
 3 фічі. Тренерський "roster" — центральна CRM-сутність системи. Один `clients` row може існувати як **standalone** (тільки запис тренера, без user account) або **linked** (з `user_id` до акаунта клієнта в системі).
 
@@ -85,7 +85,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../clients.md`](../clients.md) § `GET /clients`, `POST /clients`, `GET /clients/{id}`, `PATCH /clients/{id}`, `DELETE /clients/{id}`, `POST /clients/{id}/archive`, `POST /clients/{id}/unarchive`
+- API: `clients.md` (TBD) § `GET /clients`, `POST /clients`, `GET /clients/{id}`, `PATCH /clients/{id}`, `DELETE /clients/{id}`, `POST /clients/{id}/archive`, `POST /clients/{id}/unarchive`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `clients` (з `trainer_id`, `name`, `email`, `phone`, `type enum`, `status enum`, `user_id` FK nullable, `notes text`, `tags jsonb`, `archived_at`, `created_at`)
 - Events: `ClientAdded`, `ClientUpdated`, `ClientArchived`, `ClientUnarchived`, `ClientDeleted`
 - Index: `(trainer_id, status, name)` для list+search
@@ -173,7 +173,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../clients.md`](../clients.md) § `POST /clients/{id}/invite`, `GET /invitations`, `DELETE /invitations/{id}`, `POST /invitations/{id}/resend`, `POST /invitations/{code}/accept`
+- API: `clients.md` (TBD) § `POST /clients/{id}/invite`, `GET /invitations`, `DELETE /invitations/{id}`, `POST /invitations/{id}/resend`, `POST /invitations/{code}/accept`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `client_invitations` (з `code` UNIQUE, `client_id` FK CASCADE, `trainer_id`, `email`, `expires_at`, `accepted_at`, `revoked_at`, `last_sent_at`)
 - Events: `ClientInvited`, `InvitationAccepted`, `InvitationRevoked`, `InvitationResent`
 - Jobs: `SendClientInvitationJob` (queue `critical`), `RevokeExpiredInvitationsJob` (scheduled daily 02:00)
@@ -218,7 +218,7 @@
 
 ### Технічна спека
 
-- API: [`../clients.md`](../clients.md) § `PATCH /clients/{id}` (з полями `notes`, `tags`), `GET /clients?tags=tag1,tag2`
+- API: `clients.md` (TBD) § `PATCH /clients/{id}` (з полями `notes`, `tags`), `GET /clients?tags=tag1,tag2`
 - DB: `clients.notes text`, `clients.tags jsonb` (string array), GIN index на `tags`
 - Validation: `notes` max 10000, `tags` max 20 elements, kожен max 32 chars
 

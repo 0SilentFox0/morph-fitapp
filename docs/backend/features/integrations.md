@@ -1,6 +1,6 @@
 # Features — External Integrations
 
-**Модуль:** External Integrations · **Phase:** 2 · **Файлів-сусідів:** [`../integrations.md`](../integrations.md) (technical)
+**Модуль:** External Integrations · **Phase:** 2 · **Файлів-сусідів:** `integrations.md` (TBD) (technical)
 
 3 фічі. Інтеграції з зовнішніми сервісами: календарі (Google bi-directional, Apple via ICS), OAuth providers connect/disconnect (Google/Apple/Facebook).
 
@@ -101,7 +101,7 @@
 
 ### Зв'язок з технічною спекою
 
-- API: [`../integrations.md`](../integrations.md) § `GET /me/integrations/google/auth-url`, `POST /me/integrations/google/callback`, `PATCH /me/integrations/google`, `DELETE /me/integrations/google`, `POST /webhooks/google-calendar`
+- API: `integrations.md` (TBD) § `GET /me/integrations/google/auth-url`, `POST /me/integrations/google/callback`, `PATCH /me/integrations/google`, `DELETE /me/integrations/google`, `POST /webhooks/google-calendar`
 - DB: [`../DB_STRUCTURE.md`](../DB_STRUCTURE.md) § `calendar_integrations` (з `user_id`, `provider`, `provider_user_email`, `access_token enc`, `refresh_token enc`, `expires_at`, `calendar_id`, `sync_token`, `webhook_channel_id`, `webhook_resource_id`, `webhook_expires_at`, `last_synced_at`, `last_error text`); `sessions.google_event_id` (FK indirect)
 - Events: `IntegrationConnected`, `IntegrationDisconnected`, `SyncSucceeded`, `SyncFailed`
 - Jobs: `InitialGoogleCalendarSyncJob` (queue `default`), `PushSessionToGoogleCalendarJob`, `PullGoogleCalendarChangesJob`, `RefreshGoogleTokenJob` (scheduled hourly), `RenewWebhookSubscriptionJob` (scheduled daily — Google webhooks expire after 7 днів)
@@ -192,7 +192,7 @@ Apple **не має write API** для Calendar (тільки read через Ca
 
 ### Зв'язок з технічною спекою
 
-- API: [`../integrations.md`](../integrations.md) § `POST /me/integrations/apple/enable`, `POST /me/integrations/apple/rotate`, `DELETE /me/integrations/apple`, `GET /calendars/{user_id}/{token}.ics` (public route)
+- API: `integrations.md` (TBD) § `POST /me/integrations/apple/enable`, `POST /me/integrations/apple/rotate`, `DELETE /me/integrations/apple`, `GET /calendars/{user_id}/{token}.ics` (public route)
 - DB: same `calendar_integrations` table; `provider: "apple"`, `feed_token` (UNIQUE per trainer)
 - Service: `ICSGenerator` (RFC 5545 builder)
 - Caching: ICS response cached в Redis 5хв per `(trainer_id, version)` (invalidate on session change)
@@ -234,7 +234,7 @@ Apple **не має write API** для Calendar (тільки read через Ca
 
 ### Технічна спека
 
-- API: [`../integrations.md`](../integrations.md) § `GET /me/integrations`, `POST /me/oauth/{provider}/connect`, `DELETE /me/oauth/{provider}` (alias на AUTH-002 endpoints)
+- API: `integrations.md` (TBD) § `GET /me/integrations`, `POST /me/oauth/{provider}/connect`, `DELETE /me/oauth/{provider}` (alias на AUTH-002 endpoints)
 - DB: `oauth_identities` (з AUTH-002), `calendar_integrations` (з INT-001)
 - Service: `IntegrationsAggregator` (зliepує дані з двох таблиць)
 

@@ -151,7 +151,6 @@ Packages templates + assignment + auto-decrement, Transactions з прив'яз�
 - ✅ [`docs/backend/features/`](docs/backend/features/) — feature-level specifications (16 файлів, 53 фічі) з user stories, acceptance criteria, edge cases, permissions.
 - ✅ [`docs/backend/DB_STRUCTURE.md`](docs/backend/DB_STRUCTURE.md) — повна DB схема (40 таблиць).
 - ✅ [`docs/backend/DB_SCHEMA_TREE.md`](docs/backend/DB_SCHEMA_TREE.md) — Mermaid ER diagram + ASCII tree.
-- 🔄 [`docs/backend/{module}.md`](docs/backend/) × 16 — Technical API specs (плейсхолдери; заповнюватимуться при реалізації кожного модуля).
 - ✅ [`docs/PROGRESS.md`](docs/PROGRESS.md), [`docs/TASKS.md`](docs/TASKS.md) — frontend progress і tasks.
 - 📅 OpenAPI/Swagger — генерується автоматично з Laravel route definitions (через scribe або similar; tooling вибирається пізніше).
 
@@ -237,8 +236,7 @@ Packages templates + assignment + auto-decrement, Transactions з прив'яз�
 |---|---|
 | [`docs/backend/TECH_TASK.md`](docs/backend/TECH_TASK.md) | Umbrella tech task для backend (architecture, conventions, NFR, security, real-time, devops, roadmap) |
 | [`docs/backend/features/README.md`](docs/backend/features/README.md) | Index feature-specs + шаблони (full / compact) |
-| [`docs/backend/features/{module}.md`](docs/backend/features/) | Feature-level бізнес-логіка (user stories, AC, edge cases, permissions) |
-| [`docs/backend/{module}.md`](docs/backend/) | Technical API specs per module (TBD placeholders) |
+| [`docs/backend/features/{module}.md`](docs/backend/features/) | Feature-level бізнес-логіка (user stories, AC, edge cases, permissions, technical hints) |
 | [`docs/backend/DB_STRUCTURE.md`](docs/backend/DB_STRUCTURE.md) | Full PostgreSQL schema |
 | [`docs/backend/DB_SCHEMA_TREE.md`](docs/backend/DB_SCHEMA_TREE.md) | Mermaid ER + ASCII tree |
 | [`docs/PROGRESS.md`](docs/PROGRESS.md) | Frontend implementation progress |
