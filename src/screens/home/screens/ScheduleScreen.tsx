@@ -41,7 +41,7 @@ function buildDaysFromToday(): { label: string; date: string; dateKey: string }[
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     days.push({
-      label: DAY_LABELS[d.getDay()],
+      label: DAY_LABELS[d.getDay()] ?? '',
       date: String(d.getDate()),
       dateKey: d.toISOString().slice(0, 10),
     });

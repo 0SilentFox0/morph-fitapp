@@ -55,13 +55,13 @@ const initialConversations: Conversation[] = [
   {
     id: 'c1',
     participant: mockParticipant1,
-    lastMessage: mockMessages1[mockMessages1.length - 1],
+    lastMessage: mockMessages1[mockMessages1.length - 1] ?? null,
     unreadCount: 0,
   },
   {
     id: 'c2',
     participant: mockParticipant2,
-    lastMessage: mockMessages2[mockMessages2.length - 1],
+    lastMessage: mockMessages2[mockMessages2.length - 1] ?? null,
     unreadCount: 1,
   },
   {

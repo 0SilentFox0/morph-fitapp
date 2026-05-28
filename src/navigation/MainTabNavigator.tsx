@@ -104,11 +104,25 @@ export function MainTabNavigator() {
         component={AddPlaceholderScreen}
         options={({ navigation }) => ({
           tabBarLabel: () => null,
-          tabBarIcon: () => <AddButton onPress={() => navigation.navigate('HomeTab', { screen: 'SessionForm' })} />,
+          tabBarIcon: () => (
+            <AddButton
+              onPress={() =>
+                (navigation as unknown as { navigate: (n: string, p: object) => void }).navigate(
+                  'HomeTab',
+                  { screen: 'SessionForm' },
+                )
+              }
+            />
+          ),
           tabBarButton: (props) => (
             <TouchableOpacity
-              {...props}
-              onPress={() => navigation.navigate('HomeTab', { screen: 'SessionForm' })}
+              {...(props as unknown as React.ComponentProps<typeof TouchableOpacity>)}
+              onPress={() =>
+                (navigation as unknown as { navigate: (n: string, p: object) => void }).navigate(
+                  'HomeTab',
+                  { screen: 'SessionForm' },
+                )
+              }
               activeOpacity={0.8}
             />
           ),

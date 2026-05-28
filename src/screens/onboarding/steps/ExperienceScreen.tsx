@@ -53,7 +53,7 @@ export function ExperienceScreen() {
     >
       <View style={styles.optionsRow}>
         {EXPERIENCE_OPTIONS.map((opt, i) => {
-          const val = EXPERIENCE_VALUES[i];
+          const val = EXPERIENCE_VALUES[i] ?? '';
           const isSelected = experienceYears === val;
           return (
             <TouchableOpacity

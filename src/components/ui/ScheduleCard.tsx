@@ -64,7 +64,7 @@ export function ScheduleCard({
         </View>
         <View style={styles.bottomRow}>
           <View style={styles.bottomLeft}>
-            {session.participants.length === 1 ? (
+            {session.participants.length === 1 && session.participants[0] ? (
               <View style={styles.participantTag}>
                 <Avatar name={session.participants[0].name} size={18} />
                 <Text style={styles.participantName}>
