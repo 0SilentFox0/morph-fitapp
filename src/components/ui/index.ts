@@ -19,3 +19,5 @@ export { ParticipantChip } from './ParticipantChip';
 export { DropdownSelect } from './DropdownSelect';
 export { ChoiceCard } from './ChoiceCard';
 export type { ChoiceCardProps, ChoiceCardVariant } from './ChoiceCard';
+export { EmptyState } from './EmptyState';
+export type { EmptyStateProps } from './EmptyState';

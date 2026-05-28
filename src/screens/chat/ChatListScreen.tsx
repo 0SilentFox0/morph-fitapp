@@ -11,7 +11,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ChatStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { SearchInput, Avatar } from '../../components/ui';
+import { SearchInput, Avatar, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
@@ -58,21 +58,17 @@ export function ChatListScreen() {
         showsVerticalScrollIndicator={false}
       >
         {filtered.length === 0 ? (
-          <View style={styles.empty}>
-            <Ionicons name="chatbubbles-outline" size={48} color={colors.textMuted} />
-            <Text style={styles.emptyTitle}>No conversations yet</Text>
-            <Text style={styles.emptySub}>
-              {search ? 'No conversations match your search.' : 'Start a chat with a client to get started.'}
-            </Text>
-            {!search && (
-              <TouchableOpacity
-                style={styles.emptyBtn}
-                onPress={() => navigation.navigate('NewChat')}
-              >
-                <Text style={styles.emptyBtnText}>New chat</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          <EmptyState
+            icon="chatbubbles-outline"
+            title="No conversations yet"
+            subtitle={
+              search
+                ? 'No conversations match your search.'
+                : 'Start a chat with a client to get started.'
+            }
+            actionLabel={search ? undefined : 'New chat'}
+            onAction={search ? undefined : () => navigation.navigate('NewChat')}
+          />
         ) : (
           filtered.map((conv) => (
             <TouchableOpacity

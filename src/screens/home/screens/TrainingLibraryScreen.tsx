@@ -13,7 +13,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Card, SearchInput } from '../../../components/ui';
+import { Card, SearchInput, EmptyState } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
@@ -80,21 +80,17 @@ export function TrainingLibraryScreen() {
         showsVerticalScrollIndicator={false}
       >
         {filteredPrograms.length === 0 ? (
-          <View style={styles.empty}>
-            <Ionicons name="folder-open-outline" size={48} color={colors.textMuted} />
-            <Text style={styles.emptyTitle}>No programs yet</Text>
-            <Text style={styles.emptySub}>
-              {search ? 'No programs match your search.' : 'Add your first program to get started.'}
-            </Text>
-            {!search && (
-              <TouchableOpacity
-                style={styles.emptyBtn}
-                onPress={() => navigation.navigate('AddToLibraryForm')}
-              >
-                <Text style={styles.emptyBtnText}>Add program</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          <EmptyState
+            icon="folder-open-outline"
+            title="No programs yet"
+            subtitle={
+              search
+                ? 'No programs match your search.'
+                : 'Add your first program to get started.'
+            }
+            actionLabel={search ? undefined : 'Add program'}
+            onAction={search ? undefined : () => navigation.navigate('AddToLibraryForm')}
+          />
         ) : (
           filteredPrograms.map((p) => (
             <Card key={p.id} style={styles.programCard}>
