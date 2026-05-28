@@ -21,3 +21,5 @@ export { ChoiceCard } from './ChoiceCard';
 export type { ChoiceCardProps, ChoiceCardVariant } from './ChoiceCard';
 export { EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState';
+export { ExerciseCard } from './ExerciseCard';
+export type { ExerciseCardProps } from './ExerciseCard';
