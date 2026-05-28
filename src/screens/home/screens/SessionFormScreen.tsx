@@ -22,6 +22,7 @@ import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { useProgramsStore } from '../../../store/programsStore';
 import { mockClients } from '../../../mocks';
+import { formatDate, formatTime } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;
@@ -48,19 +49,6 @@ function validateTitle(value: string): string {
   if (!trimmed) return 'Title is required';
   if (trimmed.length < 2) return 'Title must be at least 2 characters';
   return '';
-}
-
-function formatDate(d: Date): string {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-function formatTime(d: Date): string {
-  let h = d.getHours();
-  const m = d.getMinutes().toString().padStart(2, '0');
-  const ampm = h >= 12 ? 'pm' : 'am';
-  h = h % 12 || 12;
-  return `${h}:${m}${ampm}`;
 }
 
 function programMeta(p: { tag: string; exercises?: unknown[]; videoCount: number }): string {
