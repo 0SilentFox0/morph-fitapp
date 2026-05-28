@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { radius } from '../../theme';
 
 export type ChoiceCardVariant = 'card' | 'chip';
 
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: spacing.md,
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 16,
+    borderRadius: radius.lg,
     padding: spacing.lg,
   },
   cardSelected: {
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     backgroundColor: colors.neutral2,
-    borderRadius: 20,
+    borderRadius: radius.xl,
   },
   chipSelected: {
     backgroundColor: colors.accent,
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 48,
     height: 48,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral2,
     alignItems: 'center',
     justifyContent: 'center',

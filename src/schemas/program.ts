@@ -10,7 +10,7 @@ export const programDraftSchema = z.object({
     .trim()
     .min(2, 'Title must be at least 2 characters'),
   tag: z.string().min(1, 'Please select a category'),
-  description: z.string().optional().default(''),
+  description: z.string(),
 });
 
 export type ProgramDraftValues = z.infer<typeof programDraftSchema>;

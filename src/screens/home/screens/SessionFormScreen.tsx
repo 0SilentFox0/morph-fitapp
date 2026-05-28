@@ -6,11 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { radius } from '../../../theme';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FormInput, DropdownSelect, Button } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
@@ -19,6 +22,7 @@ import { useSessionsStore } from '../../../store/sessionsStore';
 import { useProgramsStore } from '../../../store/programsStore';
 import { TRAINING_TYPES } from '../../../constants';
 import { formatDate, formatTime } from '../../../utils';
+import { sessionSchema, type SessionFormValues } from '../../../schemas/session';
 import { TypePickerModal } from './SessionForm/TypePickerModal';
 import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
 import { ParticipantsSection } from './SessionForm/ParticipantsSection';
@@ -42,13 +46,6 @@ function buildParticipants(
   });
 }
 
-function validateTitle(value: string): string {
-  const trimmed = value.trim();
-  if (!trimmed) return 'Title is required';
-  if (trimmed.length < 2) return 'Title must be at least 2 characters';
-  return '';
-}
-
 function programMeta(p: { tag: string; exercises?: unknown[]; videoCount: number }): string {
   const count = p.exercises?.length ?? p.videoCount;
   return `${p.tag} · ${count} exercises`;
@@ -62,68 +59,64 @@ export function SessionFormScreen() {
 
   const addSession = useSessionsStore((s) => s.addSession);
   const updateSession = useSessionsStore((s) => s.updateSession);
-
-  const [title, setTitle] = React.useState(session?.title ?? '');
-  const [titleError, setTitleError] = React.useState('');
-
-  const [dateObj, setDateObj] = React.useState(() => new Date());
-  const [timeObj, setTimeObj] = React.useState(() => new Date());
-
-  const [participants, setParticipants] = React.useState<string[]>(
-    session?.participants?.map((p) => p.name) ?? [],
-  );
-
-  const [type, setType] = React.useState(session?.type ?? 'Cardio');
-  const [typePickerVisible, setTypePickerVisible] = React.useState(false);
-
   const programs = useProgramsStore((s) => s.programs);
-  const [programId, setProgramId] = React.useState<string | undefined>(session?.programId);
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<SessionFormValues>({
+    resolver: zodResolver(sessionSchema),
+    defaultValues: {
+      title: session?.title ?? '',
+      programId: session?.programId ?? '',
+      date: new Date(),
+      time: new Date(),
+      type: session?.type ?? 'Cardio',
+      participants: session?.participants?.map((p) => p.name) ?? [],
+    },
+    mode: 'onBlur',
+  });
+
+  const [typePickerVisible, setTypePickerVisible] = React.useState(false);
   const [programPickerVisible, setProgramPickerVisible] = React.useState(false);
-  const [programError, setProgramError] = React.useState('');
-  const selectedProgram = programs.find((p) => p.id === programId);
 
-  const handleSave = () => {
-    const err = validateTitle(title);
-    setTitleError(err);
+  const titleValue = watch('title');
+  const dateValue = watch('date');
+  const timeValue = watch('time');
+  const typeValue = watch('type');
+  const programIdValue = watch('programId');
+  const participantsValue = watch('participants');
+  const selectedProgram = programs.find((p) => p.id === programIdValue);
 
-    if (!programId) {
-      setProgramError('Please select a training program');
-    } else {
-      setProgramError('');
-    }
-
-    if (err || !programId) return;
-
-    const trimmedTitle = title.trim();
-    const builtParticipants = buildParticipants(participants, session?.participants);
+  const onSubmit = (data: SessionFormValues) => {
+    const trimmedTitle = data.title.trim();
+    const builtParticipants = buildParticipants(data.participants, session?.participants);
 
     if (session) {
       updateSession(session.id, {
         title: trimmedTitle,
-        type,
-        date: formatDate(dateObj),
-        time: formatTime(timeObj),
+        type: data.type,
+        date: formatDate(data.date),
+        time: formatTime(data.time),
         participants: builtParticipants,
-        programId,
+        programId: data.programId,
       });
     } else {
       addSession({
         title: trimmedTitle,
-        type,
-        date: formatDate(dateObj),
-        time: formatTime(timeObj),
+        type: data.type,
+        date: formatDate(data.date),
+        time: formatTime(data.time),
         status: 'pending',
         participants: builtParticipants,
-        programId,
+        programId: data.programId,
       });
     }
 
     navigation.navigate('RequestSubmitted');
-  };
-
-  const onTitleChange = (text: string) => {
-    setTitle(text);
-    if (titleError) setTitleError(validateTitle(text));
   };
 
   return (
@@ -132,8 +125,8 @@ export function SessionFormScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
           <Ionicons name="chevron-back" size={20} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{title || 'New Session'}</Text>
-        <TouchableOpacity onPress={handleSave} style={styles.headerBtn}>
+        <Text style={styles.headerTitle}>{titleValue || 'New Session'}</Text>
+        <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.headerBtn}>
           <Ionicons name="save-outline" size={20} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -144,35 +137,45 @@ export function SessionFormScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <FormInput
-          placeholder="Session title"
-          value={title}
-          onChangeText={onTitleChange}
-          error={titleError || undefined}
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              placeholder="Session title"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.title?.message}
+            />
+          )}
         />
 
         <DateTimePickerSection
-          date={dateObj}
-          time={timeObj}
-          onDateChange={setDateObj}
-          onTimeChange={setTimeObj}
+          date={dateValue}
+          time={timeValue}
+          onDateChange={(d) => setValue('date', d, { shouldValidate: true })}
+          onTimeChange={(t) => setValue('time', t, { shouldValidate: true })}
         />
 
-        <ParticipantsSection value={participants} onChange={setParticipants} />
+        <ParticipantsSection
+          value={participantsValue}
+          onChange={(next) => setValue('participants', next, { shouldDirty: true })}
+        />
 
-        <Text style={styles.sectionLabel}>{'Type'}</Text>
+        <Text style={styles.sectionLabel}>Type</Text>
         <DropdownSelect
-          value={type}
+          value={typeValue}
           placeholder="Select type"
           onPress={() => setTypePickerVisible(true)}
           style={styles.field}
         />
 
         <Text style={styles.sectionLabel}>
-          {'Program'} <Text style={styles.required}>*</Text>
+          Program <Text style={styles.required}>*</Text>
         </Text>
         <TouchableOpacity
-          style={[styles.programPicker, programError ? styles.programPickerError : null]}
+          style={[styles.programPicker, errors.programId ? styles.programPickerError : null]}
           onPress={() => setProgramPickerVisible(true)}
           activeOpacity={0.8}
         >
@@ -193,28 +196,31 @@ export function SessionFormScreen() {
             </View>
           )}
         </TouchableOpacity>
-        {programError ? <Text style={styles.errorText}>{programError}</Text> : null}
+        {errors.programId ? (
+          <Text style={styles.errorText}>{errors.programId.message}</Text>
+        ) : null}
 
-        <Button title="Apply" onPress={handleSave} style={styles.applyButton} />
+        <Button
+          title="Apply"
+          onPress={handleSubmit(onSubmit)}
+          style={styles.applyButton}
+        />
       </ScrollView>
 
       <TypePickerModal
         visible={typePickerVisible}
         onClose={() => setTypePickerVisible(false)}
         options={TRAINING_TYPES}
-        value={type}
-        onChange={setType}
+        value={typeValue}
+        onChange={(t) => setValue('type', t, { shouldValidate: true })}
       />
 
       <ProgramPickerModal
         visible={programPickerVisible}
         onClose={() => setProgramPickerVisible(false)}
         programs={programs}
-        value={programId}
-        onChange={(id) => {
-          setProgramId(id);
-          setProgramError('');
-        }}
+        value={programIdValue || undefined}
+        onChange={(id) => setValue('programId', id, { shouldValidate: true })}
       />
     </View>
   );
@@ -263,7 +269,7 @@ const styles = StyleSheet.create({
   },
   programPicker: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: 'transparent',
     marginBottom: spacing.xs,

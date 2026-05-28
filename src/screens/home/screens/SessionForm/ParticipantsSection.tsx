@@ -6,6 +6,7 @@ import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import { mockClients } from '../../../../mocks';
+import { radius } from '../../../../theme';
 
 export interface ParticipantsSectionProps {
   value: string[];
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     paddingVertical: 4,
     paddingHorizontal: spacing.sm,
-    borderRadius: 16,
+    borderRadius: radius.lg,
   },
   chipText: {
     fontSize: typography.sizes.sm,
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   searchInput: {
     flex: 1,
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
   },
   results: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginTop: spacing.sm,
     paddingVertical: spacing.xs,
   },

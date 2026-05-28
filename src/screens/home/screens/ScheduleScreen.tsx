@@ -14,7 +14,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { ScheduleCard, SessionOptionsMenu, SearchInput } from '../../../components/ui';
+import { ScheduleCard, SessionOptionsMenu, SearchInput, EmptyState } from '../../../components/ui';
+import { MonthSelector } from './Schedule/MonthSelector';
+import { DayStrip } from './Schedule/DayStrip';
 import type { SessionOptionAction } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
@@ -160,17 +162,17 @@ export function ScheduleScreen() {
   const monthCellSize = Math.floor((availWidth - spacing.xs * 6) / 7);
 
   const renderDayEmptyState = () => (
-    <View style={styles.emptyDayState}>
-      <Ionicons name="calendar-outline" size={40} color={colors.textMuted} />
-      <Text style={styles.emptyDayTitle}>No sessions this day</Text>
-      <Text style={styles.emptyDaySubtitle}>
-        {search.trim()
+    <EmptyState
+      icon="calendar-outline"
+      title="No sessions this day"
+      subtitle={
+        search.trim()
           ? 'Try a different search or pick another date.'
           : sessions.length === 0
             ? 'Add your first session from the + button.'
-            : 'Add a session or choose another date.'}
-      </Text>
-    </View>
+            : 'Add a session or choose another date.'
+      }
+    />
   );
 
   return (
@@ -187,48 +189,11 @@ export function ScheduleScreen() {
         }
       />
 
-      <View style={styles.monthSelector}>
-        <TouchableOpacity>
-          <Ionicons name="chevron-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.monthText}>
-          {new Date(days[selectedDayIndex]?.dateKey ?? '').toLocaleString('default', {
-            month: 'long',
-            year: 'numeric',
-          })}
-        </Text>
-        <TouchableOpacity>
-          <Ionicons name="chevron-forward" size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+      <MonthSelector dateKey={days[selectedDayIndex]?.dateKey ?? ''} />
 
       <View {...panResponder.panHandlers}>
         {viewMode === 'day' && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.daysScroll}
-          >
-            {days.map((day, i) => {
-              const selected = i === selectedDayIndex;
-              return (
-                <TouchableOpacity
-                  key={day.dateKey}
-                  onPress={() => setSelectedDayIndex(i)}
-                  style={[
-                    styles.dayChip,
-                    { width: DAY_CELL_WIDTH, height: DAY_CELL_HEIGHT },
-                    selected && styles.dayChipSelected,
-                  ]}
-                >
-                  <Text style={[styles.dayLabel, selected && styles.dayLabelSelected]}>
-                    {day.label}
-                  </Text>
-                  <Text style={[styles.dayDate, selected && styles.dayDateSelected]}>{day.date}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+          <DayStrip days={days} selectedIndex={selectedDayIndex} onSelect={setSelectedDayIndex} />
         )}
 
         {viewMode === 'week' && (
@@ -376,50 +341,6 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.screenBg,
   },
-  monthSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.xs,
-  },
-  monthText: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  daysScroll: {
-    paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
-    marginBottom: 0,
-    flexGrow: 0,
-  },
-  dayChip: {
-    borderRadius: 14,
-    backgroundColor: colors.neutral2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    gap: 0,
-  },
-  dayChipSelected: {
-    backgroundColor: colors.primary3,
-  },
-  dayLabel: {
-    fontSize: 12,
-    lineHeight: 20,
-    fontWeight: typography.weights.normal,
-    color: colors.text,
-  },
-  dayLabelSelected: {
-    color: colors.text,
-  },
-  dayDate: {
-    fontSize: 14,
-    lineHeight: 22,
-    fontWeight: '900',
-    color: colors.text,
-  },
   dayDateSelected: {
     color: colors.text,
   },
@@ -526,24 +447,5 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.semibold,
     color: colors.text,
     marginBottom: spacing.md,
-  },
-  emptyDayState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing['2xl'],
-    paddingHorizontal: spacing.lg,
-  },
-  emptyDayTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginTop: spacing.md,
-    textAlign: 'center',
-  },
-  emptyDaySubtitle: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-    marginTop: spacing.sm,
-    textAlign: 'center',
   },
 });

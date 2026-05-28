@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
+import { radius } from '../theme';
 
 interface Props {
   children: React.ReactNode;
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   buttonText: {
     color: colors.text,

@@ -5,16 +5,9 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useDraftProgramStore } from '../../store/draftProgramStore';
-import type { ProgramExercise, ExerciseSet, SetNote } from '../../mocks';
-
-const SET_NOTES: { key: SetNote; label: string; icon: string }[] = [
-  { key: 'regular', label: 'Regular', icon: 'checkmark-circle-outline' },
-  { key: 'failure', label: 'To failure', icon: 'flame-outline' },
-  { key: 'dropset', label: 'Drop set', icon: 'trending-down-outline' },
-  { key: 'short_rest', label: 'Short rest', icon: 'timer-outline' },
-  { key: 'long_rest', label: 'Long rest', icon: 'time-outline' },
-];
-const NOTE_CYCLE: SetNote[] = SET_NOTES.map((n) => n.key);
+import type { ProgramExercise, ExerciseSet } from '../../mocks';
+import { SET_NOTES, SET_NOTE_CYCLE } from '../../constants';
+import { radius } from '../../theme';
 
 export interface ExerciseCardProps {
   exercise: ProgramExercise;
@@ -38,8 +31,8 @@ export const ExerciseCard = React.memo(function ExerciseCard({ exercise }: Exerc
 
   const cycleNote = (setIdx: number) => {
     const current = exercise.sets[setIdx]?.note ?? 'regular';
-    const currentIdx = NOTE_CYCLE.indexOf(current);
-    const next = NOTE_CYCLE[(currentIdx + 1) % NOTE_CYCLE.length];
+    const currentIdx = SET_NOTE_CYCLE.indexOf(current);
+    const next = SET_NOTE_CYCLE[(currentIdx + 1) % SET_NOTE_CYCLE.length];
     updateSet(exercise.id, setIdx, { note: next });
   };
 
@@ -148,7 +141,7 @@ const styles = StyleSheet.create({
   thumb: {
     width: 40,
     height: 40,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral3,
   },
   thumbEmpty: {
@@ -221,14 +214,14 @@ const styles = StyleSheet.create({
   inputCellKg: {
     flex: 1,
     backgroundColor: colors.neutral3,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     height: 32,
     justifyContent: 'center',
   },
   inputCellReps: {
     flex: 1,
     backgroundColor: colors.neutral3,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     height: 32,
     justifyContent: 'center',
   },

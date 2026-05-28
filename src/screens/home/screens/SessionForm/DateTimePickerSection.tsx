@@ -5,20 +5,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
-
-// Local helpers; will be replaced by ../../utils/date once Task 1 lands.
-const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-function formatDate(d: Date): string {
-  return `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-function formatTime(d: Date): string {
-  const m = d.getMinutes().toString().padStart(2, '0');
-  const ampm = d.getHours() >= 12 ? 'pm' : 'am';
-  const h = d.getHours() % 12 || 12;
-  return `${h}:${m}${ampm}`;
-}
+import { formatDate, formatTime } from '../../../../utils';
+import { radius } from '../../../../theme';
 
 export interface DateTimePickerSectionProps {
   date: Date;
@@ -125,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   fieldText: {
     fontSize: typography.sizes.sm,
@@ -133,7 +121,7 @@ const styles = StyleSheet.create({
   },
   native: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginTop: spacing.sm,
     overflow: 'hidden',
   },

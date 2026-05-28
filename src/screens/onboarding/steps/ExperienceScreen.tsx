@@ -47,7 +47,8 @@ export function ExperienceScreen() {
         const asset = result.assets[0];
         addCertification({ name: asset.name, uri: asset.uri });
       }
-    } catch {
+    } catch (e) {
+      console.warn('[ExperienceScreen] DocumentPicker failed:', e);
       Alert.alert('Error', 'Could not pick document. Please try again.');
     }
   };

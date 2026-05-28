@@ -8,10 +8,13 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
+import { radius } from '../../../theme';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ScreenHeader } from '../../../components/layout';
 import { Input, Button, DropdownSelect, ExerciseCard } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
@@ -21,10 +24,10 @@ import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useShallow } from 'zustand/react/shallow';
 import { TRAINING_TYPES, SET_NOTES } from '../../../constants';
+import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
-
 
 export function AddToLibraryFormScreen() {
   const navigation = useNavigation<Nav>();
@@ -36,12 +39,12 @@ export function AddToLibraryFormScreen() {
   const updateProgram = useProgramsStore((s) => s.updateProgram);
 
   const {
-    title,
-    setTitle,
-    tag,
-    setTag,
-    description,
-    setDescription,
+    title: storeTitle,
+    setTitle: setStoreTitle,
+    tag: storeTag,
+    setTag: setStoreTag,
+    description: storeDescription,
+    setDescription: setStoreDescription,
     exercises,
     setExercises,
     resetDraft,
@@ -59,23 +62,58 @@ export function AddToLibraryFormScreen() {
     })),
   );
 
-  const [showTagModal, setShowTagModal] = React.useState(false);
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+    getValues,
+  } = useForm<ProgramDraftValues>({
+    resolver: zodResolver(programDraftSchema),
+    defaultValues: {
+      title: isEdit ? (program?.name ?? '') : storeTitle,
+      tag: isEdit ? (program?.tag ?? 'Cardio') : storeTag,
+      description: isEdit ? (program?.description ?? '') : storeDescription,
+    },
+    mode: 'onBlur',
+  });
 
+  // Edit mode: hydrate the form + draft exercises from the route param.
   React.useEffect(() => {
     if (isEdit && program) {
-      setTitle(program.name);
-      setTag(program.tag);
-      setDescription(program.description ?? '');
+      reset({
+        title: program.name,
+        tag: program.tag,
+        description: program.description ?? '',
+      });
       setExercises(program.exercises ?? []);
     }
-  }, [isEdit, program?.id, setTitle, setTag, setDescription, setExercises]);
+  }, [isEdit, program?.id, reset, setExercises]);
 
-  const handleContinue = () => {
+  // Mirror form changes back into draftProgramStore so the persisted draft
+  // stays current if the user navigates away mid-edit.
+  const watchedTitle = watch('title');
+  const watchedTag = watch('tag');
+  const watchedDescription = watch('description');
+  React.useEffect(() => {
+    if (!isEdit) setStoreTitle(watchedTitle);
+  }, [watchedTitle, isEdit, setStoreTitle]);
+  React.useEffect(() => {
+    if (!isEdit) setStoreTag(watchedTag);
+  }, [watchedTag, isEdit, setStoreTag]);
+  React.useEffect(() => {
+    if (!isEdit) setStoreDescription(watchedDescription);
+  }, [watchedDescription, isEdit, setStoreDescription]);
+
+  const [showTagModal, setShowTagModal] = React.useState(false);
+
+  const onContinue = (data: ProgramDraftValues) => {
     if (isEdit && program) {
       updateProgram(program.id, {
-        name: title || program.name,
-        tag,
-        description,
+        name: data.title,
+        tag: data.tag,
+        description: data.description,
         exercises,
         videoCount: exercises.length,
       });
@@ -86,17 +124,24 @@ export function AddToLibraryFormScreen() {
     }
   };
 
+  // Save as Draft skips full validation — empty title becomes a placeholder.
   const handleSaveDraft = () => {
+    const data = getValues();
     if (isEdit && program) {
       updateProgram(program.id, {
-        name: title || program.name,
-        tag,
-        description,
+        name: data.title || program.name,
+        tag: data.tag,
+        description: data.description,
         exercises,
         videoCount: exercises.length,
       });
     } else {
-      addProgramFromDraft({ title, tag, description, exercises });
+      addProgramFromDraft({
+        title: data.title,
+        tag: data.tag,
+        description: data.description,
+        exercises,
+      });
     }
     resetDraft();
     navigation.navigate('TrainingLibrary');
@@ -105,7 +150,7 @@ export function AddToLibraryFormScreen() {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title={title || (isEdit ? (program?.name ?? 'Edit') : 'Name')}
+        title={watchedTitle || (isEdit ? (program?.name ?? 'Edit') : 'Name')}
         rightElement={
           <TouchableOpacity onPress={handleSaveDraft}>
             <Ionicons name="bookmark-outline" size={22} color={colors.text} />
@@ -124,20 +169,46 @@ export function AddToLibraryFormScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.sectionLabel}>About</Text>
-        <Input placeholder="Cardio Class" value={title} onChangeText={setTitle} />
-        <DropdownSelect
-          value={tag}
-          placeholder="Select category"
-          onPress={() => setShowTagModal(true)}
-          style={styles.dropdown}
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Cardio Class"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <Input
-          placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-          style={styles.textarea}
+        {errors.title ? <Text style={styles.errorText}>{errors.title.message}</Text> : null}
+
+        <Controller
+          control={control}
+          name="tag"
+          render={({ field: { value } }) => (
+            <DropdownSelect
+              value={value}
+              placeholder="Select category"
+              onPress={() => setShowTagModal(true)}
+              style={styles.dropdown}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
+              value={value}
+              onChangeText={onChange}
+              multiline
+              numberOfLines={4}
+              style={styles.textarea}
+            />
+          )}
         />
 
         <Text style={styles.sectionLabel}>Preview</Text>
@@ -147,7 +218,9 @@ export function AddToLibraryFormScreen() {
           </View>
           <View style={styles.uploadTextBox}>
             <Text style={styles.uploadTitle}>Tap to upload photo</Text>
-            <Text style={styles.uploadHint}>Recommended size: square,{'\n'}min 500x500px</Text>
+            <Text style={styles.uploadHint}>
+              Recommended size: square,{'\n'}min 500x500px
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -157,12 +230,18 @@ export function AddToLibraryFormScreen() {
           <View style={styles.legendGrid}>
             {SET_NOTES.map((n) => (
               <View key={n.key} style={styles.legendItem}>
-                <Ionicons name={n.icon as keyof typeof Ionicons.glyphMap} size={14} color={n.key === 'regular' ? colors.neutral6 : colors.accent} />
+                <Ionicons
+                  name={n.icon as keyof typeof Ionicons.glyphMap}
+                  size={14}
+                  color={n.key === 'regular' ? colors.neutral6 : colors.accent}
+                />
                 <Text style={styles.legendText}>{n.label}</Text>
               </View>
             ))}
           </View>
-          <Text style={styles.legendHint}>{'Tap icon to cycle \u00B7 Long press to remove set'}</Text>
+          <Text style={styles.legendHint}>
+            {'Tap icon to cycle · Long press to remove set'}
+          </Text>
         </View>
         {exercises.length > 0 ? (
           exercises.map((ex) => <ExerciseCard key={ex.id} exercise={ex} />)
@@ -188,7 +267,7 @@ export function AddToLibraryFormScreen() {
 
         <Button
           title={isEdit ? 'Save' : 'Continue'}
-          onPress={handleContinue}
+          onPress={handleSubmit(onContinue)}
           style={styles.button}
         />
         <Button
@@ -200,40 +279,46 @@ export function AddToLibraryFormScreen() {
       </ScrollView>
 
       <Modal visible={showTagModal} transparent animationType="fade">
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowTagModal(false)}
-        >
-          <View style={styles.modalContent}>
-            <FlatList
-              data={TRAINING_TYPES}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[styles.modalOption, tag === item && styles.modalOptionActive]}
-                  onPress={() => {
-                    setTag(item);
-                    setShowTagModal(false);
-                  }}
-                >
-                  <Text
-                    style={[styles.modalOptionText, tag === item && styles.modalOptionTextActive]}
-                  >
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </TouchableOpacity>
+        <Controller
+          control={control}
+          name="tag"
+          render={({ field: { onChange, value } }) => (
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={() => setShowTagModal(false)}
+            >
+              <View style={styles.modalContent}>
+                <FlatList
+                  data={TRAINING_TYPES}
+                  keyExtractor={(item) => item}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={[styles.modalOption, value === item && styles.modalOptionActive]}
+                      onPress={() => {
+                        onChange(item);
+                        setShowTagModal(false);
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.modalOptionText,
+                          value === item && styles.modalOptionTextActive,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        />
       </Modal>
     </View>
   );
 }
-
-
-// ─── Screen styles ───────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: {
@@ -252,6 +337,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     marginTop: spacing.lg,
   },
+  errorText: {
+    fontSize: typography.sizes.xs,
+    color: colors.Error,
+    marginBottom: spacing.sm,
+  },
   dropdown: {
     marginBottom: spacing.md,
   },
@@ -263,7 +353,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     padding: spacing.md,
     gap: spacing.md,
     marginBottom: spacing.md,
@@ -271,7 +361,7 @@ const styles = StyleSheet.create({
   uploadIconBox: {
     width: 84,
     height: 84,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral3,
     alignItems: 'center',
     justifyContent: 'center',
@@ -299,21 +389,21 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xs,
     fontWeight: typography.weights.semibold,
     color: colors.neutral8,
-    textTransform: 'uppercase' as const,
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
   },
   legendGrid: {
-    flexDirection: 'row' as const,
-    flexWrap: 'wrap' as const,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
     rowGap: 10,
   },
   legendItem: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
-    width: '45%' as unknown as number,
+    flexBasis: '45%',
   },
   legendText: {
     fontSize: typography.sizes.xs,
@@ -323,11 +413,11 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.neutral6,
     marginTop: spacing.sm,
-    textAlign: 'center' as const,
+    textAlign: 'center',
   },
   addExerciseEmpty: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     padding: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
@@ -366,7 +456,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '80%',
     backgroundColor: colors.neutral2,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     paddingVertical: spacing.sm,
     maxHeight: 400,
   },

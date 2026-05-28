@@ -3,6 +3,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
+import { radius } from '../../../../theme';
 
 export interface TypePickerModalProps {
   visible: boolean;
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
   box: {
     width: '80%',
     backgroundColor: colors.neutral2,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     paddingVertical: spacing.sm,
     maxHeight: 400,
   },

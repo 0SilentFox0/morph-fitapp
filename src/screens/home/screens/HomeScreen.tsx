@@ -15,6 +15,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Avatar, ScheduleCard } from '../../../components/ui';
+import { TrainingProgramsRow } from './Home/TrainingProgramsRow';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -149,67 +150,12 @@ export function HomeScreen() {
           </Card>
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Training Library</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('TrainingLibrary')}>
-              <Text style={styles.seeAllLibrary}>See all</Text>
-            </TouchableOpacity>
-          </View>
-          {programs.length > 0 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalScroll}
-            >
-              {programs.slice(0, 5).map((p) => (
-                <TouchableOpacity
-                  key={p.id}
-                  style={styles.programCard}
-                  onPress={() => navigation.navigate('TrainingLibrary')}
-                  activeOpacity={0.9}
-                >
-                  <View style={styles.programThumb}>
-                    {p.thumbnail ? (
-                      <Image
-                        source={{ uri: p.thumbnail }}
-                        style={styles.programImage}
-                        resizeMode="cover"
-                      />
-                    ) : null}
-                    <LinearGradient
-                      colors={['transparent', 'rgba(0,0,0,0.8)']}
-                      style={StyleSheet.absoluteFill}
-                    />
-                  </View>
-                  <View style={styles.programContent}>
-                    <Text style={styles.programName}>{p.name}</Text>
-                    <Text style={styles.programMeta}>{p.videoCount} videos</Text>
-                    <View style={styles.programStats}>
-                      <View style={styles.programStatPill}>
-                        <Ionicons name="people" size={12} color={colors.text} />
-                        <Text style={styles.programStatText}>{p.views}</Text>
-                      </View>
-                      <View style={styles.programStatPill}>
-                        <Ionicons name="eye" size={12} color={colors.text} />
-                        <Text style={styles.programStatText}>{p.likes}</Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          ) : (
-            <TouchableOpacity
-              style={styles.emptyCard}
-              onPress={() => navigation.navigate('AddToLibraryForm')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="add-circle-outline" size={32} color={colors.textMuted} />
-              <Text style={styles.emptyText}>Add your first training program</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <TrainingProgramsRow
+          programs={programs}
+          onProgramPress={() => navigation.navigate('TrainingLibrary')}
+          onSeeAll={() => navigation.navigate('TrainingLibrary')}
+          onEmptyPress={() => navigation.navigate('AddToLibraryForm')}
+        />
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>

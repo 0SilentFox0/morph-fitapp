@@ -4,6 +4,7 @@ import { Avatar } from './Avatar';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { radius } from '../../theme';
 
 export interface ParticipantInfo {
   id: string;
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral3,
     paddingVertical: 4,
     paddingHorizontal: spacing.sm,
-    borderRadius: 80,
+    borderRadius: radius.pill,
   },
   singleName: {
     fontSize: typography.sizes.xs,

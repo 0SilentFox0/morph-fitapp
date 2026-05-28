@@ -5,6 +5,7 @@ import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import type { TrainingProgram } from '../../../../mocks';
+import { radius } from '../../../../theme';
 
 export interface ProgramPickerModalProps {
   visible: boolean;
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   box: {
     width: '85%',
     backgroundColor: colors.neutral2,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     maxHeight: 500,
   },
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.sm,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   optionActive: {
     backgroundColor: colors.neutral3,

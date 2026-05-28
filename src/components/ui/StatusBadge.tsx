@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { radius } from '../../theme';
 
 export type StatusBadgeColor = 'success' | 'warning' | 'error' | 'accent' | 'neutral';
 
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 16,
     height: 16,
-    borderRadius: 80,
+    borderRadius: radius.pill,
     backgroundColor: 'rgba(255,255,255,0.05)',
     alignItems: 'center',
     justifyContent: 'center',

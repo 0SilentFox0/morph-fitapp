@@ -14,7 +14,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Button, SearchInput } from '../../../components/ui';
+import { Button } from '../../../components/ui';
+import { CategoryFilterBar } from './Gallery/CategoryFilterBar';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -82,15 +83,18 @@ export function GalleryScreen() {
     }
   }, []);
 
-  const toggleSelect = (id: number) => {
-    if (existingIds.has(id)) return;
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const toggleSelect = React.useCallback(
+    (id: number) => {
+      if (existingIds.has(id)) return;
+      setSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    },
+    [existingIds],
+  );
 
   const displayExercises = React.useMemo(
     () => filteredExercises(),
@@ -127,7 +131,7 @@ export function GalleryScreen() {
     navigation.navigate('TrainingLibrary');
   };
 
-  const renderExercise = ({ item }: { item: Exercise }) => {
+  const renderExercise = React.useCallback(({ item }: { item: Exercise }) => {
     const isSelected = selected.has(item.id) || existingIds.has(item.id);
     const isExisting = existingIds.has(item.id);
     return (
@@ -175,49 +179,16 @@ export function GalleryScreen() {
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [selected, existingIds, toggleSelect]);
 
   const renderHeader = () => (
-    <View>
-      <View style={styles.searchWrapper}>
-        <SearchInput
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search"
-          style={styles.search}
-        />
-      </View>
-      {categories.length > 0 && (
-        <FlatList
-          horizontal
-          data={[{ id: 0, name: 'All' }, ...categories]}
-          keyExtractor={(c) => String(c.id)}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryRow}
-          renderItem={({ item: cat }) => {
-            const active =
-              cat.id === 0 ? selectedCategory === null : selectedCategory === cat.id;
-            return (
-              <TouchableOpacity
-                style={[styles.categoryChip, active && styles.categoryChipActive]}
-                onPress={() =>
-                  setSelectedCategory(cat.id === 0 ? null : cat.id)
-                }
-              >
-                <Text
-                  style={[
-                    styles.categoryChipText,
-                    active && styles.categoryChipTextActive,
-                  ]}
-                >
-                  {cat.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      )}
-    </View>
+    <CategoryFilterBar
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      categories={categories}
+      selectedCategory={selectedCategory}
+      onCategoryChange={setSelectedCategory}
+    />
   );
 
   const renderFooter = () =>
@@ -304,35 +275,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
-  },
-  searchWrapper: {
-    marginBottom: spacing.md,
-  },
-  search: {
-    height: 40,
-  },
-  categoryRow: {
-    gap: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  categoryChip: {
-    paddingVertical: 6,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.neutral2,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  categoryChipActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-  },
-  categoryChipText: {
-    fontSize: typography.sizes.xs,
-    color: colors.textSecondary,
-  },
-  categoryChipTextActive: {
-    color: colors.text,
   },
   listContent: {
     padding: spacing.lg,

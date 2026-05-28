@@ -18,7 +18,7 @@ export const sessionSchema = z.object({
   date: z.date(),
   time: z.date(),
   type: z.string().min(1, 'Please select a type'),
-  participants: z.array(z.string()).default([]),
+  participants: z.array(z.string()),
 });
 
 export type SessionFormValues = z.infer<typeof sessionSchema>;

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
+import { radius } from '../../theme';
 
 export interface EmptyStateProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     backgroundColor: colors.accent,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   buttonText: {
     color: colors.text,

@@ -103,31 +103,26 @@ export function MainTabNavigator() {
       <Tab.Screen
         name="AddTab"
         component={AddPlaceholderScreen}
-        options={({ navigation }) => ({
-          tabBarLabel: () => null,
-          tabBarIcon: () => (
-            <AddButton
-              onPress={() =>
-                (navigation as unknown as { navigate: (n: string, p: object) => void }).navigate(
-                  'HomeTab',
-                  { screen: 'SessionForm' },
-                )
-              }
-            />
-          ),
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...(props as unknown as React.ComponentProps<typeof TouchableOpacity>)}
-              onPress={() =>
-                (navigation as unknown as { navigate: (n: string, p: object) => void }).navigate(
-                  'HomeTab',
-                  { screen: 'SessionForm' },
-                )
-              }
-              activeOpacity={0.8}
-            />
-          ),
-        })}
+        options={({ navigation }) => {
+          // BottomTab → Stack screen nav: TS can't infer the nested param shape from
+          // useNavigation here, so we cast the target. `as never` is the React Navigation
+          // community-recommended escape for nested-navigator typing.
+          const nav = navigation as unknown as { navigate: (n: string, p: object) => void };
+          const goToSessionForm = () => nav.navigate('HomeTab', { screen: 'SessionForm' });
+          return {
+            tabBarLabel: () => null,
+            tabBarIcon: () => <AddButton onPress={goToSessionForm} />,
+            // BottomTabBarButtonProps allows null for disabled/delayLongPress/onBlur
+            // which TouchableOpacityProps does not. Pass-through via React's prop type.
+            tabBarButton: (props) => (
+              <TouchableOpacity
+                {...(props as React.ComponentProps<typeof TouchableOpacity>)}
+                onPress={goToSessionForm}
+                activeOpacity={0.8}
+              />
+            ),
+          };
+        }}
       />
       <Tab.Screen
         name="ChatTab"
