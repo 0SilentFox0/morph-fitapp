@@ -7,6 +7,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { ChoiceCard } from '../../../components/ui';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'TrainingTypes'>;
@@ -41,21 +42,15 @@ export function TrainingTypesScreen() {
       onSkip={() => navigation.navigate('ClientTypes')}
     >
       <View style={styles.optionsGrid}>
-        {TRAINING_TYPES.map((type) => {
-          const isSelected = trainingTypes.includes(type);
-          return (
-            <TouchableOpacity
-              key={type}
-              onPress={() => handleToggle(type)}
-              style={[styles.option, isSelected && styles.optionSelected]}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: isSelected }}
-              accessibilityLabel={type}
-            >
-              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>{type}</Text>
-            </TouchableOpacity>
-          );
-        })}
+        {TRAINING_TYPES.map((type) => (
+          <ChoiceCard
+            key={type}
+            variant="chip"
+            selected={trainingTypes.includes(type)}
+            onPress={() => handleToggle(type)}
+            title={type}
+          />
+        ))}
       </View>
       {showWarning && (
         <Text style={styles.warning}>We recommend selecting at least one training type</Text>

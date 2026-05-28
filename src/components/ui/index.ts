@@ -17,3 +17,5 @@ export { DatePickerInput } from './DatePickerInput';
 export { TimePickerInput } from './TimePickerInput';
 export { ParticipantChip } from './ParticipantChip';
 export { DropdownSelect } from './DropdownSelect';
+export { ChoiceCard } from './ChoiceCard';
+export type { ChoiceCardProps, ChoiceCardVariant } from './ChoiceCard';
