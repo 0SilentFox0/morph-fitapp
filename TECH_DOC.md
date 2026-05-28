@@ -1,445 +1,251 @@
-# FitConnect Platform — Core Development Tasks
+# FitConnect Platform — Tech Overview
+
+Цей документ дає високорівневий огляд платформи. Деталі бекенду — у [`docs/backend/TECH_TASK.md`](docs/backend/TECH_TASK.md) (umbrella) і [`docs/backend/features/`](docs/backend/features/) (feature-level специфікації).
+
+---
 
 ## 1. Technology Stack
 
-### Mobile Application
+### 1.1 Mobile Application
 
-- **Platform:** iOS (primary)
-- **Framework:** React Native with TypeScript (strict mode)
-- **Language:** TypeScript
+- **Platform:** iOS (primary), Android (secondary).
+- **Framework:** React Native (Expo) with TypeScript (strict mode).
+- **Language:** TypeScript.
+- **State management:** Zustand.
+- **Forms / validation:** react-hook-form + zod.
+- **Charts:** react-native-chart-kit.
+- **Single binary, two roles:** один додаток з role-based навігацією (`trainer` / `client`); deep links для invitations і OAuth callbacks.
 
-### Frontend
+### 1.2 Frontend conventions
 
-- **UI Framework:** React Native
-- **State Management:** To be defined per module
-- **Code Quality:** ESLint, Prettier, pre-commit hooks
-<!-- - **Testing:** Unit tests (80%+ coverage), E2E testing, accessibility (WCAG 2.1) -->
+- ESLint + Prettier + pre-commit hooks.
+- Design tokens у `src/theme/`.
+- Strict mode TypeScript.
 
-### Backend
+### 1.3 Backend
 
-- **Runtime:** Node.js
-- **Database:** PostgreSQL
-- **Real-time:** WebSocket
-- **Authentication:** JWT with refresh tokens
-- **Encryption:** End-to-end encryption for sensitive data
+- **Language:** PHP 8.4
+- **Framework:** Laravel 12 (modular monolith з чіткими module boundaries)
+- **Database:** PostgreSQL 16+
+- **ORM:** Eloquent
+- **Auth:** Laravel Sanctum (API tokens) + custom refresh-token rotation + Laravel Socialite (OAuth)
+- **Real-time:** Laravel Reverb (WebSocket + Broadcasting)
+- **Cache & Queue driver:** Redis 7+
+- **Queue management:** Laravel Queue + Laravel Horizon
+- **Object storage:** S3-compatible (через Laravel Filesystem)
+- **Admin panel:** Filament
+- **Observability:** Laravel Telescope (dev) + Laravel Pulse (prod)
+- **Testing:** Pest (recommended) або PHPUnit
 
-### Infrastructure & DevOps
+### 1.4 Infrastructure & DevOps
 
-- **Cloud:** AWS / GCP
-- **Containerization:** Docker
-- **Orchestration:** Kubernetes
-- **CI/CD:** Automated pipelines with progressive rollout and feature flags
-- **Monitoring:** Alerting and uptime monitoring (target 99.9%)
+- **Containerization:** Docker (multi-stage builds; окремі сервіси для PHP-FPM, NGINX, Reverb, queue workers, scheduler).
+- **CI/CD:** GitHub Actions (lint + PHPStan + tests + image build + deploy).
+- **Hosting:** обраний пізніше — TECH_TASK не зобов'язує конкретного провайдера (Docker+VPS, Laravel Forge, Laravel Cloud або Kubernetes — на вибір).
+- **Monitoring:** Pulse + alerting; target uptime 99.5% (MVP) → 99.9% (post-MVP).
 
-### Third-party Services
+### 1.5 Third-party Services
 
-- **Push Notifications & Auth:** Firebase
-- **Calendar:** Google Calendar API, Apple Calendar API
-- **Social Auth:** Google OAuth, Apple Sign-In, Facebook OAuth
-- **SMS Verification:** Third-party SMS provider
-- **Analytics & Charts:** Chart.js or D3.js
+| Категорія | Сервіс | Призначення |
+|---|---|---|
+| Push notifications | Firebase Cloud Messaging | iOS + Android |
+| Calendar | Google Calendar API | bi-directional sync (INT-001) |
+| Calendar | Apple Calendar | через ICS feed (INT-002) — read-only one-way |
+| OAuth providers | Google + Apple + Facebook | login (через Socialite) |
+| Email | SES / Postmark / SendGrid | transactional emails (provider вибирається пізніше) |
+| Object storage | S3 / R2 / Spaces / MinIO | files (provider вибирається пізніше) |
+| SMS | **не в MVP** | майбутнє: для phone verification |
 
-### Security & Compliance
+### 1.6 Security & Compliance
 
-- Secure token storage via Keychain (iOS) / Keystore (Android)
-- PCI DSS compliance for payments
-- GDPR and CCPA compliance
-- Regular security audits and penetration testing
+- Secure token storage on mobile: Keychain (iOS) / Keystore (Android).
+- **PCI DSS:** не застосовується в MVP (немає прямих оплат — лише облік manual transactions).
+- **GDPR-готовність:** right to erasure (soft delete з grace period 30 днів + hard delete з анонімізацією user-row), right to export (data exports у ZIP), encrypted-at-rest credentials.
+- **Regular audits and penetration testing** — post-MVP.
+- Rate limiting, brute-force lockout, refresh-token rotation, signed S3 URLs.
 
----
-
-## 2. Core Development Tasks
-
-### 2.1 Authentication & User Management System
-
-**Priority: High**
-
-**Tasks:**
-
-- Implement JWT-based authentication with refresh tokens
-- Social login integration (Google, Apple, Facebook OAuth)
-- Email/password authentication with verification flow
-- Phone number verification (SMS integration)
-- Password reset functionality
-- Role-based access control (Clients, Trainers, Admins)
-
-**Technical Requirements:**
-
-- Secure token storage (Keychain/Keystore)
-- Session management and automatic refresh
-- Biometric authentication support
-- GDPR-compliant data handling
-
-**Deliverables:**
-
-- Authentication middleware
-- User registration/login screens
-- Email verification system
-- Password reset flow
-- Unit tests for auth logic
+Деталі — [`TECH_TASK.md`](docs/backend/TECH_TASK.md) §6 (Security).
 
 ---
 
-### 2.2 User Onboarding & Profile Management
+## 2. Scope and Modules
 
-**Priority: High**
+MVP+ скоуп — **16 модулів × 53 фічі**, поділених на 4 фази. Деталі — [`TECH_TASK.md`](docs/backend/TECH_TASK.md) §10 (Index фіч) і [`docs/backend/features/`](docs/backend/features/).
 
-**Tasks:**
+| Phase | Модулі | Що це покриває |
+|---|---|---|
+| **0 — Foundation** | Auth · Users · Files · Notifications | Registration, login, OAuth, refresh tokens, GDPR account deletion, profile management, S3 uploads, push subsystem |
+| **1 — Core CRM** | Onboarding · Clients · Programs · Exercises · Sessions | 13-step trainer onboarding, roster mgmt, invitation flow, program/exercise CRUD, session CRUD with conflict detection і recurring |
+| **2 — Real-time** | Chat · Workout Tracking · Integrations | Реал-тайм чат (Reverb), live workout sync, Google Calendar bi-directional, Apple ICS feed |
+| **3 — Business** | Packages · Transactions · Progress · Analytics | Пакети з auto-decrement, manual transactions з package linkage, body measurements + auto PR detection (1RM), trainer dashboard |
 
-- Multi-step onboarding forms for clients and trainers
-- Profile creation and editing functionality
-- Image upload and cropping
-- Professional credential verification system for trainers
-- Data validation and sanitization
+### Out of scope (post-MVP)
 
-**Technical Requirements:**
-
-- Form validation with real-time feedback
-- Image compression and optimization
-- File upload progress indicators
-- Offline form saving capability
-
----
-
-### 2.3 Intelligent Matching Algorithm
-
-**Priority: High**
-
-**Tasks:**
-
-- Develop matching algorithm considering:
-  - Training specialization vs client goals
-  - Schedule compatibility
-  - Location preferences
-  - Budget alignment
-  - Experience levels
-  - Personal preferences
-- Search and filter functionality
-- Recommendation engine with machine learning
-- A/B testing framework for algorithm improvements
-
-**Technical Requirements:**
-
-- Efficient database queries for matching
-- Caching for frequently accessed matches
-- Analytics tracking for match success rates
-- Algorithm versioning and rollback capability
+- Nutrition (раціони, KCAL/БЖВ, foods catalog).
+- Фото-прогрес (before/after).
+- Live video / відеодзвінки.
+- Прямі онлайн-оплати (Stripe/Paddle).
+- SMS verification.
+- Multi-tenancy / team accounts для гімів.
+- AI-генерація програм.
+- Intelligent matching algorithm (trainer ↔ client matchmaking).
+- Gamification beyond існуючого "You got paid" achievement.
 
 ---
 
-### 2.4 Calendar & Scheduling System
+## 3. Non-functional requirements
 
-**Priority: High**
+Повний набір — [`TECH_TASK.md`](docs/backend/TECH_TASK.md) §7. Коротко:
 
-**Tasks:**
+| Метрика | MVP target | Post-MVP target |
+|---|---|---|
+| API p50 / p95 / p99 | 100 ms / 300 ms / 800 ms | 80 / 200 / 500 ms |
+| WS message latency | < 500 ms | < 200 ms |
+| Concurrent WS connections | 1 000 | 10 000 |
+| Active monthly users | 5 000 | 50 000 |
+| Uptime SLO | 99.5% | 99.9% |
+| RPO (data loss budget) | ≤ 15 min | ≤ 5 min |
+| RTO (recovery time) | ≤ 4 hours | ≤ 1 hour |
 
-- Google Calendar and Apple Calendar integration
-- Availability management for trainers
-- Booking request and confirmation flow
-- Recurring session scheduling
-- Notification system for appointments
-- Cancellation and rescheduling logic
-- Conflict detection and resolution
+### Backups
 
-**Technical Requirements:**
+- PostgreSQL: PITR (continuous WAL archiving) + daily snapshot з retention 30 днів.
+- S3: versioning enabled; cross-region replication (post-MVP).
+- Restore drill: щомісяця.
 
-- Calendar synchronization
-- Time zone handling
-- Real-time availability updates
-- Offline calendar viewing
+### Test coverage
 
----
-
-### 2.5 Real-time Communication System
-
-**Priority: High**
-
-**Tasks:**
-
-- WebSocket implementation for real-time chat
-- Media sharing (images, videos, documents)
-- Push notification system
-- Message status indicators (sent, delivered, read)
-- Message history and search functionality
-- Group messaging capability
-
-**Technical Requirements:**
-
-- End-to-end encryption
-- Message queuing for offline users
-- File compression for media sharing
-- Message threading and reply functionality
+- Unit + feature tests through Pest/PHPUnit.
+- Coverage target: 60% (MVP) → 80% (post-MVP).
+- Critical flows (auth, payment, workout sync): integration tests must hit real DB.
 
 ---
 
-### 2.6 Payment Processing System
+## 4. Development phases (≈ 15 weeks solo dev)
 
-**Priority: High**
+Узгоджено з [`TECH_TASK.md`](docs/backend/TECH_TASK.md) §9.
 
-**Tasks:**
+### Phase 0 — Foundation (тиждень 1-3)
 
-- Stripe API integration
-- Multiple payment methods support
-- Subscription management
-- One-time payment processing
-- Payment status tracking
-- Automated billing system
-- Receipt and invoice generation
-- Trainer payout system with commission calculation
+Auth, Users, Files, Notifications. Laravel-проєкт ініціалізовано, Docker compose, PostgreSQL migrations для core tables, Sanctum + Socialite + custom refresh, S3 upload pipeline, FCM integration, CI/CD pipeline.
 
-**Technical Requirements:**
+### Phase 1 — Core CRM (тиждень 4-7)
 
-- PCI DSS compliance
-- Secure payment data handling
-- Payment retry logic
-- Refund processing
-- Financial reporting capabilities
+Clients CRM з invitation flow, Programs/Exercises бібліотеки, Sessions CRUD без real-time, Onboarding (13 кроків).
+
+### Phase 2 — Real-time (тиждень 8-11)
+
+Reverb setup, Chat (text + media + read receipts + typing), Workout Tracking з real-time sync і conflict resolution, Google Calendar bi-directional, Apple ICS feed.
+
+### Phase 3 — Business (тиждень 12-15)
+
+Packages templates + assignment + auto-decrement, Transactions з прив'язкою до пакетів, Body measurements + auto PR detection (Epley 1RM), Analytics endpoints + cached views, Filament admin panel.
 
 ---
 
-### 2.7 Workout Management Platform
+## 5. Technical deliverables
 
-**Priority: Medium**
+### Documentation
 
-**Tasks:**
+- ✅ [`docs/backend/TECH_TASK.md`](docs/backend/TECH_TASK.md) — umbrella tech task (architecture, NFR, security, real-time, devops, roadmap).
+- ✅ [`docs/backend/features/`](docs/backend/features/) — feature-level specifications (16 файлів, 53 фічі) з user stories, acceptance criteria, edge cases, permissions.
+- ✅ [`docs/backend/DB_STRUCTURE.md`](docs/backend/DB_STRUCTURE.md) — повна DB схема (40 таблиць).
+- ✅ [`docs/backend/DB_SCHEMA_TREE.md`](docs/backend/DB_SCHEMA_TREE.md) — Mermaid ER diagram + ASCII tree.
+- 🔄 [`docs/backend/{module}.md`](docs/backend/) × 16 — Technical API specs (плейсхолдери; заповнюватимуться при реалізації кожного модуля).
+- ✅ [`docs/PROGRESS.md`](docs/PROGRESS.md), [`docs/TASKS.md`](docs/TASKS.md) — frontend progress і tasks.
+- 📅 OpenAPI/Swagger — генерується автоматично з Laravel route definitions (через scribe або similar; tooling вибирається пізніше).
 
-- Exercise database creation and management
-- Custom workout plan builder for trainers
-- Workout assignment and scheduling
-- Progress tracking and logging
-- Rest timer functionality
-- Exercise instruction media player
-- Workout history and analytics
+### Code quality standards
 
-**Technical Requirements:**
+- PHP: PHPStan level 6+, Laravel Pint code style.
+- TypeScript: strict mode, ESLint, Prettier.
+- Pre-commit hooks для обох sides.
+- Git workflow: branch per feature, PR review.
+- CI must pass: lint + static analysis + tests + image build.
 
-- Efficient media streaming
-- Offline workout plan access
-- Data synchronization across devices
-- Exercise search and categorization
+### Deployment requirements
 
----
+- Containerized application (Docker з multi-stage builds).
+- Окремі сервіси у compose: app (PHP-FPM), nginx, reverb, queue (Horizon), scheduler.
+- Database migrations: forward-only; breaking changes — у дві фази з backward-compatible релізом.
+- Health checks: `/health` (app), `/health` (reverb).
+- Monitoring і alerting: Pulse + (optional) Grafana/Loki.
 
-### 2.8 Analytics & Dashboard Development
-
-**Priority: Medium**
-
-**Tasks:**
-
-- Client progress dashboard
-- Trainer business analytics
-- Data visualization components
-- Goal tracking system
-- Performance metrics calculation
-- Report generation
-- Export functionality
-
-**Technical Requirements:**
-
-- Real-time data updates
-- Chart.js or D3.js integration
-- Data aggregation and caching
-- Custom date range selection
+Деталі — [`TECH_TASK.md`](docs/backend/TECH_TASK.md) §8 (DevOps).
 
 ---
 
-### 2.9 Gamification System
+## 6. Success metrics
 
-**Priority: Low**
+### Technical KPIs
 
-**Tasks:**
+- System uptime: 99.5% (MVP) → 99.9% (post-MVP).
+- API p95 latency: < 300 ms (MVP) → < 200 ms (post-MVP).
+- Mobile app crash rate: < 0.5% (MVP) → < 0.1% (post-MVP).
+- Backend test coverage: 60% (MVP) → 80% (post-MVP).
+- Zero high/critical security vulnerabilities (regular audits).
 
-- Achievement and badge system
-- Level progression mechanics
-- Challenge creation and management
-- Streak tracking
-- Leaderboard functionality
-- Reward system
-- Social sharing integration
+### Business KPIs
 
-**Technical Requirements:**
-
-- Event-driven achievement triggers
-- Fair play mechanisms
-- Social media API integration
-- Achievement notification system
+- Trainer retention (post-onboarding 30d): > 70%.
+- Session completion rate: > 90%.
+- Average sessions per active trainer per month: > 30.
+- Time to first session after onboarding: < 7 days.
 
 ---
 
-### 2.10 Administrative Panel
+## 7. Resource requirements (current)
 
-**Priority: Medium**
+### Team
 
-**Tasks:**
+- **Backend developer:** 1 (solo PHP/Laravel) — pragmatic-mode TZ під цю конфігурацію.
+- **Frontend developer:** existing React Native team / silentfox.
+- **Designer:** Figma — [Fitness-app](https://www.figma.com/design/nWHcYBqsCKqkBh5WUnghye/Fitness-app--Copy-).
+- **DevOps:** TBD — initially handled by backend dev або external (Forge-style managed hosting).
+- **QA:** TBD; manual testing на MVP, далі — automated через Pest.
 
-- User management interface (CRUD operations)
-- Content management system
-- Platform analytics dashboard
-- Trainer verification workflow
-- Dispute resolution system
-- Payment management tools
-- System configuration panel
+### External dependencies (must obtain)
 
-**Technical Requirements:**
-
-- Role-based access control
-- Bulk operations support
-- Data export capabilities
-- Audit logging
-
----
-
-## 3. Performance & Quality Requirements
-
-### 3.1 Performance Benchmarks
-
-- App launch time: < 3 seconds
-- API response time: < 500ms for 95% of requests
-- Chat message delivery: < 1 second
-- Support for 10,000+ concurrent users
-- 60fps animations and smooth transitions
-
-### 3.2 Security Requirements
-
-- End-to-end encryption for sensitive data
-- GDPR and CCPA compliance implementation
-- Regular security audits
-- Penetration testing protocols
-- Secure data backup strategies
-
-### 3.3 Testing Requirements
-
-- Unit test coverage: 80%+
-- Integration testing for all API endpoints
-- End-to-end testing for critical user flows
-- Performance testing under load
-- Accessibility testing (WCAG 2.1 compliance)
-- A/B testing framework implementation
+- Google Cloud project credentials (OAuth + Calendar API).
+- Apple Developer account (Sign in with Apple, ICS publishing).
+- Facebook Developer project (OAuth).
+- Firebase project (FCM credentials).
+- S3-compatible storage account.
+- Email provider account (SES / Postmark / SendGrid).
+- Production domain і SSL cert.
 
 ---
 
-## 4. Development Phases
+## 8. Risk management
 
-### Phase 1: MVP Development (Months 1–3)
-
-- Basic authentication and user profiles
-- Simple matching algorithm
-- Calendar integration and booking
-- Basic chat functionality
-- Simple workout tracking
-- Core payment processing
-
-### Phase 2: Feature Enhancement (Months 4–6)
-
-- Advanced matching algorithm
-- Complete exercise library
-- Enhanced analytics dashboard
-- Advanced chat features
-- Subscription management
-
-### Phase 3: Gamification & Growth (Months 7–8)
-
-- Achievement system implementation
-- Level and reward mechanics
-- Challenge framework
-- Social sharing features
-
-### Phase 4: Industry Adaptation (Months 9–12)
-
-- Multi-industry framework development
-- Configuration-driven customization
-- First alternative industry implementation
+| Ризик | Impact | Запобігання |
+|---|---|---|
+| Real-time scaling (Reverb load) | Високий | Pulse-monitoring з самого початку; load-test з 1000 connections перед prod |
+| Calendar sync конфлікти і delays | Середній | Async-tasks з retry; UI показує `last_synced_at`; degraded mode (тільки локальні events) |
+| File storage costs ростуть | Низький | Lifecycle policies (старі media → cold storage); video size limits |
+| Workout sync inconsistency під concurrent log | Середній | Версіонування подій через `last_version`; periodic full-sync як fallback; UI shows "out of sync" warning |
+| Apple Calendar API без write API | Високий (known) | Pull-only через ICS feed; не обіцяти write-back |
+| Solo dev burnout / bus-factor 1 | Високий | Документація як first-class (TECH_TASK + features specs + DB); pragmatic-mode TZ |
+| Vendor lock-in (S3, FCM, OAuth providers) | Низький | Через Laravel abstractions (Filesystem, Notification channels, Socialite); switching cost low |
+| GDPR compliance gaps | Високий | Implemented from Phase 0 (AUTH-005 — deletion + export); audit_logs from start |
 
 ---
 
-## 5. Technical Deliverables
+## 9. Reference documents
 
-### Documentation Requirements
-
-- API documentation (Swagger/OpenAPI)
-- Database schema documentation
-- Architecture decision records (ADRs)
-- Deployment and maintenance guides
-- Code review guidelines
-- Security protocols documentation
-
-### Code Quality Standards
-
-- TypeScript strict mode enforcement
-- ESLint and Prettier configuration
-- Pre-commit hooks for code quality
-- Automated code review tools
-- Git workflow and branching strategy
-- Continuous integration pipelines
-
-### Deployment Requirements
-
-- Containerized application (Docker)
-- Kubernetes orchestration
-- Progressive rollout strategy
-- Feature flag implementation
-- Automated rollback procedures
-- Monitoring and alerting setup
+| Документ | Призначення |
+|---|---|
+| [`docs/backend/TECH_TASK.md`](docs/backend/TECH_TASK.md) | Umbrella tech task для backend (architecture, conventions, NFR, security, real-time, devops, roadmap) |
+| [`docs/backend/features/README.md`](docs/backend/features/README.md) | Index feature-specs + шаблони (full / compact) |
+| [`docs/backend/features/{module}.md`](docs/backend/features/) | Feature-level бізнес-логіка (user stories, AC, edge cases, permissions) |
+| [`docs/backend/{module}.md`](docs/backend/) | Technical API specs per module (TBD placeholders) |
+| [`docs/backend/DB_STRUCTURE.md`](docs/backend/DB_STRUCTURE.md) | Full PostgreSQL schema |
+| [`docs/backend/DB_SCHEMA_TREE.md`](docs/backend/DB_SCHEMA_TREE.md) | Mermaid ER + ASCII tree |
+| [`docs/PROGRESS.md`](docs/PROGRESS.md) | Frontend implementation progress |
+| [`docs/TASKS.md`](docs/TASKS.md) | Jira-style frontend tasks + API mapping |
+| [`docs/flows/`](docs/flows/) | UI flows (home-dashboard, onboarding) |
 
 ---
 
-## 6. Success Metrics & KPIs
-
-### Technical Metrics
-
-- System uptime: 99.9%
-- API response time: < 500ms (95th percentile)
-- Mobile app crash rate: < 0.1%
-- Test coverage: 80%+
-- Security vulnerability score: 0 high/critical
-
-### Business Metrics
-
-- User acquisition rate
-- Trainer retention rate: 80%+
-- Session completion rate: 90%+
-- User satisfaction score: 4.5+/5
-- App store rating: 4.0+/5
-
----
-
-## 7. Resource Requirements
-
-### Development Team Structure
-
-- Frontend Developers: 3–4 (React Native/TypeScript)
-- Backend Developers: 2–3 (Node.js/PostgreSQL)
-- DevOps Engineers: 1–2 (AWS/Docker/Kubernetes)
-- QA Engineers: 1–2 (Automated testing/Manual testing)
-- UI/UX Designer: 1 (Mobile-first design)
-- Project Manager: 1 (Agile methodology)
-
-### External Dependencies
-
-- Stripe API access and merchant account
-- Google/Apple Calendar API credentials
-- Firebase project setup
-- AWS/GCP cloud infrastructure
-- Third-party service integrations
-
----
-
-## 8. Risk Management
-
-### Technical Risks
-
-- Third-party API limitations: Implement fallback mechanisms
-- Scalability challenges: Design with microservices architecture
-- Data synchronization issues: Implement conflict resolution strategies
-- Security vulnerabilities: Regular audits and updates
-
-### Mitigation Strategies
-
-- Comprehensive testing at all levels
-- Monitoring and alerting systems
-- Regular backup and disaster recovery procedures
-- Documentation and knowledge sharing protocols
-
----
-
-_Document Version: 1.0 — Last Updated: August 24, 2025_
+_Document Version: 2.0 — Last Updated: 2026-05-28._
+_Major revision: backend stack PHP/Laravel; scope unified with [`docs/backend/`](docs/backend/) feature specs._
