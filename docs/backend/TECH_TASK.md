@@ -636,37 +636,46 @@ Horizon supervisor configurations:
 
 ## 10. Index фіч
 
-Усього **~113 фіч**, розподілені по 16 модулях. Кожен модуль — окремий файл у `docs/backend/features/`.
+Усього **~53 укрупнені фічі**, розподілені по 16 модулях. Кожен модуль — окремий файл у `docs/backend/features/`. Фічі **об'єднані за бізнес-значенням**: серії CRUD-операцій або тісно зв'язаних use-case'ів описуються однією фічею з кількома user stories.
 
-| Модуль | Файл | Кількість фіч | Phase | Опис |
-|---|---|:-:|:-:|---|
-| Auth & Identity | [features/auth.md](features/auth.md) | 12 | 0 | Реєстрація, логін, OAuth (Google/Apple/Facebook), refresh tokens, password/email changes, account deletion |
-| Onboarding | [features/onboarding.md](features/onboarding.md) | 6 | 1 | Trainer 13-крокове onboarding, client onboarding (skeleton), skip/resume, preview |
-| Users & Profile | [features/users.md](features/users.md) | 6 | 0 | Перегляд/редагування профіля, аватар, налаштування, points/experience |
-| Sessions & Calendar | [features/sessions.md](features/sessions.md) | 14 | 1, 2 | CRUD сесій, day/month view, search, recurring, conflict detection, статуси, нагадування, calendar sync |
-| Programs | [features/programs.md](features/programs.md) | 7 | 1 | CRUD програм, призначення клієнту, views/likes |
-| Exercises | [features/exercises.md](features/exercises.md) | 5 | 1 | CRUD вправ, пошук/фільтрація, прикріплення до програми |
-| Clients (CRM) | [features/clients.md](features/clients.md) | 8 | 1 | Список з фільтрами, створення/інвайт, профіль, notes, tags, архівація |
-| Workout Tracking | [features/workout-tracking.md](features/workout-tracking.md) | 7 | 2 | Live session, логування sets/reps/weight, real-time sync, offline-resolution |
-| Progress Metrics | [features/progress.md](features/progress.md) | 6 | 3 | Body measurements, обміри, графіки, PR auto-detect, 1RM, CSV export |
-| Packages & Subscriptions | [features/packages.md](features/packages.md) | 7 | 3 | Templates, призначення, auto-decrement, exhaustion notif, debt tracking |
-| Transactions | [features/transactions.md](features/transactions.md) | 7 | 3 | Manual entries, прив'язка до пакета, edit/delete, search, export, withdraw tracking |
-| Chat & Messaging | [features/chat.md](features/chat.md) | 9 | 2 | Список чатів, текст+media, read receipts, typing, push, search, soft delete |
-| Analytics | [features/analytics.md](features/analytics.md) | 6 | 3 | Income chart, revenue by source, profile views, trainings count, subscriptions, timeframe |
-| Files & Media | [features/files.md](features/files.md) | 5 | 0 | Signed URL upload, image processing, video pass-through, access control |
-| Notifications (Push) | [features/notifications.md](features/notifications.md) | 7 | 0, 2, 3 | Device token registration, push на сесії/чат/пакети/оплати, in-app feed, preferences |
-| External Integrations | [features/integrations.md](features/integrations.md) | 4 | 2 | Google Calendar bi-directional, Apple Calendar ICS, OAuth connect/disconnect, webhooks |
+| Модуль | Файл | Фіч | Phase | Стиль | Опис |
+|---|---|:-:|:-:|:-:|---|
+| Auth & Identity | [features/auth.md](features/auth.md) | 5 | 0 | full | Local credentials + email verification · OAuth (Google/Apple/FB) · refresh-token lifecycle · password/email management · account deletion (GDPR) |
+| Users & Profile | [features/users.md](features/users.md) | 1 | 0 | compact | Profile management — own/foreign view + edit + avatar + settings + points/experience |
+| Files & Media | [features/files.md](features/files.md) | 1 | 0 | full | File upload pipeline — signed URL + image processing + video pass-through + ACL + cleanup |
+| Notifications (Push) | [features/notifications.md](features/notifications.md) | 2 | 0 | full + compact | Push notification subsystem (FCM + delivery rules) · in-app notification feed |
+| Onboarding | [features/onboarding.md](features/onboarding.md) | 3 | 1 | full + compact | Trainer 13-step flow · client onboarding skeleton · skip/resume/preview/finalize |
+| Clients (CRM) | [features/clients.md](features/clients.md) | 3 | 1 | full + compact | Roster management · client invitation flow · notes/tags |
+| Programs | [features/programs.md](features/programs.md) | 2 | 1 | full | Program management (CRUD + library + views/likes) · assignment to clients |
+| Exercises | [features/exercises.md](features/exercises.md) | 2 | 1 | compact | Exercise library management · attachment to programs |
+| Sessions & Calendar | [features/sessions.md](features/sessions.md) | 7 | 1, 2 | full + compact | Session management (CRUD) · schedule views · status lifecycle · recurring · conflict detection · reminders · package linkage |
+| Chat & Messaging | [features/chat.md](features/chat.md) | 6 | 2 | full | Conversation management · text messaging · media messaging · read receipts/typing · search · push notifications |
+| Workout Tracking | [features/workout-tracking.md](features/workout-tracking.md) | 5 | 2 | full | Live session lifecycle · workout log entry · real-time sync · offline mode · history |
+| External Integrations | [features/integrations.md](features/integrations.md) | 3 | 2 | full + compact | Google Calendar bi-directional sync · Apple Calendar ICS feed · OAuth providers connect/disconnect |
+| Packages & Subscriptions | [features/packages.md](features/packages.md) | 4 | 3 | full + compact | Templates · package assignment & lifecycle · subscription renewal · debt tracking |
+| Transactions | [features/transactions.md](features/transactions.md) | 4 | 3 | compact | Transaction management · package linkage · search/filter/export · withdraw tracking |
+| Progress Metrics | [features/progress.md](features/progress.md) | 4 | 3 | full + compact | Body measurements · charts · PR & 1RM auto-detect · CSV export |
+| Analytics | [features/analytics.md](features/analytics.md) | 1 | 3 | compact | Trainer business analytics (income chart + revenue source + profile views + counts + timeframe) |
 
-**Total:** 116 фіч (точне число фіксується при написанні кожного модуля).
+**Total: 53 фічі** (~70-110 сторінок документації).
+
+### Стилі шаблонів
+
+Кожна фіча використовує один із двох шаблонів — залежно від складності:
+
+- **Full template** — для фіч із значимою бізнес-логікою (workout sync, packages auto-decrement, calendar sync, chat real-time, auth flows). Містить: контекст, 3-5 user stories, повний flow з UI mapping, 5-8 acceptance criteria, permissions матрицю, 5-10 edge cases, посилання на технічну спеку. ~3-5 сторінок.
+- **Compact template** — для CRUD-операцій та простих use-case'ів. Містить: контекст, 2-3 user stories, 3-4 acceptance criteria, permissions, 1-3 edge cases, посилання на технічну спеку. ~0.5-1 сторінка.
+
+Точні шаблони наведені у [features/README.md](features/README.md).
 
 ### Як читати feature-spec
 
-Кожна фіча в `features/{module}.md` описується за єдиним шаблоном:
+Кожна фіча в `features/{module}.md` описується за єдиним шаблоном (full або compact):
 
 1. **Заголовок** з кодом (`SES-001`, `WT-003`, ...).
 2. **Контекст** — навіщо ця фіча.
 3. **User stories** (`US-XXX-NNN`).
-4. **User flow + UI mapping** — крок-за-кроком з посиланнями на екрани (`SessionFormScreen.tsx` і т.д.).
+4. (full only) **User flow + UI mapping** — крок-за-кроком з посиланнями на екрани (`SessionFormScreen.tsx` і т.д.).
 5. **Acceptance criteria** (`AC-1`, `AC-2`, ...) у форматі Given/When/Then.
 6. **Permissions матриця** (Trainer / Client / Admin × actions).
 7. **Edge cases** (`EC-1`, `EC-2`, ...) — нештатні сценарії.
