@@ -275,6 +275,10 @@ export function GalleryScreen() {
         showsVerticalScrollIndicator={false}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
+        initialNumToRender={12}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        removeClippedSubviews
         ListEmptyComponent={
           <View style={styles.centered}>
             <Text style={styles.emptyText}>No exercises found</Text>
