@@ -27,6 +27,8 @@ export interface OnboardingState {
   workTimeEnd: string;
   sameSlotsEveryWeek: boolean;
   profilePhotoUri: string | null;
+  currentRoute: string | null;
+  setCurrentRoute: (route: string | null) => void;
   setField: <K extends keyof OnboardingState>(
     key: K,
     value: OnboardingState[K]
@@ -58,12 +60,14 @@ const initialState = {
   workTimeEnd: '18:00',
   sameSlotsEveryWeek: true,
   profilePhotoUri: null as string | null,
+  currentRoute: null as string | null,
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
   persist(
     (set) => ({
       ...initialState,
+      setCurrentRoute: (route) => set({ currentRoute: route }),
       setField: (key, value) => set({ [key]: value }),
       toggleTrainingType: (type) =>
         set((state) => ({
@@ -120,6 +124,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         workTimeEnd: state.workTimeEnd,
         sameSlotsEveryWeek: state.sameSlotsEveryWeek,
         profilePhotoUri: state.profilePhotoUri,
+        currentRoute: state.currentRoute,
       }),
     },
   ),
