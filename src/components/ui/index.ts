@@ -23,3 +23,7 @@ export { EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState';
 export { ExerciseCard } from './ExerciseCard';
 export type { ExerciseCardProps } from './ExerciseCard';
+export { ParticipantGroup } from './ParticipantGroup';
+export type { ParticipantGroupProps } from './ParticipantGroup';
+export { StatusBadge } from './StatusBadge';
+export type { StatusBadgeProps, StatusBadgeColor } from './StatusBadge';

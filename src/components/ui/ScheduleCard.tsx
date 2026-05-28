@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from './Avatar';
+import { ParticipantGroup } from './ParticipantGroup';
+import { StatusBadge, type StatusBadgeColor } from './StatusBadge';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
@@ -19,10 +20,10 @@ const statusBarColor: Record<SessionStatus, string> = {
   canceled: colors.Error,
 };
 
-const statusIconColor: Record<SessionStatus, string> = {
-  completed: colors.Success,
-  pending: colors.Warning,
-  canceled: colors.Error,
+const statusBadgeColor: Record<SessionStatus, StatusBadgeColor> = {
+  completed: 'success',
+  pending: 'warning',
+  canceled: 'error',
 };
 
 function ScheduleCardImpl({
@@ -31,7 +32,6 @@ function ScheduleCardImpl({
   onOptionsPress,
 }: ScheduleCardProps) {
   const barColor = statusBarColor[session.status];
-  const iconColor = statusIconColor[session.status];
   const statusLabel =
     session.status.charAt(0).toUpperCase() + session.status.slice(1);
   const handlePress = onPress ? () => onPress(session) : undefined;
@@ -66,38 +66,17 @@ function ScheduleCardImpl({
         </View>
         <View style={styles.bottomRow}>
           <View style={styles.bottomLeft}>
-            {session.participants.length === 1 && session.participants[0] ? (
-              <View style={styles.participantTag}>
-                <Avatar name={session.participants[0].name} size={18} />
-                <Text style={styles.participantName}>
-                  {session.participants[0].name}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.participantsRow}>
-                {session.participants.slice(0, 3).map((p) => (
-                  <Avatar key={p.id} name={p.name} size={24} />
-                ))}
-                {session.participants.length > 3 && (
-                  <Text style={styles.moreCount}>
-                    +{session.participants.length - 3}
-                  </Text>
-                )}
-              </View>
-            )}
+            <ParticipantGroup participants={session.participants} maxVisible={3} />
           </View>
           <View style={styles.bottomRight}>
             <View style={styles.typeTag}>
               <Text style={styles.typeTagText}>{session.type}</Text>
             </View>
-            <View style={styles.paymentBadge}>
-              <View style={styles.paymentIconCircle}>
-                <Ionicons name="cash" size={8} color={iconColor} />
-              </View>
-              <Text style={[styles.statusText, { color: iconColor }]}>
-                $ {statusLabel}
-              </Text>
-            </View>
+            <StatusBadge
+              icon="cash"
+              label={`$ ${statusLabel}`}
+              color={statusBadgeColor[session.status]}
+            />
           </View>
         </View>
       </View>
@@ -162,30 +141,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  participantTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 80,
-  },
-  participantName: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral9,
-    lineHeight: 22,
-  },
-  participantsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: -8,
-  },
-  moreCount: {
-    fontSize: typography.sizes.xs,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
   typeTag: {
     backgroundColor: 'rgba(255,255,255,0.05)',
     paddingVertical: 2,
@@ -198,23 +153,6 @@ const styles = StyleSheet.create({
   typeTagText: {
     fontSize: typography.sizes.xs,
     color: colors.text,
-    lineHeight: 20,
-  },
-  paymentBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  paymentIconCircle: {
-    width: 16,
-    height: 16,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusText: {
-    fontSize: typography.sizes.xs,
     lineHeight: 20,
   },
 });
