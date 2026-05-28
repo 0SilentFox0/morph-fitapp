@@ -10,18 +10,10 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
+import { mockClients } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'CardioClassForm'>;
 type Route = RouteProp<HomeStackParamList, 'CardioClassForm'>;
-
-const CLIENTS = [
-  { id: 'c1', name: 'Darrell Steward' },
-  { id: 'c2', name: 'Theresa Webb' },
-  { id: 'c3', name: 'Bessie Cooper' },
-  { id: 'c4', name: 'Wade Warren' },
-  { id: 'c5', name: 'Guy Hawkins' },
-  { id: 'c6', name: 'Arlene McCoy' },
-];
 
 export function CardioClassFormScreen() {
   const navigation = useNavigation<Nav>();
@@ -52,7 +44,7 @@ export function CardioClassFormScreen() {
       setTitleError('Title must be at least 2 characters');
       return;
     }
-    const participants = CLIENTS.filter((c) => selectedClients.has(c.id)).map((c) => ({
+    const participants = mockClients.filter((c) => selectedClients.has(c.id)).map((c) => ({
       id: c.id,
       name: c.name,
     }));
@@ -131,7 +123,7 @@ export function CardioClassFormScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.clientsRow}
         >
-          {CLIENTS.map((client) => {
+          {mockClients.map((client) => {
             const isSelected = selectedClients.has(client.id);
             return (
               <TouchableOpacity
