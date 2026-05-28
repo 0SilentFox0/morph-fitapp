@@ -1,29 +1,17 @@
 import { apiFetch } from './apiClient';
+import {
+  ExercisesPageSchema,
+  CategoriesPageSchema,
+  SearchPageSchema,
+  ApiExerciseInfoSchema,
+  ApiExerciseTranslationSchema,
+  ExerciseCategorySchema,
+} from '../schemas/exerciseApi';
+import { z } from 'zod';
 
-export interface ExerciseCategory {
-  id: number;
-  name: string;
-}
-
-export interface ExerciseImage {
-  id: number;
-  image: string;
-  is_main: boolean;
-}
-
-export interface ApiExerciseTranslation {
-  name: string;
-  description: string;
-  language: number;
-}
-
-export interface ApiExerciseInfo {
-  id: number;
-  category: ExerciseCategory;
-  images: ExerciseImage[];
-  translations: ApiExerciseTranslation[];
-  muscles: { id: number; name_en: string }[];
-}
+export type ExerciseCategory = z.infer<typeof ExerciseCategorySchema>;
+export type ApiExerciseTranslation = z.infer<typeof ApiExerciseTranslationSchema>;
+export type ApiExerciseInfo = z.infer<typeof ApiExerciseInfoSchema>;
 
 export interface Exercise {
   id: number;
@@ -60,31 +48,14 @@ function mapExercise(raw: ApiExerciseInfo): Exercise | null {
   };
 }
 
-interface ExercisesPage {
-  results: ApiExerciseInfo[];
-  count?: number;
-  next?: string | null;
-}
-
-interface CategoriesPage {
-  results: ExerciseCategory[];
-}
-
-interface SearchSuggestion {
-  data: { id: number; name: string };
-}
-
-interface SearchPage {
-  suggestions?: SearchSuggestion[];
-}
-
 export async function fetchExercises(
   limit = 20,
   offset = 0,
 ): Promise<{ exercises: Exercise[]; total: number; hasMore: boolean }> {
-  const data = await apiFetch<ExercisesPage>(
+  const raw = await apiFetch<unknown>(
     `/exerciseinfo/?format=json&limit=${limit}&offset=${offset}`,
   );
+  const data = ExercisesPageSchema.parse(raw);
   const exercises = data.results
     .map(mapExercise)
     .filter((e): e is Exercise => e !== null);
@@ -97,16 +68,18 @@ export async function fetchExercises(
 }
 
 export async function fetchCategories(): Promise<ExerciseCategory[]> {
-  const data = await apiFetch<CategoriesPage>(`/exercisecategory/?format=json`);
+  const raw = await apiFetch<unknown>(`/exercisecategory/?format=json`);
+  const data = CategoriesPageSchema.parse(raw);
   return data.results ?? [];
 }
 
 export async function searchExercises(
   term: string,
 ): Promise<{ name: string; id: number }[]> {
-  const data = await apiFetch<SearchPage>(
+  const raw = await apiFetch<unknown>(
     `/exercise/search/?format=json&language=english&term=${encodeURIComponent(term)}`,
   );
+  const data = SearchPageSchema.parse(raw);
   return (data.suggestions ?? []).map((s) => ({
     id: s.data.id,
     name: s.data.name,
