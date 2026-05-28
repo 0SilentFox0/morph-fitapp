@@ -91,8 +91,13 @@ export function GalleryScreen() {
     });
   };
 
+  const displayExercises = React.useMemo(
+    () => filteredExercises(),
+    [filteredExercises, exercises, searchQuery, selectedCategory],
+  );
+
   const handleContinue = () => {
-    const newExercises = filteredExercises()
+    const newExercises = displayExercises
       .filter((e) => selected.has(e.id))
       .map(exerciseToProgram);
 
@@ -101,7 +106,7 @@ export function GalleryScreen() {
   };
 
   const handleSaveDraft = () => {
-    const newExercises = filteredExercises()
+    const newExercises = displayExercises
       .filter((e) => selected.has(e.id))
       .map(exerciseToProgram);
 
@@ -120,8 +125,6 @@ export function GalleryScreen() {
     resetDraft();
     navigation.navigate('TrainingLibrary');
   };
-
-  const displayExercises = filteredExercises();
 
   const renderExercise = ({ item }: { item: Exercise }) => {
     const isSelected = selected.has(item.id) || existingIds.has(item.id);

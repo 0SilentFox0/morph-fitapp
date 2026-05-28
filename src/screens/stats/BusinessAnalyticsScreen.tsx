@@ -45,6 +45,26 @@ export function BusinessAnalyticsScreen() {
   const [chartTab, setChartTab] = React.useState(0);
   const [timeframe, setTimeframe] = React.useState(0);
 
+  const chartWidth = React.useMemo(
+    () => Dimensions.get('window').width - spacing.lg * 2 - 32,
+    [],
+  );
+  const incomeData = React.useMemo(() => mockAnalyticsData.incomeOverTime, []);
+  const sourceData = React.useMemo(
+    () => ({
+      labels: ['Subscriptions', 'Trainings'],
+      datasets: [
+        {
+          data: [
+            mockAnalyticsData.revenueBySource.subscriptions,
+            mockAnalyticsData.revenueBySource.trainings,
+          ],
+        },
+      ],
+    }),
+    [],
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -117,8 +137,8 @@ export function BusinessAnalyticsScreen() {
           <View style={styles.chartContainer}>
             {chartTab === 0 ? (
               <LineChart
-                data={mockAnalyticsData.incomeOverTime}
-                width={Dimensions.get('window').width - spacing.lg * 2 - 32}
+                data={incomeData}
+                width={chartWidth}
                 height={200}
                 yAxisLabel="$"
                 yAxisSuffix=""
@@ -128,11 +148,8 @@ export function BusinessAnalyticsScreen() {
               />
             ) : (
               <BarChart
-                data={{
-                  labels: ['Subscriptions', 'Trainings'],
-                  datasets: [{ data: [mockAnalyticsData.revenueBySource.subscriptions, mockAnalyticsData.revenueBySource.trainings] }],
-                }}
-                width={Dimensions.get('window').width - spacing.lg * 2 - 32}
+                data={sourceData}
+                width={chartWidth}
                 height={200}
                 yAxisLabel="$"
                 yAxisSuffix=""
