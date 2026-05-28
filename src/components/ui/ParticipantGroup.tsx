@@ -24,6 +24,7 @@ export const ParticipantGroup = React.memo(function ParticipantGroup({
 
   if (participants.length === 1) {
     const first = participants[0];
+    if (!first) return null;
     return (
       <View style={styles.singleTag}>
         <Avatar name={first.name} uri={first.avatar} size={18} />
