@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ParticipantGroup } from './ParticipantGroup';
 import { StatusBadge, type StatusBadgeColor } from './StatusBadge';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import type { Session, SessionStatus } from '../../mocks';
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.05)',
     paddingVertical: 2,
     paddingHorizontal: 8,
-    borderRadius: 80,
+    borderRadius: radius.pill,
     height: 28,
     alignItems: 'center',
     justifyContent: 'center',

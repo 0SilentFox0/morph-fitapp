@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from '../../../navigation/types';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
@@ -48,7 +49,7 @@ export function HaveProgramsScreen() {
 }
 
 const styles = StyleSheet.create({
-  optionCard: { backgroundColor: colors.neutral2, padding: spacing.lg, borderRadius: 12, marginBottom: spacing.md },
+  optionCard: { backgroundColor: colors.neutral2, padding: spacing.lg, borderRadius: radius.md, marginBottom: spacing.md },
   optionCardSelected: { backgroundColor: colors.accent },
   optionText: { fontSize: typography.sizes.base, color: colors.text },
   optionTextSelected: { fontSize: typography.sizes.base, color: '#FFFFFF', fontWeight: typography.weights.medium },

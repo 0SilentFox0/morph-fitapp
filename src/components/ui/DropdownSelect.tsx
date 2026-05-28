@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 
 /**
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.neutral5,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

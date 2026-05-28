@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from './Avatar';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 
 /**
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingLeft: 2,
     paddingRight: 8,
-    borderRadius: 80,
+    borderRadius: radius.pill,
   },
   wrapperSelected: {
     opacity: 1,

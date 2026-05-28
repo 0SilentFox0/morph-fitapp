@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { spacing } from '../../theme/spacing';
 
 interface CardProps {
@@ -22,7 +23,7 @@ export function Card({ children, style, onPress }: CardProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     padding: spacing.md,
   },
 });

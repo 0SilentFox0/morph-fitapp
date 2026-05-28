@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Card, Tag, Avatar } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   completionText: { fontSize: typography.sizes.xs, color: colors.text },
   profileName: {

@@ -16,6 +16,7 @@ import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Avatar, ScheduleCard } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: 80,
+    borderRadius: radius.pill,
     minWidth: 62,
   },
   notifBtn: {
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     width: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 80,
+    borderRadius: radius.pill,
   },
   notifDot: {
     position: 'absolute',
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
     right: 8,
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: radius.xs,
     backgroundColor: colors.accent,
   },
   pointsText: {
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     height: 98,
     padding: spacing.md,
     justifyContent: 'space-between',
-    borderRadius: 16,
+    borderRadius: radius.lg,
   },
   statCardTop: {
     flexDirection: 'row',
@@ -456,7 +457,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.27)',
     paddingVertical: 4,
     paddingHorizontal: spacing.sm,
-    borderRadius: 80,
+    borderRadius: radius.pill,
   },
   programStatText: {
     fontSize: typography.sizes.xs,

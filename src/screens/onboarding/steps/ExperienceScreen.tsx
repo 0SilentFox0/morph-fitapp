@@ -6,6 +6,7 @@ import type { OnboardingStackParamList } from '../../../navigation/types';
 import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.neutral5,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: spacing.md,
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     marginBottom: spacing.sm,
   },
   certName: {

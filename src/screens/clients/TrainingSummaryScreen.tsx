@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { Card } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
   timeframeBtn: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral2,
   },
   timeframeBtnActive: {
@@ -179,12 +180,12 @@ const styles = StyleSheet.create({
   chartPlaceholder: {
     height: 200,
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginBottom: spacing.lg,
   },
   table: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     overflow: 'hidden',
     marginBottom: spacing.lg,
   },

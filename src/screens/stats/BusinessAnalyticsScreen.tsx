@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { Card } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { mockTransactions, mockAnalyticsData } from '../../mocks';
@@ -37,7 +38,7 @@ const chartConfig = {
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(166, 95, 98, ${opacity})`,
   labelColor: () => colors.neutral9,
-  style: { borderRadius: 8 },
+  style: { borderRadius: radius.sm },
 };
 
 export function BusinessAnalyticsScreen() {
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   timeframeBtn: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.border,
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
   },
   chart: {
     marginVertical: 0,
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   transactionsHeader: {
     flexDirection: 'row',
@@ -333,7 +334,7 @@ const styles = StyleSheet.create({
   },
   search: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     paddingRight: 40,

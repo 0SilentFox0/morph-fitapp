@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { formatTime } from '../../store/chatStore';
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     borderBottomLeftRadius: 4,
   },
   bubbleSent: {

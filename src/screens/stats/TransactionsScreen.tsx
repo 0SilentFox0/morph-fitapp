@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { Card } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { mockTransactions } from '../../mocks';
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   filterBtn: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     backgroundColor: colors.neutral2,
   },
   filterBtnActive: {
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   },
   search: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     paddingRight: 40,

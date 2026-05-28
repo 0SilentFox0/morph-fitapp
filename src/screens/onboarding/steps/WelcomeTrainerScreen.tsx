@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { spacing } from '../../../theme/spacing';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
@@ -66,7 +67,7 @@ export function WelcomeTrainerScreen() {
 const styles = StyleSheet.create({
   card: {
     height: 525,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   profileBox: {
     width: 192,
     height: 192,
-    borderRadius: 24,
+    borderRadius: radius['2xl'],
     backgroundColor: colors.neutral1,
     alignItems: 'center',
     justifyContent: 'center',

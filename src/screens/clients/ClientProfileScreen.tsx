@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { Card, Tag, Avatar } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   programTab: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     backgroundColor: colors.neutral2,
   },
   programTabActive: {
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   exerciseThumb: {
     width: 48,
     height: 48,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral1,
     marginRight: spacing.md,
   },

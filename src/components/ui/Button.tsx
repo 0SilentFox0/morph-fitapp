@@ -8,6 +8,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   base: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: 80,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,

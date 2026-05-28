@@ -17,6 +17,7 @@ import { ScreenHeader } from '../../../components/layout';
 import { ScheduleCard, SessionOptionsMenu, SearchInput } from '../../../components/ui';
 import type { SessionOptionAction } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
   },
   weekDayCell: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: spacing.sm,
@@ -465,7 +466,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   monthCell: {
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral2,
     overflow: 'hidden',
     justifyContent: 'flex-end',
@@ -483,7 +484,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   swipeHint: {
     fontSize: 10,

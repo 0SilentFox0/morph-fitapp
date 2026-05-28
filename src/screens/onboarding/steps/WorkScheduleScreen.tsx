@@ -6,6 +6,7 @@ import type { OnboardingStackParamList } from '../../../navigation/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
@@ -117,11 +118,11 @@ export function WorkScheduleScreen() {
 const styles = StyleSheet.create({
   sectionLabel: { fontSize: typography.sizes.base, fontWeight: typography.weights.semibold, color: colors.text, marginBottom: spacing.sm, marginTop: spacing.md },
   daysRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  dayChip: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: 20, backgroundColor: colors.neutral2 },
+  dayChip: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.xl, backgroundColor: colors.neutral2 },
   dayChipSelected: { backgroundColor: colors.accent },
   dayText: { fontSize: typography.sizes.sm, color: colors.text },
   dayTextSelected: { color: '#FFFFFF' },
-  timeRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.neutral2, padding: spacing.md, borderRadius: 12, marginBottom: spacing.sm, gap: spacing.sm },
+  timeRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.neutral2, padding: spacing.md, borderRadius: radius.md, marginBottom: spacing.sm, gap: spacing.sm },
   timeText: { flex: 1, fontSize: typography.sizes.base, color: colors.text },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.lg },
   toggleLabel: { fontSize: typography.sizes.sm, color: colors.textSecondary },

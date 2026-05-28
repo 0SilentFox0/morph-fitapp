@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Input, Button, Avatar } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
   uploadArea: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     padding: spacing.xl,
     alignItems: 'center',
     marginBottom: spacing.lg,
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
   uploadHint: { fontSize: typography.sizes.xs, color: colors.textMuted, marginTop: spacing.xs },
   clientsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
   clientItem: { alignItems: 'center' },
-  clientAvatarWrap: { borderRadius: 24, borderWidth: 2, borderColor: 'transparent' },
+  clientAvatarWrap: { borderRadius: radius['2xl'], borderWidth: 2, borderColor: 'transparent' },
   clientAvatarSelected: { borderColor: colors.accent },
   clientName: {
     fontSize: typography.sizes.xs,

@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from '../../../navigation/types';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
@@ -61,7 +62,7 @@ export function ClientTypesScreen() {
 
 const styles = StyleSheet.create({
   optionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  option: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: 20, backgroundColor: colors.neutral2 },
+  option: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.xl, backgroundColor: colors.neutral2 },
   optionSelected: { backgroundColor: colors.accent },
   optionText: { fontSize: typography.sizes.sm, color: colors.text },
   optionTextSelected: { color: '#FFFFFF' },

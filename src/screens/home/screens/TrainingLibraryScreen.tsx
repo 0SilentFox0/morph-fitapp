@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Card, SearchInput, EmptyState } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   actionBtn: {
     width: 30,
     height: 30,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral3,
     alignItems: 'center',
     justifyContent: 'center',
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.accent,
-    borderRadius: 24,
+    borderRadius: radius['2xl'],
   },
   emptyBtnText: {
     fontSize: typography.sizes.sm,

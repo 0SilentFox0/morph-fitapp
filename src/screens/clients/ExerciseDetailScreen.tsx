@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { Card, IconButton } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 16 / 9,
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginBottom: spacing.lg,
   },
   setTabs: {
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   setTab: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     backgroundColor: colors.neutral2,
   },
   setTabActive: {
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
   playButton: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: radius['3xl'],
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',

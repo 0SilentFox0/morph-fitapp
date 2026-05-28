@@ -6,6 +6,7 @@ import type { OnboardingStackParamList } from '../../../navigation/types';
 import { ScreenHeader, ProgressIndicator } from '../../../components/layout';
 import { Input, Button } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
   sectionTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.semibold, color: colors.text, marginBottom: spacing.md, marginTop: spacing.sm },
-  uploadArea: { backgroundColor: colors.neutral2, borderRadius: 12, padding: spacing.xl, alignItems: 'center', marginBottom: spacing.md },
+  uploadArea: { backgroundColor: colors.neutral2, borderRadius: radius.md, padding: spacing.xl, alignItems: 'center', marginBottom: spacing.md },
   uploadText: { fontSize: typography.sizes.sm, color: colors.textMuted },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.lg },
   toggleLabel: { fontSize: typography.sizes.sm, color: colors.textSecondary },

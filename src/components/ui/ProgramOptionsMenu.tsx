@@ -9,6 +9,7 @@ import {
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   menuWrap: {
-    borderRadius: 8,
+    borderRadius: radius.sm,
     overflow: 'hidden',
     minWidth: 220,
     backgroundColor: 'rgba(255,255,255,0.04)',
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   menuOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   menu: {
     padding: spacing.sm,

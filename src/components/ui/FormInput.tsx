@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 
 /**
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral1,
     borderWidth: 1,
     borderColor: colors.neutral5,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     paddingHorizontal: 12,
     paddingVertical: 0,
     fontSize: 14,

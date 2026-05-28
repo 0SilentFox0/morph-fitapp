@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 
 interface IconButtonProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
   button: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius['2xl'],
     backgroundColor: colors.neutral2,
     alignItems: 'center',
     justifyContent: 'center',

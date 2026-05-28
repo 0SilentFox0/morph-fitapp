@@ -6,6 +6,7 @@ import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     backgroundColor: colors.neutral2,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     padding: spacing.xl,
     width: '100%',
     maxWidth: 400,

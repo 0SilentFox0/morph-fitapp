@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from './types';
 import { colors } from '../theme/colors';
+import { radius } from '../theme';
 import { spacing } from '../theme/spacing';
 import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon } from '../components/icons/TabBarIcons';
 
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     right: 2,
     width: 8,
     height: 8,
-    borderRadius: 80,
+    borderRadius: radius.pill,
     backgroundColor: colors.primary7,
   },
 });

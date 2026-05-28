@@ -13,6 +13,7 @@ import type { ClientsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Tag, Avatar } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { mockClients } from '../../mocks';
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   search: {
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     paddingRight: 40,

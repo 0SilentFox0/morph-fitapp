@@ -6,6 +6,7 @@ import type { StatsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Card } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
   },

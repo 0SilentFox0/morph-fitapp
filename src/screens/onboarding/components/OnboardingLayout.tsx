@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ProgressIndicator } from '../../../components/layout';
 import { FitnessLogo } from '../../../components/icons/FitnessLogo';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
   navBtn: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius['2xl'],
     backgroundColor: colors.neutral2,
     alignItems: 'center',
     justifyContent: 'center',
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   nextBtn: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius['2xl'],
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',

@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Button, SearchInput } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
+import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
   categoryChip: {
     paddingVertical: 6,
     paddingHorizontal: spacing.md,
-    borderRadius: 80,
+    borderRadius: radius.pill,
     backgroundColor: colors.neutral2,
     borderWidth: 1,
     borderColor: colors.border,
@@ -348,7 +349,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 0.93,
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     overflow: 'hidden',
     position: 'relative',
   },

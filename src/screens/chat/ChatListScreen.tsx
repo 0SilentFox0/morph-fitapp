@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { SearchInput, Avatar, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useChatStore, formatTime } from '../../store/chatStore';
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.sm,
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginBottom: spacing.sm,
   },
   convContent: {
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.accent,
-    borderRadius: 24,
+    borderRadius: radius['2xl'],
   },
   emptyBtnText: {
     fontSize: typography.sizes.sm,

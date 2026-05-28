@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ScreenHeader } from '../../components/layout';
 import { Card, Tag, Avatar } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
   historyThumb: {
     width: 60,
     height: 60,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral1,
     marginRight: spacing.md,
   },

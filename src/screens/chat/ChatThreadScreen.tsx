@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { MessageBubble, Avatar } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
     maxHeight: 100,
     backgroundColor: colors.neutral2,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     fontSize: typography.sizes.base,
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
   sendBtn: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',

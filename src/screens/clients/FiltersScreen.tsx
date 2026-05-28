@@ -6,6 +6,7 @@ import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Button } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   option: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     backgroundColor: colors.neutral2,
   },
   optionSelected: {

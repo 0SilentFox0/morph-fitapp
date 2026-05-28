@@ -12,6 +12,7 @@ import type { ChatStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { SearchInput, Avatar } from '../../components/ui';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.sm,
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginBottom: spacing.sm,
   },
   clientInfo: {

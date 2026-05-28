@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors } from '../../theme/colors';
+import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     alignSelf: 'flex-start',
   },
   tagAccent: {
