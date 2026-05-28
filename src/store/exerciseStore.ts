@@ -5,6 +5,7 @@ import {
   type Exercise,
   type ExerciseCategory,
 } from '../services/exerciseApi';
+import { toErrorMessage } from '../utils';
 
 interface ExerciseState {
   exercises: Exercise[];
@@ -44,8 +45,8 @@ export const useExerciseStore = create<ExerciseState>((set, get) => ({
     try {
       const { exercises, hasMore } = await fetchExercises(PAGE_SIZE, 0);
       set({ exercises, hasMore, offset: PAGE_SIZE, loading: false });
-    } catch (e: any) {
-      set({ error: e.message, loading: false });
+    } catch (e) {
+      set({ error: toErrorMessage(e), loading: false });
     }
   },
 
@@ -61,7 +62,8 @@ export const useExerciseStore = create<ExerciseState>((set, get) => ({
         offset: s.offset + PAGE_SIZE,
         loadingMore: false,
       }));
-    } catch {
+    } catch (e) {
+      console.warn('[exerciseStore] loadMore failed:', toErrorMessage(e));
       set({ loadingMore: false });
     }
   },
@@ -70,8 +72,8 @@ export const useExerciseStore = create<ExerciseState>((set, get) => ({
     try {
       const categories = await fetchCategories();
       set({ categories });
-    } catch {
-      /* keep empty */
+    } catch (e) {
+      console.warn('[exerciseStore] loadCategories failed:', toErrorMessage(e));
     }
   },
 
