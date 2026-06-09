@@ -25,17 +25,23 @@ const EXPERIENCE_VALUES = ['1-3 years', '4-6 years', '7-9 years', '10+ years'];
 
 export function ExperienceScreen() {
   const navigation = useNavigation<Nav>();
-  const { experienceYears, hasCertifications, certifications, setField, addCertification, removeCertification } =
-    useOnboardingStore(
-      useShallow((s) => ({
-        experienceYears: s.experienceYears,
-        hasCertifications: s.hasCertifications,
-        certifications: s.certifications,
-        setField: s.setField,
-        addCertification: s.addCertification,
-        removeCertification: s.removeCertification,
-      })),
-    );
+  const {
+    experienceYears,
+    hasCertifications,
+    certifications,
+    setField,
+    addCertification,
+    removeCertification,
+  } = useOnboardingStore(
+    useShallow((s) => ({
+      experienceYears: s.experienceYears,
+      hasCertifications: s.hasCertifications,
+      certifications: s.certifications,
+      setField: s.setField,
+      addCertification: s.addCertification,
+      removeCertification: s.removeCertification,
+    }))
+  );
 
   const handleUpload = async () => {
     try {
@@ -76,8 +82,12 @@ export function ExperienceScreen() {
               accessibilityRole="radio"
               accessibilityState={{ checked: isSelected }}
             >
-              <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>{opt.label}</Text>
-              <Text style={[styles.optionSub, isSelected && styles.optionSubSelected]}>{opt.sub}</Text>
+              <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+                {opt.label}
+              </Text>
+              <Text style={[styles.optionSub, isSelected && styles.optionSubSelected]}>
+                {opt.sub}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -90,7 +100,7 @@ export function ExperienceScreen() {
         accessibilityState={{ checked: hasCertifications }}
       >
         <View style={[styles.checkbox, hasCertifications && styles.checkboxChecked]}>
-          {hasCertifications && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
+          {hasCertifications && <Ionicons name="checkmark" size={12} color={colors.white} />}
         </View>
         <Text style={styles.checkboxLabel}>I have certifications</Text>
       </TouchableOpacity>
@@ -103,8 +113,13 @@ export function ExperienceScreen() {
       {certifications.map((cert) => (
         <View key={cert.uri} style={styles.certChip}>
           <Ionicons name="document-text" size={16} color={colors.text} />
-          <Text style={styles.certName} numberOfLines={1}>{cert.name}</Text>
-          <TouchableOpacity onPress={() => removeCertification(cert.uri)} accessibilityLabel={`Remove ${cert.name}`}>
+          <Text style={styles.certName} numberOfLines={1}>
+            {cert.name}
+          </Text>
+          <TouchableOpacity
+            onPress={() => removeCertification(cert.uri)}
+            accessibilityLabel={`Remove ${cert.name}`}
+          >
             <Ionicons name="close-circle" size={20} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
@@ -123,7 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 68,
     borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.surfaceSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
@@ -139,7 +154,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   optionLabelSelected: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
   optionSub: {
     fontSize: 12,

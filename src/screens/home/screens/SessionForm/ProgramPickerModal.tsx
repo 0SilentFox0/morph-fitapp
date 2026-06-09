@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Overlay } from '../../../../components/ui';
 import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
@@ -33,54 +34,46 @@ export function ProgramPickerModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-        <View style={styles.box}>
-          <Text style={styles.title}>Select Program</Text>
-          <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
-            {programs.length > 0 ? (
-              programs.map((p) => {
-                const active = value === p.id;
-                return (
-                  <TouchableOpacity
-                    key={p.id}
-                    style={[styles.option, active && styles.optionActive]}
-                    onPress={() => handleSelect(p.id)}
-                  >
-                    <View style={styles.optionRow}>
-                      <Ionicons
-                        name="barbell-outline"
-                        size={16}
-                        color={active ? colors.accent : colors.neutral8}
-                      />
-                      <View style={styles.optionInfo}>
-                        <Text style={[styles.optionText, active && styles.optionTextActive]}>
-                          {p.name}
-                        </Text>
-                        <Text style={styles.optionMeta}>{programMeta(p)}</Text>
-                      </View>
+    <Overlay visible={visible} onClose={onClose}>
+      <View style={styles.box}>
+        <Text style={styles.title}>Select Program</Text>
+        <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
+          {programs.length > 0 ? (
+            programs.map((p) => {
+              const active = value === p.id;
+              return (
+                <TouchableOpacity
+                  key={p.id}
+                  style={[styles.option, active && styles.optionActive]}
+                  onPress={() => handleSelect(p.id)}
+                >
+                  <View style={styles.optionRow}>
+                    <Ionicons
+                      name="barbell-outline"
+                      size={16}
+                      color={active ? colors.accent : colors.neutral8}
+                    />
+                    <View style={styles.optionInfo}>
+                      <Text style={[styles.optionText, active && styles.optionTextActive]}>
+                        {p.name}
+                      </Text>
+                      <Text style={styles.optionMeta}>{programMeta(p)}</Text>
                     </View>
-                    {active ? <Ionicons name="checkmark" size={18} color={colors.accent} /> : null}
-                  </TouchableOpacity>
-                );
-              })
-            ) : (
-              <Text style={styles.empty}>No programs yet. Create one in Training Library.</Text>
-            )}
-          </ScrollView>
-        </View>
-      </TouchableOpacity>
-    </Modal>
+                  </View>
+                  {active ? <Ionicons name="checkmark" size={18} color={colors.accent} /> : null}
+                </TouchableOpacity>
+              );
+            })
+          ) : (
+            <Text style={styles.empty}>No programs yet. Create one in Training Library.</Text>
+          )}
+        </ScrollView>
+      </View>
+    </Overlay>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   box: {
     width: '85%',
     backgroundColor: colors.neutral2,

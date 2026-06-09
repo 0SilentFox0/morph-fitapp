@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from '../../../navigation/types';
 import type { AccessSetting } from '../../../store/onboardingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Button, Card, Tag, Avatar } from '../../../components/ui';
+import { Button, Card, Tag, Avatar, SectionTitle } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
@@ -67,7 +67,7 @@ export function PreviewProfileScreen() {
       hasCertifications: s.hasCertifications,
       freePreview: s.freePreview,
       accessSetting: s.accessSetting,
-    })),
+    }))
   );
 
   const displayName = name.trim() || 'Trainer';
@@ -109,7 +109,7 @@ export function PreviewProfileScreen() {
         </Card>
       </View>
 
-      <Text style={styles.sectionTitle}>Certifications</Text>
+      <SectionTitle style={styles.sectionTitleSpacing}>Certifications</SectionTitle>
       <Card style={styles.card}>
         <Ionicons name="ribbon" size={20} color={colors.textSecondary} />
         <View style={styles.cardBody}>
@@ -122,14 +122,12 @@ export function PreviewProfileScreen() {
               : `${certifications.length} file${certifications.length > 1 ? 's' : ''}`}
           </Text>
           {certifications.length > 0 && (
-            <Text style={styles.certNames}>
-              {certifications.map((c) => c.name).join(', ')}
-            </Text>
+            <Text style={styles.certNames}>{certifications.map((c) => c.name).join(', ')}</Text>
           )}
         </View>
       </Card>
 
-      <Text style={styles.sectionTitle}>Availability</Text>
+      <SectionTitle style={styles.sectionTitleSpacing}>Availability</SectionTitle>
       <Card style={[styles.card, styles.availabilityCard]}>
         <Ionicons name="time" size={20} color={colors.text} />
         <View style={styles.cardBody}>
@@ -139,7 +137,7 @@ export function PreviewProfileScreen() {
         </View>
       </Card>
 
-      <Text style={styles.sectionTitle}>Access & preview</Text>
+      <SectionTitle style={styles.sectionTitleSpacing}>Access & preview</SectionTitle>
       <View style={styles.infoRow}>
         <Card style={styles.infoCard}>
           <Ionicons name="eye" size={20} color={colors.textSecondary} />
@@ -159,7 +157,7 @@ export function PreviewProfileScreen() {
 
       {trainingTypes.length > 0 && (
         <>
-          <Text style={styles.sectionTitle}>Training Types</Text>
+          <SectionTitle style={styles.sectionTitleSpacing}>Training Types</SectionTitle>
           <View style={styles.tagsRow}>
             {trainingTypes.map((t) => (
               <Tag key={t} label={t} variant="default" />
@@ -170,7 +168,7 @@ export function PreviewProfileScreen() {
 
       {clientTypes.length > 0 && (
         <>
-          <Text style={styles.sectionTitle}>Clients</Text>
+          <SectionTitle style={styles.sectionTitleSpacing}>Clients</SectionTitle>
           <View style={styles.tagsRow}>
             {clientTypes.map((c) => (
               <Tag key={c} label={c} variant="default" />
@@ -179,7 +177,7 @@ export function PreviewProfileScreen() {
         </>
       )}
 
-      <Text style={styles.sectionTitle}>Programs</Text>
+      <SectionTitle style={styles.sectionTitleSpacing}>Programs</SectionTitle>
       <Card style={styles.card}>
         <Ionicons name="library" size={20} color={colors.textSecondary} />
         <View style={styles.cardBody}>
@@ -230,13 +228,15 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
+  sectionTitleSpacing: {
     marginBottom: spacing.sm,
   },
-  card: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, marginBottom: spacing.lg },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
   availabilityCard: { backgroundColor: colors.primary2 },
   availabilityText: { fontSize: typography.sizes.base, color: colors.text },
   tagsRow: {

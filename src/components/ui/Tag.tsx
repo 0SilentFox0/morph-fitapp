@@ -13,21 +13,8 @@ interface TagProps {
 
 export function Tag({ label, variant = 'default', style }: TagProps) {
   return (
-    <View
-      style={[
-        styles.tag,
-        variant === 'accent' && styles.tagAccent,
-        style,
-      ]}
-    >
-      <Text
-        style={[
-          styles.text,
-          variant === 'accent' && styles.textAccent,
-        ]}
-      >
-        {label}
-      </Text>
+    <View style={[styles.tag, variant === 'accent' && styles.tagAccent, style]}>
+      <Text style={[styles.text, variant === 'accent' && styles.textAccent]}>{label}</Text>
     </View>
   );
 }
@@ -49,6 +36,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.medium,
   },
   textAccent: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
 });

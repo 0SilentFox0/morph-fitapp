@@ -49,8 +49,17 @@ export function HaveProgramsScreen() {
 }
 
 const styles = StyleSheet.create({
-  optionCard: { backgroundColor: colors.neutral2, padding: spacing.lg, borderRadius: radius.md, marginBottom: spacing.md },
+  optionCard: {
+    backgroundColor: colors.neutral2,
+    padding: spacing.lg,
+    borderRadius: radius.md,
+    marginBottom: spacing.md,
+  },
   optionCardSelected: { backgroundColor: colors.accent },
   optionText: { fontSize: typography.sizes.base, color: colors.text },
-  optionTextSelected: { fontSize: typography.sizes.base, color: '#FFFFFF', fontWeight: typography.weights.medium },
+  optionTextSelected: {
+    fontSize: typography.sizes.base,
+    color: colors.white,
+    fontWeight: typography.weights.medium,
+  },
 });

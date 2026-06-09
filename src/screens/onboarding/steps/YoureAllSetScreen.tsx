@@ -28,7 +28,7 @@ export function YoureAllSetScreen() {
 
       <Card style={styles.achievementCard}>
         <View style={styles.achievementIcon}>
-          <Ionicons name="trophy" size={48} color="#FFFFFF" />
+          <Ionicons name="trophy" size={48} color={colors.white} />
         </View>
         <Text style={styles.achievementLabel}>Achievement unlocked</Text>
         <Text style={styles.achievementTitle}>Profile Complete</Text>

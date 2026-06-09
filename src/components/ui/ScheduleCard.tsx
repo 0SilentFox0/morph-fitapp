@@ -27,23 +27,14 @@ const statusBadgeColor: Record<SessionStatus, StatusBadgeColor> = {
   canceled: 'error',
 };
 
-function ScheduleCardImpl({
-  session,
-  onPress,
-  onOptionsPress,
-}: ScheduleCardProps) {
+function ScheduleCardImpl({ session, onPress, onOptionsPress }: ScheduleCardProps) {
   const barColor = statusBarColor[session.status];
-  const statusLabel =
-    session.status.charAt(0).toUpperCase() + session.status.slice(1);
+  const statusLabel = session.status.charAt(0).toUpperCase() + session.status.slice(1);
   const handlePress = onPress ? () => onPress(session) : undefined;
   const handleOptionsPress = onOptionsPress ? () => onOptionsPress(session) : undefined;
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={handlePress}
-      activeOpacity={0.8}
-    >
+    <TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.8}>
       <View style={[styles.leftBar, { backgroundColor: barColor }]} />
       <View style={styles.content}>
         <View style={styles.topRow}>
@@ -52,11 +43,7 @@ function ScheduleCardImpl({
             onPress={handleOptionsPress}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons
-              name="ellipsis-horizontal"
-              size={20}
-              color={colors.text}
-            />
+            <Ionicons name="ellipsis-horizontal" size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
         <View style={styles.dateRow}>
@@ -143,7 +130,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   typeTag: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.surfaceSubtle,
     paddingVertical: 2,
     paddingHorizontal: 8,
     borderRadius: radius.pill,

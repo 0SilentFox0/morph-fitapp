@@ -17,9 +17,11 @@ import { ScreenHeader } from '../../../components/layout';
 import { ScheduleCard, SessionOptionsMenu, SearchInput, EmptyState } from '../../../components/ui';
 import { MonthSelector } from './Schedule/MonthSelector';
 import { DayStrip } from './Schedule/DayStrip';
+import { WeekStrip } from './Schedule/WeekStrip';
+import { MonthGrid } from './Schedule/MonthGrid';
+import { buildDaysFromToday, type ScheduleViewMode } from './Schedule/scheduleUtils';
 import type { SessionOptionAction } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useSessionsStore } from '../../../store/sessionsStore';
@@ -27,37 +29,6 @@ import type { Session } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
-const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const DAYS_AHEAD = 90;
-const WORK_DAY_START = 8;
-const WORK_DAY_END = 16;
-const AVG_TRAINING_HOURS = 1.5;
-const MAX_TRAININGS_PER_DAY = Math.floor((WORK_DAY_END - WORK_DAY_START) / AVG_TRAINING_HOURS);
-
-type ScheduleViewMode = 'day' | 'week' | 'month';
-
-function buildDaysFromToday(): { label: string; date: string; dateKey: string }[] {
-  const days: { label: string; date: string; dateKey: string }[] = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  for (let i = 0; i < DAYS_AHEAD; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    days.push({
-      label: DAY_LABELS[d.getDay()] ?? '',
-      date: String(d.getDate()),
-      dateKey: d.toISOString().slice(0, 10),
-    });
-  }
-  return days;
-}
-
-function getBusyPercent(sessionCount: number): number {
-  return Math.min(100, (sessionCount / MAX_TRAININGS_PER_DAY) * 100);
-}
-
-const DAY_CELL_WIDTH = 48;
-const DAY_CELL_HEIGHT = 56;
 const SWIPE_THRESHOLD = 60;
 
 export function ScheduleScreen() {
@@ -74,7 +45,7 @@ export function ScheduleScreen() {
 
   const handleSessionPress = React.useCallback(
     (s: Session) => navigation.navigate('SessionForm', { session: s }),
-    [navigation],
+    [navigation]
   );
   const handleSessionOptions = React.useCallback((s: Session) => setOptionsSession(s), []);
 
@@ -99,21 +70,17 @@ export function ScheduleScreen() {
     if (action === 'edit' || action === 'reschedule') {
       navigation.navigate('SessionForm', { session: optionsSession });
     } else if (action === 'cancel') {
-      Alert.alert(
-        'Cancel session',
-        `Cancel "${optionsSession.title}"?`,
-        [
-          { text: 'No', style: 'cancel', onPress: () => setOptionsSession(null) },
-          {
-            text: 'Yes, cancel',
-            style: 'destructive',
-            onPress: () => {
-              deleteSession(optionsSession.id);
-              setOptionsSession(null);
-            },
+      Alert.alert('Cancel session', `Cancel "${optionsSession.title}"?`, [
+        { text: 'No', style: 'cancel', onPress: () => setOptionsSession(null) },
+        {
+          text: 'Yes, cancel',
+          style: 'destructive',
+          onPress: () => {
+            deleteSession(optionsSession.id);
+            setOptionsSession(null);
           },
-        ]
-      );
+        },
+      ]);
       return;
     }
     setOptionsSession(null);
@@ -123,12 +90,9 @@ export function ScheduleScreen() {
 
   const onDayForSelected = getSessionsByDateKey(selectedDateKey);
   const qTrim = search.trim();
-  const daySessions =
-    !qTrim
-      ? onDayForSelected
-      : onDayForSelected.filter((s) =>
-          new Set(searchSessions(qTrim).map((x) => x.id)).has(s.id)
-        );
+  const daySessions = !qTrim
+    ? onDayForSelected
+    : onDayForSelected.filter((s) => new Set(searchSessions(qTrim).map((x) => x.id)).has(s.id));
 
   const weekDays = React.useMemo(
     () => days.slice(selectedDayIndex, selectedDayIndex + 7),
@@ -197,66 +161,25 @@ export function ScheduleScreen() {
         )}
 
         {viewMode === 'week' && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.weekRow}
-          >
-            {weekDays.map((day, i) => {
-              const daySess = getSessionsByDateKey(day.dateKey);
-              const selected = selectedDayIndex + i === selectedDayIndex;
-              return (
-                <TouchableOpacity
-                  key={day.dateKey}
-                  onPress={() => setSelectedDayIndex(selectedDayIndex + i)}
-                  style={[styles.weekDayCell, { width: (width - spacing.lg * 2 - spacing.sm * 6) / 7 }]}
-                >
-                  <Text style={styles.weekDayLabel}>{day.label}</Text>
-                  <Text style={[styles.weekDayDate, selected && styles.dayDateSelected]}>{day.date}</Text>
-                  <Text style={styles.weekDayCount}>{daySess.length}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+          <WeekStrip
+            weekDays={weekDays}
+            baseIndex={selectedDayIndex}
+            onSelect={setSelectedDayIndex}
+            getCount={(dateKey) => getSessionsByDateKey(dateKey).length}
+            cellWidth={(width - spacing.lg * 2 - spacing.sm * 6) / 7}
+          />
         )}
 
         {viewMode === 'month' && (
-          <View style={styles.monthGrid}>
-            {DAY_LABELS.map((l) => (
-              <View key={l} style={[styles.monthGridHeader, { width: monthCellSize }]}>
-                <Text style={styles.monthGridHeaderText}>{l.slice(0, 2)}</Text>
-              </View>
-            ))}
-            {monthDays.map((cell, i) => {
-              if (cell.empty)
-                return (
-                  <View key={`e-${i}`} style={[styles.monthCell, { width: monthCellSize, height: monthCellSize }]} />
-                );
-              const daySess = getSessionsByDateKey(cell.dateKey);
-              const pct = getBusyPercent(daySess.length);
-              return (
-                <TouchableOpacity
-                  key={cell.dateKey}
-                  style={[styles.monthCell, { width: monthCellSize, height: monthCellSize }]}
-                  onPress={() => {
-                    const idx = days.findIndex((d) => d.dateKey === cell.dateKey);
-                    if (idx >= 0) setSelectedDayIndex(idx);
-                  }}
-                >
-                  <Text style={styles.monthCellDate}>{cell.date}</Text>
-                  <View
-                    style={[
-                      styles.monthCellFill,
-                      {
-                        height: `${pct}%`,
-                        backgroundColor: pct > 0 ? colors.accent : 'transparent',
-                      },
-                    ]}
-                  />
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <MonthGrid
+            monthDays={monthDays}
+            cellSize={monthCellSize}
+            getCount={(dateKey) => getSessionsByDateKey(dateKey).length}
+            onSelectDate={(dateKey) => {
+              const idx = days.findIndex((d) => d.dateKey === dateKey);
+              if (idx >= 0) setSelectedDayIndex(idx);
+            }}
+          />
         )}
 
         <Text style={styles.swipeHint}>
@@ -340,72 +263,6 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.screenBg,
-  },
-  dayDateSelected: {
-    color: colors.text,
-  },
-  weekRow: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
-    marginBottom: 0,
-  },
-  weekDayCell: {
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.sm,
-  },
-  weekDayLabel: {
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-  weekDayDate: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  weekDayCount: {
-    fontSize: 14,
-    color: colors.accent,
-    marginTop: spacing.xs,
-  },
-  monthGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: spacing.lg,
-    marginBottom: 0,
-    gap: spacing.xs,
-  },
-  monthGridHeader: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  monthGridHeaderText: {
-    fontSize: 10,
-    color: colors.textMuted,
-  },
-  monthCell: {
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral2,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  monthCellDate: {
-    position: 'absolute',
-    top: 2,
-    left: 4,
-    fontSize: 11,
-    color: colors.text,
-    zIndex: 1,
-  },
-  monthCellFill: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    borderRadius: radius.sm,
   },
   swipeHint: {
     fontSize: 10,

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
-import { Button } from '../../components/ui';
+import { Button, SectionTitle } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
@@ -38,55 +38,32 @@ export function FiltersScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Training</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Training</SectionTitle>
         <View style={styles.optionsRow}>
           {TRAINING_OPTIONS.map((opt) => (
             <TouchableOpacity
               key={opt}
               onPress={() => setTraining(opt)}
-              style={[
-                styles.option,
-                training === opt && styles.optionSelected,
-              ]}
+              style={[styles.option, training === opt && styles.optionSelected]}
             >
-              <Text
-                style={[
-                  styles.optionText,
-                  training === opt && styles.optionTextSelected,
-                ]}
-              >
+              <Text style={[styles.optionText, training === opt && styles.optionTextSelected]}>
                 {opt}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>Payments</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Payments</SectionTitle>
         {PAYMENT_OPTIONS.map((opt) => (
-          <TouchableOpacity
-            key={opt}
-            onPress={() => togglePayment(opt)}
-            style={styles.checkRow}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                payments.has(opt) && styles.checkboxChecked,
-              ]}
-            >
-              {payments.has(opt) && (
-                <Text style={styles.checkmark}>✓</Text>
-              )}
+          <TouchableOpacity key={opt} onPress={() => togglePayment(opt)} style={styles.checkRow}>
+            <View style={[styles.checkbox, payments.has(opt) && styles.checkboxChecked]}>
+              {payments.has(opt) && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={styles.checkLabel}>{opt}</Text>
           </TouchableOpacity>
         ))}
 
-        <Button
-          title="Submit"
-          onPress={() => navigation.goBack()}
-          style={styles.button}
-        />
+        <Button title="Submit" onPress={() => navigation.goBack()} style={styles.button} />
       </ScrollView>
     </View>
   );
@@ -102,11 +79,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing['2xl'],
   },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginBottom: spacing.md,
+  sectionTitleSpacing: {
     marginTop: spacing.sm,
   },
   optionsRow: {
@@ -129,7 +102,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   optionTextSelected: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
   checkRow: {
     flexDirection: 'row',
@@ -151,7 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   checkmark: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 14,
     fontWeight: 'bold',
   },

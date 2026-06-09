@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { Card } from '../../components/ui';
+import { Card, SectionTitle } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
@@ -47,23 +47,15 @@ export function TrainingSummaryScreen() {
           </Card>
         </View>
 
-        <Text style={styles.sectionTitle}>Training progress</Text>
+        <SectionTitle>Training progress</SectionTitle>
         <View style={styles.timeframeRow}>
           {TIMEFRAME.map((t, i) => (
             <TouchableOpacity
               key={t}
               onPress={() => setTimeframe(i)}
-              style={[
-                styles.timeframeBtn,
-                i === timeframe && styles.timeframeBtnActive,
-              ]}
+              style={[styles.timeframeBtn, i === timeframe && styles.timeframeBtnActive]}
             >
-              <Text
-                style={[
-                  styles.timeframeText,
-                  i === timeframe && styles.timeframeTextActive,
-                ]}
-              >
+              <Text style={[styles.timeframeText, i === timeframe && styles.timeframeTextActive]}>
                 {t}
               </Text>
             </TouchableOpacity>
@@ -72,7 +64,7 @@ export function TrainingSummaryScreen() {
 
         <View style={styles.chartPlaceholder} />
 
-        <Text style={styles.sectionTitle}>Exercises</Text>
+        <SectionTitle>Exercises</SectionTitle>
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <Text style={[styles.tableCell, styles.tableHeader]}>Name</Text>
@@ -88,7 +80,7 @@ export function TrainingSummaryScreen() {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Trainer Notes</Text>
+        <SectionTitle>Trainer Notes</SectionTitle>
         <Card style={styles.notesCard}>
           <Text style={styles.notesText}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -103,14 +95,7 @@ export function TrainingSummaryScreen() {
             onPress={() => setActiveTab(i)}
             style={[styles.tab, i === activeTab && styles.tabActive]}
           >
-            <Text
-              style={[
-                styles.tabText,
-                i === activeTab && styles.tabTextActive,
-              ]}
-            >
-              {t}
-            </Text>
+            <Text style={[styles.tabText, i === activeTab && styles.tabTextActive]}>{t}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -150,12 +135,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: spacing.xs,
   },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
   timeframeRow: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -175,7 +154,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   timeframeTextActive: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
   chartPlaceholder: {
     height: 200,

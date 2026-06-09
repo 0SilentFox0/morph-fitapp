@@ -31,7 +31,12 @@ export function WelcomeTrainerScreen() {
             style={StyleSheet.absoluteFill}
           />
           <LinearGradient
-            colors={['transparent', 'transparent', 'rgba(240,119,75,0.3)', 'rgba(255,180,153,0.25)']}
+            colors={[
+              'transparent',
+              'transparent',
+              'rgba(240,119,75,0.3)',
+              'rgba(255,180,153,0.25)',
+            ]}
             locations={[0, 0.55, 0.85, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -49,9 +54,7 @@ export function WelcomeTrainerScreen() {
             <View style={[styles.skeletonBar, styles.skeletonBarWide]} />
           </View>
 
-          <Text style={styles.hint}>
-            Clients will discover you once{'\n'}your profile is ready
-          </Text>
+          <Text style={styles.hint}>Clients will discover you once{'\n'}your profile is ready</Text>
         </View>
       </View>
 
@@ -75,7 +78,7 @@ const styles = StyleSheet.create({
   },
   baseFill: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.surfaceSubtle,
   },
   cardContent: {
     alignItems: 'center',

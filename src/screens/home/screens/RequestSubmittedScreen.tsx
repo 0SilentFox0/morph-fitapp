@@ -18,30 +18,23 @@ export function RequestSubmittedScreen() {
   return (
     <View style={styles.overlay}>
       <View style={styles.modal}>
-        <TouchableOpacity
-          style={styles.closeBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.iconCircle}>
-          <Ionicons name="checkmark" size={48} color="#FFFFFF" />
+          <Ionicons name="checkmark" size={48} color={colors.white} />
         </View>
         <Text style={styles.title}>Request submitted</Text>
         <Text style={styles.message}>
-          Session time will change after Darrell Steward approves it. In the
-          other case, the session will be canceled in 8 hr.
+          Session time will change after Darrell Steward approves it. In the other case, the session
+          will be canceled in 8 hr.
         </Text>
         <Button
           title="Write to the client"
           onPress={() => navigation.goBack()}
           style={styles.primaryBtn}
         />
-        <Button
-          title="Cancel"
-          onPress={() => navigation.goBack()}
-          variant="outline"
-        />
+        <Button title="Cancel" onPress={() => navigation.goBack()} variant="outline" />
       </View>
     </View>
   );
@@ -50,7 +43,7 @@ export function RequestSubmittedScreen() {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,

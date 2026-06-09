@@ -51,16 +51,10 @@ export function ClientProfileScreen() {
             <TouchableOpacity
               key={p}
               onPress={() => setActiveProgram(i)}
-              style={[
-                styles.programTab,
-                i === activeProgram && styles.programTabActive,
-              ]}
+              style={[styles.programTab, i === activeProgram && styles.programTabActive]}
             >
               <Text
-                style={[
-                  styles.programTabText,
-                  i === activeProgram && styles.programTabTextActive,
-                ]}
+                style={[styles.programTabText, i === activeProgram && styles.programTabTextActive]}
               >
                 {p}
               </Text>
@@ -145,7 +139,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   programTabTextActive: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
   programCard: {
     marginBottom: spacing.lg,

@@ -34,29 +34,18 @@ export function ParticipantChip({
         {name}
       </Text>
       {onRemove ? (
-        <TouchableOpacity
-          onPress={onRemove}
-          hitSlop={8}
-          style={styles.removeBtn}
-        >
+        <TouchableOpacity onPress={onRemove} hitSlop={8} style={styles.removeBtn}>
           <Ionicons name="close" size={16} color={colors.neutral9} />
         </TouchableOpacity>
       ) : null}
     </>
   );
 
-  const wrapperStyle = [
-    styles.wrapper,
-    selected && styles.wrapperSelected,
-  ];
+  const wrapperStyle = [styles.wrapper, selected && styles.wrapperSelected];
 
   if (onPress) {
     return (
-      <TouchableOpacity
-        style={[wrapperStyle, style]}
-        onPress={onPress}
-        activeOpacity={0.8}
-      >
+      <TouchableOpacity style={[wrapperStyle, style]} onPress={onPress} activeOpacity={0.8}>
         {content}
       </TouchableOpacity>
     );
@@ -70,7 +59,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.surfaceSubtle,
     paddingVertical: 2,
     paddingLeft: 2,
     paddingRight: 8,

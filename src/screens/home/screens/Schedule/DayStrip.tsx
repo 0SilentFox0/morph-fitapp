@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors } from '../../../../theme/colors';
+import { radius } from '../../../../theme';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 
@@ -34,12 +35,8 @@ export function DayStrip({ days, selectedIndex, onSelect }: DayStripProps) {
             onPress={() => onSelect(i)}
             style={[styles.chip, selected && styles.chipSelected]}
           >
-            <Text style={[styles.label, selected && styles.labelSelected]}>
-              {day.label}
-            </Text>
-            <Text style={[styles.date, selected && styles.dateSelected]}>
-              {day.date}
-            </Text>
+            <Text style={[styles.label, selected && styles.labelSelected]}>{day.label}</Text>
+            <Text style={[styles.date, selected && styles.dateSelected]}>{day.date}</Text>
           </TouchableOpacity>
         );
       })}
@@ -58,7 +55,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.neutral2,
-    borderRadius: 12,
+    borderRadius: radius.md,
   },
   chipSelected: {
     backgroundColor: colors.accent,

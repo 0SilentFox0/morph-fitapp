@@ -14,6 +14,15 @@ export const colors = {
   Success: darkTheme.success6,
   Warning: darkTheme.warning7,
   Error: darkTheme.error8,
+
+  /** Fixed white for content on colored surfaces (e.g. text on accent). */
+  white: '#FFFFFF',
+  /** Translucent scrim behind modals and bottom sheets. */
+  overlay: 'rgba(0, 0, 0, 0.6)',
+  /** Lighter scrim for less-intrusive popovers (anchored menus, dropdowns). */
+  overlayLight: 'rgba(0, 0, 0, 0.4)',
+  /** Subtle white tint used for raised surfaces/cards on dark backgrounds. */
+  surfaceSubtle: 'rgba(255, 255, 255, 0.05)',
 } as const;
 
 export type ColorToken = keyof typeof colors;

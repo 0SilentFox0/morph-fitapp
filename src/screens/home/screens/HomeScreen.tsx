@@ -1,23 +1,14 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  RefreshControl,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { Card, Avatar, ScheduleCard } from '../../../components/ui';
+import { ScheduleCard, SectionTitle } from '../../../components/ui';
 import { TrainingProgramsRow } from './Home/TrainingProgramsRow';
+import { HomeHeader } from './Home/HomeHeader';
+import { StatCardsRow } from './Home/StatCardsRow';
 import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
@@ -29,78 +20,52 @@ type Nav = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 
 export function HomeScreen() {
   const navigation = useNavigation<Nav>();
-  const insets = useSafeAreaInsets();
   const userName = useAppStore((s) => s.userName);
   const points = useAppStore((s) => s.points);
   const programs = useProgramsStore((s) => s.programs);
   const sessions = useSessionsStore((s) => s.sessions);
   const [refreshing, setRefreshing] = React.useState(false);
+  const refreshTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(
+    () => () => {
+      if (refreshTimeout.current) clearTimeout(refreshTimeout.current);
+    },
+    []
+  );
 
   const upcomingSessions = React.useMemo(
     () => sessions.filter((s) => s.status !== 'canceled'),
-    [sessions],
+    [sessions]
   );
 
   const todayCount = React.useMemo(
     () => sessions.filter((s) => s.date === 'Today').length,
-    [sessions],
+    [sessions]
   );
 
   const handleRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
+    refreshTimeout.current = setTimeout(() => setRefreshing(false), 800);
   };
 
   const handleSessionPress = React.useCallback(
     (session: Session) => navigation.navigate('SessionForm', { session }),
-    [navigation],
+    [navigation]
   );
   const handleSessionOptions = React.useCallback(
     (_session: Session) => navigation.navigate('Schedule'),
-    [navigation],
+    [navigation]
   );
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: Math.max(insets.top, spacing.md),
-            paddingHorizontal: Math.max(insets.left, spacing.lg),
-            paddingRight: Math.max(insets.right, spacing.lg),
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Profile')}
-          style={styles.profileLeft}
-          accessibilityRole="button"
-          accessibilityLabel="View profile"
-        >
-          <Avatar name={userName || 'Trainer'} size={48} />
-          <View>
-            <Text style={styles.greeting}>Welcome</Text>
-            <Text style={styles.userName}>{userName || 'Trainer'}</Text>
-          </View>
-        </TouchableOpacity>
-        <View style={styles.headerRight}>
-          <View style={styles.pointsBtn}>
-            <Text style={styles.pointsText}>{points}</Text>
-            <Ionicons name="sparkles" size={20} color={colors.text} />
-          </View>
-          <TouchableOpacity
-            style={styles.notifBtn}
-            accessibilityRole="button"
-            accessibilityLabel="Notifications"
-          >
-            <Ionicons name="notifications" size={24} color={colors.text} />
-            {todayCount > 0 && (
-              <View style={styles.notifDot} />
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
+      <HomeHeader
+        userName={userName}
+        points={points}
+        showNotifDot={todayCount > 0}
+        onProfilePress={() => navigation.navigate('Profile')}
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -115,40 +80,11 @@ export function HomeScreen() {
           />
         }
       >
-        <View style={styles.cardsRow}>
-          <TouchableOpacity
-            style={{ flex: 1 }}
-            activeOpacity={0.8}
-            onPress={() =>
-              navigation.getParent()?.navigate('StatsTab', { screen: 'BusinessAnalytics' })
-            }
-          >
-            <Card style={styles.statCard}>
-              <View style={styles.statCardTop}>
-                <View style={styles.statCardLabel}>
-                  <Ionicons name="wallet" size={16} color={colors.text} />
-                  <Text style={styles.statLabel}>Revenue</Text>
-                </View>
-                <View style={[styles.arrowBtn, styles.arrowBtnLight]}>
-                  <Ionicons name="arrow-forward" size={16} color={colors.text} />
-                </View>
-              </View>
-              <Text style={styles.statValue}>$ 320</Text>
-            </Card>
-          </TouchableOpacity>
-          <Card style={[styles.statCard, { flex: 1 }]}>
-            <View style={styles.statCardTop}>
-              <View style={styles.statCardLabel}>
-                <Ionicons name="eye" size={16} color={colors.text} />
-                <Text style={[styles.statLabel, styles.statLabelMuted]}>Profile view</Text>
-              </View>
-              <View style={styles.arrowBtn}>
-                <Ionicons name="arrow-forward" size={16} color={colors.neutral7} />
-              </View>
-            </View>
-            <Text style={styles.statValue}>123</Text>
-          </Card>
-        </View>
+        <StatCardsRow
+          onRevenuePress={() =>
+            navigation.getParent()?.navigate('StatsTab', { screen: 'BusinessAnalytics' })
+          }
+        />
 
         <TrainingProgramsRow
           programs={programs}
@@ -160,7 +96,7 @@ export function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.scheduleTitleRow}>
-              <Text style={styles.sectionTitle}>Schedule</Text>
+              <SectionTitle style={styles.sectionTitleSpacing}>Schedule</SectionTitle>
               <View style={styles.scheduleBadge}>
                 <Text style={styles.scheduleBadgeText}>{upcomingSessions.length}</Text>
               </View>
@@ -170,14 +106,16 @@ export function HomeScreen() {
             </TouchableOpacity>
           </View>
           {upcomingSessions.length > 0 ? (
-            upcomingSessions.slice(0, 4).map((session) => (
-              <ScheduleCard
-                key={session.id}
-                session={session}
-                onPress={handleSessionPress}
-                onOptionsPress={handleSessionOptions}
-              />
-            ))
+            upcomingSessions
+              .slice(0, 4)
+              .map((session) => (
+                <ScheduleCard
+                  key={session.id}
+                  session={session}
+                  onPress={handleSessionPress}
+                  onOptionsPress={handleSessionOptions}
+                />
+              ))
           ) : (
             <TouchableOpacity
               style={styles.emptyCard}
@@ -200,117 +138,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: 60,
-    paddingBottom: spacing.md,
-  },
-  profileLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  pointsBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    height: 40,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
-    minWidth: 62,
-  },
-  notifBtn: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    height: 40,
-    width: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.pill,
-  },
-  notifDot: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: radius.xs,
-    backgroundColor: colors.accent,
-  },
-  pointsText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  greeting: {
-    fontSize: typography.sizes.xs,
-    color: colors.neutral7,
-  },
-  userName: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold,
-    color: colors.text,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing['2xl'] + spacing.tabBarInset,
-  },
-  cardsRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  statCard: {
-    height: 98,
-    padding: spacing.md,
-    justifyContent: 'space-between',
-    borderRadius: radius.lg,
-  },
-  statCardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  statCardLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  statLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-  },
-  statLabelMuted: {
-    color: colors.neutral9,
-  },
-  arrowBtn: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1,
-    borderColor: colors.neutral7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    transform: [{ rotate: '-45deg' }],
-  },
-  arrowBtnLight: {
-    borderColor: colors.neutral8,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: typography.weights.bold,
-    color: colors.text,
   },
   section: {
     marginBottom: spacing.xl,
@@ -321,10 +152,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.md,
   },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
+  sectionTitleSpacing: {
+    marginBottom: 0,
   },
   scheduleTitleRow: {
     flexDirection: 'row',
@@ -347,67 +176,6 @@ const styles = StyleSheet.create({
   seeAll: {
     fontSize: typography.sizes.sm,
     color: colors.accent,
-  },
-  seeAllLibrary: {
-    fontSize: typography.sizes.xs,
-    color: colors.neutral9,
-  },
-  horizontalScroll: {
-    gap: 12,
-    paddingRight: spacing.xl,
-  },
-  programCard: {
-    width: 152,
-    height: 180,
-    borderRadius: 14,
-    overflow: 'hidden',
-    backgroundColor: colors.neutral2,
-  },
-  programThumb: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.neutral2,
-  },
-  programImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  programContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: spacing.md,
-    gap: 5,
-  },
-  programName: {
-    fontSize: typography.sizes.base,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  programMeta: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral9,
-    fontWeight: '300',
-  },
-  programStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.xs,
-  },
-  programStatPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: 'rgba(0,0,0,0.27)',
-    paddingVertical: 4,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.pill,
-  },
-  programStatText: {
-    fontSize: typography.sizes.xs,
-    color: colors.text,
   },
   emptyCard: {
     backgroundColor: colors.neutral2,

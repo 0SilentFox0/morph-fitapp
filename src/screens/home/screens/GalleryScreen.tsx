@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,8 +15,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Button } from '../../../components/ui';
 import { CategoryFilterBar } from './Gallery/CategoryFilterBar';
+import { ExerciseGridItem } from './Gallery/ExerciseGridItem';
+import { useExerciseSelection } from './Gallery/useExerciseSelection';
 import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
@@ -69,12 +69,7 @@ export function GalleryScreen() {
   const selectedCategory = useExerciseStore((s) => s.selectedCategory);
   const setSelectedCategory = useExerciseStore((s) => s.setSelectedCategory);
 
-  const existingIds = React.useMemo(
-    () => new Set(draftExercises.map((e) => e.id)),
-    [draftExercises],
-  );
-
-  const [selected, setSelected] = React.useState<Set<number>>(new Set());
+  const { selected, toggleSelect, existingIds } = useExerciseSelection(draftExercises);
 
   React.useEffect(() => {
     if (exercises.length === 0) {
@@ -83,37 +78,20 @@ export function GalleryScreen() {
     }
   }, []);
 
-  const toggleSelect = React.useCallback(
-    (id: number) => {
-      if (existingIds.has(id)) return;
-      setSelected((prev) => {
-        const next = new Set(prev);
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-        return next;
-      });
-    },
-    [existingIds],
-  );
-
   const displayExercises = React.useMemo(
     () => filteredExercises(),
-    [filteredExercises, exercises, searchQuery, selectedCategory],
+    [filteredExercises, exercises, searchQuery, selectedCategory]
   );
 
   const handleContinue = () => {
-    const newExercises = displayExercises
-      .filter((e) => selected.has(e.id))
-      .map(exerciseToProgram);
+    const newExercises = displayExercises.filter((e) => selected.has(e.id)).map(exerciseToProgram);
 
     addDraftExercises(newExercises);
     navigation.goBack();
   };
 
   const handleSaveDraft = () => {
-    const newExercises = displayExercises
-      .filter((e) => selected.has(e.id))
-      .map(exerciseToProgram);
+    const newExercises = displayExercises.filter((e) => selected.has(e.id)).map(exerciseToProgram);
 
     const allExercises = [...draftExercises, ...newExercises];
 
@@ -131,55 +109,17 @@ export function GalleryScreen() {
     navigation.navigate('TrainingLibrary');
   };
 
-  const renderExercise = React.useCallback(({ item }: { item: Exercise }) => {
-    const isSelected = selected.has(item.id) || existingIds.has(item.id);
-    const isExisting = existingIds.has(item.id);
-    return (
-      <TouchableOpacity
-        style={[styles.gridItem, isExisting && styles.gridItemExisting]}
+  const renderExercise = React.useCallback(
+    ({ item }: { item: Exercise }) => (
+      <ExerciseGridItem
+        item={item}
+        isSelected={selected.has(item.id) || existingIds.has(item.id)}
+        isExisting={existingIds.has(item.id)}
         onPress={() => toggleSelect(item.id)}
-        activeOpacity={0.8}
-      >
-        <View style={styles.gridThumb}>
-          {item.imageUrl ? (
-            <Image
-              source={{ uri: item.imageUrl }}
-              style={styles.gridImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.gridPlaceholder}>
-              <Ionicons name="barbell-outline" size={28} color={colors.neutral5} />
-            </View>
-          )}
-          {isSelected && (
-            <View
-              style={[
-                styles.checkbox,
-                isExisting && styles.checkboxExisting,
-              ]}
-            >
-              <Ionicons name="checkmark" size={14} color="#FFFFFF" />
-            </View>
-          )}
-          <View style={styles.gridOverlay}>
-            <Text style={styles.gridName} numberOfLines={1}>
-              {item.name}
-            </Text>
-            <View style={styles.gridMeta}>
-              <View style={styles.metaChip}>
-                <Ionicons name="time-outline" size={10} color={colors.neutral9} />
-                <Text style={styles.metaText}>12m</Text>
-              </View>
-              <View style={styles.metaChip}>
-                <Text style={styles.metaText}>{item.category}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  }, [selected, existingIds, toggleSelect]);
+      />
+    ),
+    [selected, existingIds, toggleSelect]
+  );
 
   const renderHeader = () => (
     <CategoryFilterBar
@@ -192,9 +132,7 @@ export function GalleryScreen() {
   );
 
   const renderFooter = () =>
-    loadingMore ? (
-      <ActivityIndicator color={colors.accent} style={styles.loadingMore} />
-    ) : null;
+    loadingMore ? <ActivityIndicator color={colors.accent} style={styles.loadingMore} /> : null;
 
   if (loading) {
     return (
@@ -283,71 +221,6 @@ const styles = StyleSheet.create({
   gridRow: {
     gap: spacing.sm,
     marginBottom: spacing.sm,
-  },
-  gridItem: {
-    flex: 1,
-  },
-  gridThumb: {
-    width: '100%',
-    aspectRatio: 0.93,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  gridImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  gridPlaceholder: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gridOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-  },
-  gridName: {
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-    fontWeight: typography.weights.medium,
-    marginBottom: 2,
-  },
-  gridMeta: {
-    flexDirection: 'row',
-    gap: spacing.xs,
-  },
-  metaChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  metaText: {
-    fontSize: 10,
-    color: colors.neutral9,
-  },
-  checkbox: {
-    position: 'absolute',
-    top: spacing.sm,
-    left: spacing.sm,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxExisting: {
-    backgroundColor: colors.Success,
-  },
-  gridItemExisting: {
-    opacity: 0.7,
   },
   bottomBar: {
     position: 'absolute',

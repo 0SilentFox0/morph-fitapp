@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ProgressIndicator } from '../../../components/layout';
@@ -122,7 +115,7 @@ export function OnboardingLayout({
                 accessibilityState={{ disabled: nextDisabled }}
                 style={[styles.nextBtn, nextDisabled && styles.disabled]}
               >
-                <Ionicons name="arrow-forward" size={24} color="#FFFFFF" />
+                <Ionicons name="arrow-forward" size={24} color={colors.white} />
               </TouchableOpacity>
             )}
           </View>

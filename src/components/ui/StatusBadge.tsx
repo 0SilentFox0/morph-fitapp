@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.surfaceSubtle,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -21,36 +15,23 @@ interface ProgramOptionsMenuProps {
   onSelect: (action: ProgramOptionAction) => void;
 }
 
-const OPTIONS: { action: ProgramOptionAction; label: string; icon: 'create-outline' | 'trash-outline' | 'calendar-outline' }[] = [
+const OPTIONS: {
+  action: ProgramOptionAction;
+  label: string;
+  icon: 'create-outline' | 'trash-outline' | 'calendar-outline';
+}[] = [
   { action: 'edit', label: 'Edit program', icon: 'create-outline' },
   { action: 'create-session', label: 'Create session from program', icon: 'calendar-outline' },
   { action: 'delete', label: 'Delete program', icon: 'trash-outline' },
 ];
 
-export function ProgramOptionsMenu({
-  visible,
-  onClose,
-  onSelect,
-}: ProgramOptionsMenuProps) {
+export function ProgramOptionsMenu({ visible, onClose, onSelect }: ProgramOptionsMenuProps) {
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <TouchableOpacity
-          style={StyleSheet.absoluteFill}
-          activeOpacity={1}
-          onPress={onClose}
-        />
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <View style={styles.menuWrap}>
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <View style={styles.menuOverlay} />
           <View style={styles.menu}>
             {OPTIONS.map((item, index) => (
@@ -69,7 +50,12 @@ export function ProgramOptionsMenu({
                     size={20}
                     color={item.action === 'delete' ? colors.Error : colors.text}
                   />
-                  <Text style={[styles.optionLabel, item.action === 'delete' && styles.optionLabelDestructive]}>
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      item.action === 'delete' && styles.optionLabelDestructive,
+                    ]}
+                  >
                     {item.label}
                   </Text>
                 </TouchableOpacity>
@@ -87,7 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: colors.overlayLight,
   },
   menuWrap: {
     borderRadius: radius.sm,

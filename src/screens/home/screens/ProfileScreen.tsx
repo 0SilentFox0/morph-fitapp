@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Card, Tag, Avatar } from '../../../components/ui';
+import { Card, Tag, Avatar, SectionTitle } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -39,7 +39,7 @@ export function ProfileScreen() {
       workTimeStart: s.workTimeStart,
       workTimeEnd: s.workTimeEnd,
       certifications: s.certifications,
-    })),
+    }))
   );
 
   const displayName = userName || name || 'Trainer';
@@ -130,20 +130,20 @@ export function ProfileScreen() {
           </View>
         )}
 
-        <Text style={styles.sectionTitle}>Availability</Text>
+        <SectionTitle>Availability</SectionTitle>
         <Card style={[styles.card, styles.availabilityCard]}>
           <Ionicons name="time" size={20} color={colors.text} />
           <Text style={styles.availabilityText}>{displayAvailability}</Text>
         </Card>
 
-        <Text style={styles.sectionTitle}>Training Types</Text>
+        <SectionTitle>Training Types</SectionTitle>
         <View style={styles.tagsRow}>
           {displayTrainingTypes.map((t) => (
             <Tag key={t} label={t} variant="default" />
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>Clients</Text>
+        <SectionTitle>Clients</SectionTitle>
         <View style={styles.tagsRow}>
           {displayClientTypes.map((c) => (
             <Tag key={c} label={c} variant="default" />
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: colors.overlay,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
     borderRadius: radius.md,
@@ -176,16 +176,32 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: spacing.md,
   },
-  profileTitle: { fontSize: typography.sizes.base, color: colors.textSecondary, marginTop: spacing.xs },
+  profileTitle: {
+    fontSize: typography.sizes.base,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+  },
   pointsRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.sm },
-  pointsText: { fontSize: typography.sizes.sm, color: colors.accent, fontWeight: typography.weights.semibold },
+  pointsText: {
+    fontSize: typography.sizes.sm,
+    color: colors.accent,
+    fontWeight: typography.weights.semibold,
+  },
   infoRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
   infoCard: { flex: 1, flexDirection: 'column', gap: spacing.xs },
   infoLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  infoValue: { fontSize: typography.sizes.sm, fontWeight: typography.weights.semibold, color: colors.text },
-  certRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.lg },
+  infoValue: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold,
+    color: colors.text,
+  },
+  certRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
   certText: { fontSize: typography.sizes.sm, color: colors.Success },
-  sectionTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.semibold, color: colors.text, marginBottom: spacing.md },
   card: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.lg },
   availabilityCard: { backgroundColor: colors.primary2 },
   availabilityText: { fontSize: typography.sizes.base, color: colors.text },

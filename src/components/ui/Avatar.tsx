@@ -39,9 +39,7 @@ export function Avatar({ uri, name = '?', size = 40 }: AvatarProps) {
         },
       ]}
     >
-      <Text style={[styles.initials, { fontSize: size * 0.4 }]}>
-        {getInitials(name)}
-      </Text>
+      <Text style={[styles.initials, { fontSize: size * 0.4 }]}>{getInitials(name)}</Text>
     </View>
   );
 }
@@ -56,7 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   initials: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontWeight: typography.weights.semibold,
   },
 });
