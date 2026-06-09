@@ -26,26 +26,35 @@ export function ChatThreadScreen() {
   const route = useRoute<Route>();
   const { conversationId } = route.params;
 
-  const conversation = useChatStore((s) =>
-    s.conversations.find((c) => c.id === conversationId)
-  );
+  const conversation = useChatStore((s) => s.conversations.find((c) => c.id === conversationId));
   const messages = useChatStore((s) => s.messagesByConversation[conversationId] ?? []);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const markAsRead = useChatStore((s) => s.markAsRead);
 
   const [input, setInput] = React.useState('');
   const scrollRef = React.useRef<ScrollView>(null);
+  const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     markAsRead(conversationId);
   }, [conversationId, markAsRead]);
+
+  React.useEffect(
+    () => () => {
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    },
+    []
+  );
 
   const handleSend = () => {
     const text = input.trim();
     if (!text) return;
     sendMessage(conversationId, text);
     setInput('');
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    scrollTimeout.current = setTimeout(
+      () => scrollRef.current?.scrollToEnd({ animated: true }),
+      100
+    );
   };
 
   if (!conversation) {
@@ -84,12 +93,7 @@ export function ChatThreadScreen() {
         onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
       >
         {messages.map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            text={msg.text}
-            sentAt={msg.sentAt}
-            isFromMe={msg.isFromMe}
-          />
+          <MessageBubble key={msg.id} text={msg.text} sentAt={msg.sentAt} isFromMe={msg.isFromMe} />
         ))}
       </ScrollView>
 
@@ -109,11 +113,7 @@ export function ChatThreadScreen() {
           onPress={handleSend}
           disabled={!input.trim()}
         >
-          <Ionicons
-            name="send"
-            size={20}
-            color={input.trim() ? colors.text : colors.textMuted}
-          />
+          <Ionicons name="send" size={20} color={input.trim() ? colors.text : colors.textMuted} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
