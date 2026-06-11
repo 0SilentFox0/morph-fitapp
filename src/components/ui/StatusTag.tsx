@@ -38,7 +38,7 @@ export function StatusTag({ status }: StatusTagProps) {
 
   return (
     <View style={[styles.tag, { backgroundColor: config.bg }]}>
-      <Ionicons name={config.icon} size={12} color="#FFFFFF" />
+      <Ionicons name={config.icon} size={12} color={colors.white} />
       <Text style={styles.text}>{config.label}</Text>
     </View>
   );
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: typography.sizes.xs,
-    color: '#FFFFFF',
+    color: colors.white,
     fontWeight: typography.weights.medium,
   },
 });

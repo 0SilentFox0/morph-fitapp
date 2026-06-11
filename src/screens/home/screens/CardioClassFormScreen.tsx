@@ -7,7 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Input, Button, Avatar } from '../../../components/ui';
+import { Input, Button, Avatar, SectionTitle } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -48,9 +48,7 @@ export function CardioClassFormScreen() {
   const clientIds = watch('clientIds');
 
   const toggleClient = (id: string) => {
-    const next = clientIds.includes(id)
-      ? clientIds.filter((c) => c !== id)
-      : [...clientIds, id];
+    const next = clientIds.includes(id) ? clientIds.filter((c) => c !== id) : [...clientIds, id];
     setValue('clientIds', next, { shouldValidate: false, shouldDirty: true });
   };
 
@@ -89,7 +87,7 @@ export function CardioClassFormScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.sectionTitle}>About</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>About</SectionTitle>
         <Controller
           control={control}
           name="title"
@@ -133,7 +131,7 @@ export function CardioClassFormScreen() {
           )}
         />
 
-        <Text style={styles.sectionTitle}>Preview</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Preview</SectionTitle>
         <TouchableOpacity
           style={styles.uploadArea}
           accessibilityRole="button"
@@ -144,7 +142,7 @@ export function CardioClassFormScreen() {
           <Text style={styles.uploadHint}>Recommended size: square, min 500x500px</Text>
         </TouchableOpacity>
 
-        <Text style={styles.sectionTitle}>Date and time</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Date and time</SectionTitle>
         <Controller
           control={control}
           name="date"
@@ -172,7 +170,7 @@ export function CardioClassFormScreen() {
           )}
         />
 
-        <Text style={styles.sectionTitle}>Clients</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Clients</SectionTitle>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -189,9 +187,7 @@ export function CardioClassFormScreen() {
                 accessibilityState={{ checked: isSelected }}
                 accessibilityLabel={client.name}
               >
-                <View
-                  style={[styles.clientAvatarWrap, isSelected && styles.clientAvatarSelected]}
-                >
+                <View style={[styles.clientAvatarWrap, isSelected && styles.clientAvatarSelected]}>
                   <Avatar name={client.name} size={48} />
                 </View>
                 <Text style={styles.clientName} numberOfLines={1}>
@@ -202,7 +198,7 @@ export function CardioClassFormScreen() {
           })}
         </ScrollView>
 
-        <Text style={styles.sectionTitle}>Price per class</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Price per class</SectionTitle>
         <Controller
           control={control}
           name="price"
@@ -228,11 +224,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginBottom: spacing.md,
+  sectionTitleSpacing: {
     marginTop: spacing.sm,
   },
   uploadArea: {

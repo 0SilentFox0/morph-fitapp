@@ -38,29 +38,19 @@ export function Button({
 
   return (
     <TouchableOpacity
-      style={[
-        styles.base,
-        variantStyles.container,
-        isDisabled && styles.disabled,
-        style,
-      ]}
+      style={[styles.base, variantStyles.container, isDisabled && styles.disabled, style]}
       onPress={onPress}
       disabled={isDisabled}
       activeOpacity={0.8}
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? '#FFFFFF' : colors.text}
+          color={variant === 'primary' ? colors.white : colors.text}
           size="small"
         />
       ) : (
         <Text
-          style={[
-            styles.text,
-            variantStyles.text,
-            isDisabled && styles.disabledText,
-            textStyle,
-          ]}
+          style={[styles.text, variantStyles.text, isDisabled && styles.disabledText, textStyle]}
         >
           {title}
         </Text>
@@ -74,7 +64,7 @@ function getVariantStyles(variant: ButtonVariant) {
     case 'primary':
       return {
         container: { backgroundColor: colors.accent },
-        text: { color: '#FFFFFF' },
+        text: { color: colors.white },
       };
     case 'secondary':
       return {

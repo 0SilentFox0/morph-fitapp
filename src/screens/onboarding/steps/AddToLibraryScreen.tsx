@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from '../../../navigation/types';
 import { ScreenHeader, ProgressIndicator } from '../../../components/layout';
-import { Input, Button } from '../../../components/ui';
+import { Input, Button, SectionTitle } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -31,7 +31,7 @@ export function AddToLibraryScreen() {
         freePreview: s.freePreview,
         accessSetting: s.accessSetting,
         setField: s.setField,
-      })),
+      }))
     );
   const [titleError, setTitleError] = React.useState('');
 
@@ -47,12 +47,20 @@ export function AddToLibraryScreen() {
     <View style={styles.container}>
       <ScreenHeader title="Add to Library" onBack={() => navigation.goBack()} />
       <ProgressIndicator total={9} current={5} />
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <Text style={styles.sectionTitle}>About</Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <SectionTitle style={styles.sectionTitleSpacing}>About</SectionTitle>
         <Input
           placeholder="Program Title"
           value={programTitle}
-          onChangeText={(t) => { setField('programTitle', t); setTitleError(''); }}
+          onChangeText={(t) => {
+            setField('programTitle', t);
+            setTitleError('');
+          }}
           accessibilityLabel="Program title"
         />
         {titleError ? <Text style={styles.errorText}>{titleError}</Text> : null}
@@ -65,17 +73,26 @@ export function AddToLibraryScreen() {
           accessibilityLabel="Program description"
         />
 
-        <Text style={styles.sectionTitle}>Preview</Text>
-        <TouchableOpacity style={styles.uploadArea} accessibilityRole="button" accessibilityLabel="Upload file">
+        <SectionTitle style={styles.sectionTitleSpacing}>Preview</SectionTitle>
+        <TouchableOpacity
+          style={styles.uploadArea}
+          accessibilityRole="button"
+          accessibilityLabel="Upload file"
+        >
           <Text style={styles.uploadText}>Tap to upload file MP4 or PDF</Text>
         </TouchableOpacity>
 
         <View style={styles.toggleRow}>
           <Text style={styles.toggleLabel}>Allow free preview for first video</Text>
-          <Switch value={freePreview} onValueChange={(v) => setField('freePreview', v)} trackColor={{ false: colors.neutral2, true: colors.accent }} thumbColor="#FFFFFF" />
+          <Switch
+            value={freePreview}
+            onValueChange={(v) => setField('freePreview', v)}
+            trackColor={{ false: colors.neutral2, true: colors.accent }}
+            thumbColor={colors.white}
+          />
         </View>
 
-        <Text style={styles.sectionTitle}>Access Setting</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Access Setting</SectionTitle>
         {ACCESS_OPTIONS.map((opt) => (
           <TouchableOpacity
             key={opt.value}
@@ -99,13 +116,31 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
-  sectionTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.semibold, color: colors.text, marginBottom: spacing.md, marginTop: spacing.sm },
-  uploadArea: { backgroundColor: colors.neutral2, borderRadius: radius.md, padding: spacing.xl, alignItems: 'center', marginBottom: spacing.md },
+  sectionTitleSpacing: { marginTop: spacing.sm },
+  uploadArea: {
+    backgroundColor: colors.neutral2,
+    borderRadius: radius.md,
+    padding: spacing.xl,
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
   uploadText: { fontSize: typography.sizes.sm, color: colors.textMuted },
-  toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.lg },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
   toggleLabel: { fontSize: typography.sizes.sm, color: colors.textSecondary },
   radioRow: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
-  radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.border, marginRight: spacing.sm },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.border,
+    marginRight: spacing.sm,
+  },
   radioSelected: { borderColor: colors.accent, backgroundColor: colors.accent },
   radioLabel: { fontSize: typography.sizes.base, color: colors.text },
   button: { marginTop: spacing.lg },

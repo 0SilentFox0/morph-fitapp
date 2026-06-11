@@ -16,7 +16,11 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     if (!res.ok) {
       throw new Error(`API ${res.status}: ${res.statusText || 'Request failed'}`);
     }
-    return (await res.json()) as T;
+    try {
+      return (await res.json()) as T;
+    } catch {
+      throw new Error('The server returned a malformed response.');
+    }
   } finally {
     clearTimeout(timeoutId);
   }

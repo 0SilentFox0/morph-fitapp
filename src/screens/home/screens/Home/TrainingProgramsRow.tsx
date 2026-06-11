@@ -1,14 +1,8 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { SectionTitle } from '../../../../components/ui';
 import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
@@ -31,7 +25,7 @@ export function TrainingProgramsRow({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Training Library</Text>
+        <SectionTitle style={styles.sectionTitleSpacing}>Training Library</SectionTitle>
         <TouchableOpacity onPress={onSeeAll}>
           <Text style={styles.seeAll}>See all</Text>
         </TouchableOpacity>
@@ -96,10 +90,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
   },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
+  sectionTitleSpacing: {
+    marginBottom: 0,
   },
   seeAll: {
     fontSize: typography.sizes.sm,

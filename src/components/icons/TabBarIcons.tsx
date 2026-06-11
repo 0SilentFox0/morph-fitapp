@@ -1,11 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { colors } from '../../theme/colors';
 
 const SIZE = 32;
 
 export function HomeTabIcon({ color, focused }: { color: string; focused: boolean }) {
-  const fillColor = focused ? '#FFFFFF' : color;
+  const fillColor = focused ? colors.white : color;
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">

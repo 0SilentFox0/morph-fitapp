@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { Card, IconButton } from '../../components/ui';
+import { Card, IconButton, SectionTitle } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
@@ -29,24 +29,16 @@ export function ExerciseDetailScreen() {
             <TouchableOpacity
               key={s}
               onPress={() => setActiveSet(i)}
-              style={[
-                styles.setTab,
-                i === activeSet && styles.setTabActive,
-              ]}
+              style={[styles.setTab, i === activeSet && styles.setTabActive]}
             >
-              <Text
-                style={[
-                  styles.setTabText,
-                  i === activeSet && styles.setTabTextActive,
-                ]}
-              >
+              <Text style={[styles.setTabText, i === activeSet && styles.setTabTextActive]}>
                 {s}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>Main info</Text>
+        <SectionTitle>Main info</SectionTitle>
         <View style={styles.mainInfoRow}>
           <Card style={styles.infoBox}>
             <Text style={styles.infoValue}>40 kg</Text>
@@ -59,7 +51,7 @@ export function ExerciseDetailScreen() {
           </Card>
         </View>
 
-        <Text style={styles.sectionTitle}>Trainer Notes</Text>
+        <SectionTitle>Trainer Notes</SectionTitle>
         <Card style={styles.notesCard}>
           <Text style={styles.notesText}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -69,7 +61,7 @@ export function ExerciseDetailScreen() {
         <View style={styles.mediaControls}>
           <IconButton icon="play-back" onPress={() => {}} />
           <View style={styles.playButton}>
-            <Ionicons name="play" size={32} color="#FFFFFF" />
+            <Ionicons name="play" size={32} color={colors.white} />
           </View>
           <Text style={styles.timer}>04:52</Text>
           <IconButton icon="play-forward" onPress={() => {}} />
@@ -115,13 +107,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   setTabTextActive: {
-    color: '#FFFFFF',
-  },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginBottom: spacing.md,
+    color: colors.white,
   },
   mainInfoRow: {
     flexDirection: 'row',

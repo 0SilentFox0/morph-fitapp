@@ -28,13 +28,11 @@ export function YouGotPaidScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>You got paid!</Text>
-        <Text style={styles.subtitle}>
-          Track your earnings and manage your finances with ease.
-        </Text>
+        <Text style={styles.subtitle}>Track your earnings and manage your finances with ease.</Text>
 
         <Card style={styles.achievementCard}>
           <View style={styles.achievementIcon}>
-            <Ionicons name="trophy" size={48} color="#FFFFFF" />
+            <Ionicons name="trophy" size={48} color={colors.white} />
           </View>
           <Text style={styles.achievementLabel}>Achievement unlocked</Text>
           <Text style={styles.achievementTitle}>First Transaction Recorded</Text>

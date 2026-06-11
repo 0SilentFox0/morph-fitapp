@@ -43,7 +43,9 @@ export const ChoiceCard = React.memo(function ChoiceCard({
       ]}
     >
       {icon ? (
-        <View style={[styles.iconBox, isChip && styles.iconBoxChip, selected && styles.iconBoxSelected]}>
+        <View
+          style={[styles.iconBox, isChip && styles.iconBoxChip, selected && styles.iconBoxSelected]}
+        >
           <Ionicons name={icon} size={isChip ? 14 : 24} color={colors.text} />
         </View>
       ) : null}
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.surfaceSubtle,
     borderRadius: radius.lg,
     padding: spacing.lg,
   },
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   chipTextSelected: {
-    color: '#FFFFFF',
+    color: colors.white,
   },
   subtitle: {
     fontSize: 12,

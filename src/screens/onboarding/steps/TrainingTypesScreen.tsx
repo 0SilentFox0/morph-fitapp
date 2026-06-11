@@ -1,70 +1,30 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from '../../../navigation/types';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { ChoiceCard } from '../../../components/ui';
-import { OnboardingLayout } from '../components/OnboardingLayout';
+import { ONBOARDING_TRAINING_TYPES } from '../../../constants';
+import { MultiSelectStep } from '../components/MultiSelectStep';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'TrainingTypes'>;
-
-const TRAINING_TYPES = ['Strength', 'Yoga', 'Cardio', 'HIIT', 'Mobility', 'Pilates', 'Other'];
 
 export function TrainingTypesScreen() {
   const navigation = useNavigation<Nav>();
   const trainingTypes = useOnboardingStore((s) => s.trainingTypes);
   const toggleTrainingType = useOnboardingStore((s) => s.toggleTrainingType);
-  const [showWarning, setShowWarning] = React.useState(false);
-
-  const handleNext = () => {
-    if (trainingTypes.length === 0) {
-      setShowWarning(true);
-    }
-    navigation.navigate('ClientTypes');
-  };
-
-  const handleToggle = (type: string) => {
-    toggleTrainingType(type);
-    setShowWarning(false);
-  };
 
   return (
-    <OnboardingLayout
+    <MultiSelectStep
       step={3}
       title="What types of training do you offer?"
       subtitle="Select all that apply"
-      onNext={handleNext}
+      options={ONBOARDING_TRAINING_TYPES}
+      selected={trainingTypes}
+      onToggle={toggleTrainingType}
+      warning="We recommend selecting at least one training type"
+      onNext={() => navigation.navigate('ClientTypes')}
       onBack={() => navigation.goBack()}
       onSkip={() => navigation.navigate('ClientTypes')}
-    >
-      <View style={styles.optionsGrid}>
-        {TRAINING_TYPES.map((type) => (
-          <ChoiceCard
-            key={type}
-            variant="chip"
-            selected={trainingTypes.includes(type)}
-            onPress={() => handleToggle(type)}
-            title={type}
-          />
-        ))}
-      </View>
-      {showWarning && (
-        <Text style={styles.warning}>We recommend selecting at least one training type</Text>
-      )}
-    </OnboardingLayout>
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  optionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  option: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.xl, backgroundColor: colors.neutral2 },
-  optionSelected: { backgroundColor: colors.accent },
-  optionText: { fontSize: typography.sizes.sm, color: colors.text },
-  optionTextSelected: { color: '#FFFFFF' },
-  warning: { fontSize: typography.sizes.xs, color: colors.Warning, marginTop: spacing.md },
-});

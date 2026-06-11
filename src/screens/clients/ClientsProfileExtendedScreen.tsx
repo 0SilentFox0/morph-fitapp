@@ -1,14 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ScreenHeader } from '../../components/layout';
-import { Card, Tag, Avatar } from '../../components/ui';
+import { Card, Tag, Avatar, SectionTitle } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
 export function ClientsProfileExtendedScreen() {
-
   return (
     <View style={styles.container}>
       <ScreenHeader title="Client's Profile" />
@@ -24,7 +23,7 @@ export function ClientsProfileExtendedScreen() {
           <Text style={styles.status}>Personal Group</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Next training</Text>
+        <SectionTitle>Next training</SectionTitle>
         <Card style={styles.nextCard}>
           <Text style={styles.nextTitle}>Personal Session</Text>
           <Text style={styles.nextDate}>Dec 21</Text>
@@ -34,20 +33,20 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </Card>
 
-        <Text style={styles.sectionTitle}>Target Fitness</Text>
+        <SectionTitle>Target Fitness</SectionTitle>
         <View style={styles.tagsRow}>
           <Tag label="Fat loss" variant="accent" />
           <Tag label="Endurance" variant="accent" />
         </View>
 
-        <Text style={styles.sectionTitle}>Level and Interests</Text>
+        <SectionTitle>Level and Interests</SectionTitle>
         <View style={styles.tagsRow}>
           <Tag label="Intermediate" variant="accent" />
           <Tag label="HIT" variant="accent" />
           <Tag label="Cardio" variant="accent" />
         </View>
 
-        <Text style={styles.sectionTitle}>Training History</Text>
+        <SectionTitle>Training History</SectionTitle>
         <Card style={styles.historyCard}>
           <View style={styles.historyThumb} />
           <View style={styles.historyInfo}>
@@ -84,12 +83,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
     marginTop: spacing.xs,
-  },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginBottom: spacing.md,
   },
   nextCard: {
     marginBottom: spacing.lg,

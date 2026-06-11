@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { radius } from '../../../theme';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -16,15 +8,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ScreenHeader } from '../../../components/layout';
-import { Input, Button, DropdownSelect, ExerciseCard } from '../../../components/ui';
+import { Input, Button, DropdownSelect, Overlay } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useShallow } from 'zustand/react/shallow';
-import { TRAINING_TYPES, SET_NOTES } from '../../../constants';
+import { TRAINING_TYPES } from '../../../constants';
 import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
+import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
@@ -59,7 +52,7 @@ export function AddToLibraryFormScreen() {
       exercises: s.exercises,
       setExercises: s.setExercises,
       resetDraft: s.reset,
-    })),
+    }))
   );
 
   const {
@@ -218,52 +211,11 @@ export function AddToLibraryFormScreen() {
           </View>
           <View style={styles.uploadTextBox}>
             <Text style={styles.uploadTitle}>Tap to upload photo</Text>
-            <Text style={styles.uploadHint}>
-              Recommended size: square,{'\n'}min 500x500px
-            </Text>
+            <Text style={styles.uploadHint}>Recommended size: square,{'\n'}min 500x500px</Text>
           </View>
         </TouchableOpacity>
 
-        <Text style={styles.sectionLabel}>Exercises</Text>
-        <View style={styles.legend}>
-          <Text style={styles.legendTitle}>{'Set type icons'}</Text>
-          <View style={styles.legendGrid}>
-            {SET_NOTES.map((n) => (
-              <View key={n.key} style={styles.legendItem}>
-                <Ionicons
-                  name={n.icon as keyof typeof Ionicons.glyphMap}
-                  size={14}
-                  color={n.key === 'regular' ? colors.neutral6 : colors.accent}
-                />
-                <Text style={styles.legendText}>{n.label}</Text>
-              </View>
-            ))}
-          </View>
-          <Text style={styles.legendHint}>
-            {'Tap icon to cycle · Long press to remove set'}
-          </Text>
-        </View>
-        {exercises.length > 0 ? (
-          exercises.map((ex) => <ExerciseCard key={ex.id} exercise={ex} />)
-        ) : (
-          <TouchableOpacity
-            style={styles.addExerciseEmpty}
-            onPress={() => navigation.navigate('Gallery')}
-          >
-            <Ionicons name="add-circle-outline" size={24} color={colors.textMuted} />
-            <Text style={styles.addExerciseEmptyText}>Tap to browse exercises</Text>
-          </TouchableOpacity>
-        )}
-
-        {exercises.length > 0 && (
-          <TouchableOpacity
-            style={styles.addMoreBtn}
-            onPress={() => navigation.navigate('Gallery')}
-          >
-            <Ionicons name="add" size={18} color={colors.accent} />
-            <Text style={styles.addMoreText}>Add more exercises</Text>
-          </TouchableOpacity>
-        )}
+        <ExercisesSection exercises={exercises} onBrowse={() => navigation.navigate('Gallery')} />
 
         <Button
           title={isEdit ? 'Save' : 'Continue'}
@@ -278,44 +230,38 @@ export function AddToLibraryFormScreen() {
         />
       </ScrollView>
 
-      <Modal visible={showTagModal} transparent animationType="fade">
+      <Overlay visible={showTagModal} onClose={() => setShowTagModal(false)}>
         <Controller
           control={control}
           name="tag"
           render={({ field: { onChange, value } }) => (
-            <TouchableOpacity
-              style={styles.modalOverlay}
-              activeOpacity={1}
-              onPress={() => setShowTagModal(false)}
-            >
-              <View style={styles.modalContent}>
-                <FlatList
-                  data={TRAINING_TYPES}
-                  keyExtractor={(item) => item}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={[styles.modalOption, value === item && styles.modalOptionActive]}
-                      onPress={() => {
-                        onChange(item);
-                        setShowTagModal(false);
-                      }}
+            <View style={styles.modalContent}>
+              <FlatList
+                data={TRAINING_TYPES}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[styles.modalOption, value === item && styles.modalOptionActive]}
+                    onPress={() => {
+                      onChange(item);
+                      setShowTagModal(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.modalOptionText,
+                        value === item && styles.modalOptionTextActive,
+                      ]}
                     >
-                      <Text
-                        style={[
-                          styles.modalOptionText,
-                          value === item && styles.modalOptionTextActive,
-                        ]}
-                      >
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                />
-              </View>
-            </TouchableOpacity>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
           )}
         />
-      </Modal>
+      </Overlay>
     </View>
   );
 }
@@ -379,79 +325,11 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     lineHeight: 18,
   },
-  legend: {
-    backgroundColor: colors.neutral2,
-    borderRadius: 10,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  legendTitle: {
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.semibold,
-    color: colors.neutral8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.sm,
-  },
-  legendGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    rowGap: 10,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flexBasis: '45%',
-  },
-  legendText: {
-    fontSize: typography.sizes.xs,
-    color: colors.neutral9,
-  },
-  legendHint: {
-    fontSize: 10,
-    color: colors.neutral6,
-    marginTop: spacing.sm,
-    textAlign: 'center',
-  },
-  addExerciseEmpty: {
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-  },
-  addExerciseEmptyText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-  },
-  addMoreBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    paddingVertical: spacing.md,
-  },
-  addMoreText: {
-    fontSize: typography.sizes.sm,
-    color: colors.accent,
-  },
   button: {
     marginTop: spacing.lg,
   },
   buttonSecondary: {
     marginTop: spacing.md,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   modalContent: {
     width: '80%',

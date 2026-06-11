@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -21,36 +15,23 @@ interface SessionOptionsMenuProps {
   onSelect: (action: SessionOptionAction) => void;
 }
 
-const OPTIONS: { action: SessionOptionAction; label: string; icon: 'time-outline' | 'create-outline' | 'close' }[] = [
+const OPTIONS: {
+  action: SessionOptionAction;
+  label: string;
+  icon: 'time-outline' | 'create-outline' | 'close';
+}[] = [
   { action: 'reschedule', label: 'Reschedule session', icon: 'time-outline' },
   { action: 'edit', label: 'Edit session', icon: 'create-outline' },
   { action: 'cancel', label: 'Cancel session', icon: 'close' },
 ];
 
-export function SessionOptionsMenu({
-  visible,
-  onClose,
-  onSelect,
-}: SessionOptionsMenuProps) {
+export function SessionOptionsMenu({ visible, onClose, onSelect }: SessionOptionsMenuProps) {
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <TouchableOpacity
-          style={StyleSheet.absoluteFill}
-          activeOpacity={1}
-          onPress={onClose}
-        />
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <View style={styles.menuWrap}>
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <View style={styles.menuOverlay} />
           <View style={styles.menu}>
             {OPTIONS.map((item, index) => (
@@ -64,11 +45,7 @@ export function SessionOptionsMenu({
                   }}
                   activeOpacity={0.7}
                 >
-                  <Ionicons
-                    name={item.icon}
-                    size={20}
-                    color={colors.text}
-                  />
+                  <Ionicons name={item.icon} size={20} color={colors.text} />
                   <Text style={styles.optionLabel}>{item.label}</Text>
                 </TouchableOpacity>
               </React.Fragment>
@@ -85,7 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: colors.overlayLight,
   },
   menuWrap: {
     borderRadius: radius.sm,
