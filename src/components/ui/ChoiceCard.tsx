@@ -49,7 +49,7 @@ export const ChoiceCard = React.memo(function ChoiceCard({
           <Ionicons name={icon} size={isChip ? 14 : 24} color={colors.text} />
         </View>
       ) : null}
-      <View style={styles.textWrap}>
+      <View style={[styles.textWrap, !isChip && styles.textWrapCard]}>
         <Text
           style={[
             isChip ? styles.chipText : styles.cardTitle,
@@ -106,8 +106,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary1,
   },
   textWrap: {
-    flex: 1,
     gap: 4,
+  },
+  // Cards fill the remaining row width (icon + text); chips must hug their
+  // text — flex:1 (flexBasis 0%) would collapse an unsized chip to zero width
+  // and clip the label, leaving an empty circle.
+  textWrapCard: {
+    flex: 1,
   },
   cardTitle: {
     fontSize: 20,
