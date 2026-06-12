@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Card, Tag, Avatar, SectionTitle } from '../../../components/ui';
+import { Card, Tag, Avatar, SectionTitle, Button } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -16,6 +16,15 @@ export function ProfileScreen() {
   const navigation = useNavigation();
   const userName = useAppStore((s) => s.userName);
   const points = useAppStore((s) => s.points);
+  const resetApp = useAppStore((s) => s.reset);
+  const resetOnboarding = useOnboardingStore((s) => s.reset);
+
+  // Dev-only: clear the profile so RootNavigator drops back to onboarding,
+  // letting us re-run the flow without reinstalling. Stripped from prod builds.
+  const handleResetOnboarding = () => {
+    resetOnboarding();
+    resetApp();
+  };
   const {
     name,
     profilePhotoUri,
@@ -149,6 +158,15 @@ export function ProfileScreen() {
             <Tag key={c} label={c} variant="default" />
           ))}
         </View>
+
+        {__DEV__ && (
+          <Button
+            title="Reset onboarding (dev)"
+            variant="outline"
+            onPress={handleResetOnboarding}
+            style={styles.devResetBtn}
+          />
+        )}
       </ScrollView>
     </View>
   );
@@ -206,4 +224,5 @@ const styles = StyleSheet.create({
   availabilityCard: { backgroundColor: colors.primary2 },
   availabilityText: { fontSize: typography.sizes.base, color: colors.text },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
+  devResetBtn: { marginTop: spacing.md },
 });
