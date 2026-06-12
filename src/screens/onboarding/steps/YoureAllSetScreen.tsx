@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Card } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
@@ -8,23 +8,42 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
+import { buildOnboardingProfile, submitOnboardingProfile } from '../../../services/onboardingApi';
+import { toErrorMessage } from '../../../utils/error';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 export function YoureAllSetScreen() {
   const setOnboarded = useAppStore((s) => s.setOnboarded);
   const addPoints = useAppStore((s) => s.addPoints);
+  const role = useAppStore((s) => s.userRole);
+  const isClient = role === 'client';
   const resetOnboarding = useOnboardingStore((s) => s.reset);
+  const [submitting, setSubmitting] = React.useState(false);
 
-  const handleComplete = () => {
-    addPoints(20);
-    resetOnboarding();
-    setOnboarded(true);
+  const handleComplete = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      // Send the consolidated profile to the backend, then clear local state.
+      const profile = buildOnboardingProfile(useOnboardingStore.getState(), role ?? 'trainer');
+      await submitOnboardingProfile(profile);
+      addPoints(20);
+      resetOnboarding();
+      setOnboarded(true);
+    } catch (e) {
+      setSubmitting(false);
+      Alert.alert("Couldn't finish setup", toErrorMessage(e));
+    }
   };
 
   return (
     <OnboardingLayout showFooter={false} centerContent scrollContentStyle={styles.centered}>
       <Text style={styles.title}>You're all set!</Text>
-      <Text style={styles.subtitle}>Your trainer profile is now live and visible to clients.</Text>
+      <Text style={styles.subtitle}>
+        {isClient
+          ? "We'll match you with the best trainers for your goals."
+          : 'Your trainer profile is now live and visible to clients.'}
+      </Text>
 
       <Card style={styles.achievementCard}>
         <View style={styles.achievementIcon}>
@@ -41,8 +60,18 @@ export function YoureAllSetScreen() {
         </View>
       </Card>
 
-      <Button title="Go to Homepage" onPress={handleComplete} style={styles.primaryBtn} />
-      <Button title="View your profile" onPress={handleComplete} variant="outline" />
+      <Button
+        title="Go to Homepage"
+        onPress={handleComplete}
+        loading={submitting}
+        style={styles.primaryBtn}
+      />
+      <Button
+        title="View your profile"
+        onPress={handleComplete}
+        disabled={submitting}
+        variant="outline"
+      />
     </OnboardingLayout>
   );
 }
