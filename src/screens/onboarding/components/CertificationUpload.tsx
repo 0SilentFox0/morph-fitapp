@@ -28,11 +28,13 @@ export function CertificationUpload() {
       const result = await DocumentPicker.getDocumentAsync({
         type: ['application/pdf', 'image/*'],
         copyToCacheDirectory: true,
+        multiple: true,
       });
-      if (!result.canceled && result.assets?.[0]) {
-        const asset = result.assets[0];
-        addCertification({ name: asset.name, uri: asset.uri });
-      }
+      if (result.canceled || !result.assets?.length) return;
+      const existing = new Set(certifications.map((c) => c.uri));
+      result.assets.forEach((asset) => {
+        if (!existing.has(asset.uri)) addCertification({ name: asset.name, uri: asset.uri });
+      });
     } catch (e) {
       console.warn('[CertificationUpload] DocumentPicker failed:', e);
       Alert.alert('Error', 'Could not pick document. Please try again.');
@@ -49,7 +51,9 @@ export function CertificationUpload() {
 
       <TouchableOpacity style={styles.uploadBtn} onPress={handleUpload} activeOpacity={0.8}>
         <Ionicons name="cloud-upload-outline" size={16} color={colors.neutral9} />
-        <Text style={styles.uploadText}>Upload certificate</Text>
+        <Text style={styles.uploadText}>
+          {certifications.length ? 'Add another certificate' : 'Upload certificate'}
+        </Text>
       </TouchableOpacity>
 
       {certifications.map((cert) => (
