@@ -1,13 +1,12 @@
 export { ChooseRoleScreen } from './steps/ChooseRoleScreen';
-export { WelcomeTrainerScreen } from './steps/WelcomeTrainerScreen';
+export { WelcomeScreen } from './steps/WelcomeScreen';
 export { WhatsYourNameScreen } from './steps/WhatsYourNameScreen';
 export { ExperienceScreen } from './steps/ExperienceScreen';
 export { TrainingTypesScreen } from './steps/TrainingTypesScreen';
 export { ClientTypesScreen } from './steps/ClientTypesScreen';
-export { HaveProgramsScreen } from './steps/HaveProgramsScreen';
-export { AddToLibraryScreen } from './steps/AddToLibraryScreen';
 export { WhereTrainScreen } from './steps/WhereTrainScreen';
 export { WorkScheduleScreen } from './steps/WorkScheduleScreen';
+export { TrainerPreferencesScreen } from './steps/TrainerPreferencesScreen';
 export { ProfilePhotoScreen } from './steps/ProfilePhotoScreen';
 export { PreviewProfileScreen } from './steps/PreviewProfileScreen';
 export { YoureAllSetScreen } from './steps/YoureAllSetScreen';

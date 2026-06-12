@@ -1,8 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../../navigation/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../../components/ui';
@@ -10,16 +7,19 @@ import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { spacing } from '../../../theme/spacing';
 import { OnboardingLayout } from '../components/OnboardingLayout';
+import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'WelcomeTrainer'>;
-
-export function WelcomeTrainerScreen() {
-  const navigation = useNavigation<Nav>();
+export function WelcomeScreen() {
+  const { navigation, isClient } = useOnboardingScreen('Welcome');
 
   return (
     <OnboardingLayout
-      title="Welcome, Trainer!"
-      subtitle="Let's set up your profile to start working"
+      title={isClient ? 'Welcome!' : 'Welcome, Trainer!'}
+      subtitle={
+        isClient
+          ? "Let's set up your profile to find your perfect trainer"
+          : "Let's set up your profile to start working"
+      }
       showFooter={false}
     >
       <View style={styles.card}>
@@ -54,7 +54,11 @@ export function WelcomeTrainerScreen() {
             <View style={[styles.skeletonBar, styles.skeletonBarWide]} />
           </View>
 
-          <Text style={styles.hint}>Clients will discover you once{'\n'}your profile is ready</Text>
+          <Text style={styles.hint}>
+            {isClient
+              ? `We'll match you with the best${'\n'}trainers for your goals`
+              : `Clients will discover you once${'\n'}your profile is ready`}
+          </Text>
         </View>
       </View>
 

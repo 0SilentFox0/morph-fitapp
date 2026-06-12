@@ -1,8 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../../navigation/types';
+import { Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
@@ -10,11 +7,10 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
-
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'ProfilePhoto'>;
+import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function ProfilePhotoScreen() {
-  const navigation = useNavigation<Nav>();
+  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('ProfilePhoto');
   const profilePhotoUri = useOnboardingStore((s) => s.profilePhotoUri);
   const setField = useOnboardingStore((s) => s.setField);
 
@@ -41,9 +37,10 @@ export function ProfilePhotoScreen() {
 
   return (
     <OnboardingLayout
-      step={8}
+      step={step}
+      totalSteps={totalSteps}
       title="Add a profile photo"
-      subtitle="Clients will see this on your profile"
+      subtitle={isClient ? 'Trainers will see this on your profile' : 'Clients will see this on your profile'}
       centerContent
       onNext={() => navigation.navigate('PreviewProfile')}
       onBack={() => navigation.goBack()}

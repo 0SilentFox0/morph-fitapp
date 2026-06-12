@@ -1,27 +1,19 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../../navigation/types';
 import { Button, ChoiceCard } from '../../../components/ui';
 import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
-
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'ChooseRole'>;
+import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function ChooseRoleScreen() {
-  const navigation = useNavigation<Nav>();
+  const { navigation } = useOnboardingScreen('ChooseRole');
   const setUserRole = useAppStore((s) => s.setUserRole);
   const [selected, setSelected] = React.useState<'client' | 'trainer'>('trainer');
 
   const handleApply = (role: 'client' | 'trainer') => {
     setUserRole(role);
-    if (role === 'trainer') {
-      navigation.navigate('WelcomeTrainer');
-    } else {
-      navigation.navigate('YoureAllSet');
-    }
+    navigation.navigate('Welcome');
   };
 
   return (

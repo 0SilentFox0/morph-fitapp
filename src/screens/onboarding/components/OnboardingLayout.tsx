@@ -9,11 +9,13 @@ import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 
-const TOTAL_STEPS = 9;
+const DEFAULT_TOTAL_STEPS = 7;
 
 interface OnboardingLayoutProps {
   children: React.ReactNode;
   step?: number;
+  /** Total step count for the progress indicator. Trainer flow has 7, client 8. */
+  totalSteps?: number;
   title?: string;
   subtitle?: string;
   showLogo?: boolean;
@@ -29,6 +31,7 @@ interface OnboardingLayoutProps {
 export function OnboardingLayout({
   children,
   step,
+  totalSteps = DEFAULT_TOTAL_STEPS,
   title,
   subtitle,
   showLogo = true,
@@ -56,8 +59,8 @@ export function OnboardingLayout({
       )}
 
       {step != null && (
-        <View accessibilityLabel={`Step ${step} of ${TOTAL_STEPS}`}>
-          <ProgressIndicator total={TOTAL_STEPS} current={step} />
+        <View accessibilityLabel={`Step ${step} of ${totalSteps}`}>
+          <ProgressIndicator total={totalSteps} current={step} />
         </View>
       )}
 

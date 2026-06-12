@@ -3,15 +3,14 @@ import type { Session, TrainingProgram, ProgramExercise } from '../mocks';
 
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
-  WelcomeTrainer: undefined;
+  Welcome: undefined;
   WhatsYourName: undefined;
   Experience: undefined;
   TrainingTypes: undefined;
   ClientTypes: undefined;
-  HavePrograms: undefined;
-  AddToLibrary: undefined;
   WhereTrain: undefined;
   WorkSchedule: undefined;
+  TrainerPreferences: undefined;
   ProfilePhoto: undefined;
   PreviewProfile: undefined;
   YoureAllSet: undefined;

@@ -8,15 +8,14 @@ import { useOnboardingStore } from '../store/onboardingStore';
 
 import {
   ChooseRoleScreen,
-  WelcomeTrainerScreen,
+  WelcomeScreen,
   WhatsYourNameScreen,
   ExperienceScreen,
   TrainingTypesScreen,
   ClientTypesScreen,
-  HaveProgramsScreen,
-  AddToLibraryScreen,
   WhereTrainScreen,
   WorkScheduleScreen,
+  TrainerPreferencesScreen,
   ProfilePhotoScreen,
   PreviewProfileScreen,
   YoureAllSetScreen,
@@ -26,15 +25,14 @@ const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
 const RESUMABLE_ROUTES: readonly (keyof OnboardingStackParamList)[] = [
   'ChooseRole',
-  'WelcomeTrainer',
+  'Welcome',
   'WhatsYourName',
   'Experience',
   'TrainingTypes',
   'ClientTypes',
-  'HavePrograms',
-  'AddToLibrary',
   'WhereTrain',
   'WorkSchedule',
+  'TrainerPreferences',
   'ProfilePhoto',
   'PreviewProfile',
   'YoureAllSet',
@@ -85,15 +83,14 @@ export function OnboardingNavigator() {
         }}
       >
         <Stack.Screen name="ChooseRole" component={ChooseRoleScreen} />
-        <Stack.Screen name="WelcomeTrainer" component={WelcomeTrainerScreen} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="WhatsYourName" component={WhatsYourNameScreen} />
         <Stack.Screen name="Experience" component={ExperienceScreen} />
         <Stack.Screen name="TrainingTypes" component={TrainingTypesScreen} />
         <Stack.Screen name="ClientTypes" component={ClientTypesScreen} />
-        <Stack.Screen name="HavePrograms" component={HaveProgramsScreen} />
-        <Stack.Screen name="AddToLibrary" component={AddToLibraryScreen} />
         <Stack.Screen name="WhereTrain" component={WhereTrainScreen} />
         <Stack.Screen name="WorkSchedule" component={WorkScheduleScreen} />
+        <Stack.Screen name="TrainerPreferences" component={TrainerPreferencesScreen} />
         <Stack.Screen name="ProfilePhoto" component={ProfilePhotoScreen} />
         <Stack.Screen name="PreviewProfile" component={PreviewProfileScreen} />
         <Stack.Screen name="YoureAllSet" component={YoureAllSetScreen} />

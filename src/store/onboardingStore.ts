@@ -27,6 +27,14 @@ export interface OnboardingState {
   workTimeEnd: string;
   sameSlotsEveryWeek: boolean;
   profilePhotoUri: string | null;
+  // Client-only fields (client onboarding reuses the trainer screens with
+  // mirrored questions; the shared fields above double as the client's
+  // training duration / interests / preferred locations / availability).
+  selfLevel: string;
+  hasInjuries: boolean;
+  injuriesNote: string;
+  preferredTrainerGender: string;
+  preferredFormat: string[];
   currentRoute: string | null;
   setCurrentRoute: (route: string | null) => void;
   setField: <K extends keyof OnboardingState>(
@@ -37,6 +45,7 @@ export interface OnboardingState {
   toggleClientType: (type: string) => void;
   toggleLocation: (location: string) => void;
   toggleWorkDay: (day: string) => void;
+  togglePreferredFormat: (format: string) => void;
   addCertification: (cert: Certification) => void;
   removeCertification: (uri: string) => void;
   reset: () => void;
@@ -60,6 +69,11 @@ const initialState = {
   workTimeEnd: '18:00',
   sameSlotsEveryWeek: true,
   profilePhotoUri: null as string | null,
+  selfLevel: '',
+  hasInjuries: false,
+  injuriesNote: '',
+  preferredTrainerGender: '',
+  preferredFormat: [] as string[],
   currentRoute: null as string | null,
 };
 
@@ -93,6 +107,12 @@ export const useOnboardingStore = create<OnboardingState>()(
             ? state.workDays.filter((d) => d !== day)
             : [...state.workDays, day],
         })),
+      togglePreferredFormat: (format) =>
+        set((state) => ({
+          preferredFormat: state.preferredFormat.includes(format)
+            ? state.preferredFormat.filter((f) => f !== format)
+            : [...state.preferredFormat, format],
+        })),
       addCertification: (cert) =>
         set((state) => ({
           certifications: [...state.certifications, cert],
@@ -124,6 +144,11 @@ export const useOnboardingStore = create<OnboardingState>()(
         workTimeEnd: state.workTimeEnd,
         sameSlotsEveryWeek: state.sameSlotsEveryWeek,
         profilePhotoUri: state.profilePhotoUri,
+        selfLevel: state.selfLevel,
+        hasInjuries: state.hasInjuries,
+        injuriesNote: state.injuriesNote,
+        preferredTrainerGender: state.preferredTrainerGender,
+        preferredFormat: state.preferredFormat,
         currentRoute: state.currentRoute,
       }),
     },

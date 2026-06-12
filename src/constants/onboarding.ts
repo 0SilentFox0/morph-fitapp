@@ -23,3 +23,19 @@ export const TRAINING_LOCATIONS: readonly string[] = [
   'At the gym',
   'Outdoors',
 ];
+
+/**
+ * Client onboarding option lists. The client flow reuses the trainer screens
+ * with mirrored questions (see onboardingSteps.ts), so these complement the
+ * lists above: how a client rates themselves, and what they want in a trainer.
+ */
+export const CLIENT_LEVELS: readonly string[] = [
+  'Beginner',
+  'Amateur',
+  'Advanced',
+  'Professional',
+];
+
+export const TRAINER_GENDER_PREFS: readonly string[] = ['Any', 'Female', 'Male'];
+
+export const TRAINING_FORMATS: readonly string[] = ['Online', 'In-person'];

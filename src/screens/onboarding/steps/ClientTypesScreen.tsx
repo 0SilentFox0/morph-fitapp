@@ -1,30 +1,54 @@
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../../navigation/types';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { CLIENT_TYPES } from '../../../constants';
+import { CLIENT_TYPES, CLIENT_LEVELS } from '../../../constants';
 import { MultiSelectStep } from '../components/MultiSelectStep';
+import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'ClientTypes'>;
-
+/**
+ * Dual-purpose screen. Trainer: "Who do you usually train?" (multi-select
+ * client types). Client: "How would you classify yourself?" (single-select
+ * level), where picking one option replaces the previous choice.
+ */
 export function ClientTypesScreen() {
-  const navigation = useNavigation<Nav>();
+  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('ClientTypes');
   const clientTypes = useOnboardingStore((s) => s.clientTypes);
   const toggleClientType = useOnboardingStore((s) => s.toggleClientType);
+  const selfLevel = useOnboardingStore((s) => s.selfLevel);
+  const setField = useOnboardingStore((s) => s.setField);
+
+  const goNext = () => navigation.navigate('WhereTrain');
+
+  if (isClient) {
+    return (
+      <MultiSelectStep
+        step={step}
+        totalSteps={totalSteps}
+        title="How would you classify yourself?"
+        subtitle="Pick the option that best fits you"
+        options={CLIENT_LEVELS}
+        selected={selfLevel ? [selfLevel] : []}
+        onToggle={(value) => setField('selfLevel', selfLevel === value ? '' : value)}
+        warning="We recommend selecting your level"
+        onNext={goNext}
+        onBack={navigation.goBack}
+        onSkip={goNext}
+      />
+    );
+  }
 
   return (
     <MultiSelectStep
-      step={4}
+      step={step}
+      totalSteps={totalSteps}
       title="Who do you usually train?"
       subtitle="Select all types of clients you work with"
       options={CLIENT_TYPES}
       selected={clientTypes}
       onToggle={toggleClientType}
       warning="We recommend selecting at least one client type"
-      onNext={() => navigation.navigate('HavePrograms')}
-      onBack={() => navigation.goBack()}
-      onSkip={() => navigation.navigate('HavePrograms')}
+      onNext={goNext}
+      onBack={navigation.goBack}
+      onSkip={goNext}
     />
   );
 }

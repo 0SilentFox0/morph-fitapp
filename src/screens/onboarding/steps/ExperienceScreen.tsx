@@ -1,19 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../../navigation/types';
-import * as DocumentPicker from 'expo-document-picker';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { useShallow } from 'zustand/react/shallow';
 import { OnboardingLayout } from '../components/OnboardingLayout';
-
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Experience'>;
+import { CertificationUpload } from '../components/CertificationUpload';
+import { InjuriesField } from '../components/InjuriesField';
+import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 const EXPERIENCE_OPTIONS = [
   { label: '1–3', sub: 'years' },
@@ -24,51 +17,23 @@ const EXPERIENCE_OPTIONS = [
 const EXPERIENCE_VALUES = ['1-3 years', '4-6 years', '7-9 years', '10+ years'];
 
 export function ExperienceScreen() {
-  const navigation = useNavigation<Nav>();
-  const {
-    experienceYears,
-    hasCertifications,
-    certifications,
-    setField,
-    addCertification,
-    removeCertification,
-  } = useOnboardingStore(
-    useShallow((s) => ({
-      experienceYears: s.experienceYears,
-      hasCertifications: s.hasCertifications,
-      certifications: s.certifications,
-      setField: s.setField,
-      addCertification: s.addCertification,
-      removeCertification: s.removeCertification,
-    }))
-  );
+  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('Experience');
+  const experienceYears = useOnboardingStore((s) => s.experienceYears);
+  const setField = useOnboardingStore((s) => s.setField);
 
-  const handleUpload = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf', 'image/*'],
-        copyToCacheDirectory: true,
-      });
-      if (!result.canceled && result.assets?.[0]) {
-        const asset = result.assets[0];
-        addCertification({ name: asset.name, uri: asset.uri });
-      }
-    } catch (e) {
-      console.warn('[ExperienceScreen] DocumentPicker failed:', e);
-      Alert.alert('Error', 'Could not pick document. Please try again.');
-    }
-  };
-
-  const toggleCerts = () => setField('hasCertifications', !hasCertifications);
+  const goNext = () => navigation.navigate('TrainingTypes');
 
   return (
     <OnboardingLayout
-      step={2}
-      title="Tell us about your experience"
-      subtitle="This helps clients trust your skills"
-      onNext={() => navigation.navigate('TrainingTypes')}
-      onBack={() => navigation.goBack()}
-      onSkip={() => navigation.navigate('TrainingTypes')}
+      step={step}
+      totalSteps={totalSteps}
+      title={isClient ? 'How long have you been training?' : 'Tell us about your experience'}
+      subtitle={
+        isClient ? 'This helps us match you with the right trainer' : 'This helps clients trust your skills'
+      }
+      onNext={goNext}
+      onBack={navigation.goBack}
+      onSkip={goNext}
     >
       <View style={styles.optionsRow}>
         {EXPERIENCE_OPTIONS.map((opt, i) => {
@@ -93,37 +58,7 @@ export function ExperienceScreen() {
         })}
       </View>
 
-      <TouchableOpacity
-        style={styles.checkboxRow}
-        onPress={toggleCerts}
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: hasCertifications }}
-      >
-        <View style={[styles.checkbox, hasCertifications && styles.checkboxChecked]}>
-          {hasCertifications && <Ionicons name="checkmark" size={12} color={colors.white} />}
-        </View>
-        <Text style={styles.checkboxLabel}>I have certifications</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.uploadBtn} onPress={handleUpload} activeOpacity={0.8}>
-        <Ionicons name="cloud-upload-outline" size={16} color={colors.neutral9} />
-        <Text style={styles.uploadText}>Upload certificate</Text>
-      </TouchableOpacity>
-
-      {certifications.map((cert) => (
-        <View key={cert.uri} style={styles.certChip}>
-          <Ionicons name="document-text" size={16} color={colors.text} />
-          <Text style={styles.certName} numberOfLines={1}>
-            {cert.name}
-          </Text>
-          <TouchableOpacity
-            onPress={() => removeCertification(cert.uri)}
-            accessibilityLabel={`Remove ${cert.name}`}
-          >
-            <Ionicons name="close-circle" size={20} color={colors.textMuted} />
-          </TouchableOpacity>
-        </View>
-      ))}
+      {isClient ? <InjuriesField /> : <CertificationUpload />}
     </OnboardingLayout>
   );
 }
@@ -164,62 +99,5 @@ const styles = StyleSheet.create({
   },
   optionSubSelected: {
     color: colors.primary9,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: spacing.xl,
-  },
-  checkbox: {
-    width: 16,
-    height: 16,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: colors.neutral9,
-  },
-  uploadBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.neutral1,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    borderRadius: radius.sm,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: spacing.md,
-  },
-  uploadText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: colors.neutral9,
-  },
-  certChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.neutral2,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.sm,
-    marginBottom: spacing.sm,
-  },
-  certName: {
-    flex: 1,
-    fontSize: typography.sizes.sm,
-    color: colors.text,
   },
 });

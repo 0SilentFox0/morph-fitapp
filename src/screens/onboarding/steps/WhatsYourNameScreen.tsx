@@ -1,8 +1,5 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../../navigation/types';
 import { Input } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
@@ -10,11 +7,10 @@ import { spacing } from '../../../theme/spacing';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { useAppStore } from '../../../store/appStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
-
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'WhatsYourName'>;
+import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function WhatsYourNameScreen() {
-  const navigation = useNavigation<Nav>();
+  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('WhatsYourName');
   const name = useOnboardingStore((s) => s.name);
   const setField = useOnboardingStore((s) => s.setField);
   const setUserName = useAppStore((s) => s.setUserName);
@@ -33,9 +29,10 @@ export function WhatsYourNameScreen() {
 
   return (
     <OnboardingLayout
-      step={1}
+      step={step}
+      totalSteps={totalSteps}
       title="What's your name?"
-      subtitle="Let clients know how to address you"
+      subtitle={isClient ? 'Let trainers know how to address you' : 'Let clients know how to address you'}
       onNext={handleNext}
       onBack={() => navigation.goBack()}
       onSkip={() => navigation.navigate('Experience')}
