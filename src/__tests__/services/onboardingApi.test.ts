@@ -1,5 +1,5 @@
-import { buildOnboardingProfile, submitOnboardingProfile } from './onboardingApi';
-import type { OnboardingState } from '../store/onboardingStore';
+import { buildOnboardingProfile, submitOnboardingProfile } from '../../services/onboardingApi';
+import type { OnboardingState } from '../../store/onboardingStore';
 
 const baseState = {
   name: '  Alex  ',

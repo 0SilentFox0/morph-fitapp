@@ -1,4 +1,4 @@
-import { useChatStore } from './chatStore';
+import { useChatStore } from '../../store/chatStore';
 
 const initialConversations = useChatStore.getState().conversations;
 const initialMessages = useChatStore.getState().messagesByConversation;

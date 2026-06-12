@@ -1,7 +1,7 @@
-import { apiFetch } from './apiClient';
-import { fetchExercises, fetchCategories } from './exerciseApi';
+import { apiFetch } from '../../services/apiClient';
+import { fetchExercises, fetchCategories } from '../../services/exerciseApi';
 
-jest.mock('./apiClient');
+jest.mock('../../services/apiClient');
 
 const mockedApiFetch = apiFetch as jest.MockedFunction<typeof apiFetch>;
 

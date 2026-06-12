@@ -1,4 +1,4 @@
-import { useOnboardingStore } from './onboardingStore';
+import { useOnboardingStore } from '../../store/onboardingStore';
 
 const get = () => useOnboardingStore.getState();
 

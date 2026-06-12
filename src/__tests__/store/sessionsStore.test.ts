@@ -1,5 +1,5 @@
-import { useSessionsStore } from './sessionsStore';
-import type { Session } from '../mocks';
+import { useSessionsStore } from '../../store/sessionsStore';
+import type { Session } from '../../mocks';
 
 const initialSessions = useSessionsStore.getState().sessions;
 

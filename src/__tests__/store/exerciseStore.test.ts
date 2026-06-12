@@ -1,7 +1,7 @@
-import { fetchExercises, fetchCategories, type Exercise } from '../services/exerciseApi';
-import { useExerciseStore } from './exerciseStore';
+import { fetchExercises, fetchCategories, type Exercise } from '../../services/exerciseApi';
+import { useExerciseStore } from '../../store/exerciseStore';
 
-jest.mock('../services/exerciseApi');
+jest.mock('../../services/exerciseApi');
 
 const mockedFetchExercises = fetchExercises as jest.MockedFunction<typeof fetchExercises>;
 const mockedFetchCategories = fetchCategories as jest.MockedFunction<typeof fetchCategories>;

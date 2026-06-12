@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
-import { ChooseRoleScreen } from './ChooseRoleScreen';
-import { useAppStore } from '../../../store/appStore';
+import { ChooseRoleScreen } from '../../../../screens/onboarding/steps/ChooseRoleScreen';
+import { useAppStore } from '../../../../store/appStore';
 
 const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({

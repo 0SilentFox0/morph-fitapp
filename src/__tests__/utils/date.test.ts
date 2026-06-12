@@ -1,4 +1,4 @@
-import { formatDate, formatTime } from './date';
+import { formatDate, formatTime } from '../../utils/date';
 
 describe('formatDate', () => {
   it('formats a valid date as "Mon D, YYYY"', () => {

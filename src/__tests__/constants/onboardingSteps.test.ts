@@ -1,4 +1,4 @@
-import { stepFor } from './onboardingSteps';
+import { stepFor } from '../../constants/onboardingSteps';
 
 describe('stepFor', () => {
   it('numbers the trainer flow (7 steps, no TrainerPreferences)', () => {

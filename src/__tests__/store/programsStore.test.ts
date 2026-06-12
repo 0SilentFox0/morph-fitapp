@@ -1,4 +1,4 @@
-import { useProgramsStore } from './programsStore';
+import { useProgramsStore } from '../../store/programsStore';
 
 const initialPrograms = useProgramsStore.getState().programs;
 
