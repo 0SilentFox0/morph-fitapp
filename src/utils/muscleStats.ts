@@ -79,3 +79,79 @@ export function toIntensities(
     return acc;
   }, {} as Record<MuscleGroup, number>);
 }
+
+export interface SessionTotals {
+  tonnage: number;
+  exerciseCount: number;
+  setCount: number;
+  sessionCount: number;
+}
+
+/** Overall totals across a history (no per-muscle double counting). */
+export function computeTotals(history: CompletedTraining[]): SessionTotals {
+  let tonnage = 0;
+  let exerciseCount = 0;
+  let setCount = 0;
+  for (const training of history) {
+    for (const logged of training.exercises) {
+      exerciseCount += 1;
+      setCount += logged.sets.length;
+      tonnage += logged.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
+    }
+  }
+  return { tonnage, exerciseCount, setCount, sessionCount: history.length };
+}
+
+export interface TrendPoint {
+  date: string;
+  tonnage: number;
+}
+
+/**
+ * Per-training tonnage attributed to one muscle, for the trend chart. Includes
+ * only trainings that actually worked the muscle, in chronological (input) order.
+ */
+export function muscleTrend(
+  history: CompletedTraining[],
+  muscle: MuscleGroup,
+  lookup: Record<number, MuscleGroup[]>,
+): TrendPoint[] {
+  const points: TrendPoint[] = [];
+  for (const training of history) {
+    let tonnage = 0;
+    let worked = false;
+    for (const logged of training.exercises) {
+      if (!lookup[logged.exerciseId]?.includes(muscle)) continue;
+      worked = true;
+      tonnage += logged.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
+    }
+    if (worked) points.push({ date: training.date, tonnage });
+  }
+  return points;
+}
+
+export type Timeframe = 'session' | 'week' | 'all';
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Narrows a chronological (oldest → newest) history to a timeframe:
+ * - `session`: just the most recent training
+ * - `week`: trainings within 7 days of `now` (falls back to the parseable subset)
+ * - `all`: everything
+ */
+export function filterByTimeframe(
+  history: CompletedTraining[],
+  timeframe: Timeframe,
+  now: Date,
+): CompletedTraining[] {
+  if (timeframe === 'all') return history;
+  if (timeframe === 'session') {
+    return history.length ? [history[history.length - 1]!] : [];
+  }
+  const cutoff = now.getTime() - WEEK_MS;
+  return history.filter((h) => {
+    const t = new Date(h.date).getTime();
+    return !Number.isNaN(t) && t >= cutoff;
+  });
+}

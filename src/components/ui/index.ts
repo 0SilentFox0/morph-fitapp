@@ -40,3 +40,5 @@ export { RestTimerControl } from './RestTimerControl';
 export { ProgramExerciseList } from './ProgramExerciseList';
 export { ClientSwitcherStrip } from './ClientSwitcherStrip';
 export type { SwitcherClient } from './ClientSwitcherStrip';
+export { BodyMap } from './BodyMap';
+export type { BodyMapProps } from './BodyMap';

@@ -2,6 +2,9 @@ import {
   computeMuscleStats,
   toIntensities,
   emptyMuscleStats,
+  computeTotals,
+  muscleTrend,
+  filterByTimeframe,
 } from '../../utils/muscleStats';
 import type { MuscleGroup } from '../../constants/muscles';
 import type { CompletedTraining } from '../../mocks';
@@ -96,5 +99,52 @@ describe('toIntensities', () => {
   it('returns all zeros when there is no data at all', () => {
     const intensities = toIntensities(emptyMuscleStats(), 'totalWeight');
     expect(Object.values(intensities).every((v) => v === 0)).toBe(true);
+  });
+});
+
+describe('computeTotals', () => {
+  it('sums tonnage, exercises, sets and sessions without per-muscle double counting', () => {
+    const totals = computeTotals(history);
+    // totals count all logged work, mapped or not:
+    // 980 (101) + 500 (999) + 0 (301) + 400 (101) = 1880
+    expect(totals.tonnage).toBe(1880);
+    expect(totals.exerciseCount).toBe(4);
+    expect(totals.setCount).toBe(5);
+    expect(totals.sessionCount).toBe(2);
+  });
+});
+
+describe('muscleTrend', () => {
+  it('returns one point per training that worked the muscle, in order', () => {
+    const trend = muscleTrend(history, 'chest', lookup);
+    expect(trend).toEqual([
+      { date: 'Dec 1', tonnage: 980 },
+      { date: 'Dec 8', tonnage: 400 },
+    ]);
+  });
+
+  it('omits trainings that did not work the muscle', () => {
+    const trend = muscleTrend(history, 'quads', lookup);
+    expect(trend).toEqual([{ date: 'Dec 8', tonnage: 0 }]);
+  });
+});
+
+describe('filterByTimeframe', () => {
+  const dated: CompletedTraining[] = [
+    { id: 'old', clientName: 'Me', programId: '1', date: '2026-06-01T00:00:00Z', exercises: [] },
+    { id: 'recent', clientName: 'Me', programId: '1', date: '2026-06-12T00:00:00Z', exercises: [] },
+  ];
+  const now = new Date('2026-06-13T00:00:00Z');
+
+  it('session → only the most recent training', () => {
+    expect(filterByTimeframe(dated, 'session', now)).toEqual([dated[1]]);
+  });
+
+  it('week → trainings within 7 days of now', () => {
+    expect(filterByTimeframe(dated, 'week', now)).toEqual([dated[1]]);
+  });
+
+  it('all → everything', () => {
+    expect(filterByTimeframe(dated, 'all', now)).toEqual(dated);
   });
 });

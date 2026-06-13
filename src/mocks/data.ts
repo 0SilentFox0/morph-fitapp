@@ -384,17 +384,39 @@ export const mockTrainingPrograms: TrainingProgram[] = [
   },
 ];
 
+/** Minimal per-exercise reference info, derived from the program definitions. */
+export interface ExerciseInfo {
+  id: number;
+  name: string;
+  category: string;
+  muscles: MuscleGroup[];
+}
+
+/** exercise id → reference info, deduped across all program definitions. */
+export const exerciseCatalog: Record<number, ExerciseInfo> =
+  mockTrainingPrograms.reduce<Record<number, ExerciseInfo>>((acc, program) => {
+    for (const exercise of program.exercises ?? []) {
+      if (!acc[exercise.id]) {
+        acc[exercise.id] = {
+          id: exercise.id,
+          name: exercise.name,
+          category: exercise.category,
+          muscles: exercise.muscles ?? [],
+        };
+      }
+    }
+    return acc;
+  }, {});
+
 /**
  * exercise id → muscle groups, derived from the program definitions above.
  * Source of truth for the per-muscle progress stats (see utils/muscleStats.ts).
  */
-export const exerciseMuscleMap: Record<number, MuscleGroup[]> =
-  mockTrainingPrograms.reduce<Record<number, MuscleGroup[]>>((acc, program) => {
-    for (const exercise of program.exercises ?? []) {
-      if (exercise.muscles?.length) acc[exercise.id] = exercise.muscles;
-    }
-    return acc;
-  }, {});
+export const exerciseMuscleMap: Record<number, MuscleGroup[]> = Object.fromEntries(
+  Object.values(exerciseCatalog)
+    .filter((e) => e.muscles.length > 0)
+    .map((e) => [e.id, e.muscles]),
+);
 
 export const mockClients: Client[] = [
   {

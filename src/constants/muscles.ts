@@ -66,14 +66,14 @@ export const MUSCLE_VIEW: Record<MuscleGroup, 'front' | 'back' | 'both'> = {
 };
 
 /**
- * Maps each group to the body-part slug(s) used by `react-native-body-highlighter`.
- * The BodyMap component is the only consumer; if the library is swapped for a
- * hand-built SVG these slugs become the SVG region ids instead.
+ * Maps each group to the body-part slug(s) used by `react-native-body-highlighter`
+ * (v3 slug set). The BodyMap component is the only consumer; if the library is
+ * swapped for a hand-built SVG these slugs become the SVG region ids instead.
  */
 export const MUSCLE_TO_SLUGS: Record<MuscleGroup, string[]> = {
   chest: ['chest'],
   back: ['upper-back', 'lower-back', 'trapezius'],
-  shoulders: ['front-deltoids', 'back-deltoids'],
+  shoulders: ['deltoids'],
   biceps: ['biceps'],
   triceps: ['triceps'],
   forearms: ['forearm'],

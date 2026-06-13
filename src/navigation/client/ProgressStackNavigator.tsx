@@ -3,12 +3,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { ProgressStackParamList } from '../types';
 import { ScreenBackground } from '../../components/layout';
 import { makeClientPlaceholder } from '../../screens/client/ClientPlaceholderScreen';
+import { ProgressOverviewScreen } from '../../screens/client/progress/ProgressOverviewScreen';
+import { MuscleDetailScreen } from '../../screens/client/progress/MuscleDetailScreen';
 
 const Stack = createNativeStackNavigator<ProgressStackParamList>();
 
-// Placeholders replaced in Phase 2 (Overview/MuscleDetail) and Phase 3 (rest).
-const ProgressOverviewScreen = makeClientPlaceholder('Progress', 'body');
-const MuscleDetailScreen = makeClientPlaceholder('Muscle', 'fitness', true);
+// Placeholders replaced in Phase 3 (history/PR/measurements/achievements).
 const TrainingHistoryScreen = makeClientPlaceholder('Training history', 'time', true);
 const TrainingHistoryDetailScreen = makeClientPlaceholder('Training', 'barbell', true);
 const PersonalRecordsScreen = makeClientPlaceholder('Personal records', 'trophy', true);
