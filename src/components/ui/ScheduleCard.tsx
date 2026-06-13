@@ -10,9 +10,13 @@ import type { Session, SessionStatus } from '../../mocks';
 
 interface ScheduleCardProps {
   session: Session;
+  /** 'trainer' (default) keeps the full trainer UI; 'client' hides trainer-only bits. */
+  variant?: 'trainer' | 'client';
+  /** Client variant only: renders a "w/ {trainerName}" pill in place of participants. */
+  trainerName?: string;
   onPress?: (session: Session) => void;
   onOptionsPress?: (session: Session) => void;
-  /** When provided, a "Start training" button is shown for pending sessions. */
+  /** When provided (trainer variant), a "Start training" button shows for pending sessions. */
   onStart?: (session: Session) => void;
 }
 
@@ -28,14 +32,22 @@ const statusBadgeColor: Record<SessionStatus, StatusBadgeColor> = {
   canceled: 'error',
 };
 
-function ScheduleCardImpl({ session, onPress, onOptionsPress, onStart }: ScheduleCardProps) {
+function ScheduleCardImpl({
+  session,
+  variant = 'trainer',
+  trainerName,
+  onPress,
+  onOptionsPress,
+  onStart,
+}: ScheduleCardProps) {
+  const isClient = variant === 'client';
   const barColor = statusBarColor[session.status];
   const statusLabel = session.status.charAt(0).toUpperCase() + session.status.slice(1);
   const isGroup = session.participants.length !== 1;
   const nameLabel = isGroup ? 'Group' : session.participants[0]?.name ?? 'Group';
   const handlePress = onPress ? () => onPress(session) : undefined;
   const handleOptionsPress = onOptionsPress ? () => onOptionsPress(session) : undefined;
-  const canStart = !!onStart && session.status === 'pending';
+  const canStart = !isClient && !!onStart && session.status === 'pending';
 
   return (
     <TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.8}>
@@ -43,12 +55,15 @@ function ScheduleCardImpl({ session, onPress, onOptionsPress, onStart }: Schedul
       <View style={styles.content}>
         <View style={styles.topRow}>
           <Text style={styles.title}>{session.title}</Text>
-          <TouchableOpacity
-            onPress={handleOptionsPress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="ellipsis-horizontal" size={20} color={colors.text} />
-          </TouchableOpacity>
+          {!isClient && (
+            <TouchableOpacity
+              testID="schedule-card-options"
+              onPress={handleOptionsPress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="ellipsis-horizontal" size={20} color={colors.text} />
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.dateRow}>
           <Ionicons name="calendar-outline" size={14} color={colors.neutral9} />
@@ -58,16 +73,24 @@ function ScheduleCardImpl({ session, onPress, onOptionsPress, onStart }: Schedul
         </View>
         <View style={styles.bottomRow}>
           <View style={styles.bottomLeft}>
-            <View style={[styles.namePill, isGroup ? styles.namePillGroup : styles.namePillSingle]}>
-              <Text style={styles.nameText}>{nameLabel}</Text>
-            </View>
+            {isClient ? (
+              trainerName ? (
+                <View style={[styles.namePill, styles.namePillSingle]}>
+                  <Text style={styles.nameText}>w/ {trainerName}</Text>
+                </View>
+              ) : null
+            ) : (
+              <View style={[styles.namePill, isGroup ? styles.namePillGroup : styles.namePillSingle]}>
+                <Text style={styles.nameText}>{nameLabel}</Text>
+              </View>
+            )}
           </View>
           <View style={styles.bottomRight}>
             <View style={styles.typeTag}>
               <Text style={styles.typeTagText}>{session.type}</Text>
             </View>
             <StatusBadge
-              icon="logo-usd"
+              icon={isClient ? undefined : 'logo-usd'}
               label={statusLabel}
               color={statusBadgeColor[session.status]}
             />
