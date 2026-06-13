@@ -37,3 +37,28 @@ describe('client screens render (no infinite render loop)', () => {
     expect(() => render(<ExerciseProgressDetailScreen />)).not.toThrow();
   });
 });
+
+import { fireEvent, screen } from '@testing-library/react-native';
+import { useSessionsStore } from '../../../store/sessionsStore';
+
+describe('ClientHomeScreen enriched home', () => {
+  it('renders the streak banner and quick actions', async () => {
+    await render(<ClientHomeScreen />);
+    expect(screen.getByTestId('streak-banner')).toBeTruthy();
+    expect(screen.getByTestId('quick-action-book')).toBeTruthy();
+    expect(screen.getByTestId('quick-action-message')).toBeTruthy();
+    expect(screen.getByTestId('quick-action-progress')).toBeTruthy();
+  });
+
+  it('shows the book CTA when there are no upcoming sessions', async () => {
+    useSessionsStore.setState({ sessions: [] });
+    await render(<ClientHomeScreen />);
+    expect(screen.getByTestId('book-cta')).toBeTruthy();
+  });
+
+  it('routes Book quick action to BookSession', async () => {
+    await render(<ClientHomeScreen />);
+    fireEvent.press(screen.getByTestId('quick-action-book'));
+    expect(mockNavigate).toHaveBeenCalledWith('BookSession');
+  });
+});
