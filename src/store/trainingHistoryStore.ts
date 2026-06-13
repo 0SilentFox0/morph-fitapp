@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { mockTrainingHistory } from '../mocks';
+import { mockTrainingHistory, CURRENT_USER_NAME } from '../mocks';
 import type { CompletedTraining, ExerciseSet } from '../mocks';
 
 export type { CompletedTraining };
@@ -12,6 +12,8 @@ interface TrainingHistoryState {
   history: CompletedTraining[];
   /** All completed trainings for a client, oldest → newest (seed order). */
   getClientHistory: (clientName: string) => CompletedTraining[];
+  /** The signed-in client's own trainings, oldest → newest. */
+  getCurrentUserHistory: () => CompletedTraining[];
   /** Sets logged for an exercise in the client's most recent training, or null. */
   getLastSets: (clientName: string, exerciseId: number) => ExerciseSet[] | null;
 }
@@ -23,6 +25,8 @@ export const useTrainingHistoryStore = create<TrainingHistoryState>((set, get) =
     const key = normalizeName(clientName);
     return get().history.filter((h) => normalizeName(h.clientName) === key);
   },
+
+  getCurrentUserHistory: () => get().getClientHistory(CURRENT_USER_NAME),
 
   getLastSets: (clientName, exerciseId) => {
     const key = normalizeName(clientName);

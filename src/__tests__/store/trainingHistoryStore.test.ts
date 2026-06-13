@@ -1,5 +1,5 @@
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
-import { mockClients, mockSessions } from '../../mocks';
+import { mockClients, mockSessions, CURRENT_USER_NAME } from '../../mocks';
 import type { CompletedTraining } from '../../mocks';
 
 const seed = useTrainingHistoryStore.getState().history;
@@ -42,6 +42,12 @@ describe('useTrainingHistoryStore', () => {
   it('seeds mock history that resolves known demo clients', () => {
     // Brooklyn Simmons did Back squat (301) in the seed
     expect(useTrainingHistoryStore.getState().getLastSets('Brooklyn Simmons', 301)).not.toBeNull();
+  });
+
+  it('getCurrentUserHistory returns the signed-in client\'s own trainings', () => {
+    const history = useTrainingHistoryStore.getState().getCurrentUserHistory();
+    expect(history.length).toBeGreaterThan(0);
+    expect(history.every((h) => h.clientName === CURRENT_USER_NAME)).toBe(true);
   });
 
   it('seeds history for every demo client so the progress chart always has data', () => {

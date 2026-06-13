@@ -3,6 +3,8 @@
  * Replace this file or its exports with API calls when backend is ready.
  */
 
+import type { MuscleGroup } from '../constants/muscles';
+
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 export type SessionStatus = 'completed' | 'pending' | 'canceled';
@@ -41,6 +43,8 @@ export interface ProgramExercise {
   durationLabel?: string;
   /** Free-text guidance shown on the live Exercise screen. */
   trainerNotes?: string;
+  /** Muscle groups this exercise loads — source of the per-muscle progress stats. */
+  muscles?: MuscleGroup[];
 }
 
 export interface TrainingProgram {
@@ -239,6 +243,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Chest',
         imageUrl: TRAINING_IMAGES[0]!,
         durationLabel: '5m',
+        muscles: ['chest', 'triceps', 'shoulders'],
         trainerNotes:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         sets: [
@@ -258,6 +263,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Chest',
         imageUrl: TRAINING_IMAGES[1]!,
         durationLabel: '5m',
+        muscles: ['chest', 'shoulders', 'triceps'],
         sets: [
           { weight: 20, reps: 15 },
           { weight: 22, reps: 12 },
@@ -270,6 +276,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Core',
         imageUrl: TRAINING_IMAGES[2]!,
         durationLabel: '5m',
+        muscles: ['core', 'quads', 'shoulders'],
         sets: [
           { weight: 0, reps: 40, note: 'short_rest' },
           { weight: 0, reps: 40 },
@@ -295,6 +302,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Cardio',
         imageUrl: TRAINING_IMAGES[3]!,
         durationLabel: '20m',
+        muscles: ['quads', 'hamstrings', 'calves'],
         sets: [
           { weight: 0, reps: 20, note: 'long_rest' },
           { weight: 0, reps: 20 },
@@ -306,6 +314,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Cardio',
         imageUrl: TRAINING_IMAGES[4]!,
         durationLabel: '10m',
+        muscles: ['back', 'biceps', 'core'],
         sets: [
           { weight: 0, reps: 15 },
           { weight: 0, reps: 15 },
@@ -330,6 +339,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Legs',
         imageUrl: TRAINING_IMAGES[2]!,
         durationLabel: '8m',
+        muscles: ['quads', 'glutes', 'hamstrings', 'core'],
         sets: [
           { weight: 60, reps: 12 },
           { weight: 70, reps: 10 },
@@ -343,6 +353,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Back',
         imageUrl: TRAINING_IMAGES[0]!,
         durationLabel: '8m',
+        muscles: ['back', 'hamstrings', 'glutes', 'core'],
         sets: [
           { weight: 80, reps: 8 },
           { weight: 90, reps: 6 },
@@ -372,6 +383,18 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     price: '$5/month',
   },
 ];
+
+/**
+ * exercise id → muscle groups, derived from the program definitions above.
+ * Source of truth for the per-muscle progress stats (see utils/muscleStats.ts).
+ */
+export const exerciseMuscleMap: Record<number, MuscleGroup[]> =
+  mockTrainingPrograms.reduce<Record<number, MuscleGroup[]>>((acc, program) => {
+    for (const exercise of program.exercises ?? []) {
+      if (exercise.muscles?.length) acc[exercise.id] = exercise.muscles;
+    }
+    return acc;
+  }, {});
 
 export const mockClients: Client[] = [
   {
@@ -546,6 +569,82 @@ function seedClientHistory(clientName: string): CompletedTraining[] {
   ];
 }
 
+/**
+ * The signed-in client. Their own past trainings are seeded below so the
+ * client-side progress features (body-map, PRs, streak) always have data,
+ * independent of whatever display name was entered at onboarding.
+ */
+export const CURRENT_USER_NAME = 'You';
+
+/**
+ * Richer, dated history for the current client across several programs so the
+ * per-muscle heat-map, trend charts and streak all render meaningfully. Dates
+ * are ISO (recent, relative to the demo "today") and ascending oldest → newest.
+ */
+const currentUserHistory: CompletedTraining[] = [
+  {
+    id: 'me-1',
+    clientName: CURRENT_USER_NAME,
+    programId: '3',
+    date: '2026-06-01T18:00:00Z',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+    ],
+  },
+  {
+    id: 'me-2',
+    clientName: CURRENT_USER_NAME,
+    programId: '1',
+    date: '2026-06-03T18:00:00Z',
+    exercises: [
+      { exerciseId: 101, sets: [{ weight: 45, reps: 12 }, { weight: 50, reps: 10 }, { weight: 55, reps: 8 }] },
+      { exerciseId: 102, sets: [{ weight: 20, reps: 14 }, { weight: 22, reps: 12 }] },
+      { exerciseId: 103, sets: [{ weight: 0, reps: 40 }, { weight: 0, reps: 35 }] },
+    ],
+  },
+  {
+    id: 'me-3',
+    clientName: CURRENT_USER_NAME,
+    programId: '2',
+    date: '2026-06-06T08:00:00Z',
+    exercises: [
+      { exerciseId: 201, sets: [{ weight: 0, reps: 25 }] },
+      { exerciseId: 202, sets: [{ weight: 0, reps: 18 }, { weight: 0, reps: 16 }] },
+    ],
+  },
+  {
+    id: 'me-4',
+    clientName: CURRENT_USER_NAME,
+    programId: '3',
+    date: '2026-06-08T18:00:00Z',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 55, reps: 12 }, { weight: 65, reps: 10 }, { weight: 75, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 75, reps: 8 }, { weight: 85, reps: 6 }, { weight: 95, reps: 4 }] },
+    ],
+  },
+  {
+    id: 'me-5',
+    clientName: CURRENT_USER_NAME,
+    programId: '1',
+    date: '2026-06-10T18:00:00Z',
+    exercises: [
+      { exerciseId: 101, sets: [{ weight: 50, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
+      { exerciseId: 102, sets: [{ weight: 22, reps: 14 }, { weight: 24, reps: 12 }] },
+    ],
+  },
+  {
+    id: 'me-6',
+    clientName: CURRENT_USER_NAME,
+    programId: '3',
+    date: '2026-06-12T18:00:00Z',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 60, reps: 12 }, { weight: 70, reps: 10 }, { weight: 80, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 80, reps: 8 }, { weight: 90, reps: 6 }, { weight: 100, reps: 4 }] },
+    ],
+  },
+];
+
 const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientName));
 
 /**
@@ -555,6 +654,7 @@ const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientNa
  * post-training stats chart is never empty.
  */
 export const mockTrainingHistory: CompletedTraining[] = [
+  ...currentUserHistory,
   ...curatedTrainingHistory,
   ...Array.from(
     new Set([
