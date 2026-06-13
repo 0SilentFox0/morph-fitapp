@@ -49,3 +49,4 @@ export { AnimatedCounter } from './AnimatedCounter';
 export { PagerDots } from './PagerDots';
 export { PricingInsightHint } from './PricingInsightHint';
 export { StreakBanner } from './StreakBanner';
+export { QuickActions } from './QuickActions';
