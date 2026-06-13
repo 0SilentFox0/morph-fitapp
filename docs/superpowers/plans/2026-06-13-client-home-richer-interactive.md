@@ -31,8 +31,8 @@ import { renderHook } from '@testing-library/react-native';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 
 describe('useReduceMotion', () => {
-  it('defaults to false before the async query resolves', () => {
-    const { result } = renderHook(() => useReduceMotion());
+  it('defaults to false before the async query resolves', async () => {
+    const { result } = await renderHook(() => useReduceMotion());
     expect(result.current).toBe(false);
   });
 });
@@ -105,8 +105,8 @@ import { render, screen } from '@testing-library/react-native';
 import { FadeInUp } from '../../components/ui/FadeInUp';
 
 describe('FadeInUp', () => {
-  it('renders its children', () => {
-    render(
+  it('renders its children', async () => {
+    await render(
       <FadeInUp>
         <Text>hello</Text>
       </FadeInUp>,
@@ -206,8 +206,8 @@ import { AnimatedCounter } from '../../components/ui/AnimatedCounter';
 jest.mock('../../hooks/useReduceMotion', () => ({ useReduceMotion: () => true }));
 
 describe('AnimatedCounter', () => {
-  it('renders the formatted target value when reduce-motion is on', () => {
-    render(<AnimatedCounter value={2100} format={(n) => `${n}kg`} />);
+  it('renders the formatted target value when reduce-motion is on', async () => {
+    await render(<AnimatedCounter value={2100} format={(n) => `${n}kg`} />);
     expect(screen.getByText('2100kg')).toBeTruthy();
   });
 });
@@ -309,13 +309,13 @@ import { render, screen } from '@testing-library/react-native';
 import { PagerDots } from '../../components/ui/PagerDots';
 
 describe('PagerDots', () => {
-  it('renders one dot per page', () => {
-    render(<PagerDots count={3} activeIndex={1} />);
+  it('renders one dot per page', async () => {
+    await render(<PagerDots count={3} activeIndex={1} />);
     expect(screen.getAllByTestId('pager-dot')).toHaveLength(3);
   });
 
-  it('renders nothing for a single page', () => {
-    render(<PagerDots count={1} activeIndex={0} />);
+  it('renders nothing for a single page', async () => {
+    await render(<PagerDots count={1} activeIndex={0} />);
     expect(screen.queryByTestId('pager-dot')).toBeNull();
   });
 });
@@ -414,29 +414,29 @@ const session: Session = {
 };
 
 describe('ScheduleCard client variant', () => {
-  it('renders the status label and title', () => {
-    render(<ScheduleCard session={session} variant="client" />);
+  it('renders the status label and title', async () => {
+    await render(<ScheduleCard session={session} variant="client" />);
     expect(screen.getByText('Upper body strength')).toBeTruthy();
     expect(screen.getByText('Pending')).toBeTruthy();
   });
 
-  it('hides the options menu and start button', () => {
-    render(
+  it('hides the options menu and start button', async () => {
+    await render(
       <ScheduleCard session={session} variant="client" onStart={jest.fn()} onOptionsPress={jest.fn()} />,
     );
     expect(screen.queryByTestId('schedule-card-options')).toBeNull();
     expect(screen.queryByText('Start training')).toBeNull();
   });
 
-  it('shows the trainer pill only when trainerName is provided', () => {
-    const { rerender } = render(<ScheduleCard session={session} variant="client" />);
+  it('shows the trainer pill only when trainerName is provided', async () => {
+    await render(<ScheduleCard session={session} variant="client" />);
     expect(screen.queryByText('w/ Coach Sam')).toBeNull();
-    rerender(<ScheduleCard session={session} variant="client" trainerName="Coach Sam" />);
+    await render(<ScheduleCard session={session} variant="client" trainerName="Coach Sam" />);
     expect(screen.getByText('w/ Coach Sam')).toBeTruthy();
   });
 
-  it('trainer variant still shows the options menu', () => {
-    render(<ScheduleCard session={session} variant="trainer" onOptionsPress={jest.fn()} />);
+  it('trainer variant still shows the options menu', async () => {
+    await render(<ScheduleCard session={session} variant="trainer" onOptionsPress={jest.fn()} />);
     expect(screen.getByTestId('schedule-card-options')).toBeTruthy();
   });
 });
@@ -571,20 +571,20 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StreakBanner } from '../../components/ui/StreakBanner';
 
 describe('StreakBanner', () => {
-  it('shows the streak count when there is a streak', () => {
-    render(<StreakBanner streak={3} sessionsThisWeek={2} />);
+  it('shows the streak count when there is a streak', async () => {
+    await render(<StreakBanner streak={3} sessionsThisWeek={2} />);
     expect(screen.getByText('3-week streak')).toBeTruthy();
     expect(screen.getByText('2/3 sessions this week')).toBeTruthy();
   });
 
-  it('shows an encouraging message when there is no streak', () => {
-    render(<StreakBanner streak={0} sessionsThisWeek={0} />);
+  it('shows an encouraging message when there is no streak', async () => {
+    await render(<StreakBanner streak={0} sessionsThisWeek={0} />);
     expect(screen.getByText('Start your streak this week')).toBeTruthy();
   });
 
-  it('fires onPress when tapped', () => {
+  it('fires onPress when tapped', async () => {
     const onPress = jest.fn();
-    render(<StreakBanner streak={1} sessionsThisWeek={1} onPress={onPress} />);
+    await render(<StreakBanner streak={1} sessionsThisWeek={1} onPress={onPress} />);
     fireEvent.press(screen.getByTestId('streak-banner'));
     expect(onPress).toHaveBeenCalled();
   });
@@ -704,11 +704,11 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { QuickActions } from '../../components/ui/QuickActions';
 
 describe('QuickActions', () => {
-  it('fires the matching handler for each action', () => {
+  it('fires the matching handler for each action', async () => {
     const onBook = jest.fn();
     const onMessage = jest.fn();
     const onProgress = jest.fn();
-    render(<QuickActions onBook={onBook} onMessage={onMessage} onProgress={onProgress} />);
+    await render(<QuickActions onBook={onBook} onMessage={onMessage} onProgress={onProgress} />);
 
     fireEvent.press(screen.getByTestId('quick-action-book'));
     fireEvent.press(screen.getByTestId('quick-action-message'));
@@ -834,15 +834,15 @@ const make = (id: string, title: string): Session => ({
 });
 
 describe('UpcomingCarousel', () => {
-  it('shows the book CTA when there are no sessions', () => {
+  it('shows the book CTA when there are no sessions', async () => {
     const onBook = jest.fn();
-    render(<UpcomingCarousel sessions={[]} onPressSession={jest.fn()} onBook={onBook} />);
+    await render(<UpcomingCarousel sessions={[]} onPressSession={jest.fn()} onBook={onBook} />);
     fireEvent.press(screen.getByTestId('book-cta'));
     expect(onBook).toHaveBeenCalled();
   });
 
-  it('renders a card per session with pagination dots', () => {
-    render(
+  it('renders a card per session with pagination dots', async () => {
+    await render(
       <UpcomingCarousel
         sessions={[make('1', 'Leg day'), make('2', 'Push day')]}
         onPressSession={jest.fn()}
@@ -854,9 +854,9 @@ describe('UpcomingCarousel', () => {
     expect(screen.getAllByTestId('pager-dot')).toHaveLength(2);
   });
 
-  it('calls onPressSession when a card is tapped', () => {
+  it('calls onPressSession when a card is tapped', async () => {
     const onPressSession = jest.fn();
-    render(
+    await render(
       <UpcomingCarousel sessions={[make('1', 'Leg day')]} onPressSession={onPressSession} onBook={jest.fn()} />,
     );
     fireEvent.press(screen.getByText('Leg day'));
@@ -1246,22 +1246,22 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { useSessionsStore } from '../../../store/sessionsStore';
 
 describe('ClientHomeScreen enriched home', () => {
-  it('renders the streak banner and quick actions', () => {
-    render(<ClientHomeScreen />);
+  it('renders the streak banner and quick actions', async () => {
+    await render(<ClientHomeScreen />);
     expect(screen.getByTestId('streak-banner')).toBeTruthy();
     expect(screen.getByTestId('quick-action-book')).toBeTruthy();
     expect(screen.getByTestId('quick-action-message')).toBeTruthy();
     expect(screen.getByTestId('quick-action-progress')).toBeTruthy();
   });
 
-  it('shows the book CTA when there are no upcoming sessions', () => {
+  it('shows the book CTA when there are no upcoming sessions', async () => {
     useSessionsStore.setState({ sessions: [] });
-    render(<ClientHomeScreen />);
+    await render(<ClientHomeScreen />);
     expect(screen.getByTestId('book-cta')).toBeTruthy();
   });
 
-  it('routes Book quick action to BookSession', () => {
-    render(<ClientHomeScreen />);
+  it('routes Book quick action to BookSession', async () => {
+    await render(<ClientHomeScreen />);
     fireEvent.press(screen.getByTestId('quick-action-book'));
     expect(mockNavigate).toHaveBeenCalledWith('BookSession');
   });
