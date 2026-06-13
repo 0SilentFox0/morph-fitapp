@@ -11,6 +11,8 @@ import { TrainingHistoryDetailScreen } from '../../screens/client/progress/Train
 import { PersonalRecordsScreen } from '../../screens/client/progress/PersonalRecordsScreen';
 import { MeasurementsScreen } from '../../screens/client/progress/MeasurementsScreen';
 import { AchievementsScreen } from '../../screens/client/progress/AchievementsScreen';
+import { LeagueScreen } from '../../screens/client/progress/LeagueScreen';
+import { LeaderboardScreen } from '../../screens/client/progress/LeaderboardScreen';
 
 const Stack = createNativeStackNavigator<ProgressStackParamList>();
 
@@ -35,6 +37,8 @@ export function ProgressStackNavigator() {
       <Stack.Screen name="PersonalRecords" component={PersonalRecordsScreen} />
       <Stack.Screen name="Measurements" component={MeasurementsScreen} />
       <Stack.Screen name="Achievements" component={AchievementsScreen} />
+      <Stack.Screen name="League" component={LeagueScreen} />
+      <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
     </Stack.Navigator>
   );
 }

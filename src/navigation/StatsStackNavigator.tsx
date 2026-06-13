@@ -7,6 +7,7 @@ import { BusinessAnalyticsScreen } from '../screens/stats/BusinessAnalyticsScree
 import { TransactionsScreen } from '../screens/stats/TransactionsScreen';
 import { AddTransactionScreen } from '../screens/stats/AddTransactionScreen';
 import { YouGotPaidScreen } from '../screens/stats/YouGotPaidScreen';
+import { TrainerLeagueScreen } from '../screens/stats/TrainerLeagueScreen';
 
 const Stack = createNativeStackNavigator<StatsStackParamList>();
 
@@ -26,6 +27,7 @@ export function StatsStackNavigator() {
       <Stack.Screen name="Transactions" component={TransactionsScreen} />
       <Stack.Screen name="AddTransaction" component={AddTransactionScreen} />
       <Stack.Screen name="YouGotPaid" component={YouGotPaidScreen} />
+      <Stack.Screen name="TrainerLeague" component={TrainerLeagueScreen} />
     </Stack.Navigator>
   );
 }

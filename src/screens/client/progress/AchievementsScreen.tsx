@@ -1,15 +1,22 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
+import type { ProgressStackParamList } from '../../../navigation/types';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { useAppStore } from '../../../store/appStore';
+import { useGamificationStore } from '../../../store/gamificationStore';
 import { activeDayKeys, computeWeekStreak, computeBadges } from '../../../utils/achievements';
+import { LEAGUE_TIERS } from '../../../utils/leagues';
+
+type Nav = NativeStackNavigationProp<ProgressStackParamList, 'Achievements'>;
 
 const WEEKS = 5;
 const DAYS = WEEKS * 7;
@@ -18,10 +25,19 @@ const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export function AchievementsScreen() {
+  const navigation = useNavigation<Nav>();
   const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
   useTrainingHistoryStore((s) => s.history);
   const history = getCurrentUserHistory();
   const points = useAppStore((s) => s.points);
+  const overview = useGamificationStore((s) => s.overview);
+  const loadOverview = useGamificationStore((s) => s.loadOverview);
+
+  useEffect(() => {
+    loadOverview();
+  }, [loadOverview]);
+
+  const tier = overview ? LEAGUE_TIERS.find((t) => t.key === overview.league.key) : null;
 
   const now = new Date();
   const active = activeDayKeys(history);
@@ -42,6 +58,21 @@ export function AchievementsScreen() {
     <View style={styles.container}>
       <ScreenHeader title="Achievements" transparent />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        {tier && overview && (
+          <TouchableOpacity style={styles.leagueCard} onPress={() => navigation.navigate('League')}>
+            <View style={[styles.leagueBadge, { borderColor: tier.color }]}>
+              <Ionicons name={tier.icon} size={26} color={tier.color} />
+            </View>
+            <View style={styles.leagueText}>
+              <Text style={styles.leagueName}>{tier.name} league</Text>
+              <Text style={styles.leagueSub}>
+                Top {Math.max(1, Math.round((1 - overview.percentile) * 100))}% · rank #{overview.rank}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+          </TouchableOpacity>
+        )}
+
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Ionicons name="flame" size={22} color={colors.accent} />
@@ -108,6 +139,26 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
   content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.md },
+  leagueCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.cardBg,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+  },
+  leagueBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.neutral1,
+  },
+  leagueText: { flex: 1 },
+  leagueName: { fontSize: typography.sizes.base, fontWeight: typography.weights.bold, color: colors.text },
+  leagueSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   statsRow: { flexDirection: 'row', gap: spacing.sm },
   statCard: {
     flex: 1,

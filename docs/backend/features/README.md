@@ -22,8 +22,9 @@
 | 3 | Transactions | [transactions.md](transactions.md) | 4 |
 | 3 | Progress Metrics | [progress.md](progress.md) | 4 |
 | 3 | Analytics | [analytics.md](analytics.md) | 1 |
+| 4 | Gamification | [gamification.md](gamification.md) | 8 |
 
-**Total:** 53 фічі.
+**Total:** 61 фіча.
 
 ---
 
@@ -141,5 +142,6 @@
 | TRX | Transactions |
 | PROG | Progress Metrics |
 | ANL | Analytics |
+| GAME | Gamification |
 
 User stories — `US-<CODE>-NNN`, acceptance criteria — `AC-N` (локально в фічі), edge cases — `EC-N`.

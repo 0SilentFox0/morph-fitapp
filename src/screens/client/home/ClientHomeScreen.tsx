@@ -17,9 +17,11 @@ import { useAppStore } from '../../../store/appStore';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { useTrainersStore } from '../../../store/trainersStore';
+import { useGamificationStore } from '../../../store/gamificationStore';
 import { exerciseMuscleMap } from '../../../mocks';
 import { computeMuscleStats, toIntensities, computeTotals, filterByTimeframe } from '../../../utils/muscleStats';
 import { computeWeekStreak } from '../../../utils/achievements';
+import { LEAGUE_TIERS } from '../../../utils/leagues';
 import { MUSCLE_GROUPS, MUSCLE_LABELS } from '../../../constants/muscles';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'ClientHome'>;
@@ -64,6 +66,13 @@ export function ClientHomeScreen() {
       topMuscle: top ? MUSCLE_LABELS[top] : null,
     };
   }, [history]);
+
+  const overview = useGamificationStore((s) => s.overview);
+  const loadOverview = useGamificationStore((s) => s.loadOverview);
+  React.useEffect(() => {
+    loadOverview();
+  }, [loadOverview]);
+  const leagueTier = overview ? LEAGUE_TIERS.find((t) => t.key === overview.league.key) : null;
 
   const nextSession = upcoming[0];
   const myTrainer = trainers.find((t) => t.connection !== 'none');
@@ -120,6 +129,22 @@ export function ClientHomeScreen() {
           <WeekTile value={`${streak}`} label="Streak" />
           <WeekTile value={topMuscle ?? '—'} label="Top muscle" />
         </View>
+
+        {/* League */}
+        {leagueTier && overview && (
+          <TouchableOpacity style={styles.leagueBanner} activeOpacity={0.85} onPress={() => goToTab('ProgressTab')}>
+            <View style={[styles.leagueIcon, { borderColor: leagueTier.color }]}>
+              <Ionicons name={leagueTier.icon} size={22} color={leagueTier.color} />
+            </View>
+            <View style={styles.cardMain}>
+              <Text style={styles.cardTitle}>{leagueTier.name} league</Text>
+              <Text style={styles.cardSub}>
+                Top {Math.max(1, Math.round((1 - overview.percentile) * 100))}% · {overview.points} pts
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.accent} />
+          </TouchableOpacity>
+        )}
 
         {/* My trainer */}
         <SectionTitle>Your trainer</SectionTitle>
@@ -193,6 +218,23 @@ const styles = StyleSheet.create({
   cardMain: { flex: 1, gap: 2 },
   cardTitle: { fontSize: typography.sizes.base, color: colors.text, fontWeight: typography.weights.semibold },
   cardSub: { fontSize: typography.sizes.sm, color: colors.textSecondary },
+  leagueBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.cardBg,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+  },
+  leagueIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.neutral1,
+  },
   ctaCard: {
     flexDirection: 'row',
     alignItems: 'center',

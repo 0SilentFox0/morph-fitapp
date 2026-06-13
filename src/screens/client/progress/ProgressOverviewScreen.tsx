@@ -58,6 +58,8 @@ const QUICK_LINKS: {
   icon: keyof typeof Ionicons.glyphMap;
   route: keyof ProgressStackParamList;
 }[] = [
+  { label: 'My league', icon: 'ribbon-outline', route: 'League' },
+  { label: 'Leaderboards', icon: 'podium-outline', route: 'Leaderboard' },
   { label: 'Exercise progress', icon: 'barbell-outline', route: 'ExerciseProgress' },
   { label: 'Training history', icon: 'time-outline', route: 'TrainingHistory' },
   { label: 'Personal records', icon: 'trophy-outline', route: 'PersonalRecords' },
