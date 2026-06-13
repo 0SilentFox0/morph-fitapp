@@ -2,18 +2,15 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { ProgressStackParamList } from '../types';
 import { ScreenBackground } from '../../components/layout';
-import { makeClientPlaceholder } from '../../screens/client/ClientPlaceholderScreen';
 import { ProgressOverviewScreen } from '../../screens/client/progress/ProgressOverviewScreen';
 import { MuscleDetailScreen } from '../../screens/client/progress/MuscleDetailScreen';
+import { TrainingHistoryScreen } from '../../screens/client/progress/TrainingHistoryScreen';
+import { TrainingHistoryDetailScreen } from '../../screens/client/progress/TrainingHistoryDetailScreen';
+import { PersonalRecordsScreen } from '../../screens/client/progress/PersonalRecordsScreen';
+import { MeasurementsScreen } from '../../screens/client/progress/MeasurementsScreen';
+import { AchievementsScreen } from '../../screens/client/progress/AchievementsScreen';
 
 const Stack = createNativeStackNavigator<ProgressStackParamList>();
-
-// Placeholders replaced in Phase 3 (history/PR/measurements/achievements).
-const TrainingHistoryScreen = makeClientPlaceholder('Training history', 'time', true);
-const TrainingHistoryDetailScreen = makeClientPlaceholder('Training', 'barbell', true);
-const PersonalRecordsScreen = makeClientPlaceholder('Personal records', 'trophy', true);
-const MeasurementsScreen = makeClientPlaceholder('Measurements', 'analytics', true);
-const AchievementsScreen = makeClientPlaceholder('Achievements', 'medal', true);
 
 export function ProgressStackNavigator() {
   return (

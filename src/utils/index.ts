@@ -4,3 +4,6 @@ export * from './transactions';
 export * from './activeTraining';
 export * from './time';
 export * from './progression';
+export * from './muscleStats';
+export * from './personalRecords';
+export * from './achievements';

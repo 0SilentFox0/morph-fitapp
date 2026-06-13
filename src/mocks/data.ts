@@ -748,3 +748,24 @@ export const mockAnalyticsData: AnalyticsData = {
     trainings: 248,
   },
 };
+
+// ─── Body measurements (client progress) ────────────────────────────────────
+
+export interface MeasurementEntry {
+  id: string;
+  /** ISO date the measurement was taken. */
+  date: string;
+  weightKg: number;
+  chestCm?: number;
+  waistCm?: number;
+  armCm?: number;
+}
+
+/** Seed bodyweight/measurement history for the current client, oldest → newest. */
+export const mockMeasurements: MeasurementEntry[] = [
+  { id: 'm1', date: '2026-05-16T08:00:00Z', weightKg: 82.4, chestCm: 102, waistCm: 88, armCm: 36 },
+  { id: 'm2', date: '2026-05-23T08:00:00Z', weightKg: 81.8, chestCm: 102, waistCm: 87, armCm: 36 },
+  { id: 'm3', date: '2026-05-30T08:00:00Z', weightKg: 81.1, chestCm: 103, waistCm: 86, armCm: 37 },
+  { id: 'm4', date: '2026-06-06T08:00:00Z', weightKg: 80.5, chestCm: 103, waistCm: 85, armCm: 37 },
+  { id: 'm5', date: '2026-06-12T08:00:00Z', weightKg: 79.9, chestCm: 104, waistCm: 84, armCm: 38 },
+];
