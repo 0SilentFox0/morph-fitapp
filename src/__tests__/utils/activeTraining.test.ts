@@ -74,4 +74,25 @@ describe('seedActiveClient', () => {
     client.setLog[1]![0]!.weight = 99;
     expect(programs[0]!.exercises![0]!.sets[0]!.weight).toBe(40);
   });
+
+  it('seeds prevSets from the lookup and defaults setLog to previous values', () => {
+    const lookup = (_name: string, exerciseId: number) =>
+      exerciseId === 1 ? [{ weight: 35, reps: 12 }] : null;
+    const client = seedActiveClient({ id: 'c1', name: 'Alice' }, programs[0]!, {
+      lookupPrevSets: lookup,
+    });
+    expect(client.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
+    // no planned sets -> setLog defaults to the previous training values
+    expect(client.setLog[1]).toEqual([{ weight: 35, reps: 12 }]);
+  });
+
+  it('prefers planned sets over previous and template for setLog', () => {
+    const lookup = () => [{ weight: 35, reps: 12 }];
+    const client = seedActiveClient({ id: 'c1', name: 'Alice' }, programs[0]!, {
+      plannedSets: { 1: [{ weight: 50, reps: 9 }] },
+      lookupPrevSets: lookup,
+    });
+    expect(client.setLog[1]).toEqual([{ weight: 50, reps: 9 }]);
+    expect(client.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
+  });
 });

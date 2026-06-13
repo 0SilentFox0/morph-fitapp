@@ -10,6 +10,7 @@ import type { SwitcherClient } from '../../components/ui';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { deriveActiveGroup, formatClock } from '../../utils';
+import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -34,7 +35,11 @@ export function ClientProfileScreen() {
   // Seed the active training group from today's overlapping sessions on first entry.
   React.useEffect(() => {
     if (useActiveTrainingStore.getState().clients.length === 0) {
-      const group = deriveActiveGroup(useSessionsStore.getState().sessions, mockTrainingPrograms);
+      const group = deriveActiveGroup(
+        useSessionsStore.getState().sessions,
+        mockTrainingPrograms,
+        useTrainingHistoryStore.getState().getLastSets,
+      );
       if (group.length > 0) startTraining(group, requestedClientId);
     } else if (requestedClientId) {
       setActiveClient(requestedClientId);

@@ -43,11 +43,13 @@ export function ExerciseDetailScreen() {
   const route = useRoute<Route>();
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
+  // Params are optional at runtime: the screen can also be reached with an
+  // already-active training (e.g. via the client switcher) and no params.
   const {
     clientId: routeClientId,
     programId: routeProgramId,
     exerciseIndex: routeExerciseIndex,
-  } = route.params;
+  } = route.params ?? {};
 
   // The screen follows the *active* client, so switching avatars instantly
   // shows that client's current exercise and live timer.
@@ -66,8 +68,10 @@ export function ExerciseDetailScreen() {
   // Apply the tapped selection once on entry; from then on the store is the
   // source of truth, so switching clients preserves each one's progress.
   React.useEffect(() => {
-    openExercise(routeClientId, routeProgramId, routeExerciseIndex);
-    setActiveClient(routeClientId);
+    if (routeClientId && routeProgramId && routeExerciseIndex != null) {
+      openExercise(routeClientId, routeProgramId, routeExerciseIndex);
+      setActiveClient(routeClientId);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -101,6 +105,7 @@ export function ExerciseDetailScreen() {
   const sets = client.setLog[exercise.id] ?? exercise.sets;
   const setIndex = Math.min(client.setIndex, sets.length - 1);
   const currentSet = sets[setIndex]!;
+  const prevSet = client.prevSets?.[exercise.id]?.[setIndex];
 
   const handleStartRest = () => {
     const seconds = (currentSet.note && REST_SECONDS[currentSet.note]) || 60;
@@ -145,7 +150,7 @@ export function ExerciseDetailScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.videoCircle}>
+        <View style={styles.video}>
           {exercise.imageUrl && (
             <Image source={{ uri: exercise.imageUrl }} style={styles.videoImage} />
           )}
@@ -163,6 +168,15 @@ export function ExerciseDetailScreen() {
           value={setIndex}
           onChange={(i) => setSetIndex(client.clientId, i)}
         />
+
+        {prevSet && (
+          <View style={styles.lastTimeRow}>
+            <Ionicons name="time-outline" size={14} color={colors.textMuted} />
+            <Text style={styles.lastTimeText}>
+              Last time: {prevSet.weight} kg × {prevSet.reps}
+            </Text>
+          </View>
+        )}
 
         <Text style={[styles.label, styles.labelSpaced]}>Main info</Text>
         <View style={styles.field}>
@@ -223,8 +237,6 @@ export function ExerciseDetailScreen() {
   );
 }
 
-const VIDEO = 120;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -249,26 +261,37 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.semibold,
     color: colors.accent,
   },
-  videoCircle: {
-    width: VIDEO,
-    height: VIDEO,
-    borderRadius: VIDEO / 2,
+  video: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.neutral5,
     backgroundColor: colors.neutral3,
-    alignSelf: 'center',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   videoImage: {
     ...StyleSheet.absoluteFillObject,
-    width: VIDEO,
-    height: VIDEO,
   },
   playOverlay: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  lastTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.md,
+  },
+  lastTimeText: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
   },
   progress: {
     fontSize: typography.sizes.base,

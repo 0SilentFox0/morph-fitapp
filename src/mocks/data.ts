@@ -16,6 +16,11 @@ export interface Session {
   status: SessionStatus;
   participants: { id: string; name: string; avatar?: string }[];
   programId?: string;
+  /**
+   * Planned (target) sets per exercise id, computed at creation from the
+   * client's previous training + progression %. Seeds the live defaults.
+   */
+  plannedSets?: Record<number, ExerciseSet[]>;
 }
 
 export type SetNote = 'regular' | 'failure' | 'dropset' | 'short_rest' | 'long_rest';
@@ -58,6 +63,22 @@ export interface Client {
   avatar?: string;
   lastSession?: string;
   tag: string;
+}
+
+/** A client's logged sets for one exercise in a past (completed) training. */
+export interface LoggedExercise {
+  exerciseId: number;
+  sets: ExerciseSet[];
+}
+
+/** A past training a client completed — source of "previous metrics". */
+export interface CompletedTraining {
+  id: string;
+  /** Keyed by client display name (ids differ between mocks and the form). */
+  clientName: string;
+  programId: string;
+  date: string;
+  exercises: LoggedExercise[];
 }
 
 export type TransactionStatus = 'completed' | 'pending' | 'canceled';
@@ -371,6 +392,178 @@ export const mockClients: Client[] = [
     lastSession: 'Dec 3, 15:00',
     tag: 'Group',
   },
+];
+
+/**
+ * Curated past trainings for the headline demo clients. Values are intentionally
+ * a little below the program templates so applying +5/10/15% is meaningful.
+ * Exercise ids match mockTrainingPrograms (101-103 / 201-202 / 301-302).
+ */
+const curatedTrainingHistory: CompletedTraining[] = [
+  {
+    id: 'th1',
+    clientName: 'Guy Hawkins',
+    programId: '1',
+    date: 'Dec 5',
+    exercises: [
+      {
+        exerciseId: 101,
+        sets: [
+          { weight: 38, reps: 28 },
+          { weight: 42, reps: 24 },
+          { weight: 46, reps: 20 },
+          { weight: 46, reps: 16 },
+        ],
+      },
+      {
+        exerciseId: 102,
+        sets: [
+          { weight: 18, reps: 15 },
+          { weight: 20, reps: 12 },
+        ],
+      },
+      {
+        exerciseId: 103,
+        sets: [
+          { weight: 0, reps: 35 },
+          { weight: 0, reps: 35 },
+        ],
+      },
+    ],
+  },
+  // Brooklyn Simmons — several Strength sessions (oldest → newest) so the
+  // client-profile progress chart has multiple points.
+  {
+    id: 'th2a',
+    clientName: 'Brooklyn Simmons',
+    programId: '3',
+    date: 'Nov 22',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 45, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 60, reps: 8 }, { weight: 70, reps: 6 }] },
+    ],
+  },
+  {
+    id: 'th2b',
+    clientName: 'Brooklyn Simmons',
+    programId: '3',
+    date: 'Nov 29',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+    ],
+  },
+  {
+    id: 'th2',
+    clientName: 'Brooklyn Simmons',
+    programId: '3',
+    date: 'Dec 6',
+    exercises: [
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 55, reps: 12 },
+          { weight: 65, reps: 10 },
+          { weight: 75, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 75, reps: 8 },
+          { weight: 85, reps: 6 },
+        ],
+      },
+    ],
+  },
+  // Darrell Steward — Cardio sessions.
+  {
+    id: 'th3a',
+    clientName: 'Darrell Steward',
+    programId: '2',
+    date: 'Nov 27',
+    exercises: [
+      { exerciseId: 201, sets: [{ weight: 0, reps: 15 }] },
+      { exerciseId: 202, sets: [{ weight: 0, reps: 12 }] },
+    ],
+  },
+  {
+    id: 'th3',
+    clientName: 'Darrell Steward',
+    programId: '2',
+    date: 'Dec 4',
+    exercises: [
+      {
+        exerciseId: 201,
+        sets: [{ weight: 0, reps: 18 }],
+      },
+      {
+        exerciseId: 202,
+        sets: [{ weight: 0, reps: 14 }],
+      },
+    ],
+  },
+];
+
+/**
+ * A uniform three-point Strength progression (program 3, exercises 301/302),
+ * ascending over time. Used to auto-populate history for every demo client
+ * without a curated set, so the progress chart always has data to render.
+ */
+function seedClientHistory(clientName: string): CompletedTraining[] {
+  const slug = clientName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return [
+    {
+      id: `th-${slug}-1`,
+      clientName,
+      programId: '3',
+      date: 'Nov 22',
+      exercises: [
+        { exerciseId: 301, sets: [{ weight: 45, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
+        { exerciseId: 302, sets: [{ weight: 60, reps: 8 }, { weight: 70, reps: 6 }] },
+      ],
+    },
+    {
+      id: `th-${slug}-2`,
+      clientName,
+      programId: '3',
+      date: 'Nov 29',
+      exercises: [
+        { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
+        { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+      ],
+    },
+    {
+      id: `th-${slug}-3`,
+      clientName,
+      programId: '3',
+      date: 'Dec 6',
+      exercises: [
+        { exerciseId: 301, sets: [{ weight: 55, reps: 12 }, { weight: 65, reps: 10 }, { weight: 75, reps: 8 }] },
+        { exerciseId: 302, sets: [{ weight: 75, reps: 8 }, { weight: 85, reps: 6 }] },
+      ],
+    },
+  ];
+}
+
+const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientName));
+
+/**
+ * Past trainings keyed by client display name. The headline demo clients keep
+ * their curated, program-specific values; every other client (from mockClients
+ * or any session participant) gets a uniform seeded progression so the
+ * post-training stats chart is never empty.
+ */
+export const mockTrainingHistory: CompletedTraining[] = [
+  ...curatedTrainingHistory,
+  ...Array.from(
+    new Set([
+      ...mockClients.map((c) => c.name),
+      ...mockSessions.flatMap((s) => s.participants.map((p) => p.name)),
+    ]),
+  )
+    .filter((name) => !curatedHistoryNames.has(name))
+    .flatMap(seedClientHistory),
 ];
 
 export const mockTransactions: Transaction[] = [

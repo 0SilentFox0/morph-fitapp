@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +8,8 @@ import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Card, SectionTitle } from '../../components/ui';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
+import { trainingMetric } from '../../utils';
 import { mockTrainingPrograms } from '../../mocks';
 import type { ExerciseSet, ProgramExercise } from '../../mocks';
 import { colors } from '../../theme/colors';
@@ -18,6 +21,19 @@ type Route = RouteProp<ClientsStackParamList, 'TrainingSummary'>;
 
 const TABS = ['Summary', 'Exercises'];
 const TIMEFRAME = ['Week', 'Month', 'Custom'];
+
+const CHART_WIDTH = Dimensions.get('window').width - spacing.lg * 2 - 20;
+
+const chartConfig = {
+  backgroundColor: colors.neutral1,
+  backgroundGradientFrom: colors.neutral1,
+  backgroundGradientTo: colors.neutral1,
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
+  labelColor: () => colors.neutral7,
+  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
+  style: { borderRadius: radius.sm },
+};
 
 /** Picks the heaviest logged set as the representative row for an exercise. */
 function topSet(sets: ExerciseSet[]): ExerciseSet | undefined {
@@ -45,9 +61,19 @@ export function TrainingSummaryScreen() {
   const client = useActiveTrainingStore(
     (s) => s.clients.find((c) => c.clientId === clientId) ?? s.clients[0] ?? null,
   );
+  const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
   const program =
     mockTrainingPrograms.find((p) => p.id === client?.programId) ?? mockTrainingPrograms[0]!;
   const exercises = program.exercises ?? [];
+
+  const history = client ? getClientHistory(client.name) : [];
+  const chartData =
+    history.length > 0
+      ? {
+          labels: history.map((h) => h.date),
+          datasets: [{ data: history.map(trainingMetric) }],
+        }
+      : null;
 
   const rows = exercises.map((ex) => {
     const sets = client?.setLog[ex.id] ?? ex.sets;
@@ -108,8 +134,20 @@ export function TrainingSummaryScreen() {
           ))}
         </View>
 
-        {/* TODO chart: render real progress chart when analytics are available. */}
-        <View style={styles.chartPlaceholder} />
+        {chartData ? (
+          <View style={styles.chartCard}>
+            <LineChart
+              data={chartData}
+              width={CHART_WIDTH}
+              height={180}
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+            />
+          </View>
+        ) : (
+          <View style={styles.chartPlaceholder} />
+        )}
 
         <SectionTitle>Exercises</SectionTitle>
         <View style={styles.table}>
@@ -210,6 +248,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     borderRadius: radius.md,
     marginBottom: spacing.lg,
+  },
+  chartCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  chart: {
+    borderRadius: radius.sm,
   },
   table: {
     backgroundColor: colors.neutral2,

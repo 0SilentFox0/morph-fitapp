@@ -8,6 +8,7 @@ function makeClient(over: Partial<ActiveClient> = {}): ActiveClient {
     exerciseIndex: 0,
     setIndex: 0,
     setLog: { 1: [{ weight: 40, reps: 10 }, { weight: 45, reps: 8 }] },
+    prevSets: {},
     rest: { running: false, remainingSec: 0, durationSec: 0 },
     ...over,
   };

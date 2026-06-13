@@ -1,12 +1,27 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRoute, type RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
-import { Avatar, SectionTitle } from '../../components/ui';
+import { Avatar, SectionTitle, Button, Tag } from '../../components/ui';
+import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
+import { useSessionsStore } from '../../store/sessionsStore';
+import { useProgramsStore } from '../../store/programsStore';
+import { seedActiveClient, trainingMetric } from '../../utils';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -14,18 +29,65 @@ import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
 type Route = RouteProp<ClientsStackParamList, 'ClientsProfileExtended'>;
+type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 
-const HISTORY = [
-  { id: 'h1', name: 'Name', type: 'HIIT', clients: 24, views: 340, duration: '50m', image: mockTrainingPrograms[0]?.thumbnail },
-  { id: 'h2', name: 'Name', type: 'Cardio', clients: 24, views: 340, duration: '50m', image: mockTrainingPrograms[3]?.thumbnail },
-];
+const CHART_WIDTH = Dimensions.get('window').width - spacing.lg * 2 - 20;
+
+const chartConfig = {
+  backgroundColor: colors.neutral1,
+  backgroundGradientFrom: colors.neutral1,
+  backgroundGradientTo: colors.neutral1,
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
+  labelColor: () => colors.neutral7,
+  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
+  style: { borderRadius: radius.sm },
+};
 
 export function ClientsProfileExtendedScreen() {
   const route = useRoute<Route>();
+  const navigation = useNavigation<Nav>();
   const clientId = route.params?.clientId;
+
   const fromTraining = useActiveTrainingStore((s) => s.clients.find((c) => c.clientId === clientId));
+  const startTraining = useActiveTrainingStore((s) => s.startTraining);
+  const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+  const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
+  const sessions = useSessionsStore((s) => s.sessions);
+  const programs = useProgramsStore((s) => s.programs);
+
   const name =
     fromTraining?.name ?? mockClients.find((c) => c.id === clientId)?.name ?? 'Brooklyn Simmons';
+
+  const [pickerVisible, setPickerVisible] = React.useState(false);
+
+  const history = getClientHistory(name);
+  const nextSession = sessions.find(
+    (s) => s.status === 'pending' && s.participants.some((p) => p.name === name),
+  );
+
+  const handleStart = (programId: string) => {
+    setPickerVisible(false);
+    const program =
+      programs.find((p) => p.id === programId) ??
+      mockTrainingPrograms.find((p) => p.id === programId);
+    if (!program) return;
+    const client = seedActiveClient(
+      { id: clientId ?? name, name, avatar: fromTraining?.avatar },
+      program,
+      { lookupPrevSets: getLastSets },
+    );
+    startTraining([client], client.clientId);
+    navigation.navigate('ClientProfile', { clientId: client.clientId });
+  };
+
+  const chartData =
+    history.length > 0
+      ? {
+          labels: history.map((h) => h.date),
+          datasets: [{ data: history.map(trainingMetric) }],
+        }
+      : null;
 
   return (
     <View style={styles.container}>
@@ -54,39 +116,39 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </View>
 
-        <LinearGradient
-          colors={[colors.neutral2, colors.neutral2, 'rgba(140,30,3,0.35)']}
-          locations={[0, 0.55, 1]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.nextCard}
-        >
-          <View style={styles.nextHeader}>
-            <Text style={styles.nextLabel}>Next training</Text>
-            <Text style={styles.seeAll}>See all</Text>
-          </View>
-          <Text style={styles.nextTitle}>Personal Session</Text>
-          <View style={styles.hiitTag}>
-            <Text style={styles.hiitTagText}>HIIT</Text>
-          </View>
-          <View style={styles.nextFooter}>
-            <View style={styles.dateChip}>
-              <Ionicons name="calendar-outline" size={14} color={colors.neutral1} />
-              <Text style={styles.dateChipText}>Today: 13:00am</Text>
-            </View>
+        <Button title="Start training" onPress={() => setPickerVisible(true)} style={styles.startBtn} />
+
+        <View style={styles.sectionHeader}>
+          <SectionTitle style={styles.sectionTitleInline}>Next training</SectionTitle>
+        </View>
+        {nextSession ? (
+          <LinearGradient
+            colors={[colors.neutral2, colors.neutral2, 'rgba(140,30,3,0.35)']}
+            locations={[0, 0.55, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.nextCard}
+          >
+            <Text style={styles.nextTitle}>{nextSession.title}</Text>
+            <Tag label={nextSession.type} variant="default" style={styles.nextTag} />
             <View style={styles.completedRow}>
-              <Ionicons name="logo-usd" size={14} color={colors.Success} />
-              <Text style={styles.completedText}>Completed</Text>
+              <View style={styles.dateChip}>
+                <Ionicons name="calendar-outline" size={14} color={colors.neutral1} />
+                <Text style={styles.dateChipText}>
+                  {nextSession.date}: {nextSession.time}
+                </Text>
+              </View>
             </View>
-          </View>
-        </LinearGradient>
+          </LinearGradient>
+        ) : (
+          <Text style={styles.emptyNote}>No upcoming sessions.</Text>
+        )}
 
         <View style={styles.infoRowFull}>
           <IconSquare icon="flag" />
           <Text style={styles.infoLabel}>Target:</Text>
           <Text style={styles.infoValue}>Fat loss, Endurance</Text>
         </View>
-
         <View style={styles.infoColumns}>
           <View style={styles.infoCol}>
             <IconSquare icon="rocket" />
@@ -104,29 +166,60 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </View>
 
-        <SectionTitle>Training History</SectionTitle>
-        {HISTORY.map((h) => (
-          <View key={h.id} style={styles.historyCard}>
-            {h.image ? (
-              <Image source={{ uri: h.image }} style={styles.historyThumb} />
-            ) : (
-              <View style={styles.historyThumb} />
-            )}
-            <View style={styles.historyInfo}>
-              <View style={styles.historyTitleRow}>
-                <Text style={styles.historyName}>{h.name}</Text>
-                <Ionicons name="ellipsis-horizontal" size={18} color={colors.textMuted} />
-              </View>
-              <Text style={styles.historyType}>{h.type}</Text>
-              <View style={styles.statRow}>
-                <Stat icon="person-outline" value={h.clients} />
-                <Stat icon="eye-outline" value={h.views} />
-                <Stat icon="time-outline" value={h.duration} />
-              </View>
+        {chartData && (
+          <>
+            <SectionTitle>Progress</SectionTitle>
+            <View style={styles.chartCard}>
+              <LineChart
+                data={chartData}
+                width={CHART_WIDTH}
+                height={180}
+                chartConfig={chartConfig}
+                bezier
+                style={styles.chart}
+              />
             </View>
-          </View>
-        ))}
+          </>
+        )}
+
+        <SectionTitle>Training History</SectionTitle>
+        {history.length === 0 ? (
+          <Text style={styles.emptyNote}>No completed trainings yet.</Text>
+        ) : (
+          [...history].reverse().map((h) => {
+            const program = mockTrainingPrograms.find((p) => p.id === h.programId);
+            const exerciseCount = h.exercises.length;
+            return (
+              <View key={h.id} style={styles.historyCard}>
+                {program?.thumbnail ? (
+                  <Image source={{ uri: program.thumbnail }} style={styles.historyThumb} />
+                ) : (
+                  <View style={styles.historyThumb} />
+                )}
+                <View style={styles.historyInfo}>
+                  <View style={styles.historyTitleRow}>
+                    <Text style={styles.historyName}>{program?.name ?? 'Training'}</Text>
+                    <Text style={styles.historyDate}>{h.date}</Text>
+                  </View>
+                  <Text style={styles.historyType}>{program?.tag ?? '—'}</Text>
+                  <View style={styles.statRow}>
+                    <Stat icon="barbell-outline" value={`${exerciseCount} ex`} />
+                    <Stat icon="trending-up-outline" value={trainingMetric(h)} />
+                  </View>
+                </View>
+              </View>
+            );
+          })
+        )}
       </ScrollView>
+
+      <ProgramPickerModal
+        visible={pickerVisible}
+        onClose={() => setPickerVisible(false)}
+        programs={programs}
+        value={undefined}
+        onChange={handleStart}
+      />
     </View>
   );
 }
@@ -183,48 +276,35 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginRight: spacing.xs,
   },
-  nextCard: {
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    overflow: 'hidden',
+  startBtn: {
+    marginBottom: spacing.lg,
   },
-  nextHeader: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  nextLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral9,
+  sectionTitleInline: {
+    marginBottom: spacing.md,
   },
-  seeAll: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+  nextCard: {
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    overflow: 'hidden',
   },
   nextTitle: {
-    fontSize: typography.sizes.xl,
+    fontSize: typography.sizes.lg,
     fontWeight: typography.weights.semibold,
     color: colors.text,
+  },
+  nextTag: {
     marginTop: spacing.sm,
   },
-  hiitTag: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.neutral3,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  hiitTagText: {
-    fontSize: typography.sizes.xs,
-    color: colors.textSecondary,
-  },
-  nextFooter: {
+  completedRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
   },
   dateChip: {
     flexDirection: 'row',
@@ -239,14 +319,10 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.neutral1,
   },
-  completedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  completedText: {
+  emptyNote: {
     fontSize: typography.sizes.sm,
-    color: colors.text,
+    color: colors.textMuted,
+    marginBottom: spacing.lg,
   },
   infoRowFull: {
     flexDirection: 'row',
@@ -288,6 +364,16 @@ const styles = StyleSheet.create({
     color: colors.text,
     flexShrink: 1,
   },
+  chartCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  chart: {
+    borderRadius: radius.sm,
+  },
   historyCard: {
     flexDirection: 'row',
     backgroundColor: colors.neutral2,
@@ -315,6 +401,10 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.base,
     color: colors.text,
   },
+  historyDate: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
+  },
   historyType: {
     fontSize: typography.sizes.sm,
     color: colors.textMuted,
@@ -322,20 +412,16 @@ const styles = StyleSheet.create({
   },
   statRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.md,
+    gap: spacing.md,
+    marginTop: spacing.sm,
   },
   stat: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.neutral3,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
   },
   statText: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral9,
+    color: colors.textSecondary,
   },
 });

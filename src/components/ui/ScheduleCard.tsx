@@ -12,6 +12,8 @@ interface ScheduleCardProps {
   session: Session;
   onPress?: (session: Session) => void;
   onOptionsPress?: (session: Session) => void;
+  /** When provided, a "Start training" button is shown for pending sessions. */
+  onStart?: (session: Session) => void;
 }
 
 const statusBarColor: Record<SessionStatus, string> = {
@@ -26,13 +28,14 @@ const statusBadgeColor: Record<SessionStatus, StatusBadgeColor> = {
   canceled: 'error',
 };
 
-function ScheduleCardImpl({ session, onPress, onOptionsPress }: ScheduleCardProps) {
+function ScheduleCardImpl({ session, onPress, onOptionsPress, onStart }: ScheduleCardProps) {
   const barColor = statusBarColor[session.status];
   const statusLabel = session.status.charAt(0).toUpperCase() + session.status.slice(1);
   const isGroup = session.participants.length !== 1;
   const nameLabel = isGroup ? 'Group' : session.participants[0]?.name ?? 'Group';
   const handlePress = onPress ? () => onPress(session) : undefined;
   const handleOptionsPress = onOptionsPress ? () => onOptionsPress(session) : undefined;
+  const canStart = !!onStart && session.status === 'pending';
 
   return (
     <TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.8}>
@@ -70,6 +73,16 @@ function ScheduleCardImpl({ session, onPress, onOptionsPress }: ScheduleCardProp
             />
           </View>
         </View>
+        {canStart && (
+          <TouchableOpacity
+            onPress={() => onStart!(session)}
+            style={styles.startBtn}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="play" size={14} color={colors.white} />
+            <Text style={styles.startText}>Start training</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -163,6 +176,21 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xs,
     color: colors.text,
     lineHeight: 20,
+  },
+  startBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.accent,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  startText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold,
+    color: colors.white,
   },
 });
 

@@ -206,13 +206,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButton: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
     borderRadius: 96,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 0,
   },
   chatIconWrap: {
     position: 'relative',

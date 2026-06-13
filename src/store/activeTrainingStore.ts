@@ -20,6 +20,8 @@ export interface ActiveClient {
   setIndex: number;
   /** Editable set values logged during the session, keyed by exercise id. */
   setLog: Record<number, ExerciseSet[]>;
+  /** Read-only reference: the same exercises' sets from the client's previous training. */
+  prevSets: Record<number, ExerciseSet[]>;
   rest: RestState;
 }
 
