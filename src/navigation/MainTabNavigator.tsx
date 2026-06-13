@@ -3,11 +3,11 @@ import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute, type RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from './types';
 import { colors } from '../theme/colors';
 import { radius } from '../theme';
-import { spacing } from '../theme/spacing';
 import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon } from '../components/icons/TabBarIcons';
 
 import { HomeStackNavigator } from './HomeStackNavigator';
@@ -47,30 +47,40 @@ function AddButton({ onPress }: { onPress: () => void }) {
 
 const TAB_BAR_BASE_HEIGHT = 60;
 
-function ChatTabIconWithBadge({ color }: { color: string }) {
+function ChatTabIconWithBadge({ color, focused }: { color: string; focused: boolean }) {
   const unreadCount = useChatStore((s) => s.getUnreadCount());
 
   return (
     <View style={styles.chatIconWrap}>
-      <ChatTabIcon color={color} />
+      <ChatTabIcon color={color} focused={focused} />
       {unreadCount > 0 && <View style={styles.chatBadge} />}
     </View>
   );
 }
 
+// Pushed detail screens that should not sit under the floating tab bar — the
+// thread's message bar would otherwise be hidden behind it.
+const CHAT_FULLSCREEN_ROUTES = ['ChatThread', 'NewChat'];
+
+// The live training screen uses the very bottom for its rest-timer controls,
+// and the training summary has its own bottom tabs — neither should sit under
+// the floating tab bar.
+const CLIENTS_FULLSCREEN_ROUTES = ['ExerciseDetail', 'TrainingSummary'];
+
 export function MainTabNavigator() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
+  const baseTabBarStyle = [
+    styles.tabBar,
+    { height: tabBarHeight, paddingBottom: insets.bottom },
+  ];
 
   return (
     <Tab.Navigator
       safeAreaInsets={{ bottom: 0 }}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: [
-          styles.tabBar,
-          { height: tabBarHeight, paddingBottom: insets.bottom },
-        ],
+        tabBarStyle: baseTabBarStyle,
         tabBarBackground: () => <TabBarBackground />,
         tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.neutral8,
@@ -93,11 +103,17 @@ export function MainTabNavigator() {
       <Tab.Screen
         name="ClientsTab"
         component={ClientsStackNavigator}
-        options={{
-          tabBarLabel: 'Clients',
-          tabBarIcon: ({ color }) => (
-            <ProfileTabIcon color={color} />
-          ),
+        options={({ route }) => {
+          const focused = getFocusedRouteNameFromRoute(route as RouteProp<MainTabParamList>) ?? '';
+          return {
+            tabBarLabel: 'Clients',
+            tabBarIcon: ({ focused: tabFocused, color }) => (
+              <ProfileTabIcon color={color} focused={tabFocused} />
+            ),
+            tabBarStyle: CLIENTS_FULLSCREEN_ROUTES.includes(focused)
+              ? [...baseTabBarStyle, styles.tabBarHidden]
+              : baseTabBarStyle,
+          };
         }}
       />
       <Tab.Screen
@@ -127,9 +143,17 @@ export function MainTabNavigator() {
       <Tab.Screen
         name="ChatTab"
         component={ChatStackNavigator}
-        options={{
-          tabBarLabel: 'Chat',
-          tabBarIcon: ({ color }) => <ChatTabIconWithBadge color={color} />,
+        options={({ route }) => {
+          const focused = getFocusedRouteNameFromRoute(route as RouteProp<MainTabParamList>) ?? '';
+          return {
+            tabBarLabel: 'Chat',
+            tabBarIcon: ({ focused: tabFocused, color }) => (
+              <ChatTabIconWithBadge color={color} focused={tabFocused} />
+            ),
+            tabBarStyle: CHAT_FULLSCREEN_ROUTES.includes(focused)
+              ? [...baseTabBarStyle, styles.tabBarHidden]
+              : baseTabBarStyle,
+          };
         }}
       />
       <Tab.Screen
@@ -137,8 +161,8 @@ export function MainTabNavigator() {
         component={StatsStackNavigator}
         options={{
           tabBarLabel: 'Stats',
-          tabBarIcon: ({ color }) => (
-            <StatsTabIcon color={color} />
+          tabBarIcon: ({ focused, color }) => (
+            <StatsTabIcon color={color} focused={focused} />
           ),
         }}
       />
@@ -156,6 +180,9 @@ const styles = StyleSheet.create({
     elevation: 0,
     shadowOpacity: 0,
     paddingTop: 8,
+  },
+  tabBarHidden: {
+    display: 'none',
   },
   tabBarBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -179,13 +206,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButton: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
     borderRadius: 96,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 0,
   },
   chatIconWrap: {
     position: 'relative',

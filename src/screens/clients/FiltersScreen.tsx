@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: {
     padding: spacing.lg,
-    paddingBottom: spacing['2xl'],
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
   },
   sectionTitleSpacing: {
     marginTop: spacing.sm,

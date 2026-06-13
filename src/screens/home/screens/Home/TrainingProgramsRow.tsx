@@ -25,7 +25,7 @@ export function TrainingProgramsRow({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <SectionTitle style={styles.sectionTitleSpacing}>Training Library</SectionTitle>
+        <SectionTitle style={styles.sectionTitleSpacing}>Training Templates</SectionTitle>
         <TouchableOpacity onPress={onSeeAll}>
           <Text style={styles.seeAll}>See all</Text>
         </TouchableOpacity>
@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
   },
   sectionTitleSpacing: {
@@ -98,7 +97,6 @@ const styles = StyleSheet.create({
     color: colors.accent,
   },
   scroll: {
-    paddingHorizontal: spacing.lg,
     gap: spacing.md,
   },
   card: {
@@ -149,7 +147,6 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   empty: {
-    marginHorizontal: spacing.lg,
     paddingVertical: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',

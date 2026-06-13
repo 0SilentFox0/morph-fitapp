@@ -1,12 +1,16 @@
 import React from 'react';
 import { View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, G } from 'react-native-svg';
 import { colors } from '../../theme/colors';
 
 const SIZE = 32;
 
+// When a tab is active the design renders its icon as a solid accent silhouette
+// rather than the inactive grey outline. All active icons share one accent fill.
+const ACTIVE_FILL = colors.primary9;
+
 export function HomeTabIcon({ color, focused }: { color: string; focused: boolean }) {
-  const fillColor = focused ? colors.white : color;
+  const fillColor = focused ? ACTIVE_FILL : color;
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
@@ -22,13 +26,16 @@ export function HomeTabIcon({ color, focused }: { color: string; focused: boolea
   );
 }
 
-export function ProfileTabIcon({ color }: { color: string }) {
+export function ProfileTabIcon({ color, focused }: { color: string; focused: boolean }) {
+  const fillColor = focused ? ACTIVE_FILL : 'none';
+  const strokeColor = focused ? ACTIVE_FILL : color;
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
         <Path
           d="M23.3334 26.6663C24.438 26.6663 25.3613 25.7632 25.1876 24.6724C24.5499 20.6683 21.7765 18.6663 16.0001 18.6663C10.2237 18.6663 7.45029 20.6683 6.81259 24.6724C6.63886 25.7632 7.56218 26.6663 8.66675 26.6663H23.3334Z"
-          stroke={color}
+          fill={fillColor}
+          stroke={strokeColor}
           strokeWidth={0.75}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -37,7 +44,8 @@ export function ProfileTabIcon({ color }: { color: string }) {
           fillRule="evenodd"
           clipRule="evenodd"
           d="M16.0001 14.6663C18.6667 14.6663 20.0001 13.333 20.0001 9.99967C20.0001 6.66634 18.6667 5.33301 16.0001 5.33301C13.3334 5.33301 12.0001 6.66634 12.0001 9.99967C12.0001 13.333 13.3334 14.6663 16.0001 14.6663Z"
-          stroke={color}
+          fill={fillColor}
+          stroke={strokeColor}
           strokeWidth={0.75}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -47,13 +55,16 @@ export function ProfileTabIcon({ color }: { color: string }) {
   );
 }
 
-export function ChatTabIcon({ color }: { color: string }) {
+export function ChatTabIcon({ color, focused }: { color: string; focused?: boolean }) {
+  const fillColor = focused ? ACTIVE_FILL : 'none';
+  const strokeColor = focused ? ACTIVE_FILL : color;
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
         <Path
           d="M16.3861 23.9976C24.1287 23.9121 28 21.2249 28 14.6663C28 7.99967 24 5.33301 16 5.33301C8 5.33301 4 7.99967 4 14.6663C4 18.7691 5.51497 21.357 8.5449 22.7406L6.66667 27.9997L16.3861 23.9976Z"
-          stroke={color}
+          fill={fillColor}
+          stroke={strokeColor}
           strokeWidth={0.75}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -63,7 +74,28 @@ export function ChatTabIcon({ color }: { color: string }) {
   );
 }
 
-export function StatsTabIcon({ color }: { color: string }) {
+export function StatsTabIcon({ color, focused }: { color: string; focused: boolean }) {
+  if (focused) {
+    // Active state uses the design's solid bar-chart silhouette. Its source
+    // viewBox (20.75 x 19.4167) is mapped onto the inactive glyph's bounding box
+    // within the 32x32 canvas so the icon stays put when toggling states.
+    return (
+      <View style={{ width: SIZE, height: SIZE }}>
+        <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
+          <G transform="translate(5.3344 6.6656) scale(0.96386 0.96149)">
+            <Path
+              d="M9.04167 0.375H11.7083C12.8129 0.375 13.7083 1.27043 13.7083 2.375V7.04167H18.375C19.4796 7.04167 20.375 7.9371 20.375 9.04167V17.0417C20.375 18.1462 19.4796 19.0417 18.375 19.0417H13.7083H7.04167H2.375C1.27043 19.0417 0.375 18.1462 0.375 17.0417V13.0417C0.375 11.9371 1.27043 11.0417 2.375 11.0417H7.04167V2.375C7.04167 1.27043 7.9371 0.375 9.04167 0.375Z"
+              fill={ACTIVE_FILL}
+              stroke={ACTIVE_FILL}
+              strokeWidth={0.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </G>
+        </Svg>
+      </View>
+    );
+  }
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">

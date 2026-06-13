@@ -1,32 +1,28 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { StatsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { Card, SectionTitle } from '../../components/ui';
+import { ScreenHeader } from '../../components/layout';
+import { SearchInput } from '../../components/ui';
 import { AnalyticsChartCard } from './Analytics/AnalyticsChartCard';
 import { TransactionCard } from './Analytics/TransactionCard';
 import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { exportTransactions } from '../../utils';
 import { mockTransactions, mockAnalyticsData } from '../../mocks';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'BusinessAnalytics'>;
 
+const ICON_HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+
 export function BusinessAnalyticsScreen() {
   const navigation = useNavigation<Nav>();
+  const [search, setSearch] = React.useState('');
 
-  const chartWidth = React.useMemo(() => Dimensions.get('window').width - spacing.lg * 2 - 32, []);
+  const chartWidth = React.useMemo(() => Dimensions.get('window').width - spacing.lg * 2 - 20, []);
   const incomeData = React.useMemo(() => mockAnalyticsData.incomeOverTime, []);
   const sourceData = React.useMemo(
     () => ({
@@ -43,11 +39,17 @@ export function BusinessAnalyticsScreen() {
     []
   );
 
+  const preview = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const list = q
+      ? mockTransactions.filter((t) => t.clientName.toLowerCase().includes(q))
+      : mockTransactions;
+    return list.slice(0, 5);
+  }, [search]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Business Analytics</Text>
-      </View>
+      <ScreenHeader title="Business Analytics" transparent />
 
       <ScrollView
         style={styles.scroll}
@@ -55,18 +57,18 @@ export function BusinessAnalyticsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.earningsRow}>
-          <Card style={styles.earningsCard}>
-            <Text style={styles.earningsLabel}>Total Earnings/Month</Text>
+          <View style={styles.earningsCard}>
+            <Text style={styles.earningsLabel}>Total Month</Text>
             <Text style={styles.earningsValue}>${mockAnalyticsData.totalEarningsPerMonth}</Text>
-          </Card>
-          <Card style={styles.earningsCard}>
-            <Text style={styles.earningsLabel}>From Subscriptions</Text>
+          </View>
+          <View style={styles.earningsCard}>
+            <Text style={styles.earningsLabel}>Subscriptions</Text>
             <Text style={styles.earningsValue}>${mockAnalyticsData.fromSubscriptions}</Text>
-          </Card>
-          <Card style={styles.earningsCard}>
-            <Text style={styles.earningsLabel}>From Trainings</Text>
+          </View>
+          <View style={styles.earningsCard}>
+            <Text style={styles.earningsLabel}>Trainings</Text>
             <Text style={styles.earningsValue}>${mockAnalyticsData.fromTrainings}</Text>
-          </Card>
+          </View>
         </View>
 
         <AnalyticsChartCard
@@ -75,31 +77,46 @@ export function BusinessAnalyticsScreen() {
           chartWidth={chartWidth}
         />
 
-        <View style={styles.transactionsHeader}>
-          <SectionTitle style={styles.sectionTitleSpacing}>Transactions</SectionTitle>
-          <TouchableOpacity onPress={() => navigation.navigate('Transactions')}>
-            <Text style={styles.seeAll}>See all</Text>
-          </TouchableOpacity>
+        <View style={styles.transactionsCard}>
+          <View style={styles.transactionsTop}>
+            <View style={styles.transactionsHeader}>
+              <Text style={styles.transactionsTitle}>Transactions</Text>
+              <View style={styles.transactionsActions}>
+                <TouchableOpacity
+                  hitSlop={ICON_HIT_SLOP}
+                  onPress={() => navigation.navigate('Transactions')}
+                >
+                  <Ionicons name="filter" size={18} color={colors.text} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={ICON_HIT_SLOP}
+                  onPress={() => navigation.navigate('AddTransaction')}
+                >
+                  <Ionicons name="pencil" size={18} color={colors.text} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={ICON_HIT_SLOP}
+                  onPress={() => exportTransactions(mockTransactions)}
+                >
+                  <Ionicons name="download" size={18} color={colors.text} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={ICON_HIT_SLOP}
+                  onPress={() => navigation.navigate('Transactions')}
+                >
+                  <Text style={styles.seeAll}>See all</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <SearchInput value={search} onChangeText={setSearch} />
+          </View>
+
+          <View style={styles.transactionsList}>
+            {preview.map((t) => (
+              <TransactionCard key={t.id} transaction={t} />
+            ))}
+          </View>
         </View>
-        <View style={styles.transactionsActions}>
-          <TouchableOpacity>
-            <Ionicons name="download" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name="pencil" size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.searchWrapper}>
-          <TextInput
-            style={styles.search}
-            placeholder="Search"
-            placeholderTextColor={colors.textMuted}
-          />
-          <Ionicons name="search" size={20} color={colors.textMuted} style={styles.searchIcon} />
-        </View>
-        {mockTransactions.slice(0, 5).map((t) => (
-          <TransactionCard key={t.id} transaction={t} />
-        ))}
       </ScrollView>
     </View>
   );
@@ -110,73 +127,67 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: 60,
-    paddingBottom: spacing.md,
-  },
-  title: {
-    fontSize: typography.sizes['2xl'],
-    fontWeight: typography.weights.bold,
-    color: colors.text,
-  },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.md,
   },
   earningsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginBottom: spacing.lg,
   },
   earningsCard: {
     flex: 1,
+    minHeight: 85,
+    justifyContent: 'center',
+    gap: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: 14,
+    backgroundColor: colors.neutral2,
   },
   earningsLabel: {
     fontSize: typography.sizes.xs,
-    color: colors.textSecondary,
+    lineHeight: 20,
+    color: colors.primary9,
   },
   earningsValue: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold,
+    fontSize: typography.sizes.base,
+    lineHeight: 24,
+    fontWeight: typography.weights.heavy,
     color: colors.text,
-    marginTop: spacing.xs,
+  },
+  transactionsCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 18,
+    gap: spacing.md,
+  },
+  transactionsTop: {
+    gap: spacing.sm,
   },
   transactionsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
   },
-  sectionTitleSpacing: {
-    marginBottom: 0,
-  },
-  seeAll: {
-    fontSize: typography.sizes.sm,
-    color: colors.accent,
+  transactionsTitle: {
+    fontSize: typography.sizes.base,
+    lineHeight: 24,
+    color: colors.neutral9,
   },
   transactionsActions: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.md,
+    alignItems: 'center',
+    gap: spacing.sm,
   },
-  searchWrapper: {
-    position: 'relative',
-    marginBottom: spacing.md,
+  seeAll: {
+    fontSize: typography.sizes.xs,
+    lineHeight: 16,
+    color: colors.textSecondary,
   },
-  search: {
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingRight: 40,
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  searchIcon: {
-    position: 'absolute',
-    right: spacing.md,
-    top: 16,
+  transactionsList: {
+    gap: spacing.sm,
   },
 });

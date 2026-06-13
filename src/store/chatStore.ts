@@ -1,23 +1,65 @@
 import { create } from 'zustand';
 
+/** Avatar tint pairs (background + foreground) for initials placeholders, per Figma. */
+export type AvatarTint = 'primary' | 'blue' | 'success';
+
 export interface ChatParticipant {
   id: string;
   name: string;
+  /** Photo URL; when absent, initials on a tinted background are shown. */
   avatar?: string | null;
+  /** Tint used for the initials placeholder when there is no photo. */
+  tint?: AvatarTint;
 }
 
-export interface ChatMessage {
-  id: string;
-  text: string;
-  sentAt: string;
-  isFromMe: boolean;
-  status: 'sent' | 'delivered' | 'read';
-}
+/** Delivery state shown as a single / double check on the list row. */
+export type MessageStatus = 'sent' | 'delivered' | 'read';
+
+/**
+ * A chat message. Beyond plain text, the design embeds rich cards in the
+ * thread: a session invite card ("Single Training") and a "Session started"
+ * timer card. These are modelled as message variants so they live inline in
+ * the message stream just like the Figma design.
+ */
+export type ChatMessage =
+  | {
+      kind: 'text';
+      id: string;
+      text: string;
+      sentAt: string;
+      isFromMe: boolean;
+      status: MessageStatus;
+    }
+  | {
+      kind: 'session';
+      id: string;
+      sentAt: string;
+      isFromMe: boolean;
+      status: MessageStatus;
+      session: {
+        title: string;
+        date: string;
+        time: string;
+        participants: number;
+      };
+    }
+  | {
+      kind: 'sessionStarted';
+      id: string;
+      sentAt: string;
+      isFromMe: boolean;
+      status: MessageStatus;
+    };
 
 export interface Conversation {
   id: string;
   participant: ChatParticipant;
-  lastMessage: ChatMessage | null;
+  lastMessagePreview: string | null;
+  lastMessageAt: string | null;
+  /** Status of the last outgoing message; drives the check-mark on the row. */
+  lastMessageStatus: MessageStatus | null;
+  /** Whether the last message was sent by me (controls the check-mark display). */
+  lastMessageFromMe: boolean;
   unreadCount: number;
 }
 
@@ -32,51 +74,69 @@ interface ChatState {
   getUnreadCount: () => number;
 }
 
-let nextConvId = 1;
+let nextConvId = 100;
 let nextMsgId = 1;
 
-const mockParticipant1: ChatParticipant = { id: '1', name: 'Brooklyn Simmons' };
-const mockParticipant2: ChatParticipant = { id: '2', name: 'Darrell Steward' };
-const mockParticipant3: ChatParticipant = { id: '3', name: 'Theresa Webb' };
-
-const mockMessages1: ChatMessage[] = [
-  { id: 'm1', text: 'Hi! When is our next session?', sentAt: '2025-03-01T10:00:00Z', isFromMe: false, status: 'read' },
-  { id: 'm2', text: 'How about tomorrow at 10am?', sentAt: '2025-03-01T10:05:00Z', isFromMe: true, status: 'read' },
-  { id: 'm3', text: 'Perfect, see you then!', sentAt: '2025-03-01T10:06:00Z', isFromMe: false, status: 'read' },
+// --- Mock conversations (Chat list) -------------------------------------------------
+// Names, avatar tints and read-receipt states mirror Figma node 2006:10239.
+const listParticipants: {
+  participant: ChatParticipant;
+  unread: number;
+  fromMe: boolean;
+  status: MessageStatus;
+}[] = [
+  { participant: { id: '1', name: 'Jacob Jones', avatar: 'https://i.pravatar.cc/150?img=12' }, unread: 2, fromMe: false, status: 'delivered' },
+  { participant: { id: '2', name: 'Dianne Russell', avatar: 'https://i.pravatar.cc/150?img=5' }, unread: 3, fromMe: false, status: 'delivered' },
+  { participant: { id: '3', name: 'Brooklyn Simmons', tint: 'primary' }, unread: 0, fromMe: true, status: 'read' },
+  { participant: { id: '4', name: 'Jerome Bell', avatar: 'https://i.pravatar.cc/150?img=33' }, unread: 0, fromMe: true, status: 'sent' },
+  { participant: { id: '5', name: 'Cameron Williamson', tint: 'blue' }, unread: 0, fromMe: true, status: 'read' },
+  { participant: { id: '6', name: 'Ronald Richards', avatar: 'https://i.pravatar.cc/150?img=52' }, unread: 0, fromMe: true, status: 'read' },
+  { participant: { id: '7', name: 'Brooklyn Simmons', avatar: 'https://i.pravatar.cc/150?img=47' }, unread: 0, fromMe: true, status: 'read' },
+  { participant: { id: '8', name: 'Eleanor Pena', tint: 'success' }, unread: 0, fromMe: true, status: 'sent' },
+  { participant: { id: '9', name: 'Savannah Nguyen', avatar: 'https://i.pravatar.cc/150?img=15' }, unread: 0, fromMe: true, status: 'read' },
 ];
 
-const mockMessages2: ChatMessage[] = [
-  { id: 'm4', text: 'Can we reschedule the cardio class?', sentAt: '2025-03-01T14:30:00Z', isFromMe: false, status: 'read' },
-  { id: 'm5', text: 'Sure, what time works for you?', sentAt: '2025-03-01T14:35:00Z', isFromMe: true, status: 'read' },
-  { id: 'm6', text: 'Is 3pm ok?', sentAt: '2025-03-01T14:40:00Z', isFromMe: false, status: 'delivered' },
-];
+const initialConversations: Conversation[] = listParticipants.map((row, i) => ({
+  id: `c${i + 1}`,
+  participant: row.participant,
+  lastMessagePreview: 'Thanks for the workout plan!',
+  lastMessageAt: '2025-03-01T10:30:00Z',
+  lastMessageStatus: row.status,
+  lastMessageFromMe: row.fromMe,
+  unreadCount: row.unread,
+}));
 
-const initialConversations: Conversation[] = [
+// --- Mock thread (Morning Warriors group) -------------------------------------------
+// Mirrors Figma node 2006:10366 — bubbles, a session card and a timer card.
+const morningWarriorsMessages: ChatMessage[] = [
+  { kind: 'text', id: 'mw1', text: 'Good morning !', sentAt: '2025-03-16T08:00:00Z', isFromMe: true, status: 'read' },
   {
-    id: 'c1',
-    participant: mockParticipant1,
-    lastMessage: mockMessages1[mockMessages1.length - 1] ?? null,
-    unreadCount: 0,
+    kind: 'session',
+    id: 'mw2',
+    sentAt: '2025-03-16T08:05:00Z',
+    isFromMe: false,
+    status: 'read',
+    session: { title: 'Single Training', date: 'Mar 16, 2026', time: '6:00 AM', participants: 8 },
   },
-  {
-    id: 'c2',
-    participant: mockParticipant2,
-    lastMessage: mockMessages2[mockMessages2.length - 1] ?? null,
-    unreadCount: 1,
-  },
-  {
-    id: 'c3',
-    participant: mockParticipant3,
-    lastMessage: { id: 'm7', text: 'Thanks for the session!', sentAt: '2025-03-01T09:00:00Z', isFromMe: false, status: 'read' },
-    unreadCount: 0,
-  },
+  { kind: 'sessionStarted', id: 'mw3', sentAt: '2025-03-16T09:00:00Z', isFromMe: false, status: 'read' },
+  { kind: 'text', id: 'mw4', text: 'See you all tomorrow at 6AM', sentAt: '2025-03-16T09:15:00Z', isFromMe: true, status: 'read' },
+  { kind: 'text', id: 'mw5', text: 'Thanks for the workout plan!', sentAt: '2025-03-16T09:20:00Z', isFromMe: false, status: 'read' },
 ];
 
 const initialMessages: Record<string, ChatMessage[]> = {
-  c1: mockMessages1,
-  c2: mockMessages2,
-  c3: [{ id: 'm7', text: 'Thanks for the session!', sentAt: '2025-03-01T09:00:00Z', isFromMe: false, status: 'read' }],
+  c1: morningWarriorsMessages,
 };
+
+function previewOf(msg: ChatMessage): string {
+  switch (msg.kind) {
+    case 'text':
+      return msg.text;
+    case 'session':
+      return `Session: ${msg.session.title}`;
+    case 'sessionStarted':
+      return 'Session started';
+  }
+}
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -96,7 +156,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const conv: Conversation = {
       id,
       participant,
-      lastMessage: null,
+      lastMessagePreview: null,
+      lastMessageAt: null,
+      lastMessageStatus: null,
+      lastMessageFromMe: false,
       unreadCount: 0,
     };
     set((s) => ({
@@ -114,6 +177,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   sendMessage: (conversationId, text) => {
     const msg: ChatMessage = {
+      kind: 'text',
       id: `msg${nextMsgId++}`,
       text,
       sentAt: new Date().toISOString(),
@@ -125,7 +189,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const conv = s.conversations.find((c) => c.id === conversationId);
       const updated = conv
         ? s.conversations.map((c) =>
-            c.id === conversationId ? { ...c, lastMessage: msg, unreadCount: 0 } : c
+            c.id === conversationId
+              ? {
+                  ...c,
+                  lastMessagePreview: previewOf(msg),
+                  lastMessageAt: msg.sentAt,
+                  lastMessageStatus: msg.status,
+                  lastMessageFromMe: true,
+                  unreadCount: 0,
+                }
+              : c
           )
         : s.conversations;
       return {

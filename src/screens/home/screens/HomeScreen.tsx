@@ -14,6 +14,9 @@ import { spacing } from '../../../theme/spacing';
 import { useAppStore } from '../../../store/appStore';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
+import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
+import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
+import { deriveGroupFromSession } from '../../../utils';
 import type { Session } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
@@ -56,6 +59,25 @@ export function HomeScreen() {
   const handleSessionOptions = React.useCallback(
     (_session: Session) => navigation.navigate('Schedule'),
     [navigation]
+  );
+  const startTraining = useActiveTrainingStore((s) => s.startTraining);
+  const handleSessionStart = React.useCallback(
+    (session: Session) => {
+      const group = deriveGroupFromSession(
+        session,
+        programs,
+        useTrainingHistoryStore.getState().getLastSets,
+      );
+      if (group.length === 0) return;
+      startTraining(group, group[0]!.clientId);
+      navigation
+        .getParent()
+        ?.navigate('ClientsTab', {
+          screen: 'ClientProfile',
+          params: { clientId: group[0]!.clientId },
+        });
+    },
+    [navigation, programs, startTraining]
   );
 
   return (
@@ -114,6 +136,7 @@ export function HomeScreen() {
                   session={session}
                   onPress={handleSessionPress}
                   onOptionsPress={handleSessionOptions}
+                  onStart={handleSessionStart}
                 />
               ))
           ) : (

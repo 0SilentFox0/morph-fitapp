@@ -223,7 +223,7 @@ export function CardioClassFormScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
+  scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset },
   sectionTitleSpacing: {
     marginTop: spacing.sm,
   },

@@ -11,7 +11,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ChatStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { SearchInput, Avatar, EmptyState } from '../../components/ui';
+import { SearchInput, Avatar, EmptyState, MessageReceipt } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
@@ -48,7 +48,7 @@ export function ChatListScreen() {
         <SearchInput
           value={search}
           onChangeText={setSearch}
-          placeholder="Search conversations"
+          placeholder="Search"
           style={styles.search}
         />
       </View>
@@ -81,6 +81,7 @@ export function ChatListScreen() {
               <Avatar
                 name={conv.participant.name}
                 uri={conv.participant.avatar}
+                tint={conv.participant.tint}
                 size={48}
               />
               <View style={styles.convContent}>
@@ -88,25 +89,25 @@ export function ChatListScreen() {
                   <Text style={styles.convName} numberOfLines={1}>
                     {conv.participant.name}
                   </Text>
-                  {conv.lastMessage && (
-                    <Text style={styles.convTime}>
-                      {formatTime(conv.lastMessage.sentAt)}
-                    </Text>
+                  {conv.lastMessageAt && (
+                    <Text style={styles.convTime}>{formatTime(conv.lastMessageAt)}</Text>
                   )}
                 </View>
-                {conv.lastMessage && (
+                <View style={styles.convFooter}>
                   <Text style={styles.convPreview} numberOfLines={1}>
-                    {conv.lastMessage.isFromMe ? 'You: ' : ''}{conv.lastMessage.text}
+                    {conv.lastMessagePreview}
                   </Text>
-                )}
-              </View>
-              {conv.unreadCount > 0 && (
-                <View style={styles.unreadBadge}>
-                  <Text style={styles.unreadText}>
-                    {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
-                  </Text>
+                  {conv.unreadCount > 0 ? (
+                    <View style={styles.unreadBadge}>
+                      <Text style={styles.unreadText}>
+                        {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                      </Text>
+                    </View>
+                  ) : conv.lastMessageFromMe && conv.lastMessageStatus ? (
+                    <MessageReceipt status={conv.lastMessageStatus} size={20} />
+                  ) : null}
                 </View>
-              )}
+              </View>
             </TouchableOpacity>
           ))
         )}
@@ -121,7 +122,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   searchWrapper: {
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.xs,
     marginBottom: spacing.md,
   },
   search: {
@@ -129,22 +131,21 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.sm,
   },
   convCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    marginBottom: spacing.sm,
+    gap: spacing.md,
+    padding: spacing.sm,
+    borderRadius: radius.sm + 2,
   },
   convContent: {
     flex: 1,
-    marginLeft: spacing.md,
     minWidth: 0,
+    justifyContent: 'center',
   },
   convHeader: {
     flexDirection: 'row',
@@ -153,60 +154,41 @@ const styles = StyleSheet.create({
   },
   convName: {
     fontSize: typography.sizes.base,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
+    lineHeight: 24,
+    color: colors.neutral9,
     flex: 1,
   },
   convTime: {
-    fontSize: typography.sizes.xs,
+    fontSize: typography.sizes.sm,
+    lineHeight: 22,
     color: colors.textMuted,
     marginLeft: spacing.xs,
   },
+  convFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   convPreview: {
+    flex: 1,
     fontSize: typography.sizes.sm,
+    lineHeight: 22,
     color: colors.textMuted,
-    marginTop: spacing.xs,
   },
   unreadBadge: {
-    minWidth: 22,
+    minWidth: 29,
+    paddingHorizontal: spacing.xs,
     height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.accent,
+    borderRadius: radius.pill,
+    backgroundColor: colors.neutral4,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: spacing.sm,
   },
   unreadText: {
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing['3xl'],
-  },
-  emptyTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginTop: spacing.md,
-  },
-  emptySub: {
     fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
-  },
-  emptyBtn: {
-    marginTop: spacing.lg,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    backgroundColor: colors.accent,
-    borderRadius: radius['2xl'],
-  },
-  emptyBtnText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
+    lineHeight: 22,
+    color: colors.white,
+    textAlign: 'center',
   },
 });

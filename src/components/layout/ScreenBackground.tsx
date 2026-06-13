@@ -11,7 +11,8 @@ export function ScreenBackground({ children }: { children: React.ReactNode }) {
     <View style={styles.base}>
       <View style={styles.gradientWrap} pointerEvents="none">
         <LinearGradient
-          colors={['rgba(121,26,31,0.35)', 'rgba(121,26,31,0.08)', 'transparent']}
+          colors={['rgba(121,26,31,0.45)', 'rgba(121,26,31,0.12)', 'transparent']}
+          locations={[0, 0.45, 1]}
           start={{ x: 1, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={StyleSheet.absoluteFill}
@@ -28,6 +29,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.screenBg,
   },
   gradientWrap: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '68%',
+    height: '34%',
   },
 });

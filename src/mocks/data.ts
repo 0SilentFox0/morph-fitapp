@@ -16,6 +16,11 @@ export interface Session {
   status: SessionStatus;
   participants: { id: string; name: string; avatar?: string }[];
   programId?: string;
+  /**
+   * Planned (target) sets per exercise id, computed at creation from the
+   * client's previous training + progression %. Seeds the live defaults.
+   */
+  plannedSets?: Record<number, ExerciseSet[]>;
 }
 
 export type SetNote = 'regular' | 'failure' | 'dropset' | 'short_rest' | 'long_rest';
@@ -32,6 +37,10 @@ export interface ProgramExercise {
   category: string;
   imageUrl: string | null;
   sets: ExerciseSet[];
+  /** Short duration label shown in exercise lists, e.g. "5m". */
+  durationLabel?: string;
+  /** Free-text guidance shown on the live Exercise screen. */
+  trainerNotes?: string;
 }
 
 export interface TrainingProgram {
@@ -56,6 +65,22 @@ export interface Client {
   tag: string;
 }
 
+/** A client's logged sets for one exercise in a past (completed) training. */
+export interface LoggedExercise {
+  exerciseId: number;
+  sets: ExerciseSet[];
+}
+
+/** A past training a client completed — source of "previous metrics". */
+export interface CompletedTraining {
+  id: string;
+  /** Keyed by client display name (ids differ between mocks and the form). */
+  clientName: string;
+  programId: string;
+  date: string;
+  exercises: LoggedExercise[];
+}
+
 export type TransactionStatus = 'completed' | 'pending' | 'canceled';
 export type TransactionType = 'Training' | 'Subscription';
 
@@ -66,6 +91,9 @@ export interface Transaction {
   amount: string;
   type: TransactionType;
   status: TransactionStatus;
+  /** Sessions used / total — shown as a progress bar for Subscription transactions. */
+  sessionsUsed?: number;
+  sessionsTotal?: number;
 }
 
 export interface ChartDataPoint {
@@ -135,6 +163,27 @@ export const mockSessions: Session[] = [
     time: '2:00pm',
     status: 'pending',
     participants: [{ id: '5', name: 'Guy Hawkins' }],
+    programId: '1',
+  },
+  {
+    id: '7',
+    title: 'Personal Session',
+    type: 'Strength',
+    date: 'Today',
+    time: '2:00pm',
+    status: 'pending',
+    participants: [{ id: '6', name: 'Brooklyn Simmons' }],
+    programId: '3',
+  },
+  {
+    id: '8',
+    title: 'Personal Session',
+    type: 'Cardio',
+    date: 'Today',
+    time: '2:00pm',
+    status: 'pending',
+    participants: [{ id: '2', name: 'Darrell Steward' }],
+    programId: '2',
   },
   {
     id: '4',
@@ -182,6 +231,52 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 340,
     thumbnail: TRAINING_IMAGES[0],
     price: '$5/month',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    exercises: [
+      {
+        id: 101,
+        name: 'Bench press',
+        category: 'Chest',
+        imageUrl: TRAINING_IMAGES[0]!,
+        durationLabel: '5m',
+        trainerNotes:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        sets: [
+          { weight: 40, reps: 30, note: 'failure' },
+          { weight: 45, reps: 25 },
+          { weight: 50, reps: 20 },
+          { weight: 50, reps: 18 },
+          { weight: 55, reps: 15 },
+          { weight: 55, reps: 12 },
+          { weight: 60, reps: 10 },
+          { weight: 60, reps: 8 },
+        ],
+      },
+      {
+        id: 102,
+        name: 'Incline dumbbell press',
+        category: 'Chest',
+        imageUrl: TRAINING_IMAGES[1]!,
+        durationLabel: '5m',
+        sets: [
+          { weight: 20, reps: 15 },
+          { weight: 22, reps: 12 },
+          { weight: 24, reps: 10 },
+        ],
+      },
+      {
+        id: 103,
+        name: 'Mountain climbers',
+        category: 'Core',
+        imageUrl: TRAINING_IMAGES[2]!,
+        durationLabel: '5m',
+        sets: [
+          { weight: 0, reps: 40, note: 'short_rest' },
+          { weight: 0, reps: 40 },
+          { weight: 0, reps: 30 },
+        ],
+      },
+    ],
   },
   {
     id: '2',
@@ -192,6 +287,31 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 210,
     thumbnail: TRAINING_IMAGES[1],
     price: '$5/month',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    exercises: [
+      {
+        id: 201,
+        name: 'Treadmill run',
+        category: 'Cardio',
+        imageUrl: TRAINING_IMAGES[3]!,
+        durationLabel: '20m',
+        sets: [
+          { weight: 0, reps: 20, note: 'long_rest' },
+          { weight: 0, reps: 20 },
+        ],
+      },
+      {
+        id: 202,
+        name: 'Rowing',
+        category: 'Cardio',
+        imageUrl: TRAINING_IMAGES[4]!,
+        durationLabel: '10m',
+        sets: [
+          { weight: 0, reps: 15 },
+          { weight: 0, reps: 15 },
+        ],
+      },
+    ],
   },
   {
     id: '3',
@@ -202,6 +322,34 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 520,
     thumbnail: TRAINING_IMAGES[2],
     price: '$5/month',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    exercises: [
+      {
+        id: 301,
+        name: 'Back squat',
+        category: 'Legs',
+        imageUrl: TRAINING_IMAGES[2]!,
+        durationLabel: '8m',
+        sets: [
+          { weight: 60, reps: 12 },
+          { weight: 70, reps: 10 },
+          { weight: 80, reps: 8, note: 'failure' },
+          { weight: 80, reps: 6 },
+        ],
+      },
+      {
+        id: 302,
+        name: 'Deadlift',
+        category: 'Back',
+        imageUrl: TRAINING_IMAGES[0]!,
+        durationLabel: '8m',
+        sets: [
+          { weight: 80, reps: 8 },
+          { weight: 90, reps: 6 },
+          { weight: 100, reps: 4 },
+        ],
+      },
+    ],
   },
   {
     id: '4',
@@ -246,6 +394,178 @@ export const mockClients: Client[] = [
   },
 ];
 
+/**
+ * Curated past trainings for the headline demo clients. Values are intentionally
+ * a little below the program templates so applying +5/10/15% is meaningful.
+ * Exercise ids match mockTrainingPrograms (101-103 / 201-202 / 301-302).
+ */
+const curatedTrainingHistory: CompletedTraining[] = [
+  {
+    id: 'th1',
+    clientName: 'Guy Hawkins',
+    programId: '1',
+    date: 'Dec 5',
+    exercises: [
+      {
+        exerciseId: 101,
+        sets: [
+          { weight: 38, reps: 28 },
+          { weight: 42, reps: 24 },
+          { weight: 46, reps: 20 },
+          { weight: 46, reps: 16 },
+        ],
+      },
+      {
+        exerciseId: 102,
+        sets: [
+          { weight: 18, reps: 15 },
+          { weight: 20, reps: 12 },
+        ],
+      },
+      {
+        exerciseId: 103,
+        sets: [
+          { weight: 0, reps: 35 },
+          { weight: 0, reps: 35 },
+        ],
+      },
+    ],
+  },
+  // Brooklyn Simmons — several Strength sessions (oldest → newest) so the
+  // client-profile progress chart has multiple points.
+  {
+    id: 'th2a',
+    clientName: 'Brooklyn Simmons',
+    programId: '3',
+    date: 'Nov 22',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 45, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 60, reps: 8 }, { weight: 70, reps: 6 }] },
+    ],
+  },
+  {
+    id: 'th2b',
+    clientName: 'Brooklyn Simmons',
+    programId: '3',
+    date: 'Nov 29',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+    ],
+  },
+  {
+    id: 'th2',
+    clientName: 'Brooklyn Simmons',
+    programId: '3',
+    date: 'Dec 6',
+    exercises: [
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 55, reps: 12 },
+          { weight: 65, reps: 10 },
+          { weight: 75, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 75, reps: 8 },
+          { weight: 85, reps: 6 },
+        ],
+      },
+    ],
+  },
+  // Darrell Steward — Cardio sessions.
+  {
+    id: 'th3a',
+    clientName: 'Darrell Steward',
+    programId: '2',
+    date: 'Nov 27',
+    exercises: [
+      { exerciseId: 201, sets: [{ weight: 0, reps: 15 }] },
+      { exerciseId: 202, sets: [{ weight: 0, reps: 12 }] },
+    ],
+  },
+  {
+    id: 'th3',
+    clientName: 'Darrell Steward',
+    programId: '2',
+    date: 'Dec 4',
+    exercises: [
+      {
+        exerciseId: 201,
+        sets: [{ weight: 0, reps: 18 }],
+      },
+      {
+        exerciseId: 202,
+        sets: [{ weight: 0, reps: 14 }],
+      },
+    ],
+  },
+];
+
+/**
+ * A uniform three-point Strength progression (program 3, exercises 301/302),
+ * ascending over time. Used to auto-populate history for every demo client
+ * without a curated set, so the progress chart always has data to render.
+ */
+function seedClientHistory(clientName: string): CompletedTraining[] {
+  const slug = clientName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return [
+    {
+      id: `th-${slug}-1`,
+      clientName,
+      programId: '3',
+      date: 'Nov 22',
+      exercises: [
+        { exerciseId: 301, sets: [{ weight: 45, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
+        { exerciseId: 302, sets: [{ weight: 60, reps: 8 }, { weight: 70, reps: 6 }] },
+      ],
+    },
+    {
+      id: `th-${slug}-2`,
+      clientName,
+      programId: '3',
+      date: 'Nov 29',
+      exercises: [
+        { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
+        { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+      ],
+    },
+    {
+      id: `th-${slug}-3`,
+      clientName,
+      programId: '3',
+      date: 'Dec 6',
+      exercises: [
+        { exerciseId: 301, sets: [{ weight: 55, reps: 12 }, { weight: 65, reps: 10 }, { weight: 75, reps: 8 }] },
+        { exerciseId: 302, sets: [{ weight: 75, reps: 8 }, { weight: 85, reps: 6 }] },
+      ],
+    },
+  ];
+}
+
+const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientName));
+
+/**
+ * Past trainings keyed by client display name. The headline demo clients keep
+ * their curated, program-specific values; every other client (from mockClients
+ * or any session participant) gets a uniform seeded progression so the
+ * post-training stats chart is never empty.
+ */
+export const mockTrainingHistory: CompletedTraining[] = [
+  ...curatedTrainingHistory,
+  ...Array.from(
+    new Set([
+      ...mockClients.map((c) => c.name),
+      ...mockSessions.flatMap((s) => s.participants.map((p) => p.name)),
+    ]),
+  )
+    .filter((name) => !curatedHistoryNames.has(name))
+    .flatMap(seedClientHistory),
+];
+
 export const mockTransactions: Transaction[] = [
   {
     id: '1',
@@ -262,6 +582,8 @@ export const mockTransactions: Transaction[] = [
     amount: '$400',
     type: 'Subscription',
     status: 'completed',
+    sessionsUsed: 4,
+    sessionsTotal: 9,
   },
   {
     id: '3',
@@ -278,6 +600,8 @@ export const mockTransactions: Transaction[] = [
     amount: '$65',
     type: 'Subscription',
     status: 'completed',
+    sessionsUsed: 4,
+    sessionsTotal: 9,
   },
   {
     id: '5',

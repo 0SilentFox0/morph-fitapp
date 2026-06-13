@@ -27,6 +27,8 @@ import { TypePickerModal } from './SessionForm/TypePickerModal';
 import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
 import { ParticipantsSection } from './SessionForm/ParticipantsSection';
 import { DateTimePickerSection } from './SessionForm/DateTimePickerSection';
+import { ExerciseProgressionSection } from './SessionForm/ExerciseProgressionSection';
+import type { ExerciseSet } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;
@@ -82,6 +84,7 @@ export function SessionFormScreen() {
 
   const [typePickerVisible, setTypePickerVisible] = React.useState(false);
   const [programPickerVisible, setProgramPickerVisible] = React.useState(false);
+  const [plannedSets, setPlannedSets] = React.useState<Record<number, ExerciseSet[]>>({});
 
   const titleValue = watch('title');
   const dateValue = watch('date');
@@ -90,6 +93,9 @@ export function SessionFormScreen() {
   const programIdValue = watch('programId');
   const participantsValue = watch('participants');
   const selectedProgram = programs.find((p) => p.id === programIdValue);
+  // Progression pre-fill is per-client, so it only applies to Personal (1-participant) sessions.
+  const isPersonal = participantsValue.length === 1;
+  const showProgression = isPersonal && (selectedProgram?.exercises?.length ?? 0) > 0;
 
   const onSubmit = (data: SessionFormValues) => {
     const trimmedTitle = data.title.trim();
@@ -103,6 +109,7 @@ export function SessionFormScreen() {
         time: formatTime(data.time),
         participants: builtParticipants,
         programId: data.programId,
+        plannedSets: showProgression ? plannedSets : undefined,
       });
     } else {
       addSession({
@@ -113,6 +120,7 @@ export function SessionFormScreen() {
         status: 'pending',
         participants: builtParticipants,
         programId: data.programId,
+        plannedSets: showProgression ? plannedSets : undefined,
       });
     }
 
@@ -198,6 +206,14 @@ export function SessionFormScreen() {
         </TouchableOpacity>
         {errors.programId ? (
           <Text style={styles.errorText}>{errors.programId.message}</Text>
+        ) : null}
+
+        {showProgression && selectedProgram ? (
+          <ExerciseProgressionSection
+            program={selectedProgram}
+            clientName={participantsValue[0]!}
+            onChange={setPlannedSets}
+          />
         ) : null}
 
         <Button

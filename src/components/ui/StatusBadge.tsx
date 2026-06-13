@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
 import { radius } from '../../theme';
 
 export type StatusBadgeColor = 'success' | 'warning' | 'error' | 'accent' | 'neutral';
@@ -32,10 +31,10 @@ export const StatusBadge = React.memo(function StatusBadge({
     <View style={styles.badge}>
       {icon ? (
         <View style={styles.iconCircle}>
-          <Ionicons name={icon} size={8} color={fg} />
+          <Ionicons name={icon} size={10} color={fg} />
         </View>
       ) : null}
-      <Text style={[styles.label, { color: fg }]}>{label}</Text>
+      <Text style={styles.label}>{label}</Text>
     </View>
   );
 });
@@ -57,5 +56,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.sizes.xs,
     lineHeight: 20,
+    color: colors.text,
   },
 });

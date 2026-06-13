@@ -8,32 +8,45 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ChatStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { ScreenHeader } from '../../components/layout';
-import { MessageBubble, Avatar } from '../../components/ui';
+import { MessageBubble, SessionMessageCard, SystemMessageCard } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
+import { ChatOptionsSheet, ChatAttachmentSheet, type ChatOptionAction } from './components';
 
 type Route = RouteProp<ChatStackParamList, 'ChatThread'>;
+type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatThread'>;
 
 export function ChatThreadScreen() {
   const route = useRoute<Route>();
+  const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const { conversationId } = route.params;
 
   const conversation = useChatStore((s) => s.conversations.find((c) => c.id === conversationId));
-  const messages = useChatStore((s) => s.messagesByConversation[conversationId] ?? []);
+  // Default outside the selector: returning a fresh `[]` from the selector makes
+  // zustand see a new reference every render (Object.is) and loops forever for
+  // conversations with no seeded messages.
+  const messages = useChatStore((s) => s.messagesByConversation[conversationId]) ?? [];
   const sendMessage = useChatStore((s) => s.sendMessage);
   const markAsRead = useChatStore((s) => s.markAsRead);
 
   const [input, setInput] = React.useState('');
+  const [optionsVisible, setOptionsVisible] = React.useState(false);
+  const [attachVisible, setAttachVisible] = React.useState(false);
   const scrollRef = React.useRef<ScrollView>(null);
   const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const title = conversation?.participant.name ?? 'Chat';
 
   React.useEffect(() => {
     markAsRead(conversationId);
@@ -46,27 +59,76 @@ export function ChatThreadScreen() {
     []
   );
 
-  const handleSend = () => {
-    const text = input.trim();
-    if (!text) return;
-    sendMessage(conversationId, text);
-    setInput('');
+  const scrollToEndSoon = () => {
     scrollTimeout.current = setTimeout(
       () => scrollRef.current?.scrollToEnd({ animated: true }),
       100
     );
   };
 
-  if (!conversation) {
-    return (
-      <View style={styles.container}>
-        <ScreenHeader title="Chat" />
-        <View style={styles.center}>
-          <Text style={styles.errorText}>Conversation not found</Text>
-        </View>
-      </View>
-    );
-  }
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text) return;
+    sendMessage(conversationId, text);
+    setInput('');
+    scrollToEndSoon();
+  };
+
+  const handlePickAttachment = (uri: string) => {
+    // Mock app: represent a sent photo as a text message referencing it.
+    setAttachVisible(false);
+    void uri;
+    sendMessage(conversationId, '📷 Photo');
+    scrollToEndSoon();
+  };
+
+  const handleStartSession = () => {
+    Alert.alert('Start session', `Start the session for "${title}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Start',
+        onPress: () => {
+          sendMessage(conversationId, 'Session started — timer running.');
+          scrollToEndSoon();
+        },
+      },
+    ]);
+  };
+
+  const handleOption = (action: ChatOptionAction) => {
+    setOptionsVisible(false);
+    switch (action) {
+      case 'reschedule':
+        sendMessage(conversationId, 'Requested to reschedule the session.');
+        scrollToEndSoon();
+        break;
+      case 'cancel':
+        Alert.alert('Cancel session', `Cancel the session for "${title}"?`, [
+          { text: 'Keep', style: 'cancel' },
+          {
+            text: 'Cancel session',
+            style: 'destructive',
+            onPress: () => {
+              sendMessage(conversationId, 'Session was cancelled.');
+              scrollToEndSoon();
+            },
+          },
+        ]);
+        break;
+      case 'viewClient':
+        Alert.alert('Client profile', `Viewing ${title}'s profile.`);
+        break;
+      case 'viewProgram':
+        Alert.alert('Program', `Viewing the program for ${title}.`);
+        break;
+      case 'addClient':
+        // Concrete in-stack destination: pick a client to add.
+        navigation.navigate('NewChat');
+        break;
+    }
+  };
+
+  const hasInput = input.trim().length > 0;
 
   return (
     <KeyboardAvoidingView
@@ -74,48 +136,123 @@ export function ChatThreadScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-      <ScreenHeader
-        title={conversation.participant.name}
-        rightElement={
-          <Avatar
-            name={conversation.participant.name}
-            uri={conversation.participant.avatar}
-            size={32}
-          />
-        }
-      />
+      {/* Header: back, left-aligned title, more menu (Figma node 2006:10369) */}
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md) }]}>
+        <TouchableOpacity
+          style={styles.headerBtn}
+          onPress={() => navigation.goBack()}
+          hitSlop={8}
+        >
+          <Ionicons name="arrow-back" size={20} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {title}
+        </Text>
+        <TouchableOpacity
+          style={styles.headerBtn}
+          onPress={() => setOptionsVisible(true)}
+          hitSlop={8}
+        >
+          <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
+        </TouchableOpacity>
+      </View>
 
-      <ScrollView
-        ref={scrollRef}
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
-      >
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} text={msg.text} sentAt={msg.sentAt} isFromMe={msg.isFromMe} />
-        ))}
-      </ScrollView>
+      {conversation ? (
+        <ScrollView
+          ref={scrollRef}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+        >
+          {messages.map((msg) => {
+            switch (msg.kind) {
+              case 'text':
+                return (
+                  <MessageBubble
+                    key={msg.id}
+                    text={msg.text}
+                    sentAt={msg.sentAt}
+                    isFromMe={msg.isFromMe}
+                  />
+                );
+              case 'session':
+                return (
+                  <SessionMessageCard
+                    key={msg.id}
+                    title={msg.session.title}
+                    date={msg.session.date}
+                    time={msg.session.time}
+                    participants={msg.session.participants}
+                    sentAt={msg.sentAt}
+                    onStart={handleStartSession}
+                  />
+                );
+              case 'sessionStarted':
+                return (
+                  <SystemMessageCard
+                    key={msg.id}
+                    title="Session started"
+                    subtitle="Timer running"
+                    sentAt={msg.sentAt}
+                  />
+                );
+            }
+          })}
+        </ScrollView>
+      ) : (
+        <View style={styles.center}>
+          <Text style={styles.errorText}>Conversation not found</Text>
+        </View>
+      )}
 
-      <View style={styles.inputRow}>
+      {/* Message bar: attach, text input, mic/send (Figma node 2006:10439) */}
+      <View style={[styles.inputRow, { paddingBottom: spacing.md + insets.bottom }]}>
+        <TouchableOpacity
+          style={styles.iconBox}
+          onPress={() => setAttachVisible(true)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="link-outline" size={24} color={colors.neutral8} />
+        </TouchableOpacity>
+
         <TextInput
           style={styles.input}
-          placeholder="Message..."
-          placeholderTextColor={colors.textMuted}
+          placeholder="Type a message..."
+          placeholderTextColor={colors.neutral5}
           value={input}
           onChangeText={setInput}
           multiline
           maxLength={1000}
           onSubmitEditing={handleSend}
         />
+
         <TouchableOpacity
-          style={[styles.sendBtn, !input.trim() && styles.sendBtnDisabled]}
-          onPress={handleSend}
-          disabled={!input.trim()}
+          style={styles.iconBox}
+          onPress={hasInput ? handleSend : undefined}
+          disabled={!hasInput}
+          activeOpacity={0.7}
         >
-          <Ionicons name="send" size={20} color={input.trim() ? colors.text : colors.textMuted} />
+          <Ionicons
+            name={hasInput ? 'send' : 'mic-outline'}
+            size={20}
+            color={hasInput ? colors.accent : colors.neutral8}
+          />
         </TouchableOpacity>
       </View>
+
+      <ChatOptionsSheet
+        visible={optionsVisible}
+        title={title}
+        onClose={() => setOptionsVisible(false)}
+        onSelect={handleOption}
+      />
+
+      <ChatAttachmentSheet
+        visible={attachVisible}
+        onClose={() => setAttachVisible(false)}
+        onPick={handlePickAttachment}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -124,6 +261,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.md,
+  },
+  headerBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: typography.sizes.xl,
+    lineHeight: 28,
+    color: colors.text,
   },
   center: {
     flex: 1,
@@ -136,40 +293,39 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: {
-    paddingVertical: spacing.md,
-    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   inputRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    gap: spacing.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    paddingBottom: spacing.md + spacing.tabBarInset,
+    paddingTop: spacing.md - 3,
+  },
+  iconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.sm,
     backgroundColor: colors.neutral1,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderWidth: 1,
+    borderColor: colors.neutral5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: {
     flex: 1,
     minHeight: 40,
     maxHeight: 100,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.xl,
+    backgroundColor: colors.neutral1,
+    borderWidth: 1,
+    borderColor: colors.neutral5,
+    borderRadius: radius.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    fontSize: typography.sizes.base,
+    fontSize: typography.sizes.sm,
+    lineHeight: 22,
     color: colors.text,
-    marginRight: spacing.sm,
-  },
-  sendBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.xl,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sendBtnDisabled: {
-    backgroundColor: colors.neutral2,
   },
 });

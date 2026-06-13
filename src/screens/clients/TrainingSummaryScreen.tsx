@@ -1,19 +1,91 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
+import { useRoute, type RouteProp } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Card, SectionTitle } from '../../components/ui';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
+import { trainingMetric } from '../../utils';
+import { mockTrainingPrograms } from '../../mocks';
+import type { ExerciseSet, ProgramExercise } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
+type Route = RouteProp<ClientsStackParamList, 'TrainingSummary'>;
+
 const TABS = ['Summary', 'Exercises'];
 const TIMEFRAME = ['Week', 'Month', 'Custom'];
 
+const CHART_WIDTH = Dimensions.get('window').width - spacing.lg * 2 - 20;
+
+const chartConfig = {
+  backgroundColor: colors.neutral1,
+  backgroundGradientFrom: colors.neutral1,
+  backgroundGradientTo: colors.neutral1,
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
+  labelColor: () => colors.neutral7,
+  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
+  style: { borderRadius: radius.sm },
+};
+
+/** Picks the heaviest logged set as the representative row for an exercise. */
+function topSet(sets: ExerciseSet[]): ExerciseSet | undefined {
+  return sets.reduce<ExerciseSet | undefined>(
+    (best, s) => (!best || s.weight > best.weight ? s : best),
+    undefined,
+  );
+}
+
+function durationLabel(exercises: ProgramExercise[]): string {
+  const minutes = exercises.reduce((sum, ex) => {
+    const m = ex.durationLabel?.match(/(\d+)\s*m/);
+    return sum + (m ? Number(m[1]) : 0);
+  }, 0);
+  return minutes > 0 ? `${minutes}m` : '—';
+}
+
 export function TrainingSummaryScreen() {
+  const route = useRoute<Route>();
+  const insets = useSafeAreaInsets();
+  const clientId = route.params?.clientId;
   const [activeTab, setActiveTab] = React.useState(0);
   const [timeframe, setTimeframe] = React.useState(0);
+
+  const client = useActiveTrainingStore(
+    (s) => s.clients.find((c) => c.clientId === clientId) ?? s.clients[0] ?? null,
+  );
+  const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+  const program =
+    mockTrainingPrograms.find((p) => p.id === client?.programId) ?? mockTrainingPrograms[0]!;
+  const exercises = program.exercises ?? [];
+
+  const history = client ? getClientHistory(client.name) : [];
+  const chartData =
+    history.length > 0
+      ? {
+          labels: history.map((h) => h.date),
+          datasets: [{ data: history.map(trainingMetric) }],
+        }
+      : null;
+
+  const rows = exercises.map((ex) => {
+    const sets = client?.setLog[ex.id] ?? ex.sets;
+    const top = topSet(sets);
+    return {
+      id: ex.id,
+      name: ex.name,
+      weight: top ? `${top.weight}kg` : '—',
+      sets: sets.length,
+      reps: top ? top.reps : 0,
+    };
+  });
 
   return (
     <View style={styles.container}>
@@ -39,11 +111,11 @@ export function TrainingSummaryScreen() {
         <View style={styles.summaryRow}>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Duration</Text>
-            <Text style={styles.summaryValue}>53m</Text>
+            <Text style={styles.summaryValue}>{durationLabel(exercises)}</Text>
           </Card>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Type</Text>
-            <Text style={styles.summaryValue}>HIT</Text>
+            <Text style={styles.summaryValue}>{program.tag}</Text>
           </Card>
         </View>
 
@@ -62,7 +134,20 @@ export function TrainingSummaryScreen() {
           ))}
         </View>
 
-        <View style={styles.chartPlaceholder} />
+        {chartData ? (
+          <View style={styles.chartCard}>
+            <LineChart
+              data={chartData}
+              width={CHART_WIDTH}
+              height={180}
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+            />
+          </View>
+        ) : (
+          <View style={styles.chartPlaceholder} />
+        )}
 
         <SectionTitle>Exercises</SectionTitle>
         <View style={styles.table}>
@@ -72,23 +157,25 @@ export function TrainingSummaryScreen() {
             <Text style={[styles.tableCell, styles.tableHeader]}>Sets</Text>
             <Text style={[styles.tableCell, styles.tableHeader]}>Reps</Text>
           </View>
-          <View style={[styles.tableRow, styles.tableRowHighlight]}>
-            <Text style={styles.tableCell}>Bench press</Text>
-            <Text style={styles.tableCell}>80kg</Text>
-            <Text style={styles.tableCell}>7</Text>
-            <Text style={styles.tableCell}>35</Text>
-          </View>
+          {rows.map((r, i) => (
+            <View key={r.id} style={[styles.tableRow, i % 2 === 0 && styles.tableRowHighlight]}>
+              <Text style={styles.tableCell}>{r.name}</Text>
+              <Text style={styles.tableCell}>{r.weight}</Text>
+              <Text style={styles.tableCell}>{r.sets}</Text>
+              <Text style={styles.tableCell}>{r.reps}</Text>
+            </View>
+          ))}
         </View>
 
         <SectionTitle>Trainer Notes</SectionTitle>
         <Card style={styles.notesCard}>
           <Text style={styles.notesText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            {exercises[0]?.trainerNotes ?? 'No notes recorded for this session.'}
           </Text>
         </Card>
       </ScrollView>
 
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { paddingBottom: spacing.md + insets.bottom }]}>
         {TABS.map((t, i) => (
           <TouchableOpacity
             key={t}
@@ -161,6 +248,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral2,
     borderRadius: radius.md,
     marginBottom: spacing.lg,
+  },
+  chartCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  chart: {
+    borderRadius: radius.sm,
   },
   table: {
     backgroundColor: colors.neutral2,

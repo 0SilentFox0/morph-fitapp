@@ -55,7 +55,7 @@ export function ClientsListScreen() {
           <Card
             key={client.id}
             style={styles.clientCard}
-            onPress={() => navigation.navigate('ClientProfile')}
+            onPress={() => navigation.navigate('ClientsProfileExtended', { clientId: client.id })}
           >
             <Avatar name={client.name} size={48} />
             <View style={styles.clientInfo}>
