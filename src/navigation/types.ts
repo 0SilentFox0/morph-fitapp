@@ -58,6 +58,7 @@ export type StatsStackParamList = {
   Transactions: undefined;
   AddTransaction: undefined;
   YouGotPaid: undefined;
+  TrainerLeague: undefined;
 };
 
 export type ChatStackParamList = {
@@ -99,6 +100,8 @@ export type ProgressStackParamList = {
   PersonalRecords: undefined;
   Measurements: undefined;
   Achievements: undefined;
+  League: undefined;
+  Leaderboard: undefined;
 };
 
 export type OnboardingScreenProps<T extends keyof OnboardingStackParamList> =

@@ -13,6 +13,8 @@ import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { exportTransactions } from '../../utils';
 import { mockTransactions, mockAnalyticsData } from '../../mocks';
+import { useGamificationStore } from '../../store/gamificationStore';
+import { LEAGUE_TIERS } from '../../utils/leagues';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'BusinessAnalytics'>;
 
@@ -21,6 +23,14 @@ const ICON_HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 export function BusinessAnalyticsScreen() {
   const navigation = useNavigation<Nav>();
   const [search, setSearch] = React.useState('');
+  const trainerOverview = useGamificationStore((s) => s.trainerOverview);
+  const loadTrainer = useGamificationStore((s) => s.loadTrainer);
+  React.useEffect(() => {
+    loadTrainer();
+  }, [loadTrainer]);
+  const leagueTier = trainerOverview
+    ? LEAGUE_TIERS.find((t) => t.key === trainerOverview.league.key)
+    : null;
 
   const chartWidth = React.useMemo(() => Dimensions.get('window').width - spacing.lg * 2 - 20, []);
   const incomeData = React.useMemo(() => mockAnalyticsData.incomeOverTime, []);
@@ -70,6 +80,26 @@ export function BusinessAnalyticsScreen() {
             <Text style={styles.earningsValue}>${mockAnalyticsData.fromTrainings}</Text>
           </View>
         </View>
+
+        {leagueTier && trainerOverview && (
+          <TouchableOpacity
+            style={styles.leagueBanner}
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('TrainerLeague')}
+          >
+            <View style={[styles.leagueIcon, { borderColor: leagueTier.color }]}>
+              <Ionicons name={leagueTier.icon} size={22} color={leagueTier.color} />
+            </View>
+            <View style={styles.leagueText}>
+              <Text style={styles.leagueName}>{leagueTier.name} league</Text>
+              <Text style={styles.leagueSub}>
+                Top {Math.max(1, Math.round((1 - trainerOverview.percentile) * 100))}% · rank #
+                {trainerOverview.rank}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.accent} />
+          </TouchableOpacity>
+        )}
 
         <AnalyticsChartCard
           incomeData={incomeData}
@@ -137,6 +167,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.sm,
   },
+  leagueBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.neutral2,
+    borderRadius: 14,
+    padding: spacing.md,
+    marginTop: spacing.md,
+  },
+  leagueIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.neutral1,
+  },
+  leagueText: { flex: 1 },
+  leagueName: { fontSize: typography.sizes.base, fontWeight: typography.weights.bold, color: colors.text },
+  leagueSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   earningsCard: {
     flex: 1,
     minHeight: 85,

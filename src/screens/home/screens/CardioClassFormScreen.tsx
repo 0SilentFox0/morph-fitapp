@@ -7,7 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Input, Button, Avatar, SectionTitle } from '../../../components/ui';
+import { Input, Button, Avatar, SectionTitle, PricingInsightHint } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -214,6 +214,10 @@ export function CardioClassFormScreen() {
         />
         {errors.price ? <Text style={styles.errorText}>{errors.price.message}</Text> : null}
 
+        <View style={styles.insightSpacing}>
+          <PricingInsightHint price={parseInt(watch('price') || '0', 10)} currency="USD" />
+        </View>
+
         <Button title="Apply" onPress={handleSubmit(onSubmit)} style={styles.button} />
       </ScrollView>
     </View>
@@ -225,6 +229,9 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset },
   sectionTitleSpacing: {
+    marginTop: spacing.sm,
+  },
+  insightSpacing: {
     marginTop: spacing.sm,
   },
   uploadArea: {

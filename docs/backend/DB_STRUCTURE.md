@@ -954,6 +954,157 @@ Optional gamification (e.g. "You got paid").
 
 ---
 
+## 16A. Tables — Gamification (Phase 4)
+
+Спека: [features/gamification.md](features/gamification.md). Чотири незалежні концепти — points, consistency, strength, league — у розділених таблицях/колонках.
+
+### 16A.0 Alterations to existing tables
+
+| Таблиця | Колонка | Тип | Призначення |
+|---|---|---|---|
+| `users` | `points` | INTEGER DEFAULT 0 | **уже існує** — стає денормалізованим кешем над `points_ledger` |
+| `exercises` | `canonical_exercise_id` | UUID NULL FK → canonical_exercises ON DELETE SET NULL | міст приватної вправи у глобальний борд |
+| `sessions` | `is_trainer_verified` | BOOLEAN NOT NULL DEFAULT true | тренерська сесія = true; соло само-лог = false |
+| `workout_log_sets` | `is_verified` | BOOLEAN NOT NULL DEFAULT false | копіюється з `sessions.is_trainer_verified` при вставці |
+| `personal_records` | `is_verified` | BOOLEAN NOT NULL DEFAULT false | копіюється з сету-джерела при детекті PR |
+| `personal_records` | `canonical_exercise_id` | UUID NULL | денормалізовано з `exercises` для борда «по вправі» |
+
+**Нові індекси на змінених таблицях:** `exercises (canonical_exercise_id) WHERE canonical_exercise_id IS NOT NULL`; `personal_records (canonical_exercise_id, is_verified, estimated_1rm DESC) WHERE canonical_exercise_id IS NOT NULL AND is_verified`.
+
+---
+
+### 16A.1 `canonical_exercises`
+
+Невеликий адмін-курований глобальний каталог базових вправ ([GAME-005](features/gamification.md)).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | |
+| key | VARCHAR(64) | NOT NULL UNIQUE | `bench_press`, `back_squat`, `deadlift`, `overhead_press`, `barbell_row` |
+| name | VARCHAR(255) | NOT NULL | display |
+| category | VARCHAR(32) | NOT NULL | `push`/`pull`/`squat`/`hinge` |
+| is_bodyweight | BOOLEAN | NOT NULL DEFAULT false | вмикає bodyweight-нормалізацію 1RM |
+| strength_weight | NUMERIC(4,3) | NOT NULL DEFAULT 1.0 | внесок вправи у силовий суб-бал (тюнабельно) |
+| is_active | BOOLEAN | NOT NULL DEFAULT true | борди лише для активних |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+
+**Indexes:** UNIQUE `(key)`, `(is_active) WHERE is_active`.
+
+---
+
+### 16A.2 `points_ledger`
+
+Append-only джерело істини нарахувань; `users.points` — кеш ([GAME-001](features/gamification.md)).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | |
+| user_id | UUID | FK → users CASCADE NOT NULL | |
+| amount | INTEGER | NOT NULL | signed; реверс = негативний row |
+| reason | VARCHAR(48) | NOT NULL | `session_completed`,`pr_set`,`streak_milestone`,`reversal`,`admin_adjustment` |
+| source_type | VARCHAR(48) | NULL | `session`,`personal_record`,`streak` |
+| source_id | UUID | NULL | |
+| dedup_key | VARCHAR(96) | NULL | `session_completed:{session_id}:{user_id}` |
+| metadata | JSONB | NULL | streak length, exercise, admin_id |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+
+**Indexes:** `(user_id, created_at DESC)`, UNIQUE `(dedup_key) WHERE dedup_key IS NOT NULL` (ідемпотентність), `(reason, source_id)`.
+
+---
+
+### 16A.3 `gamification_scores`
+
+Похідний стан per (user, subject_role, scope) ([GAME-002/003](features/gamification.md)).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | |
+| user_id | UUID | FK → users CASCADE NOT NULL | |
+| subject_role | VARCHAR(8) | NOT NULL DEFAULT `client` | `client` / `trainer` |
+| scope_type | VARCHAR(16) | NOT NULL DEFAULT `world` | `world`/`gym`/`city`/`region` (розширюваність) |
+| scope_id | UUID | NULL | NULL для world |
+| consistency_score | NUMERIC(10,4) | NOT NULL DEFAULT 0 | |
+| strength_score | NUMERIC(10,4) | NOT NULL DEFAULT 0 | 0..1 перцентиль verified 1RM |
+| composite_score | NUMERIC(10,4) | NOT NULL DEFAULT 0 | зважений мікс |
+| composite_percentile | NUMERIC(6,5) | NULL | 0..1 у пулі (з останнього snapshot) |
+| league_tier_id | UUID | NULL FK → league_tiers SET NULL | поточна ліга |
+| previous_league_tier_id | UUID | NULL | для promo/demo diff |
+| rank | INTEGER | NULL | dense rank у скоупі |
+| pool_size | INTEGER | NULL | популяція на момент snapshot |
+| inputs | JSONB | NULL | аудит складових (streak/longevity/freq/percentiles) |
+| scored_at | TIMESTAMPTZ | NULL | останній перерахунок сирих балів |
+| ranked_at | TIMESTAMPTZ | NULL | останнє призначення перцентиля/ліги |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+
+**Indexes:** UNIQUE `(user_id, subject_role, scope_type, scope_id)`, `(scope_type, scope_id, subject_role, composite_score DESC)` (робочий — віконний сорт перцентилів), `(scope_type, scope_id, league_tier_id)`.
+
+---
+
+### 16A.4 `league_tiers`
+
+Конфіг перцентильних тірів зі сталими назвами, окремий набір на роль ([GAME-003](features/gamification.md)).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | |
+| subject_role | VARCHAR(8) | NOT NULL DEFAULT `client` | |
+| key | VARCHAR(24) | NOT NULL | `wooden`,`bronze`,`silver`,`gold`,`diamond`,`platinum` |
+| name | VARCHAR(48) | NOT NULL | |
+| ordinal | SMALLINT | NOT NULL | 1..6, вище = краще |
+| min_percentile | NUMERIC(6,5) | NOT NULL | inclusive |
+| max_percentile | NUMERIC(6,5) | NOT NULL | exclusive |
+| icon_key | VARCHAR(48) | NULL | |
+| is_active | BOOLEAN | NOT NULL DEFAULT true | |
+
+**Indexes:** UNIQUE `(subject_role, key)`, UNIQUE `(subject_role, ordinal)`. Constraint: діапазони тайлять `[0,1)` без проміжків per role.
+
+---
+
+### 16A.5 `leaderboard_snapshots`
+
+Матеріалізовані борди, читаються по `rank` (cursor) ([GAME-004](features/gamification.md)).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | |
+| board_type | VARCHAR(24) | NOT NULL | `composite` / `canonical_1rm` |
+| canonical_exercise_id | UUID | NULL | для `canonical_1rm` |
+| subject_role | VARCHAR(8) | NOT NULL | |
+| scope_type | VARCHAR(16) | NOT NULL | |
+| scope_id | UUID | NULL | |
+| batch_id | UUID | NOT NULL | один повний перерахунок |
+| user_id | UUID | NOT NULL | |
+| rank | INTEGER | NOT NULL | |
+| score | NUMERIC(12,4) | NOT NULL | composite_score або estimated_1rm |
+| percentile | NUMERIC(6,5) | NOT NULL | |
+| league_tier_id | UUID | NULL | для composite |
+| computed_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+
+**Indexes:** `(board_type, canonical_exercise_id, scope_type, scope_id, subject_role, batch_id, rank)` (cursor read), `(board_type, scope_type, scope_id, user_id, batch_id)` (my-rank). Старі batch-и чистить `LeaderboardSnapshotPruneJob` (latest+1).
+
+---
+
+### 16A.6 `pricing_insight_aggregates`
+
+Анонімні перцентилі цін пакетів ([GAME-008](features/gamification.md)).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | |
+| currency | VARCHAR(3) | NOT NULL | |
+| kind | package_kind | NULL | сегментація `count_based`/`time_based`/`hybrid` |
+| sample_size | INTEGER | NOT NULL | приховуємо показ якщо < min_sample |
+| percentiles | JSONB | NOT NULL | `{p10,p25,p50,p75,p90}` з `percentile_cont` |
+| min_price | NUMERIC(10,2) | NOT NULL | |
+| max_price | NUMERIC(10,2) | NOT NULL | |
+| computed_at | TIMESTAMPTZ | NOT NULL DEFAULT now() | |
+
+**Indexes:** UNIQUE `(currency, kind)`.
+
+---
+
 ## 17. Enums (PostgreSQL)
 
 ```sql
@@ -1032,6 +1183,11 @@ CREATE TYPE data_export_status AS ENUM ('pending', 'processing', 'ready', 'faile
 | media_files | `(uploaded_at) WHERE status = 'pending'` | cleanup orphans |
 | clients | `(trainer_id, status, name)`, GIN `tags` | roster + filter |
 | profile_view_events | UNIQUE partial dedup by day | profile views dedup |
+| points_ledger | UNIQUE `(dedup_key) WHERE dedup_key IS NOT NULL` | award idempotency |
+| gamification_scores | `(scope_type, scope_id, subject_role, composite_score DESC)` | percentile window sort |
+| gamification_scores | UNIQUE `(user_id, subject_role, scope_type, scope_id)` | one row per pool |
+| leaderboard_snapshots | `(board_type, canonical_exercise_id, scope_type, scope_id, subject_role, batch_id, rank)` | cursor read |
+| personal_records | `(canonical_exercise_id, is_verified, estimated_1rm DESC) WHERE ...` | canonical 1RM board |
 
 ---
 
@@ -1070,6 +1226,16 @@ CREATE TYPE data_export_status AS ENUM ('pending', 'processing', 'ready', 'faile
 20. `transactions`, `withdrawals`.
 21. `body_measurements`, `personal_records`.
 22. `profile_view_events`, `analytics_cache`, `achievements`.
+
+### Phase 4 — Gamification
+
+23. `canonical_exercises`; alter `exercises` ADD `canonical_exercise_id`.
+24. Alter `sessions` ADD `is_trainer_verified`; `workout_log_sets` ADD `is_verified`; `personal_records` ADD `is_verified` + `canonical_exercise_id`.
+25. `points_ledger`.
+26. `league_tiers` (+ seed 6 tiers per role).
+27. `gamification_scores`.
+28. `leaderboard_snapshots`.
+29. `pricing_insight_aggregates`.
 
 ---
 
