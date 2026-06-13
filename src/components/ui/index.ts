@@ -46,4 +46,5 @@ export { HorizontalSwipe } from './HorizontalSwipe';
 export type { HorizontalSwipeProps } from './HorizontalSwipe';
 export { FadeInUp } from './FadeInUp';
 export { AnimatedCounter } from './AnimatedCounter';
+export { PagerDots } from './PagerDots';
 export { PricingInsightHint } from './PricingInsightHint';
