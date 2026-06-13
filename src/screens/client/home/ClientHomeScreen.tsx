@@ -5,9 +5,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import type { ClientHomeStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
-import { BodyMap, Avatar, SectionTitle, StatusBadge } from '../../../components/ui';
+import { BodyMap, Avatar, SectionTitle, StatusBadge, HorizontalSwipe } from '../../../components/ui';
 import type { StatusBadgeColor } from '../../../components/ui';
 import type { SessionStatus } from '../../../mocks';
+import { useClientTabSwipe } from '../useClientTabSwipe';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -47,6 +48,7 @@ export function ClientHomeScreen() {
 
   const tabNav = navigation.getParent() as unknown as TabNav | undefined;
   const goToTab = (tab: string) => tabNav?.navigate(tab);
+  const tabSwipe = useClientTabSwipe('ClientHomeTab');
 
   const { intensities, totals, weekTotals, streak, topMuscle } = React.useMemo(() => {
     const now = new Date();
@@ -67,7 +69,11 @@ export function ClientHomeScreen() {
   const myTrainer = trainers.find((t) => t.connection !== 'none');
 
   return (
-    <View style={styles.container}>
+    <HorizontalSwipe
+      style={styles.container}
+      onSwipeLeft={tabSwipe.onSwipeLeft}
+      onSwipeRight={tabSwipe.onSwipeRight}
+    >
       <ScreenHeader
         title={userName ? `Hi, ${userName}` : 'Hi there'}
         showBack={false}
@@ -150,7 +156,7 @@ export function ClientHomeScreen() {
           </View>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </HorizontalSwipe>
   );
 }
 

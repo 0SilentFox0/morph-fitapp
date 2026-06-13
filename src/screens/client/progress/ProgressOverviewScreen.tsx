@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
-import { BodyMap, SectionTitle } from '../../../components/ui';
+import { BodyMap, SectionTitle, HorizontalSwipe } from '../../../components/ui';
+import { overallVolumeSeries } from '../../../utils/exerciseProgress';
+import { useClientTabSwipe } from '../useClientTabSwipe';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -34,11 +37,28 @@ const HEAT_COLORS = ['#5E1A08', '#8C1E03', '#AE451F', '#BF4F33', '#E7775B'];
 const formatKg = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`;
 
+const chartConfig = {
+  backgroundColor: colors.neutral1,
+  backgroundGradientFrom: colors.neutral1,
+  backgroundGradientTo: colors.neutral1,
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
+  labelColor: () => colors.neutral7,
+  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
+  style: { borderRadius: radius.sm },
+};
+
+const shortLabel = (date: string) => {
+  const d = new Date(date);
+  return Number.isNaN(d.getTime()) ? date : `${d.getMonth() + 1}/${d.getDate()}`;
+};
+
 const QUICK_LINKS: {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   route: keyof ProgressStackParamList;
 }[] = [
+  { label: 'Exercise progress', icon: 'barbell-outline', route: 'ExerciseProgress' },
   { label: 'Training history', icon: 'time-outline', route: 'TrainingHistory' },
   { label: 'Personal records', icon: 'trophy-outline', route: 'PersonalRecords' },
   { label: 'Measurements', icon: 'analytics-outline', route: 'Measurements' },
@@ -51,8 +71,13 @@ export function ProgressOverviewScreen() {
 
   const [timeframe, setTimeframe] = React.useState<Timeframe>('all');
   const [view, setView] = React.useState<'front' | 'back'>('front');
+  const tabSwipe = useClientTabSwipe('ProgressTab');
 
   const fullHistory = getCurrentUserHistory();
+
+  // Overall dynamics is always all-time (independent of the timeframe pills).
+  const overallSeries = React.useMemo(() => overallVolumeSeries(fullHistory), [fullHistory]);
+  const chartWidth = Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
 
   const { intensities, totals, topMuscles } = React.useMemo(() => {
     const filtered = filterByTimeframe(fullHistory, timeframe, new Date());
@@ -68,7 +93,11 @@ export function ProgressOverviewScreen() {
   }, [fullHistory, timeframe]);
 
   return (
-    <View style={styles.container}>
+    <HorizontalSwipe
+      style={styles.container}
+      onSwipeLeft={tabSwipe.onSwipeLeft}
+      onSwipeRight={tabSwipe.onSwipeRight}
+    >
       <ScreenHeader
         title="Progress"
         showBack={false}
@@ -145,6 +174,29 @@ export function ProgressOverviewScreen() {
           </View>
         </View>
 
+        {/* Overall progress dynamics (all-time volume per session) */}
+        {overallSeries.length >= 2 && (
+          <>
+            <SectionTitle>Overall progress</SectionTitle>
+            <View style={styles.chartCard}>
+              <Text style={styles.chartCaption}>Total volume per session</Text>
+              <LineChart
+                data={{
+                  labels: overallSeries.map((p) => shortLabel(p.date)),
+                  datasets: [{ data: overallSeries.map((p) => p.value) }],
+                }}
+                width={chartWidth}
+                height={200}
+                yAxisLabel=""
+                yAxisSuffix=""
+                chartConfig={chartConfig}
+                bezier
+                style={styles.chart}
+              />
+            </View>
+          </>
+        )}
+
         {/* Muscles worked */}
         <SectionTitle>Muscles worked</SectionTitle>
         {topMuscles.length === 0 ? (
@@ -184,7 +236,7 @@ export function ProgressOverviewScreen() {
           ))}
         </View>
       </ScrollView>
-    </View>
+    </HorizontalSwipe>
   );
 }
 
@@ -245,6 +297,9 @@ const styles = StyleSheet.create({
   legendLabel: { fontSize: typography.sizes.xs, color: colors.textMuted },
   legendBar: { flexDirection: 'row', borderRadius: radius.sm, overflow: 'hidden' },
   legendSwatch: { width: 22, height: 8 },
+  chartCard: { backgroundColor: colors.neutral1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.xs },
+  chartCaption: { fontSize: typography.sizes.sm, color: colors.textSecondary },
+  chart: { borderRadius: radius.sm },
   empty: { color: colors.textSecondary, fontSize: typography.sizes.sm },
   muscleList: { gap: spacing.xs },
   muscleRow: {

@@ -2,6 +2,8 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { ProgressOverviewScreen } from '../../../screens/client/progress/ProgressOverviewScreen';
 import { ClientHomeScreen } from '../../../screens/client/home/ClientHomeScreen';
+import { ExerciseProgressScreen } from '../../../screens/client/progress/ExerciseProgressScreen';
+import { ExerciseProgressDetailScreen } from '../../../screens/client/progress/ExerciseProgressDetailScreen';
 import { useAppStore } from '../../../store/appStore';
 
 // Screens read navigation; getParent() supports the cross-tab calls in ClientHome.
@@ -25,5 +27,13 @@ describe('client screens render (no infinite render loop)', () => {
 
   it('ClientHomeScreen renders without an infinite render loop', () => {
     expect(() => render(<ClientHomeScreen />)).not.toThrow();
+  });
+
+  it('ExerciseProgressScreen renders without an infinite render loop', () => {
+    expect(() => render(<ExerciseProgressScreen />)).not.toThrow();
+  });
+
+  it('ExerciseProgressDetailScreen renders without an infinite render loop', () => {
+    expect(() => render(<ExerciseProgressDetailScreen />)).not.toThrow();
   });
 });

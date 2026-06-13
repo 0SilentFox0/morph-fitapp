@@ -92,6 +92,8 @@ export type TrainersStackParamList = {
 export type ProgressStackParamList = {
   ProgressOverview: undefined;
   MuscleDetail: { muscle: MuscleGroup };
+  ExerciseProgress: undefined;
+  ExerciseProgressDetail: { exerciseId: number };
   TrainingHistory: undefined;
   TrainingHistoryDetail: { trainingId: string };
   PersonalRecords: undefined;

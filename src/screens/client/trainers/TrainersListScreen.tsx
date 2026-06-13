@@ -5,12 +5,13 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import type { TrainersStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
-import { SearchInput, Avatar, Tag, EmptyState } from '../../../components/ui';
+import { SearchInput, Avatar, Tag, EmptyState, HorizontalSwipe } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainersStore } from '../../../store/trainersStore';
+import { useClientTabSwipe } from '../useClientTabSwipe';
 import type { Trainer } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<TrainersStackParamList, 'TrainersList'>;
@@ -24,11 +25,16 @@ export function TrainersListScreen() {
   useTrainersStore((s) => s.onlineOnly);
   useTrainersStore((s) => s.trainers);
   const activeFilters = useTrainersStore((s) => s.activeFilterCount());
+  const tabSwipe = useClientTabSwipe('TrainersTab');
 
   const results = visibleTrainers(query);
 
   return (
-    <View style={styles.container}>
+    <HorizontalSwipe
+      style={styles.container}
+      onSwipeLeft={tabSwipe.onSwipeLeft}
+      onSwipeRight={tabSwipe.onSwipeRight}
+    >
       <ScreenHeader
         title="Find a trainer"
         showBack={false}
@@ -62,7 +68,7 @@ export function TrainersListScreen() {
           ))}
         </ScrollView>
       )}
-    </View>
+    </HorizontalSwipe>
   );
 }
 

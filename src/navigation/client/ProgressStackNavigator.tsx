@@ -4,6 +4,8 @@ import type { ProgressStackParamList } from '../types';
 import { ScreenBackground } from '../../components/layout';
 import { ProgressOverviewScreen } from '../../screens/client/progress/ProgressOverviewScreen';
 import { MuscleDetailScreen } from '../../screens/client/progress/MuscleDetailScreen';
+import { ExerciseProgressScreen } from '../../screens/client/progress/ExerciseProgressScreen';
+import { ExerciseProgressDetailScreen } from '../../screens/client/progress/ExerciseProgressDetailScreen';
 import { TrainingHistoryScreen } from '../../screens/client/progress/TrainingHistoryScreen';
 import { TrainingHistoryDetailScreen } from '../../screens/client/progress/TrainingHistoryDetailScreen';
 import { PersonalRecordsScreen } from '../../screens/client/progress/PersonalRecordsScreen';
@@ -26,6 +28,8 @@ export function ProgressStackNavigator() {
     >
       <Stack.Screen name="ProgressOverview" component={ProgressOverviewScreen} />
       <Stack.Screen name="MuscleDetail" component={MuscleDetailScreen} />
+      <Stack.Screen name="ExerciseProgress" component={ExerciseProgressScreen} />
+      <Stack.Screen name="ExerciseProgressDetail" component={ExerciseProgressDetailScreen} />
       <Stack.Screen name="TrainingHistory" component={TrainingHistoryScreen} />
       <Stack.Screen name="TrainingHistoryDetail" component={TrainingHistoryDetailScreen} />
       <Stack.Screen name="PersonalRecords" component={PersonalRecordsScreen} />

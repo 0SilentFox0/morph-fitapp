@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ProgressIndicator } from '../../../components/layout';
+import { HorizontalSwipe } from '../../../components/ui';
 import { FitnessLogo } from '../../../components/icons/FitnessLogo';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
@@ -51,7 +52,12 @@ export function OnboardingLayout({
   };
 
   return (
-    <View style={[styles.container, { paddingTop: Math.max(insets.top, 20) + 12 }]}>
+    // Swipe left = next step (respects validation); swipe right/back is left to the
+    // native-stack gesture, so we only wire onSwipeLeft here.
+    <HorizontalSwipe
+      style={[styles.container, { paddingTop: Math.max(insets.top, 20) + 12 }]}
+      onSwipeLeft={onNext ? handleNext : undefined}
+    >
       {showLogo && (
         <View style={styles.logo} accessible accessibilityRole="header">
           <FitnessLogo width={138} height={32} />
@@ -124,7 +130,7 @@ export function OnboardingLayout({
           </View>
         </View>
       )}
-    </View>
+    </HorizontalSwipe>
   );
 }
 

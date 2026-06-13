@@ -42,3 +42,5 @@ export { ClientSwitcherStrip } from './ClientSwitcherStrip';
 export type { SwitcherClient } from './ClientSwitcherStrip';
 export { BodyMap } from './BodyMap';
 export type { BodyMapProps } from './BodyMap';
+export { HorizontalSwipe } from './HorizontalSwipe';
+export type { HorizontalSwipeProps } from './HorizontalSwipe';

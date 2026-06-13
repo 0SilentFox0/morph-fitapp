@@ -7,3 +7,4 @@ export * from './progression';
 export * from './muscleStats';
 export * from './personalRecords';
 export * from './achievements';
+export * from './exerciseProgress';
