@@ -17,6 +17,7 @@ export function ProfileScreen() {
   const userName = useAppStore((s) => s.userName);
   const points = useAppStore((s) => s.points);
   const resetApp = useAppStore((s) => s.reset);
+  const setUserRole = useAppStore((s) => s.setUserRole);
   const resetOnboarding = useOnboardingStore((s) => s.reset);
 
   // Dev-only: clear the profile so RootNavigator drops back to onboarding,
@@ -25,6 +26,10 @@ export function ProfileScreen() {
     resetOnboarding();
     resetApp();
   };
+
+  // Dev-only: jump to the client experience without re-onboarding. The client
+  // profile has the reverse toggle back to the trainer view.
+  const handleSwitchToClient = () => setUserRole('client');
   const {
     name,
     profilePhotoUri,
@@ -160,12 +165,20 @@ export function ProfileScreen() {
         </View>
 
         {__DEV__ && (
-          <Button
-            title="Reset onboarding (dev)"
-            variant="outline"
-            onPress={handleResetOnboarding}
-            style={styles.devResetBtn}
-          />
+          <>
+            <Button
+              title="Switch to client view (dev)"
+              variant="outline"
+              onPress={handleSwitchToClient}
+              style={styles.devResetBtn}
+            />
+            <Button
+              title="Reset onboarding (dev)"
+              variant="outline"
+              onPress={handleResetOnboarding}
+              style={styles.devResetBtn}
+            />
+          </>
         )}
       </ScrollView>
     </View>

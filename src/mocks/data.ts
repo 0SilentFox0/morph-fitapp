@@ -3,6 +3,8 @@
  * Replace this file or its exports with API calls when backend is ready.
  */
 
+import type { MuscleGroup } from '../constants/muscles';
+
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 export type SessionStatus = 'completed' | 'pending' | 'canceled';
@@ -41,6 +43,8 @@ export interface ProgramExercise {
   durationLabel?: string;
   /** Free-text guidance shown on the live Exercise screen. */
   trainerNotes?: string;
+  /** Muscle groups this exercise loads — source of the per-muscle progress stats. */
+  muscles?: MuscleGroup[];
 }
 
 export interface TrainingProgram {
@@ -239,6 +243,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Chest',
         imageUrl: TRAINING_IMAGES[0]!,
         durationLabel: '5m',
+        muscles: ['chest', 'triceps', 'shoulders'],
         trainerNotes:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         sets: [
@@ -258,6 +263,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Chest',
         imageUrl: TRAINING_IMAGES[1]!,
         durationLabel: '5m',
+        muscles: ['chest', 'shoulders', 'triceps'],
         sets: [
           { weight: 20, reps: 15 },
           { weight: 22, reps: 12 },
@@ -270,6 +276,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Core',
         imageUrl: TRAINING_IMAGES[2]!,
         durationLabel: '5m',
+        muscles: ['core', 'quads', 'shoulders'],
         sets: [
           { weight: 0, reps: 40, note: 'short_rest' },
           { weight: 0, reps: 40 },
@@ -295,6 +302,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Cardio',
         imageUrl: TRAINING_IMAGES[3]!,
         durationLabel: '20m',
+        muscles: ['quads', 'hamstrings', 'calves'],
         sets: [
           { weight: 0, reps: 20, note: 'long_rest' },
           { weight: 0, reps: 20 },
@@ -306,6 +314,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Cardio',
         imageUrl: TRAINING_IMAGES[4]!,
         durationLabel: '10m',
+        muscles: ['back', 'biceps', 'core'],
         sets: [
           { weight: 0, reps: 15 },
           { weight: 0, reps: 15 },
@@ -330,6 +339,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Legs',
         imageUrl: TRAINING_IMAGES[2]!,
         durationLabel: '8m',
+        muscles: ['quads', 'glutes', 'hamstrings', 'core'],
         sets: [
           { weight: 60, reps: 12 },
           { weight: 70, reps: 10 },
@@ -343,6 +353,7 @@ export const mockTrainingPrograms: TrainingProgram[] = [
         category: 'Back',
         imageUrl: TRAINING_IMAGES[0]!,
         durationLabel: '8m',
+        muscles: ['back', 'hamstrings', 'glutes', 'core'],
         sets: [
           { weight: 80, reps: 8 },
           { weight: 90, reps: 6 },
@@ -372,6 +383,40 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     price: '$5/month',
   },
 ];
+
+/** Minimal per-exercise reference info, derived from the program definitions. */
+export interface ExerciseInfo {
+  id: number;
+  name: string;
+  category: string;
+  muscles: MuscleGroup[];
+}
+
+/** exercise id → reference info, deduped across all program definitions. */
+export const exerciseCatalog: Record<number, ExerciseInfo> =
+  mockTrainingPrograms.reduce<Record<number, ExerciseInfo>>((acc, program) => {
+    for (const exercise of program.exercises ?? []) {
+      if (!acc[exercise.id]) {
+        acc[exercise.id] = {
+          id: exercise.id,
+          name: exercise.name,
+          category: exercise.category,
+          muscles: exercise.muscles ?? [],
+        };
+      }
+    }
+    return acc;
+  }, {});
+
+/**
+ * exercise id → muscle groups, derived from the program definitions above.
+ * Source of truth for the per-muscle progress stats (see utils/muscleStats.ts).
+ */
+export const exerciseMuscleMap: Record<number, MuscleGroup[]> = Object.fromEntries(
+  Object.values(exerciseCatalog)
+    .filter((e) => e.muscles.length > 0)
+    .map((e) => [e.id, e.muscles]),
+);
 
 export const mockClients: Client[] = [
   {
@@ -546,6 +591,82 @@ function seedClientHistory(clientName: string): CompletedTraining[] {
   ];
 }
 
+/**
+ * The signed-in client. Their own past trainings are seeded below so the
+ * client-side progress features (body-map, PRs, streak) always have data,
+ * independent of whatever display name was entered at onboarding.
+ */
+export const CURRENT_USER_NAME = 'You';
+
+/**
+ * Richer, dated history for the current client across several programs so the
+ * per-muscle heat-map, trend charts and streak all render meaningfully. Dates
+ * are ISO (recent, relative to the demo "today") and ascending oldest → newest.
+ */
+const currentUserHistory: CompletedTraining[] = [
+  {
+    id: 'me-1',
+    clientName: CURRENT_USER_NAME,
+    programId: '3',
+    date: '2026-06-01T18:00:00Z',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+    ],
+  },
+  {
+    id: 'me-2',
+    clientName: CURRENT_USER_NAME,
+    programId: '1',
+    date: '2026-06-03T18:00:00Z',
+    exercises: [
+      { exerciseId: 101, sets: [{ weight: 45, reps: 12 }, { weight: 50, reps: 10 }, { weight: 55, reps: 8 }] },
+      { exerciseId: 102, sets: [{ weight: 20, reps: 14 }, { weight: 22, reps: 12 }] },
+      { exerciseId: 103, sets: [{ weight: 0, reps: 40 }, { weight: 0, reps: 35 }] },
+    ],
+  },
+  {
+    id: 'me-3',
+    clientName: CURRENT_USER_NAME,
+    programId: '2',
+    date: '2026-06-06T08:00:00Z',
+    exercises: [
+      { exerciseId: 201, sets: [{ weight: 0, reps: 25 }] },
+      { exerciseId: 202, sets: [{ weight: 0, reps: 18 }, { weight: 0, reps: 16 }] },
+    ],
+  },
+  {
+    id: 'me-4',
+    clientName: CURRENT_USER_NAME,
+    programId: '3',
+    date: '2026-06-08T18:00:00Z',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 55, reps: 12 }, { weight: 65, reps: 10 }, { weight: 75, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 75, reps: 8 }, { weight: 85, reps: 6 }, { weight: 95, reps: 4 }] },
+    ],
+  },
+  {
+    id: 'me-5',
+    clientName: CURRENT_USER_NAME,
+    programId: '1',
+    date: '2026-06-10T18:00:00Z',
+    exercises: [
+      { exerciseId: 101, sets: [{ weight: 50, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
+      { exerciseId: 102, sets: [{ weight: 22, reps: 14 }, { weight: 24, reps: 12 }] },
+    ],
+  },
+  {
+    id: 'me-6',
+    clientName: CURRENT_USER_NAME,
+    programId: '3',
+    date: '2026-06-12T18:00:00Z',
+    exercises: [
+      { exerciseId: 301, sets: [{ weight: 60, reps: 12 }, { weight: 70, reps: 10 }, { weight: 80, reps: 8 }] },
+      { exerciseId: 302, sets: [{ weight: 80, reps: 8 }, { weight: 90, reps: 6 }, { weight: 100, reps: 4 }] },
+    ],
+  },
+];
+
 const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientName));
 
 /**
@@ -555,6 +676,7 @@ const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientNa
  * post-training stats chart is never empty.
  */
 export const mockTrainingHistory: CompletedTraining[] = [
+  ...currentUserHistory,
   ...curatedTrainingHistory,
   ...Array.from(
     new Set([
@@ -626,3 +748,147 @@ export const mockAnalyticsData: AnalyticsData = {
     trainings: 248,
   },
 };
+
+// ─── Body measurements (client progress) ────────────────────────────────────
+
+export interface MeasurementEntry {
+  id: string;
+  /** ISO date the measurement was taken. */
+  date: string;
+  weightKg: number;
+  chestCm?: number;
+  waistCm?: number;
+  armCm?: number;
+}
+
+/** Seed bodyweight/measurement history for the current client, oldest → newest. */
+export const mockMeasurements: MeasurementEntry[] = [
+  { id: 'm1', date: '2026-05-16T08:00:00Z', weightKg: 82.4, chestCm: 102, waistCm: 88, armCm: 36 },
+  { id: 'm2', date: '2026-05-23T08:00:00Z', weightKg: 81.8, chestCm: 102, waistCm: 87, armCm: 36 },
+  { id: 'm3', date: '2026-05-30T08:00:00Z', weightKg: 81.1, chestCm: 103, waistCm: 86, armCm: 37 },
+  { id: 'm4', date: '2026-06-06T08:00:00Z', weightKg: 80.5, chestCm: 103, waistCm: 85, armCm: 37 },
+  { id: 'm5', date: '2026-06-12T08:00:00Z', weightKg: 79.9, chestCm: 104, waistCm: 84, armCm: 38 },
+];
+
+// ─── Trainers (client-side discovery) ───────────────────────────────────────
+
+export type ConnectionStatus = 'none' | 'pending' | 'connected';
+
+export interface Trainer {
+  id: string;
+  name: string;
+  avatar?: string;
+  /** Short professional headline, e.g. "Strength & Conditioning Coach". */
+  headline: string;
+  bio: string;
+  /** Training types / focus areas — also used for filtering. */
+  specialties: string[];
+  location: string;
+  /** Average rating 0–5. */
+  rating: number;
+  reviews: number;
+  pricePerSession: string;
+  experienceYears: number;
+  certifications: string[];
+  /** Offers online sessions. */
+  online: boolean;
+  connection: ConnectionStatus;
+}
+
+export const mockTrainers: Trainer[] = [
+  {
+    id: 't1',
+    name: 'Marcus Reed',
+    headline: 'Strength & Conditioning Coach',
+    bio: 'Former competitive powerlifter helping clients build strength safely and progressively. 10+ years coaching all levels.',
+    specialties: ['Strength', 'Powerlifting', 'Mobility'],
+    location: 'Kyiv · In-person & Online',
+    rating: 4.9,
+    reviews: 128,
+    pricePerSession: '$45/session',
+    experienceYears: 11,
+    certifications: ['NASM-CPT', 'CSCS'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't2',
+    name: 'Sofia Marenko',
+    headline: 'HIIT & Fat-loss Specialist',
+    bio: 'High-energy sessions focused on conditioning and sustainable fat loss. I make hard work fun.',
+    specialties: ['HIIT', 'Cardio', 'Nutrition'],
+    location: 'Lviv · In-person',
+    rating: 4.8,
+    reviews: 94,
+    pricePerSession: '$38/session',
+    experienceYears: 7,
+    certifications: ['ACE-CPT'],
+    online: false,
+    connection: 'none',
+  },
+  {
+    id: 't3',
+    name: 'Daniel Cho',
+    headline: 'Mobility & Rehab Coach',
+    bio: 'Physiotherapy background. Specialise in injury recovery, posture and pain-free movement.',
+    specialties: ['Mobility', 'Rehab', 'Yoga'],
+    location: 'Online only',
+    rating: 5.0,
+    reviews: 61,
+    pricePerSession: '$50/session',
+    experienceYears: 9,
+    certifications: ['DPT', 'FRC'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't4',
+    name: 'Amina Yusuf',
+    headline: 'Bodybuilding & Physique Coach',
+    bio: 'Helping clients build muscle and prep for stage. Detailed programming and accountability.',
+    specialties: ['Bodybuilding', 'Strength', 'Nutrition'],
+    location: 'Odesa · In-person & Online',
+    rating: 4.7,
+    reviews: 73,
+    pricePerSession: '$42/session',
+    experienceYears: 8,
+    certifications: ['ISSA-CPT'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't5',
+    name: 'Liam O’Brien',
+    headline: 'Running & Endurance Coach',
+    bio: 'From 5k to marathon. Structured endurance plans tailored to your race calendar.',
+    specialties: ['Cardio', 'Endurance', 'Running'],
+    location: 'Kyiv · Outdoor & Online',
+    rating: 4.6,
+    reviews: 52,
+    pricePerSession: '$35/session',
+    experienceYears: 6,
+    certifications: ['UESCA Run'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't6',
+    name: 'Yulia Tkachenko',
+    headline: 'Yoga & Flexibility Instructor',
+    bio: 'Vinyasa and restorative yoga for strength, balance and stress relief. All levels welcome.',
+    specialties: ['Yoga', 'Mobility', 'Wellness'],
+    location: 'Lviv · In-person & Online',
+    rating: 4.9,
+    reviews: 110,
+    pricePerSession: '$30/session',
+    experienceYears: 12,
+    certifications: ['RYT-500'],
+    online: true,
+    connection: 'none',
+  },
+];
+
+/** Distinct specialties across all trainers, for the filter screen. */
+export const trainerSpecialties: string[] = Array.from(
+  new Set(mockTrainers.flatMap((t) => t.specialties)),
+).sort();

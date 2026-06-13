@@ -1,5 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Session, TrainingProgram, ProgramExercise } from '../mocks';
+import type { MuscleGroup } from '../constants/muscles';
 
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
@@ -63,6 +64,39 @@ export type ChatStackParamList = {
   ChatList: undefined;
   ChatThread: { conversationId: string };
   NewChat: undefined;
+};
+
+// ─── Client-side navigation ──────────────────────────────────────────────────
+
+export type ClientTabParamList = {
+  ClientHomeTab: undefined;
+  TrainersTab: undefined;
+  ClientAddTab: undefined;
+  ChatTab: undefined;
+  ProgressTab: undefined;
+};
+
+export type ClientHomeStackParamList = {
+  ClientHome: undefined;
+  ClientProfile: undefined;
+  BookSession: { trainerId?: string } | undefined;
+  RequestSubmitted: undefined;
+};
+
+export type TrainersStackParamList = {
+  TrainersList: undefined;
+  TrainerFilters: undefined;
+  TrainerProfile: { trainerId: string };
+};
+
+export type ProgressStackParamList = {
+  ProgressOverview: undefined;
+  MuscleDetail: { muscle: MuscleGroup };
+  TrainingHistory: undefined;
+  TrainingHistoryDetail: { trainingId: string };
+  PersonalRecords: undefined;
+  Measurements: undefined;
+  Achievements: undefined;
 };
 
 export type OnboardingScreenProps<T extends keyof OnboardingStackParamList> =
