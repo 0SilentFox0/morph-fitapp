@@ -2,14 +2,11 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { TrainersStackParamList } from '../types';
 import { ScreenBackground } from '../../components/layout';
-import { makeClientPlaceholder } from '../../screens/client/ClientPlaceholderScreen';
+import { TrainersListScreen } from '../../screens/client/trainers/TrainersListScreen';
+import { TrainerFiltersScreen } from '../../screens/client/trainers/TrainerFiltersScreen';
+import { TrainerProfileScreen } from '../../screens/client/trainers/TrainerProfileScreen';
 
 const Stack = createNativeStackNavigator<TrainersStackParamList>();
-
-// Placeholders replaced in Phase 4.
-const TrainersListScreen = makeClientPlaceholder('Find a trainer', 'search');
-const TrainerFiltersScreen = makeClientPlaceholder('Filters', 'options', true);
-const TrainerProfileScreen = makeClientPlaceholder('Trainer', 'person', true);
 
 export function TrainersStackNavigator() {
   return (

@@ -769,3 +769,126 @@ export const mockMeasurements: MeasurementEntry[] = [
   { id: 'm4', date: '2026-06-06T08:00:00Z', weightKg: 80.5, chestCm: 103, waistCm: 85, armCm: 37 },
   { id: 'm5', date: '2026-06-12T08:00:00Z', weightKg: 79.9, chestCm: 104, waistCm: 84, armCm: 38 },
 ];
+
+// ─── Trainers (client-side discovery) ───────────────────────────────────────
+
+export type ConnectionStatus = 'none' | 'pending' | 'connected';
+
+export interface Trainer {
+  id: string;
+  name: string;
+  avatar?: string;
+  /** Short professional headline, e.g. "Strength & Conditioning Coach". */
+  headline: string;
+  bio: string;
+  /** Training types / focus areas — also used for filtering. */
+  specialties: string[];
+  location: string;
+  /** Average rating 0–5. */
+  rating: number;
+  reviews: number;
+  pricePerSession: string;
+  experienceYears: number;
+  certifications: string[];
+  /** Offers online sessions. */
+  online: boolean;
+  connection: ConnectionStatus;
+}
+
+export const mockTrainers: Trainer[] = [
+  {
+    id: 't1',
+    name: 'Marcus Reed',
+    headline: 'Strength & Conditioning Coach',
+    bio: 'Former competitive powerlifter helping clients build strength safely and progressively. 10+ years coaching all levels.',
+    specialties: ['Strength', 'Powerlifting', 'Mobility'],
+    location: 'Kyiv · In-person & Online',
+    rating: 4.9,
+    reviews: 128,
+    pricePerSession: '$45/session',
+    experienceYears: 11,
+    certifications: ['NASM-CPT', 'CSCS'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't2',
+    name: 'Sofia Marenko',
+    headline: 'HIIT & Fat-loss Specialist',
+    bio: 'High-energy sessions focused on conditioning and sustainable fat loss. I make hard work fun.',
+    specialties: ['HIIT', 'Cardio', 'Nutrition'],
+    location: 'Lviv · In-person',
+    rating: 4.8,
+    reviews: 94,
+    pricePerSession: '$38/session',
+    experienceYears: 7,
+    certifications: ['ACE-CPT'],
+    online: false,
+    connection: 'none',
+  },
+  {
+    id: 't3',
+    name: 'Daniel Cho',
+    headline: 'Mobility & Rehab Coach',
+    bio: 'Physiotherapy background. Specialise in injury recovery, posture and pain-free movement.',
+    specialties: ['Mobility', 'Rehab', 'Yoga'],
+    location: 'Online only',
+    rating: 5.0,
+    reviews: 61,
+    pricePerSession: '$50/session',
+    experienceYears: 9,
+    certifications: ['DPT', 'FRC'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't4',
+    name: 'Amina Yusuf',
+    headline: 'Bodybuilding & Physique Coach',
+    bio: 'Helping clients build muscle and prep for stage. Detailed programming and accountability.',
+    specialties: ['Bodybuilding', 'Strength', 'Nutrition'],
+    location: 'Odesa · In-person & Online',
+    rating: 4.7,
+    reviews: 73,
+    pricePerSession: '$42/session',
+    experienceYears: 8,
+    certifications: ['ISSA-CPT'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't5',
+    name: 'Liam O’Brien',
+    headline: 'Running & Endurance Coach',
+    bio: 'From 5k to marathon. Structured endurance plans tailored to your race calendar.',
+    specialties: ['Cardio', 'Endurance', 'Running'],
+    location: 'Kyiv · Outdoor & Online',
+    rating: 4.6,
+    reviews: 52,
+    pricePerSession: '$35/session',
+    experienceYears: 6,
+    certifications: ['UESCA Run'],
+    online: true,
+    connection: 'none',
+  },
+  {
+    id: 't6',
+    name: 'Yulia Tkachenko',
+    headline: 'Yoga & Flexibility Instructor',
+    bio: 'Vinyasa and restorative yoga for strength, balance and stress relief. All levels welcome.',
+    specialties: ['Yoga', 'Mobility', 'Wellness'],
+    location: 'Lviv · In-person & Online',
+    rating: 4.9,
+    reviews: 110,
+    pricePerSession: '$30/session',
+    experienceYears: 12,
+    certifications: ['RYT-500'],
+    online: true,
+    connection: 'none',
+  },
+];
+
+/** Distinct specialties across all trainers, for the filter screen. */
+export const trainerSpecialties: string[] = Array.from(
+  new Set(mockTrainers.flatMap((t) => t.specialties)),
+).sort();
