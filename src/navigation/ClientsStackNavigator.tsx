@@ -1,7 +1,8 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { ClientsStackParamList } from './types';
-import { colors } from '../theme/colors';
+import { ScreenBackground } from '../components/layout';
+import { useRestTimer } from '../hooks/useRestTimer';
 
 import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
 import { FiltersScreen } from '../screens/clients/FiltersScreen';
@@ -14,11 +15,13 @@ import { TrainingSummaryScreen } from '../screens/clients/TrainingSummaryScreen'
 const Stack = createNativeStackNavigator<ClientsStackParamList>();
 
 export function ClientsStackNavigator() {
+  useRestTimer();
+
   return (
     <Stack.Navigator
+      screenLayout={({ children }) => <ScreenBackground>{children}</ScreenBackground>}
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: colors.screenBg },
         animation: 'slide_from_right',
         animationDuration: 250,
         fullScreenGestureEnabled: true,

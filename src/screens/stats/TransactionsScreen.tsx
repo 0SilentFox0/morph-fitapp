@@ -1,43 +1,51 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import type { StatsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
-import { Card } from '../../components/ui';
+import { SearchInput } from '../../components/ui';
+import { TransactionCard } from './Analytics/TransactionCard';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
+import { exportTransactions } from '../../utils';
 import { mockTransactions } from '../../mocks';
 
-const FILTERS = ['All', 'Earnings', 'Subscriptions'];
+type Nav = NativeStackNavigationProp<StatsStackParamList, 'Transactions'>;
 
-const statusColors = {
-  completed: colors.Success,
-  pending: colors.Warning,
-  canceled: colors.Error,
-};
+const FILTERS = ['All', 'Earnings', 'Subscriptions'] as const;
 
 export function TransactionsScreen() {
+  const navigation = useNavigation<Nav>();
   const [activeFilter, setActiveFilter] = React.useState(0);
+  const [search, setSearch] = React.useState('');
+
+  const transactions = React.useMemo(() => {
+    const byFilter = mockTransactions.filter((t) => {
+      if (activeFilter === 1) return t.type === 'Training';
+      if (activeFilter === 2) return t.type === 'Subscription';
+      return true;
+    });
+    const q = search.trim().toLowerCase();
+    if (!q) return byFilter;
+    return byFilter.filter((t) => t.clientName.toLowerCase().includes(q));
+  }, [activeFilter, search]);
 
   return (
     <View style={styles.container}>
       <ScreenHeader
         title="Transactions"
+        transparent
         rightElement={
           <View style={styles.headerRight}>
-            <TouchableOpacity>
-              <Ionicons name="download" size={24} color={colors.text} />
+            <TouchableOpacity onPress={() => navigation.navigate('AddTransaction')}>
+              <Ionicons name="pencil" size={22} color={colors.text} />
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Ionicons name="pencil" size={24} color={colors.text} />
+            <TouchableOpacity onPress={() => exportTransactions(transactions)}>
+              <Ionicons name="download" size={22} color={colors.text} />
             </TouchableOpacity>
           </View>
         }
@@ -48,17 +56,9 @@ export function TransactionsScreen() {
           <TouchableOpacity
             key={f}
             onPress={() => setActiveFilter(i)}
-            style={[
-              styles.filterBtn,
-              i === activeFilter && styles.filterBtnActive,
-            ]}
+            style={[styles.filterBtn, i === activeFilter && styles.filterBtnActive]}
           >
-            <Text
-              style={[
-                styles.filterText,
-                i === activeFilter && styles.filterTextActive,
-              ]}
-            >
+            <Text style={[styles.filterText, i === activeFilter && styles.filterTextActive]}>
               {f}
             </Text>
           </TouchableOpacity>
@@ -66,17 +66,7 @@ export function TransactionsScreen() {
       </View>
 
       <View style={styles.searchWrapper}>
-        <TextInput
-          style={styles.search}
-          placeholder="Search"
-          placeholderTextColor={colors.textMuted}
-        />
-        <Ionicons
-          name="search"
-          size={20}
-          color={colors.textMuted}
-          style={styles.searchIcon}
-        />
+        <SearchInput value={search} onChangeText={setSearch} />
       </View>
 
       <ScrollView
@@ -84,27 +74,8 @@ export function TransactionsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {mockTransactions.map((t) => (
-          <Card key={t.id} style={styles.transactionCard}>
-            <View style={styles.transactionLeft}>
-              <Text style={styles.transactionName}>{t.clientName}</Text>
-              <Text style={styles.transactionDate}>{t.date}</Text>
-              <Text style={styles.transactionType}>{t.type}</Text>
-            </View>
-            <View style={styles.transactionRight}>
-              <Text style={[styles.transactionAmount, { color: colors.Success }]}>
-                {t.amount}
-              </Text>
-              <View style={styles.statusRow}>
-                <Ionicons
-                  name="cash"
-                  size={16}
-                  color={statusColors[t.status]}
-                />
-                <Text style={styles.statusText}>{t.status}</Text>
-              </View>
-            </View>
-          </Card>
+        {transactions.map((t) => (
+          <TransactionCard key={t.id} transaction={t} />
         ))}
       </ScrollView>
     </View>
@@ -129,11 +100,12 @@ const styles = StyleSheet.create({
   filterBtn: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.xl,
-    backgroundColor: colors.neutral2,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.neutral3,
   },
   filterBtnActive: {
-    backgroundColor: colors.neutral1,
+    borderColor: colors.neutral8,
   },
   filterText: {
     fontSize: typography.sizes.sm,
@@ -146,64 +118,11 @@ const styles = StyleSheet.create({
   searchWrapper: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    position: 'relative',
-  },
-  search: {
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingRight: 40,
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  searchIcon: {
-    position: 'absolute',
-    right: spacing.md,
-    top: 16,
   },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing['2xl'] + spacing.tabBarInset,
-  },
-  transactionCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  transactionLeft: {
-    flex: 1,
-  },
-  transactionName: {
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  transactionDate: {
-    fontSize: typography.sizes.xs,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
-  },
-  transactionType: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
-  transactionRight: {
-    alignItems: 'flex-end',
-  },
-  transactionAmount: {
-    fontSize: typography.sizes.base,
-    fontWeight: typography.weights.bold,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.xs,
-  },
-  statusText: {
-    fontSize: typography.sizes.xs,
-    color: colors.textSecondary,
+    gap: spacing.sm,
   },
 });

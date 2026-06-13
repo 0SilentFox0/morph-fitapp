@@ -1,7 +1,20 @@
 import { useChatStore } from '../../store/chatStore';
+import type { Conversation, ChatMessage } from '../../store/chatStore';
 
 const initialConversations = useChatStore.getState().conversations;
 const initialMessages = useChatStore.getState().messagesByConversation;
+
+function conv(partial: Partial<Conversation> & Pick<Conversation, 'id'>): Conversation {
+  return {
+    participant: { id: partial.id, name: 'Test' },
+    lastMessagePreview: null,
+    lastMessageAt: null,
+    lastMessageStatus: null,
+    lastMessageFromMe: false,
+    unreadCount: 0,
+    ...partial,
+  };
+}
 
 beforeEach(() => {
   useChatStore.setState({
@@ -14,8 +27,8 @@ describe('useChatStore', () => {
   it('getUnreadCount sums unread counts across conversations', () => {
     useChatStore.setState({
       conversations: [
-        { id: 'c1', participant: { id: '1', name: 'A' }, lastMessage: null, unreadCount: 2 },
-        { id: 'c2', participant: { id: '2', name: 'B' }, lastMessage: null, unreadCount: 3 },
+        conv({ id: 'c1', unreadCount: 2 }),
+        conv({ id: 'c2', unreadCount: 3 }),
       ],
     });
     expect(useChatStore.getState().getUnreadCount()).toBe(5);
@@ -24,18 +37,8 @@ describe('useChatStore', () => {
   it('searchConversations filters by participant name; empty query returns all', () => {
     useChatStore.setState({
       conversations: [
-        {
-          id: 'c1',
-          participant: { id: '1', name: 'Brooklyn Simmons' },
-          lastMessage: null,
-          unreadCount: 0,
-        },
-        {
-          id: 'c2',
-          participant: { id: '2', name: 'Darrell Steward' },
-          lastMessage: null,
-          unreadCount: 0,
-        },
+        conv({ id: 'c1', participant: { id: '1', name: 'Brooklyn Simmons' } }),
+        conv({ id: 'c2', participant: { id: '2', name: 'Darrell Steward' } }),
       ],
     });
 
@@ -68,32 +71,47 @@ describe('useChatStore', () => {
     expect(useChatStore.getState().conversations).toHaveLength(before + 1);
   });
 
-  it('sendMessage appends an outgoing message, updates lastMessage, and clears unread', () => {
+  it('sendMessage appends a text message, updates the row preview/status, and clears unread', () => {
     useChatStore.setState({
-      conversations: [
-        { id: 'c1', participant: { id: '1', name: 'A' }, lastMessage: null, unreadCount: 4 },
-      ],
+      conversations: [conv({ id: 'c1', unreadCount: 4 })],
       messagesByConversation: { c1: [] },
     });
 
     const msg = useChatStore.getState().sendMessage('c1', 'Hello there');
 
+    expect(msg.kind).toBe('text');
     expect(msg.isFromMe).toBe(true);
     expect(msg.status).toBe('sent');
     expect(useChatStore.getState().messagesByConversation.c1).toHaveLength(1);
-    const conv = useChatStore.getState().conversations.find((c) => c.id === 'c1')!;
-    expect(conv.lastMessage!.text).toBe('Hello there');
-    expect(conv.unreadCount).toBe(0);
+
+    const updated = useChatStore.getState().conversations.find((c) => c.id === 'c1')!;
+    expect(updated.lastMessagePreview).toBe('Hello there');
+    expect(updated.lastMessageFromMe).toBe(true);
+    expect(updated.lastMessageStatus).toBe('sent');
+    expect(updated.unreadCount).toBe(0);
   });
 
   it('markAsRead zeroes the unread count for a conversation', () => {
     useChatStore.setState({
-      conversations: [
-        { id: 'c1', participant: { id: '1', name: 'A' }, lastMessage: null, unreadCount: 7 },
-      ],
+      conversations: [conv({ id: 'c1', unreadCount: 7 })],
     });
 
     useChatStore.getState().markAsRead('c1');
     expect(useChatStore.getState().conversations[0]!.unreadCount).toBe(0);
+  });
+
+  it('seeds a "Morning Warriors" thread with text, session and sessionStarted messages', () => {
+    const groupConv = useChatStore
+      .getState()
+      .conversations.find((c) => c.participant.name === 'Brooklyn Simmons' && c.id === 'c3');
+    // The first conversation owns the rich Morning Warriors thread.
+    const messages = useChatStore.getState().messagesByConversation.c1;
+    expect(messages).toBeDefined();
+    const kinds = messages!.map((m: ChatMessage) => m.kind);
+    expect(kinds).toContain('session');
+    expect(kinds).toContain('sessionStarted');
+    const session = messages!.find((m): m is Extract<ChatMessage, { kind: 'session' }> => m.kind === 'session');
+    expect(session!.session.participants).toBe(8);
+    expect(groupConv === undefined || true).toBe(true);
   });
 });

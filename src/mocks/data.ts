@@ -32,6 +32,10 @@ export interface ProgramExercise {
   category: string;
   imageUrl: string | null;
   sets: ExerciseSet[];
+  /** Short duration label shown in exercise lists, e.g. "5m". */
+  durationLabel?: string;
+  /** Free-text guidance shown on the live Exercise screen. */
+  trainerNotes?: string;
 }
 
 export interface TrainingProgram {
@@ -66,6 +70,9 @@ export interface Transaction {
   amount: string;
   type: TransactionType;
   status: TransactionStatus;
+  /** Sessions used / total — shown as a progress bar for Subscription transactions. */
+  sessionsUsed?: number;
+  sessionsTotal?: number;
 }
 
 export interface ChartDataPoint {
@@ -135,6 +142,27 @@ export const mockSessions: Session[] = [
     time: '2:00pm',
     status: 'pending',
     participants: [{ id: '5', name: 'Guy Hawkins' }],
+    programId: '1',
+  },
+  {
+    id: '7',
+    title: 'Personal Session',
+    type: 'Strength',
+    date: 'Today',
+    time: '2:00pm',
+    status: 'pending',
+    participants: [{ id: '6', name: 'Brooklyn Simmons' }],
+    programId: '3',
+  },
+  {
+    id: '8',
+    title: 'Personal Session',
+    type: 'Cardio',
+    date: 'Today',
+    time: '2:00pm',
+    status: 'pending',
+    participants: [{ id: '2', name: 'Darrell Steward' }],
+    programId: '2',
   },
   {
     id: '4',
@@ -182,6 +210,52 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 340,
     thumbnail: TRAINING_IMAGES[0],
     price: '$5/month',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    exercises: [
+      {
+        id: 101,
+        name: 'Bench press',
+        category: 'Chest',
+        imageUrl: TRAINING_IMAGES[0]!,
+        durationLabel: '5m',
+        trainerNotes:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        sets: [
+          { weight: 40, reps: 30, note: 'failure' },
+          { weight: 45, reps: 25 },
+          { weight: 50, reps: 20 },
+          { weight: 50, reps: 18 },
+          { weight: 55, reps: 15 },
+          { weight: 55, reps: 12 },
+          { weight: 60, reps: 10 },
+          { weight: 60, reps: 8 },
+        ],
+      },
+      {
+        id: 102,
+        name: 'Incline dumbbell press',
+        category: 'Chest',
+        imageUrl: TRAINING_IMAGES[1]!,
+        durationLabel: '5m',
+        sets: [
+          { weight: 20, reps: 15 },
+          { weight: 22, reps: 12 },
+          { weight: 24, reps: 10 },
+        ],
+      },
+      {
+        id: 103,
+        name: 'Mountain climbers',
+        category: 'Core',
+        imageUrl: TRAINING_IMAGES[2]!,
+        durationLabel: '5m',
+        sets: [
+          { weight: 0, reps: 40, note: 'short_rest' },
+          { weight: 0, reps: 40 },
+          { weight: 0, reps: 30 },
+        ],
+      },
+    ],
   },
   {
     id: '2',
@@ -192,6 +266,31 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 210,
     thumbnail: TRAINING_IMAGES[1],
     price: '$5/month',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    exercises: [
+      {
+        id: 201,
+        name: 'Treadmill run',
+        category: 'Cardio',
+        imageUrl: TRAINING_IMAGES[3]!,
+        durationLabel: '20m',
+        sets: [
+          { weight: 0, reps: 20, note: 'long_rest' },
+          { weight: 0, reps: 20 },
+        ],
+      },
+      {
+        id: 202,
+        name: 'Rowing',
+        category: 'Cardio',
+        imageUrl: TRAINING_IMAGES[4]!,
+        durationLabel: '10m',
+        sets: [
+          { weight: 0, reps: 15 },
+          { weight: 0, reps: 15 },
+        ],
+      },
+    ],
   },
   {
     id: '3',
@@ -202,6 +301,34 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 520,
     thumbnail: TRAINING_IMAGES[2],
     price: '$5/month',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    exercises: [
+      {
+        id: 301,
+        name: 'Back squat',
+        category: 'Legs',
+        imageUrl: TRAINING_IMAGES[2]!,
+        durationLabel: '8m',
+        sets: [
+          { weight: 60, reps: 12 },
+          { weight: 70, reps: 10 },
+          { weight: 80, reps: 8, note: 'failure' },
+          { weight: 80, reps: 6 },
+        ],
+      },
+      {
+        id: 302,
+        name: 'Deadlift',
+        category: 'Back',
+        imageUrl: TRAINING_IMAGES[0]!,
+        durationLabel: '8m',
+        sets: [
+          { weight: 80, reps: 8 },
+          { weight: 90, reps: 6 },
+          { weight: 100, reps: 4 },
+        ],
+      },
+    ],
   },
   {
     id: '4',
@@ -262,6 +389,8 @@ export const mockTransactions: Transaction[] = [
     amount: '$400',
     type: 'Subscription',
     status: 'completed',
+    sessionsUsed: 4,
+    sessionsTotal: 9,
   },
   {
     id: '3',
@@ -278,6 +407,8 @@ export const mockTransactions: Transaction[] = [
     amount: '$65',
     type: 'Subscription',
     status: 'completed',
+    sessionsUsed: 4,
+    sessionsTotal: 9,
   },
   {
     id: '5',

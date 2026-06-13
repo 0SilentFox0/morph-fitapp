@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { StatsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { Button, Card } from '../../components/ui';
+import { Button } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
@@ -30,30 +31,39 @@ export function YouGotPaidScreen() {
         <Text style={styles.title}>You got paid!</Text>
         <Text style={styles.subtitle}>Track your earnings and manage your finances with ease.</Text>
 
-        <Card style={styles.achievementCard}>
-          <View style={styles.achievementIcon}>
-            <Ionicons name="trophy" size={48} color={colors.white} />
+        <View style={styles.achievementCard}>
+          <LinearGradient
+            colors={['#1D1D1D', 'rgba(121,26,31,0)', 'rgba(174,69,31,0.45)']}
+            locations={[0, 0.55, 1]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.trophyCircle}>
+            <Ionicons name="trophy" size={32} color={colors.neutral1} />
           </View>
           <Text style={styles.achievementLabel}>Achievement unlocked</Text>
           <Text style={styles.achievementTitle}>First Transaction Recorded</Text>
           <Text style={styles.achievementDesc}>
             Earn more achievements by uploading content or getting reviews
           </Text>
-          <View style={styles.pointsBadge}>
-            <Text style={styles.pointsText}>+20</Text>
-            <Ionicons name="star" size={16} color={colors.text} />
-          </View>
-        </Card>
+        </View>
+
+        <View style={styles.pointsBadge}>
+          <Text style={styles.pointsText}>+ 20</Text>
+          <Ionicons name="sparkles" size={16} color={colors.text} />
+        </View>
 
         <Button
           title="Go to Homepage"
-          onPress={() => navigation.navigate('BusinessAnalytics')}
+          onPress={() => navigation.getParent()?.navigate('HomeTab' as never)}
           style={styles.primaryBtn}
         />
         <Button
           title="Record More Transactions"
           onPress={() => navigation.navigate('Transactions')}
           variant="secondary"
+          style={styles.secondaryBtn}
         />
       </ScrollView>
     </View>
@@ -69,9 +79,9 @@ const styles = StyleSheet.create({
   logo: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
   },
   logoText: {
     fontSize: typography.sizes.lg,
@@ -81,7 +91,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing['2xl'],
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
     alignItems: 'center',
   },
   title: {
@@ -97,18 +107,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   achievementCard: {
+    width: '100%',
     alignItems: 'center',
-    marginBottom: spacing.xl,
-    padding: spacing.xl,
+    marginBottom: spacing.lg,
+    paddingVertical: spacing['2xl'],
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
   },
-  achievementIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.accent,
+  trophyCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.primary9,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   achievementLabel: {
     fontSize: typography.sizes.xs,
@@ -119,23 +133,23 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xl,
     fontWeight: typography.weights.bold,
     color: colors.text,
+    textAlign: 'center',
     marginBottom: spacing.sm,
   },
   achievementDesc: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.md,
   },
   pointsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
+    backgroundColor: colors.neutral2,
+    marginBottom: spacing.xl,
   },
   pointsText: {
     fontSize: typography.sizes.sm,
@@ -145,5 +159,8 @@ const styles = StyleSheet.create({
   primaryBtn: {
     width: '100%',
     marginBottom: spacing.md,
+  },
+  secondaryBtn: {
+    width: '100%',
   },
 });

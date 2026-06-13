@@ -1,10 +1,8 @@
 export const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const DAYS_AHEAD = 90;
 
-const WORK_DAY_START = 8;
-const WORK_DAY_END = 16;
-const AVG_TRAINING_HOURS = 1.5;
-const MAX_TRAININGS_PER_DAY = Math.floor((WORK_DAY_END - WORK_DAY_START) / AVG_TRAINING_HOURS);
+/** Assumed full-day training capacity; drives the month-view heatmap saturation. */
+const MAX_TRAININGS_PER_DAY = 8;
 
 export type ScheduleViewMode = 'day' | 'week' | 'month';
 
@@ -12,6 +10,9 @@ export interface ScheduleDay {
   label: string;
   date: string;
   dateKey: string;
+  /** Local calendar year/month — used for month logic (timezone-safe, unlike parsing dateKey). */
+  year: number;
+  month: number;
 }
 
 /** Builds a flat list of the next DAYS_AHEAD days starting today. */
@@ -26,6 +27,8 @@ export function buildDaysFromToday(): ScheduleDay[] {
       label: DAY_LABELS[d.getDay()] ?? '',
       date: String(d.getDate()),
       dateKey: d.toISOString().slice(0, 10),
+      year: d.getFullYear(),
+      month: d.getMonth(),
     });
   }
   return days;

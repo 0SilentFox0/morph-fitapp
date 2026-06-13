@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ParticipantGroup } from './ParticipantGroup';
 import { StatusBadge, type StatusBadgeColor } from './StatusBadge';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -18,7 +17,7 @@ interface ScheduleCardProps {
 const statusBarColor: Record<SessionStatus, string> = {
   completed: colors.Success,
   pending: colors.Warning,
-  canceled: colors.Error,
+  canceled: colors.error6,
 };
 
 const statusBadgeColor: Record<SessionStatus, StatusBadgeColor> = {
@@ -30,6 +29,8 @@ const statusBadgeColor: Record<SessionStatus, StatusBadgeColor> = {
 function ScheduleCardImpl({ session, onPress, onOptionsPress }: ScheduleCardProps) {
   const barColor = statusBarColor[session.status];
   const statusLabel = session.status.charAt(0).toUpperCase() + session.status.slice(1);
+  const isGroup = session.participants.length !== 1;
+  const nameLabel = isGroup ? 'Group' : session.participants[0]?.name ?? 'Group';
   const handlePress = onPress ? () => onPress(session) : undefined;
   const handleOptionsPress = onOptionsPress ? () => onOptionsPress(session) : undefined;
 
@@ -54,15 +55,17 @@ function ScheduleCardImpl({ session, onPress, onOptionsPress }: ScheduleCardProp
         </View>
         <View style={styles.bottomRow}>
           <View style={styles.bottomLeft}>
-            <ParticipantGroup participants={session.participants} maxVisible={3} />
+            <View style={[styles.namePill, isGroup ? styles.namePillGroup : styles.namePillSingle]}>
+              <Text style={styles.nameText}>{nameLabel}</Text>
+            </View>
           </View>
           <View style={styles.bottomRight}>
             <View style={styles.typeTag}>
               <Text style={styles.typeTagText}>{session.type}</Text>
             </View>
             <StatusBadge
-              icon="cash"
-              label={`$ ${statusLabel}`}
+              icon="logo-usd"
+              label={statusLabel}
               color={statusBadgeColor[session.status]}
             />
           </View>
@@ -123,6 +126,24 @@ const styles = StyleSheet.create({
   bottomLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
+  },
+  namePill: {
+    paddingVertical: 2,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.pill,
+    alignSelf: 'flex-start',
+  },
+  namePillSingle: {
+    backgroundColor: colors.surfaceSubtle,
+  },
+  namePillGroup: {
+    backgroundColor: colors.neutral3,
+  },
+  nameText: {
+    fontSize: typography.sizes.sm,
+    color: colors.neutral9,
+    lineHeight: 22,
   },
   bottomRight: {
     flexDirection: 'row',

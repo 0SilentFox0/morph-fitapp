@@ -24,12 +24,43 @@ import type { SessionOptionAction } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
+import { radius } from '../../../theme';
 import { useSessionsStore } from '../../../store/sessionsStore';
-import type { Session } from '../../../mocks';
+import type { Session, SessionStatus } from '../../../mocks';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
 const SWIPE_THRESHOLD = 60;
+
+const WEEK_STATUS_BAR: Record<SessionStatus, string> = {
+  completed: colors.Success,
+  pending: colors.Warning,
+  canceled: colors.error6,
+};
+
+/** Compact session card used inside the week view's per-day columns. */
+function WeekMiniCard({
+  session,
+  onPress,
+}: {
+  session: Session;
+  onPress: (s: Session) => void;
+}) {
+  return (
+    <TouchableOpacity style={styles.miniCard} activeOpacity={0.8} onPress={() => onPress(session)}>
+      <View style={[styles.miniBar, { backgroundColor: WEEK_STATUS_BAR[session.status] }]} />
+      <View style={styles.miniBody}>
+        <Text style={styles.miniTitle} numberOfLines={2}>
+          {session.title}
+        </Text>
+        <Text style={styles.miniTime}>{session.time}</Text>
+        <View style={styles.miniTypeTag}>
+          <Text style={styles.miniTypeText}>{session.type}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 export function ScheduleScreen() {
   const navigation = useNavigation<Nav>();
@@ -42,12 +73,35 @@ export function ScheduleScreen() {
   const [search, setSearch] = React.useState('');
   const [optionsSession, setOptionsSession] = React.useState<Session | null>(null);
   const [viewMode, setViewMode] = React.useState<ScheduleViewMode>('day');
+  // Month view: the day whose session list is shown — only set when a day is tapped.
+  const [monthSelectedKey, setMonthSelectedKey] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (viewMode !== 'month') setMonthSelectedKey(null);
+  }, [viewMode]);
 
   const handleSessionPress = React.useCallback(
     (s: Session) => navigation.navigate('SessionForm', { session: s }),
     [navigation]
   );
   const handleSessionOptions = React.useCallback((s: Session) => setOptionsSession(s), []);
+
+  const shiftMonth = React.useCallback(
+    (dir: 1 | -1) => {
+      const current = days[selectedDayIndex];
+      if (!current) return;
+      // Normalize to the 1st of the target month, then find the first matching day.
+      const target = new Date(current.year, current.month + dir, 1);
+      const targetYear = target.getFullYear();
+      const targetMonth = target.getMonth();
+      const idx = days.findIndex((d) => d.year === targetYear && d.month === targetMonth);
+      if (idx >= 0) {
+        setSelectedDayIndex(idx);
+        setMonthSelectedKey(null);
+      }
+    },
+    [days, selectedDayIndex]
+  );
 
   const panResponder = React.useMemo(
     () =>
@@ -88,11 +142,10 @@ export function ScheduleScreen() {
 
   const selectedDateKey = days[selectedDayIndex]?.dateKey ?? '';
 
-  const onDayForSelected = getSessionsByDateKey(selectedDateKey);
   const qTrim = search.trim();
-  const daySessions = !qTrim
-    ? onDayForSelected
-    : onDayForSelected.filter((s) => new Set(searchSessions(qTrim).map((x) => x.id)).has(s.id));
+  const matchedIds = qTrim ? new Set(searchSessions(qTrim).map((x) => x.id)) : null;
+  const matchesSearch = (s: Session) => !matchedIds || matchedIds.has(s.id);
+  const daySessions = getSessionsByDateKey(selectedDateKey).filter(matchesSearch);
 
   const weekDays = React.useMemo(
     () => days.slice(selectedDayIndex, selectedDayIndex + 7),
@@ -100,9 +153,8 @@ export function ScheduleScreen() {
   );
 
   const monthStart = React.useMemo(() => {
-    const d = new Date(days[selectedDayIndex]?.dateKey ?? '');
-    d.setDate(1);
-    return d;
+    const sel = days[selectedDayIndex];
+    return sel ? new Date(sel.year, sel.month, 1) : new Date();
   }, [days, selectedDayIndex]);
 
   const monthDays = React.useMemo(() => {
@@ -153,7 +205,11 @@ export function ScheduleScreen() {
         }
       />
 
-      <MonthSelector dateKey={days[selectedDayIndex]?.dateKey ?? ''} />
+      <MonthSelector
+        dateKey={days[selectedDayIndex]?.dateKey ?? ''}
+        onPrev={() => shiftMonth(-1)}
+        onNext={() => shiftMonth(1)}
+      />
 
       <View {...panResponder.panHandlers}>
         {viewMode === 'day' && (
@@ -176,6 +232,7 @@ export function ScheduleScreen() {
             cellSize={monthCellSize}
             getCount={(dateKey) => getSessionsByDateKey(dateKey).length}
             onSelectDate={(dateKey) => {
+              setMonthSelectedKey(dateKey);
               const idx = days.findIndex((d) => d.dateKey === dateKey);
               if (idx >= 0) setSelectedDayIndex(idx);
             }}
@@ -210,41 +267,53 @@ export function ScheduleScreen() {
                 />
               )))}
         {viewMode === 'week' && (
-          <View style={styles.weekColumns}>
-            {weekDays.map((day) => (
-              <View key={day.dateKey} style={styles.weekColumn}>
-                <Text style={styles.weekColumnTitle}>
-                  {day.label} {day.date}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.weekColumns}
+          >
+            {weekDays.map((day) => {
+              const sess = getSessionsByDateKey(day.dateKey).filter(matchesSearch);
+              return (
+                <View key={day.dateKey} style={styles.weekColumn}>
+                  <Text style={styles.weekColumnTitle}>
+                    {day.label} {day.date}
+                  </Text>
+                  {sess.length === 0 ? (
+                    <Text style={styles.weekColumnEmpty}>No sessions</Text>
+                  ) : (
+                    sess.map((s) => (
+                      <WeekMiniCard key={s.id} session={s} onPress={handleSessionPress} />
+                    ))
+                  )}
+                </View>
+              );
+            })}
+          </ScrollView>
+        )}
+        {viewMode === 'month' &&
+          monthSelectedKey &&
+          (() => {
+            const selDay = days.find((d) => d.dateKey === monthSelectedKey);
+            const monthSessions = getSessionsByDateKey(monthSelectedKey).filter(matchesSearch);
+            return (
+              <View style={styles.monthDetail}>
+                <Text style={styles.monthDetailTitle}>
+                  {selDay ? `${selDay.label} ${selDay.date}` : monthSelectedKey}
                 </Text>
-                {getSessionsByDateKey(day.dateKey).map((s) => (
-                  <ScheduleCard
-                    key={s.id}
-                    session={s}
-                    onPress={handleSessionPress}
-                    onOptionsPress={handleSessionOptions}
-                  />
-                ))}
+                {monthSessions.length === 0
+                  ? renderDayEmptyState()
+                  : monthSessions.map((session) => (
+                      <ScheduleCard
+                        key={session.id}
+                        session={session}
+                        onPress={handleSessionPress}
+                        onOptionsPress={handleSessionOptions}
+                      />
+                    ))}
               </View>
-            ))}
-          </View>
-        )}
-        {viewMode === 'month' && (
-          <View style={styles.monthDetail}>
-            <Text style={styles.monthDetailTitle}>
-              {days[selectedDayIndex]?.label} {days[selectedDayIndex]?.date}
-            </Text>
-            {daySessions.length === 0
-              ? renderDayEmptyState()
-              : daySessions.map((session) => (
-                  <ScheduleCard
-                    key={session.id}
-                    session={session}
-                    onPress={() => navigation.navigate('SessionForm', { session })}
-                    onOptionsPress={() => setOptionsSession(session)}
-                  />
-                ))}
-          </View>
-        )}
+            );
+          })()}
       </ScrollView>
 
       <SessionOptionsMenu
@@ -262,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   header: {
-    backgroundColor: colors.screenBg,
+    backgroundColor: 'transparent',
   },
   swipeHint: {
     fontSize: 10,
@@ -285,16 +354,59 @@ const styles = StyleSheet.create({
   weekColumns: {
     flexDirection: 'row',
     gap: spacing.sm,
+    paddingRight: spacing.lg,
   },
   weekColumn: {
-    flex: 1,
-    minWidth: 100,
+    width: 160,
   },
   weekColumnTitle: {
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.semibold,
     color: colors.text,
     marginBottom: spacing.sm,
+  },
+  weekColumnEmpty: {
+    fontSize: typography.sizes.xs,
+    color: colors.textMuted,
+  },
+  miniCard: {
+    flexDirection: 'row',
+    backgroundColor: colors.neutral2,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    borderTopLeftRadius: 2,
+    borderBottomLeftRadius: 2,
+    marginBottom: spacing.sm,
+    overflow: 'hidden',
+  },
+  miniBar: {
+    width: 2,
+  },
+  miniBody: {
+    flex: 1,
+    padding: spacing.sm,
+    gap: spacing.xs,
+  },
+  miniTitle: {
+    fontSize: typography.sizes.xs,
+    fontWeight: typography.weights.medium,
+    color: colors.text,
+    lineHeight: 16,
+  },
+  miniTime: {
+    fontSize: 11,
+    color: colors.neutral9,
+  },
+  miniTypeTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.surfaceSubtle,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radius.pill,
+  },
+  miniTypeText: {
+    fontSize: 11,
+    color: colors.text,
   },
   monthDetail: {
     marginTop: spacing.sm,

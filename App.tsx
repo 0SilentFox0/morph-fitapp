@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigator } from './src/navigation/RootNavigator';
-import { ScreenBackground } from './src/components/layout';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { ThemeProvider } from './src/theme/ThemeContext';
 import { colors } from './src/theme/colors';
@@ -15,8 +14,9 @@ const AppTheme = {
   colors: {
     ...DefaultTheme.colors,
     primary: colors.accent,
-    background: colors.screenBg,
-    card: colors.screenBg,
+    // Transparent so the app-wide ScreenBackground gradient shows through every scene.
+    background: 'transparent',
+    card: 'transparent',
     text: colors.text,
     border: colors.border,
   },
@@ -27,14 +27,12 @@ export default function App() {
     <ThemeProvider>
       <SafeAreaProvider>
         <View style={{ flex: 1, backgroundColor: colors.screenBg }}>
-          <ScreenBackground>
-            <ErrorBoundary>
-              <NavigationContainer theme={AppTheme}>
-                <StatusBar style="light" />
-                <RootNavigator />
-              </NavigationContainer>
-            </ErrorBoundary>
-          </ScreenBackground>
+          <ErrorBoundary>
+            <NavigationContainer theme={AppTheme}>
+              <StatusBar style="light" />
+              <RootNavigator />
+            </NavigationContainer>
+          </ErrorBoundary>
         </View>
       </SafeAreaProvider>
     </ThemeProvider>

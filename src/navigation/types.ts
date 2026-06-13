@@ -45,16 +45,17 @@ export type HomeStackParamList = {
 export type ClientsStackParamList = {
   ClientsList: undefined;
   Filters: undefined;
-  ClientProfile: undefined;
-  ProgramDetail: undefined;
-  ExerciseDetail: undefined;
-  ClientsProfileExtended: undefined;
-  TrainingSummary: undefined;
+  ClientProfile: { clientId?: string } | undefined;
+  ProgramDetail: { programId: string };
+  ExerciseDetail: { clientId: string; programId: string; exerciseIndex: number };
+  ClientsProfileExtended: { clientId?: string } | undefined;
+  TrainingSummary: { clientId?: string } | undefined;
 };
 
 export type StatsStackParamList = {
   BusinessAnalytics: undefined;
   Transactions: undefined;
+  AddTransaction: undefined;
   YouGotPaid: undefined;
 };
 

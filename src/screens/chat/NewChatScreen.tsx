@@ -9,6 +9,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ChatStackParamList } from '../../navigation/types';
+import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { SearchInput, Avatar } from '../../components/ui';
 import { colors } from '../../theme/colors';
@@ -35,9 +36,10 @@ export function NewChatScreen() {
     const conv = getOrCreateConversation(clientId, {
       id: clientId,
       name,
-      avatar: undefined,
+      tint: 'primary',
     });
-    navigation.navigate('ChatThread', { conversationId: conv.id });
+    // Replace this screen so Back returns to the chat list, not the picker.
+    navigation.replace('ChatThread', { conversationId: conv.id });
   };
 
   return (
@@ -65,12 +67,12 @@ export function NewChatScreen() {
             onPress={() => handleSelectClient(client.id, client.name)}
             activeOpacity={0.7}
           >
-            <Avatar name={client.name} uri={client.avatar} size={48} />
+            <Avatar name={client.name} tint="primary" size={48} />
             <View style={styles.clientInfo}>
               <Text style={styles.clientName}>{client.name}</Text>
               <Text style={styles.clientTag}>{client.tag}</Text>
             </View>
-            <Text style={styles.chevron}>›</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -84,7 +86,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   searchWrapper: {
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.xs,
     marginBottom: spacing.md,
   },
   search: {
@@ -92,34 +95,30 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing['2xl'],
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.sm,
   },
   clientRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    marginBottom: spacing.sm,
+    gap: spacing.md,
+    padding: spacing.sm,
+    borderRadius: radius.sm + 2,
   },
   clientInfo: {
     flex: 1,
-    marginLeft: spacing.md,
+    minWidth: 0,
   },
   clientName: {
     fontSize: typography.sizes.base,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
+    lineHeight: 24,
+    color: colors.neutral9,
   },
   clientTag: {
     fontSize: typography.sizes.sm,
+    lineHeight: 22,
     color: colors.textMuted,
     marginTop: spacing.xs,
-  },
-  chevron: {
-    fontSize: 24,
-    color: colors.textMuted,
   },
 });

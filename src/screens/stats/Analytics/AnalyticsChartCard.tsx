@@ -1,32 +1,45 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
-import { Card } from '../../../components/ui';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 
 const CHART_TABS = ['Income Over Time', 'By Source'];
-const TIMEFRAME = ['Week', 'Month', 'Custom'];
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const chartConfig = {
-  backgroundColor: colors.neutral2,
-  backgroundGradientFrom: colors.neutral2,
+  backgroundColor: colors.neutral1,
+  backgroundGradientFrom: colors.neutral1,
   backgroundGradientTo: colors.neutral1,
   decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(166, 95, 98, ${opacity})`,
-  labelColor: () => colors.neutral9,
+  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
+  labelColor: () => colors.neutral7,
+  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
   style: { borderRadius: radius.sm },
 };
 
+// chart-kit treats `paddingRight` as the LEFT gutter (y-axis labels live here and
+// the plot starts at this x). The 64px default pushes the whole graph far to the
+// right of the tabs; 28 keeps room for "$140"-style labels while aligning the plot
+// under the Income/Week tabs.
+const CHART_LEFT_GUTTER = 28;
+
+type LineData = React.ComponentProps<typeof LineChart>['data'];
+
+const shortDate = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
 export interface AnalyticsChartCardProps {
-  incomeData: React.ComponentProps<typeof LineChart>['data'];
+  incomeData: LineData;
   sourceData: React.ComponentProps<typeof BarChart>['data'];
   chartWidth: number;
 }
 
-/** Revenue chart card with Income/By-Source tabs and a timeframe selector. */
+/** Revenue chart card with Income/By-Source tabs and a working timeframe selector. */
 export function AnalyticsChartCard({
   incomeData,
   sourceData,
@@ -34,15 +47,126 @@ export function AnalyticsChartCard({
 }: AnalyticsChartCardProps) {
   const [chartTab, setChartTab] = React.useState(0);
   const [timeframe, setTimeframe] = React.useState(0);
+  const [customRange, setCustomRange] = React.useState<{ start: Date; end: Date } | null>(null);
+  // Two-step date-range picker state: which bound we're picking + the draft start.
+  const [picking, setPicking] = React.useState<null | 'start' | 'end'>(null);
+  const [draft, setDraft] = React.useState(new Date());
+  const [draftStart, setDraftStart] = React.useState<Date | null>(null);
+
+  // Week stays as provided; Month / Custom are derived so the selector visibly
+  // re-renders the chart instead of being a dead toggle.
+  const monthIncome = React.useMemo<LineData>(() => {
+    const week = incomeData.datasets[0]?.data ?? [];
+    const total = week.reduce((sum, n) => sum + n, 0);
+    return {
+      labels: ['W1', 'W2', 'W3', 'W4'],
+      datasets: [
+        {
+          data: [
+            Math.round(total * 0.9),
+            Math.round(total * 0.75),
+            Math.round(total * 1.05),
+            Math.round(total * 0.85),
+          ],
+        },
+      ],
+    };
+  }, [incomeData]);
+
+  const customIncome = React.useMemo<LineData>(() => {
+    if (!customRange) return incomeData;
+    const pattern = incomeData.datasets[0]?.data ?? [100];
+    const days = Math.max(1, Math.round((customRange.end.getTime() - customRange.start.getTime()) / DAY_MS) + 1);
+    const count = Math.min(days, 7);
+    const step = days / count;
+    const data: number[] = [];
+    const labels: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const dayIndex = Math.floor(i * step);
+      const d = new Date(customRange.start.getTime() + dayIndex * DAY_MS);
+      data.push(pattern[dayIndex % pattern.length] ?? 0);
+      labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+    }
+    return { labels, datasets: [{ data }] };
+  }, [customRange, incomeData]);
+
+  const timeframes = [
+    { key: 'week', label: 'Week', data: incomeData },
+    { key: 'month', label: 'Month', data: monthIncome },
+    {
+      key: 'custom',
+      label: customRange ? `${shortDate(customRange.start)} – ${shortDate(customRange.end)}` : 'Custom',
+      data: customIncome,
+    },
+  ];
+  const activeIncome = timeframes[timeframe]?.data ?? incomeData;
+
+  const openRangePicker = () => {
+    setDraft(customRange?.start ?? new Date());
+    setDraftStart(null);
+    setPicking('start');
+  };
+
+  const handleTimeframePress = (i: number) => {
+    setTimeframe(i);
+    if (i === 2) {
+      // Tapping Custom (even when already active) restarts range selection.
+      openRangePicker();
+    } else {
+      // Leaving Custom closes any open picker.
+      setPicking(null);
+    }
+  };
+
+  const cancelPicker = () => {
+    setPicking(null);
+    // Abandoned before ever configuring a range → fall back to Week.
+    if (!customRange) setTimeframe(0);
+  };
+
+  const resetCustom = () => {
+    setCustomRange(null);
+    setPicking(null);
+    setTimeframe(0);
+  };
+
+  const handlePickerChange = (event: { type?: string }, selected?: Date) => {
+    if (Platform.OS === 'android') {
+      if (event?.type === 'dismissed' || !selected) {
+        cancelPicker();
+        return;
+      }
+      commitPicker(selected);
+      return;
+    }
+    if (selected) setDraft(selected);
+  };
+
+  const commitPicker = (value: Date) => {
+    if (picking === 'start') {
+      setDraftStart(value);
+      setDraft(value);
+      setPicking('end');
+    } else if (picking === 'end') {
+      const start = draftStart ?? value;
+      // Guard against an end earlier than start by swapping.
+      const range = value < start ? { start: value, end: start } : { start, end: value };
+      setCustomRange(range);
+      setPicking(null);
+    }
+  };
 
   return (
-    <Card style={styles.chartCard}>
+    <View style={styles.chartCard}>
+      <Text style={styles.heading}>Earnings Overview</Text>
+
       <View style={styles.chartTabs}>
         {CHART_TABS.map((t, i) => (
           <TouchableOpacity
             key={t}
             onPress={() => setChartTab(i)}
             style={[styles.chartTab, i === chartTab && styles.chartTabActive]}
+            activeOpacity={0.8}
           >
             <Text style={[styles.chartTabText, i === chartTab && styles.chartTabTextActive]}>
               {t}
@@ -50,23 +174,72 @@ export function AnalyticsChartCard({
           </TouchableOpacity>
         ))}
       </View>
+
       <View style={styles.timeframeRow}>
-        {TIMEFRAME.map((t, i) => (
-          <TouchableOpacity
-            key={t}
-            onPress={() => setTimeframe(i)}
-            style={[styles.timeframeBtn, i === timeframe && styles.timeframeBtnActive]}
-          >
-            <Text style={[styles.timeframeText, i === timeframe && styles.timeframeTextActive]}>
-              {t}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {timeframes.map((tf, i) => {
+          const active = i === timeframe;
+          const showReset = tf.key === 'custom' && customRange;
+          return (
+            <TouchableOpacity
+              key={tf.key}
+              onPress={() => handleTimeframePress(i)}
+              style={[styles.timeframeBtn, active && styles.timeframeBtnActive]}
+              activeOpacity={0.8}
+            >
+              <Text
+                numberOfLines={1}
+                style={[styles.timeframeText, active && styles.timeframeTextActive]}
+              >
+                {tf.label}
+              </Text>
+              {showReset && (
+                <TouchableOpacity
+                  onPress={resetCustom}
+                  activeOpacity={0.8}
+                  accessibilityLabel="Reset custom range"
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons
+                    name="close"
+                    size={14}
+                    color={active ? colors.text : colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </View>
+
+      {picking && (
+        <View style={styles.picker}>
+          <Text style={styles.pickerLabel}>
+            {picking === 'start' ? 'Select start date' : 'Select end date'}
+          </Text>
+          <DateTimePicker
+            value={draft}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handlePickerChange}
+            themeVariant="dark"
+          />
+          {Platform.OS === 'ios' && (
+            <View style={styles.pickerActions}>
+              <TouchableOpacity style={styles.pickerBtn} onPress={cancelPicker}>
+                <Text style={styles.pickerCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.pickerBtn} onPress={() => commitPicker(draft)}>
+                <Text style={styles.pickerDoneText}>{picking === 'start' ? 'Next' : 'Done'}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
+
       <View style={styles.chartContainer}>
         {chartTab === 0 ? (
           <LineChart
-            data={incomeData}
+            data={activeIncome}
             width={chartWidth}
             height={200}
             yAxisLabel="$"
@@ -87,25 +260,45 @@ export function AnalyticsChartCard({
           />
         )}
       </View>
-    </Card>
+
+      <View style={styles.legend}>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: colors.accent }]} />
+          <Text style={styles.legendText}>Subscription</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: colors.primary7 }]} />
+          <Text style={styles.legendText}>Training</Text>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   chartCard: {
-    marginBottom: spacing.xl,
-  },
-  chartTabs: {
-    flexDirection: 'row',
+    backgroundColor: colors.neutral1,
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 18,
     gap: spacing.md,
     marginBottom: spacing.md,
   },
+  heading: {
+    fontSize: typography.sizes.base,
+    lineHeight: 24,
+    color: colors.neutral9,
+  },
+  chartTabs: {
+    flexDirection: 'row',
+  },
   chartTab: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral5,
   },
   chartTabActive: {
-    borderBottomWidth: 2,
     borderBottomColor: colors.accent,
   },
   chartTabText: {
@@ -113,38 +306,88 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   chartTabTextActive: {
-    color: colors.accent,
-    fontWeight: typography.weights.semibold,
+    color: colors.text,
   },
   timeframeRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
+    gap: spacing.xs,
   },
   timeframeBtn: {
-    paddingVertical: spacing.sm,
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.sm,
+    paddingVertical: 5,
+    borderRadius: radius.pill,
     backgroundColor: colors.neutral1,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.neutral5,
   },
   timeframeBtnActive: {
-    backgroundColor: colors.neutral1,
-    borderColor: colors.accent,
+    backgroundColor: colors.neutral3,
+    borderColor: colors.text,
   },
   timeframeText: {
     fontSize: typography.sizes.sm,
-    color: colors.text,
+    lineHeight: 22,
+    color: colors.textSecondary,
   },
   timeframeTextActive: {
+    color: colors.text,
+  },
+  picker: {
+    backgroundColor: colors.neutral2,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  pickerLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+    paddingTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  pickerActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pickerBtn: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  pickerCancelText: {
+    color: colors.textSecondary,
+    fontWeight: typography.weights.semibold,
+  },
+  pickerDoneText: {
     color: colors.accent,
+    fontWeight: typography.weights.semibold,
   },
   chartContainer: {
-    marginTop: spacing.sm,
+    alignItems: 'flex-start',
   },
   chart: {
     marginVertical: 0,
     borderRadius: radius.sm,
+    paddingRight: CHART_LEFT_GUTTER,
+  },
+  legend: {
+    flexDirection: 'row',
+    gap: spacing.lg,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  legendText: {
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
   },
 });

@@ -1,38 +1,105 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ClientsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { Card, Tag, Avatar } from '../../components/ui';
+import { Avatar, ClientSwitcherStrip, ProgramExerciseList } from '../../components/ui';
+import type { SwitcherClient } from '../../components/ui';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useSessionsStore } from '../../store/sessionsStore';
+import { deriveActiveGroup, formatClock } from '../../utils';
+import { mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientProfile'>;
+type Route = RouteProp<ClientsStackParamList, 'ClientProfile'>;
 
-const PROGRAMS = ['Program 1', 'Program 2', 'Program 3'];
-const EXERCISES = [
-  { name: 'Exercise 1', duration: '15 min' },
-  { name: 'Exercise 2', duration: '20 min' },
-  { name: 'Exercise 3', duration: '10 min' },
-];
+const PROGRAMS = mockTrainingPrograms.filter((p) => p.exercises && p.exercises.length > 0);
 
 export function ClientProfileScreen() {
   const navigation = useNavigation<Nav>();
-  const [activeProgram, setActiveProgram] = React.useState(0);
+  const route = useRoute<Route>();
+  const requestedClientId = route.params?.clientId;
+
+  const clients = useActiveTrainingStore((s) => s.clients);
+  const activeClientId = useActiveTrainingStore((s) => s.activeClientId);
+  const setActiveClient = useActiveTrainingStore((s) => s.setActiveClient);
+  const startTraining = useActiveTrainingStore((s) => s.startTraining);
+
+  // Seed the active training group from today's overlapping sessions on first entry.
+  React.useEffect(() => {
+    if (useActiveTrainingStore.getState().clients.length === 0) {
+      const group = deriveActiveGroup(useSessionsStore.getState().sessions, mockTrainingPrograms);
+      if (group.length > 0) startTraining(group, requestedClientId);
+    } else if (requestedClientId) {
+      setActiveClient(requestedClientId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const activeClient = clients.find((c) => c.clientId === activeClientId) ?? clients[0] ?? null;
+
+  const [selectedProgramId, setSelectedProgramId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (activeClient) setSelectedProgramId(activeClient.programId);
+    // reset to the client's assigned program when the active client changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeClient?.clientId]);
+
+  if (!activeClient) {
+    return (
+      <View style={styles.container}>
+        <ScreenHeader title="Profile" />
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>No active training.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  const selectedProgram =
+    PROGRAMS.find((p) => p.id === (selectedProgramId ?? activeClient.programId)) ?? PROGRAMS[0]!;
+
+  const switcherClients: SwitcherClient[] = clients.map((c) => ({
+    id: c.clientId,
+    name: c.name,
+    avatar: c.avatar,
+    badge: c.rest.running ? formatClock(c.rest.remainingSec) : undefined,
+  }));
+
+  const assigned = mockTrainingPrograms.find((p) => p.id === activeClient.programId);
+  const currentExercise = assigned?.exercises?.[activeClient.exerciseIndex];
+  const subtitle = currentExercise
+    ? `${currentExercise.name} · set ${activeClient.setIndex + 1}` +
+      (activeClient.rest.running ? ` · rest ${formatClock(activeClient.rest.remainingSec)}` : '')
+    : undefined;
 
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Brooklyn Simmons"
+        title=""
         rightElement={
-          <TouchableOpacity>
-            <Ionicons name="person" size={24} color={colors.text} />
-          </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <TouchableOpacity onPress={() => navigation.navigate('ClientsProfileExtended', { clientId: activeClient.clientId })}>
+              <Ionicons name="person-outline" size={22} color={colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Ionicons name="chatbubble-outline" size={22} color={colors.text} />
+            </TouchableOpacity>
+          </View>
         }
+      />
+
+      <ClientSwitcherStrip
+        clients={switcherClients}
+        activeId={activeClientId}
+        onSelect={setActiveClient}
+        activeSubtitle={subtitle}
       />
 
       <ScrollView
@@ -41,55 +108,43 @@ export function ClientProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.profileHeader}>
-          <Avatar name="Brooklyn Simmons" size={80} />
-          <Text style={styles.clientName}>Brooklyn Simmons</Text>
-          <Text style={styles.status}>Active Group</Text>
+          <Avatar uri={activeClient.avatar} name={activeClient.name} size={80} />
+          <Text style={styles.clientName}>{activeClient.name}</Text>
+          <View style={styles.statusRow}>
+            <View style={[styles.dot, { backgroundColor: colors.accent }]} />
+            <Text style={styles.status}>Active</Text>
+            <View style={[styles.dot, styles.dotMuted]} />
+            <Text style={styles.status}>Group</Text>
+          </View>
         </View>
 
         <View style={styles.programTabs}>
-          {PROGRAMS.map((p, i) => (
-            <TouchableOpacity
-              key={p}
-              onPress={() => setActiveProgram(i)}
-              style={[styles.programTab, i === activeProgram && styles.programTabActive]}
-            >
-              <Text
-                style={[styles.programTabText, i === activeProgram && styles.programTabTextActive]}
+          {PROGRAMS.map((p, i) => {
+            const active = p.id === selectedProgram.id;
+            return (
+              <TouchableOpacity
+                key={p.id}
+                onPress={() => setSelectedProgramId(p.id)}
+                style={[styles.programTab, active && styles.programTabActive]}
               >
-                {p}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[styles.programTabText, active && styles.programTabTextActive]}>
+                  Program {i + 1}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        <Card style={styles.programCard}>
-          <View style={styles.programHeader}>
-            <Text style={styles.programName}>Name</Text>
-            <TouchableOpacity>
-              <Ionicons name="pencil" size={20} color={colors.text} />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.programDesc}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </Text>
-          <View style={styles.tagsRow}>
-            <Tag label="Active" variant="accent" />
-            <Tag label="HIT" variant="default" />
-          </View>
-          {EXERCISES.map((ex, i) => (
-            <TouchableOpacity
-              key={i}
-              style={styles.exerciseRow}
-              onPress={() => navigation.navigate('ExerciseDetail')}
-            >
-              <View style={styles.exerciseThumb} />
-              <View style={styles.exerciseInfo}>
-                <Text style={styles.exerciseName}>{ex.name}</Text>
-                <Text style={styles.exerciseDuration}>{ex.duration}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </Card>
+        <ProgramExerciseList
+          program={selectedProgram}
+          onSelectExercise={(index) =>
+            navigation.navigate('ExerciseDetail', {
+              clientId: activeClient.clientId,
+              programId: selectedProgram.id,
+              exerciseIndex: index,
+            })
+          }
+        />
       </ScrollView>
     </View>
   );
@@ -100,10 +155,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  headerRight: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.base,
+  },
   scroll: { flex: 1 },
   scrollContent: {
     padding: spacing.lg,
-    paddingBottom: spacing['2xl'],
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
   },
   profileHeader: {
     alignItems: 'center',
@@ -115,10 +183,24 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: spacing.sm,
   },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  dotMuted: {
+    backgroundColor: colors.neutral6,
+  },
   status: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
-    marginTop: spacing.xs,
+    marginRight: spacing.xs,
   },
   programTabs: {
     flexDirection: 'row',
@@ -128,64 +210,20 @@ const styles = StyleSheet.create({
   programTab: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.xl,
-    backgroundColor: colors.neutral2,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.neutral5,
+    backgroundColor: colors.neutral1,
   },
   programTabActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.neutral3,
+    borderColor: colors.neutral10,
   },
   programTabText: {
     fontSize: typography.sizes.sm,
-    color: colors.text,
+    color: colors.neutral8,
   },
   programTabTextActive: {
-    color: colors.white,
-  },
-  programCard: {
-    marginBottom: spacing.lg,
-  },
-  programHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  programName: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  programDesc: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  exerciseRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  exerciseThumb: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral1,
-    marginRight: spacing.md,
-  },
-  exerciseInfo: {
-    flex: 1,
-  },
-  exerciseName: {
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  exerciseDuration: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
+    color: colors.neutral10,
   },
 });

@@ -44,12 +44,7 @@ export function MonthGrid({ monthDays, cellSize, getCount, onSelectDate }: Month
             onPress={() => onSelectDate(cell.dateKey)}
           >
             <Text style={styles.monthCellDate}>{cell.date}</Text>
-            <View
-              style={[
-                styles.monthCellFill,
-                { height: `${pct}%`, backgroundColor: pct > 0 ? colors.accent : 'transparent' },
-              ]}
-            />
+            <View style={[styles.monthCellFill, { height: `${pct}%` }]} />
           </TouchableOpacity>
         );
       })}
@@ -92,6 +87,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    backgroundColor: colors.accent,
     borderRadius: radius.sm,
   },
 });
