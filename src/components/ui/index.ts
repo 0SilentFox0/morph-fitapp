@@ -45,4 +45,5 @@ export type { BodyMapProps } from './BodyMap';
 export { HorizontalSwipe } from './HorizontalSwipe';
 export type { HorizontalSwipeProps } from './HorizontalSwipe';
 export { FadeInUp } from './FadeInUp';
+export { AnimatedCounter } from './AnimatedCounter';
 export { PricingInsightHint } from './PricingInsightHint';
