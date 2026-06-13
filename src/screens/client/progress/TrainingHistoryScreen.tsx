@@ -25,8 +25,9 @@ const labelDate = (d: string) => formatDate(d) || d;
 
 export function TrainingHistoryScreen() {
   const navigation = useNavigation<Nav>();
-  const history = useTrainingHistoryStore((s) => s.getCurrentUserHistory());
-  const items = [...history].reverse(); // newest first
+  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+  useTrainingHistoryStore((s) => s.history);
+  const items = [...getCurrentUserHistory()].reverse(); // newest first
 
   return (
     <View style={styles.container}>

@@ -18,7 +18,9 @@ const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export function AchievementsScreen() {
-  const history = useTrainingHistoryStore((s) => s.getCurrentUserHistory());
+  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+  useTrainingHistoryStore((s) => s.history);
+  const history = getCurrentUserHistory();
   const points = useAppStore((s) => s.points);
 
   const now = new Date();

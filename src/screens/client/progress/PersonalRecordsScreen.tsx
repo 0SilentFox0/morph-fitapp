@@ -12,8 +12,9 @@ import { exerciseCatalog } from '../../../mocks';
 import { computePRs } from '../../../utils/personalRecords';
 
 export function PersonalRecordsScreen() {
-  const history = useTrainingHistoryStore((s) => s.getCurrentUserHistory());
-  const prs = computePRs(history);
+  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+  useTrainingHistoryStore((s) => s.history);
+  const prs = computePRs(getCurrentUserHistory());
 
   return (
     <View style={styles.container}>

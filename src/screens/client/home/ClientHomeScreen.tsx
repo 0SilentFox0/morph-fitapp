@@ -17,8 +17,9 @@ import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { useTrainersStore } from '../../../store/trainersStore';
 import { exerciseMuscleMap } from '../../../mocks';
-import { computeMuscleStats, toIntensities, computeTotals } from '../../../utils/muscleStats';
+import { computeMuscleStats, toIntensities, computeTotals, filterByTimeframe } from '../../../utils/muscleStats';
 import { computeWeekStreak } from '../../../utils/achievements';
+import { MUSCLE_GROUPS, MUSCLE_LABELS } from '../../../constants/muscles';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'ClientHome'>;
 type TabNav = { navigate: (name: string, params?: object) => void };
@@ -34,19 +35,31 @@ const STATUS_BADGE: Record<SessionStatus, { label: string; color: StatusBadgeCol
 export function ClientHomeScreen() {
   const navigation = useNavigation<Nav>();
   const userName = useAppStore((s) => s.userName);
-  const history = useTrainingHistoryStore((s) => s.getCurrentUserHistory());
-  const upcoming = useSessionsStore((s) => s.getUpcomingSessions());
+  // Select stable method refs and the raw state they depend on; calling a getter
+  // *inside* the selector returns a fresh array each render → infinite loop.
+  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+  useTrainingHistoryStore((s) => s.history);
+  const getUpcomingSessions = useSessionsStore((s) => s.getUpcomingSessions);
+  useSessionsStore((s) => s.sessions);
   const trainers = useTrainersStore((s) => s.trainers);
+  const history = getCurrentUserHistory();
+  const upcoming = getUpcomingSessions();
 
   const tabNav = navigation.getParent() as unknown as TabNav | undefined;
   const goToTab = (tab: string) => tabNav?.navigate(tab);
 
-  const { intensities, totals, streak } = React.useMemo(() => {
+  const { intensities, totals, weekTotals, streak, topMuscle } = React.useMemo(() => {
+    const now = new Date();
     const stats = computeMuscleStats(history, exerciseMuscleMap);
+    const top = MUSCLE_GROUPS.filter((g) => stats[g].exerciseCount > 0).sort(
+      (a, b) => stats[b].totalWeight - stats[a].totalWeight,
+    )[0];
     return {
       intensities: toIntensities(stats),
       totals: computeTotals(history),
-      streak: computeWeekStreak(history, new Date()),
+      weekTotals: computeTotals(filterByTimeframe(history, 'week', now)),
+      streak: computeWeekStreak(history, now),
+      topMuscle: top ? MUSCLE_LABELS[top] : null,
     };
   }, [history]);
 
@@ -92,6 +105,15 @@ export function ClientHomeScreen() {
             <Text style={styles.ctaText}>Book your next session</Text>
           </TouchableOpacity>
         )}
+
+        {/* This week */}
+        <SectionTitle>This week</SectionTitle>
+        <View style={styles.weekRow}>
+          <WeekTile value={`${weekTotals.sessionCount}`} label="Sessions" />
+          <WeekTile value={formatKg(weekTotals.tonnage)} label="Volume" />
+          <WeekTile value={`${streak}`} label="Streak" />
+          <WeekTile value={topMuscle ?? '—'} label="Top muscle" />
+        </View>
 
         {/* My trainer */}
         <SectionTitle>Your trainer</SectionTitle>
@@ -141,6 +163,15 @@ function Stat({ value, label }: { value: string; label: string }) {
   );
 }
 
+function WeekTile({ value, label }: { value: string; label: string }) {
+  return (
+    <View style={styles.weekTile}>
+      <Text style={styles.weekValue} numberOfLines={1}>{value}</Text>
+      <Text style={styles.weekLabel}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
@@ -181,6 +212,18 @@ const styles = StyleSheet.create({
   stat: { gap: 0 },
   statValue: { fontSize: typography.sizes.lg, fontWeight: typography.weights.bold, color: colors.text },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
+  weekRow: { flexDirection: 'row', gap: spacing.xs },
+  weekTile: {
+    flex: 1,
+    backgroundColor: colors.cardBg,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xs,
+    alignItems: 'center',
+    gap: 2,
+  },
+  weekValue: { fontSize: typography.sizes.base, fontWeight: typography.weights.bold, color: colors.text },
+  weekLabel: { fontSize: 10, color: colors.textSecondary },
   viewMore: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: spacing.xs },
   viewMoreText: { fontSize: typography.sizes.sm, color: colors.accent, fontWeight: typography.weights.semibold },
 });

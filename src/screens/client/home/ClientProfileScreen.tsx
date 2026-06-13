@@ -21,7 +21,9 @@ export function ClientProfileScreen() {
   const resetApp = useAppStore((s) => s.reset);
   const resetOnboarding = useOnboardingStore((s) => s.reset);
   const trainingTypes = useOnboardingStore((s) => s.trainingTypes);
-  const history = useTrainingHistoryStore((s) => s.getCurrentUserHistory());
+  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+  useTrainingHistoryStore((s) => s.history);
+  const history = getCurrentUserHistory();
 
   const totals = computeTotals(history);
 
