@@ -48,3 +48,4 @@ export { FadeInUp } from './FadeInUp';
 export { AnimatedCounter } from './AnimatedCounter';
 export { PagerDots } from './PagerDots';
 export { PricingInsightHint } from './PricingInsightHint';
+export { StreakBanner } from './StreakBanner';
