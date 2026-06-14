@@ -6,6 +6,7 @@ import {
   type ExerciseCategory,
 } from '../services/exerciseApi';
 import { toErrorMessage } from '../utils';
+import { searchItems } from '../utils/search';
 
 interface ExerciseState {
   exercises: Exercise[];
@@ -86,14 +87,6 @@ export const useExerciseStore = create<ExerciseState>((set, get) => ({
     if (selectedCategory) {
       result = result.filter((e) => e.categoryId === selectedCategory);
     }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (e) =>
-          e.name.toLowerCase().includes(q) ||
-          e.category.toLowerCase().includes(q),
-      );
-    }
-    return result;
+    return searchItems(searchQuery, result, (e) => [e.name, e.category]);
   },
 }));

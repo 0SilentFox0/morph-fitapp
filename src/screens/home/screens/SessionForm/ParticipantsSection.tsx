@@ -6,6 +6,7 @@ import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import { mockClients } from '../../../../mocks';
+import { searchByName } from '../../../../utils';
 import { radius } from '../../../../theme';
 
 export interface ParticipantsSectionProps {
@@ -18,11 +19,8 @@ export function ParticipantsSection({ value, onChange }: ParticipantsSectionProp
   const [showResults, setShowResults] = React.useState(false);
 
   const filtered = React.useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return mockClients.filter((c) => !value.includes(c.name));
-    return mockClients.filter(
-      (c) => c.name.toLowerCase().includes(q) && !value.includes(c.name),
-    );
+    const available = mockClients.filter((c) => !value.includes(c.name));
+    return searchByName(search, available);
   }, [search, value]);
 
   const addParticipant = (name: string) => {

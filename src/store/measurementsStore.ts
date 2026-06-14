@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '../services/storage';
-import { mockMeasurements, type MeasurementEntry } from '../mocks';
+import { getSeedMeasurements } from '../services/repositories';
+import type { MeasurementEntry } from '../types';
 
 export type { MeasurementEntry };
 export type MeasurementField = 'weightKg' | 'chestCm' | 'waistCm' | 'armCm';
@@ -28,7 +29,7 @@ function byDateAsc(a: MeasurementEntry, b: MeasurementEntry): number {
 export const useMeasurementsStore = create<MeasurementsState>()(
   persist(
     (set, get) => ({
-      entries: [...mockMeasurements],
+      entries: [...getSeedMeasurements()],
 
       addEntry: (entry) =>
         set((state) => ({

@@ -16,7 +16,8 @@ import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { useChatStore, formatTime } from '../../store/chatStore';
+import { useChatStore } from '../../store/chatStore';
+import { formatRelativeTime } from '../../utils';
 
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatList'>;
 
@@ -90,7 +91,7 @@ export function ChatListScreen() {
                     {conv.participant.name}
                   </Text>
                   {conv.lastMessageAt && (
-                    <Text style={styles.convTime}>{formatTime(conv.lastMessageAt)}</Text>
+                    <Text style={styles.convTime}>{formatRelativeTime(conv.lastMessageAt)}</Text>
                   )}
                 </View>
                 <View style={styles.convFooter}>

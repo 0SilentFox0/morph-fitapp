@@ -1,5 +1,5 @@
 import { applyProgression, trainingMetric } from '../../utils/progression';
-import type { CompletedTraining } from '../../mocks';
+import type { CompletedTraining } from '../../types';
 
 describe('applyProgression', () => {
   it('returns the same values at 0%', () => {

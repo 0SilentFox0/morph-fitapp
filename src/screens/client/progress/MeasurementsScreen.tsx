@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
+import { getChartWidth } from '../../../utils/layout';
 import { LineChart } from 'react-native-chart-kit';
 import { ScreenHeader } from '../../../components/layout';
 import { Button, SectionTitle } from '../../../components/ui';
@@ -46,7 +47,7 @@ export function MeasurementsScreen() {
     setWeightInput('');
   };
 
-  const chartWidth = Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
+  const chartWidth = getChartWidth(spacing.md * 2);
 
   return (
     <View style={styles.container}>

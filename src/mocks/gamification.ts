@@ -1,5 +1,5 @@
 import { mockTrainingHistory, mockSessions, mockClients, CURRENT_USER_NAME } from './data';
-import type { CompletedTraining } from './data';
+import type { CompletedTraining } from '../types';
 import { computePRs } from '../utils/personalRecords';
 import { computeWeekStreak } from '../utils/achievements';
 import {

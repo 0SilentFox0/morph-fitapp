@@ -1,7 +1,7 @@
 // The draft store persists via AsyncStorage; the official in-memory mock is
 // registered globally in jest.setup.js.
 import { useDraftProgramStore } from '../../store/draftProgramStore';
-import type { ProgramExercise } from '../../mocks';
+import type { ProgramExercise } from '../../types';
 
 function exercise(id: number, sets = [{ weight: 20, reps: 10 }]): ProgramExercise {
   return { id, name: `Ex ${id}`, category: 'Strength', imageUrl: null, sets };

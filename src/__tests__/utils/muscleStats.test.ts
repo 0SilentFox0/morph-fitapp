@@ -7,7 +7,7 @@ import {
   filterByTimeframe,
 } from '../../utils/muscleStats';
 import type { MuscleGroup } from '../../constants/muscles';
-import type { CompletedTraining } from '../../mocks';
+import type { CompletedTraining } from '../../types';
 
 const lookup: Record<number, MuscleGroup[]> = {
   101: ['chest', 'triceps'],

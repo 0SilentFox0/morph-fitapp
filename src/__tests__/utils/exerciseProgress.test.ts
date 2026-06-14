@@ -3,7 +3,7 @@ import {
   exerciseSessionSeries,
   overallVolumeSeries,
 } from '../../utils/exerciseProgress';
-import type { CompletedTraining, ExerciseInfo } from '../../mocks';
+import type { CompletedTraining, ExerciseInfo } from '../../types';
 
 const catalog: Record<number, ExerciseInfo> = {
   101: { id: 101, name: 'Bench press', category: 'Chest', muscles: ['chest'] },

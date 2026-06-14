@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ExerciseSet } from '../mocks';
+import type { ExerciseSet } from '../types';
 
 export type { ExerciseSet };
 

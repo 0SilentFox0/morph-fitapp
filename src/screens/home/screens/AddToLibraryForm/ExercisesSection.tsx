@@ -7,7 +7,7 @@ import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import { radius } from '../../../../theme';
-import type { ProgramExercise } from '../../../../mocks';
+import type { ProgramExercise } from '../../../../types';
 
 export interface ExercisesSectionProps {
   exercises: ProgramExercise[];

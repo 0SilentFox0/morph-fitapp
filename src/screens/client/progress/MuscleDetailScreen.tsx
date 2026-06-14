@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { getChartWidth } from '../../../utils/layout';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import type { ProgressStackParamList } from '../../../navigation/types';
@@ -11,7 +12,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseMuscleMap, exerciseCatalog } from '../../../mocks';
-import type { ExerciseSet } from '../../../mocks';
+import type { ExerciseSet } from '../../../types';
 import { computeMuscleStats, muscleTrend } from '../../../utils/muscleStats';
 import { MUSCLE_LABELS } from '../../../constants/muscles';
 
@@ -72,7 +73,7 @@ export function MuscleDetailScreen() {
     };
   }, [history, muscle]);
 
-  const chartWidth = Dimensions.get('window').width - spacing.lg * 2;
+  const chartWidth = getChartWidth(spacing.md * 2);
 
   return (
     <View style={styles.container}>
@@ -93,7 +94,7 @@ export function MuscleDetailScreen() {
                 labels: trend.map((p) => shortLabel(p.date)),
                 datasets: [{ data: trend.map((p) => p.tonnage) }],
               }}
-              width={chartWidth - spacing.md * 2}
+              width={chartWidth}
               height={200}
               yAxisLabel=""
               yAxisSuffix=""

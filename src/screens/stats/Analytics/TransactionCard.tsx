@@ -5,13 +5,8 @@ import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
-import type { Transaction, TransactionStatus } from '../../../mocks';
-
-const statusColors: Record<TransactionStatus, string> = {
-  completed: colors.Success,
-  pending: colors.Warning,
-  canceled: colors.Error,
-};
+import type { Transaction } from '../../../types';
+import { TRANSACTION_STATUS_COLORS } from '../../../constants/transactions';
 
 export interface TransactionCardProps {
   transaction: Transaction;
@@ -19,7 +14,7 @@ export interface TransactionCardProps {
 
 /** Single transaction row in the business analytics list (Figma 2006:9948). */
 export function TransactionCard({ transaction: t }: TransactionCardProps) {
-  const statusColor = statusColors[t.status];
+  const statusColor = TRANSACTION_STATUS_COLORS[t.status];
   const statusLabel = t.status.charAt(0).toUpperCase() + t.status.slice(1);
   const showProgress =
     t.type === 'Subscription' && t.sessionsTotal != null && t.sessionsUsed != null;

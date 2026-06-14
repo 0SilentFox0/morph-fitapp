@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { formatTime } from '../../store/chatStore';
+import { formatRelativeTime } from '../../utils';
 
 interface SystemMessageCardProps {
   title: string;
@@ -21,7 +21,7 @@ export function SystemMessageCard({ title, subtitle, sentAt }: SystemMessageCard
       <View style={styles.card}>
         <Text style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-        <Text style={styles.time}>{formatTime(sentAt)}</Text>
+        <Text style={styles.time}>{formatRelativeTime(sentAt)}</Text>
       </View>
     </View>
   );

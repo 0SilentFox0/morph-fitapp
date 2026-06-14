@@ -2,11 +2,9 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,11 +15,13 @@ import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Avatar, SectionTitle, Button, Tag } from '../../components/ui';
 import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
+import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useProgramsStore } from '../../store/programsStore';
-import { seedActiveClient, trainingMetric } from '../../utils';
+import { seedActiveClient, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
+import { useDisclosure } from '../../hooks/useDisclosure';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -31,7 +31,7 @@ import { spacing } from '../../theme/spacing';
 type Route = RouteProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 
-const CHART_WIDTH = Dimensions.get('window').width - spacing.lg * 2 - 20;
+const CHART_WIDTH = getChartWidth(20);
 
 const chartConfig = {
   backgroundColor: colors.neutral1,
@@ -59,7 +59,7 @@ export function ClientsProfileExtendedScreen() {
   const name =
     fromTraining?.name ?? mockClients.find((c) => c.id === clientId)?.name ?? 'Brooklyn Simmons';
 
-  const [pickerVisible, setPickerVisible] = React.useState(false);
+  const programPicker = useDisclosure();
 
   const history = getClientHistory(name);
   const nextSession = sessions.find(
@@ -67,7 +67,7 @@ export function ClientsProfileExtendedScreen() {
   );
 
   const handleStart = (programId: string) => {
-    setPickerVisible(false);
+    programPicker.close();
     const program =
       programs.find((p) => p.id === programId) ??
       mockTrainingPrograms.find((p) => p.id === programId);
@@ -81,13 +81,7 @@ export function ClientsProfileExtendedScreen() {
     navigation.navigate('ClientProfile', { clientId: client.clientId });
   };
 
-  const chartData =
-    history.length > 0
-      ? {
-          labels: history.map((h) => h.date),
-          datasets: [{ data: history.map(trainingMetric) }],
-        }
-      : null;
+  const chartData = buildLineChart(history, (h) => h.date, trainingMetric);
 
   return (
     <View style={styles.container}>
@@ -116,7 +110,7 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </View>
 
-        <Button title="Start training" onPress={() => setPickerVisible(true)} style={styles.startBtn} />
+        <Button title="Start training" onPress={programPicker.open} style={styles.startBtn} />
 
         <View style={styles.sectionHeader}>
           <SectionTitle style={styles.sectionTitleInline}>Next training</SectionTitle>
@@ -186,36 +180,19 @@ export function ClientsProfileExtendedScreen() {
         {history.length === 0 ? (
           <Text style={styles.emptyNote}>No completed trainings yet.</Text>
         ) : (
-          [...history].reverse().map((h) => {
-            const program = mockTrainingPrograms.find((p) => p.id === h.programId);
-            const exerciseCount = h.exercises.length;
-            return (
-              <View key={h.id} style={styles.historyCard}>
-                {program?.thumbnail ? (
-                  <Image source={{ uri: program.thumbnail }} style={styles.historyThumb} />
-                ) : (
-                  <View style={styles.historyThumb} />
-                )}
-                <View style={styles.historyInfo}>
-                  <View style={styles.historyTitleRow}>
-                    <Text style={styles.historyName}>{program?.name ?? 'Training'}</Text>
-                    <Text style={styles.historyDate}>{h.date}</Text>
-                  </View>
-                  <Text style={styles.historyType}>{program?.tag ?? '—'}</Text>
-                  <View style={styles.statRow}>
-                    <Stat icon="barbell-outline" value={`${exerciseCount} ex`} />
-                    <Stat icon="trending-up-outline" value={trainingMetric(h)} />
-                  </View>
-                </View>
-              </View>
-            );
-          })
+          [...history].reverse().map((h) => (
+            <TrainingHistoryCard
+              key={h.id}
+              training={h}
+              program={mockTrainingPrograms.find((p) => p.id === h.programId)}
+            />
+          ))
         )}
       </ScrollView>
 
       <ProgramPickerModal
-        visible={pickerVisible}
-        onClose={() => setPickerVisible(false)}
+        visible={programPicker.visible}
+        onClose={programPicker.close}
         programs={programs}
         value={undefined}
         onChange={handleStart}
@@ -228,15 +205,6 @@ function IconSquare({ icon }: { icon: keyof typeof Ionicons.glyphMap }) {
   return (
     <View style={styles.iconSquare}>
       <Ionicons name={icon} size={16} color={colors.white} />
-    </View>
-  );
-}
-
-function Stat({ icon, value }: { icon: keyof typeof Ionicons.glyphMap; value: string | number }) {
-  return (
-    <View style={styles.stat}>
-      <Ionicons name={icon} size={14} color={colors.textSecondary} />
-      <Text style={styles.statText}>{value}</Text>
     </View>
   );
 }
@@ -373,55 +341,5 @@ const styles = StyleSheet.create({
   },
   chart: {
     borderRadius: radius.sm,
-  },
-  historyCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  historyThumb: {
-    width: 96,
-    height: 96,
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral1,
-    marginRight: spacing.md,
-  },
-  historyInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  historyTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  historyName: {
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  historyDate: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-  },
-  historyType: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
-  },
-  statRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.sm,
-  },
-  stat: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  statText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
   },
 });

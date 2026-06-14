@@ -7,6 +7,7 @@ import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
+import { useDateRangePicker } from '../../../hooks/useDateRangePicker';
 
 const CHART_TABS = ['Income Over Time', 'By Source'];
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -46,12 +47,7 @@ export function AnalyticsChartCard({
   chartWidth,
 }: AnalyticsChartCardProps) {
   const [chartTab, setChartTab] = React.useState(0);
-  const [timeframe, setTimeframe] = React.useState(0);
-  const [customRange, setCustomRange] = React.useState<{ start: Date; end: Date } | null>(null);
-  // Two-step date-range picker state: which bound we're picking + the draft start.
-  const [picking, setPicking] = React.useState<null | 'start' | 'end'>(null);
-  const [draft, setDraft] = React.useState(new Date());
-  const [draftStart, setDraftStart] = React.useState<Date | null>(null);
+  const picker = useDateRangePicker();
 
   // Week stays as provided; Month / Custom are derived so the selector visibly
   // re-renders the chart instead of being a dead toggle.
@@ -74,87 +70,35 @@ export function AnalyticsChartCard({
   }, [incomeData]);
 
   const customIncome = React.useMemo<LineData>(() => {
-    if (!customRange) return incomeData;
+    const range = picker.customRange;
+    if (!range) return incomeData;
     const pattern = incomeData.datasets[0]?.data ?? [100];
-    const days = Math.max(1, Math.round((customRange.end.getTime() - customRange.start.getTime()) / DAY_MS) + 1);
+    const days = Math.max(1, Math.round((range.end.getTime() - range.start.getTime()) / DAY_MS) + 1);
     const count = Math.min(days, 7);
     const step = days / count;
     const data: number[] = [];
     const labels: string[] = [];
     for (let i = 0; i < count; i++) {
       const dayIndex = Math.floor(i * step);
-      const d = new Date(customRange.start.getTime() + dayIndex * DAY_MS);
+      const d = new Date(range.start.getTime() + dayIndex * DAY_MS);
       data.push(pattern[dayIndex % pattern.length] ?? 0);
       labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
     }
     return { labels, datasets: [{ data }] };
-  }, [customRange, incomeData]);
+  }, [picker.customRange, incomeData]);
 
   const timeframes = [
     { key: 'week', label: 'Week', data: incomeData },
     { key: 'month', label: 'Month', data: monthIncome },
     {
       key: 'custom',
-      label: customRange ? `${shortDate(customRange.start)} – ${shortDate(customRange.end)}` : 'Custom',
+      label: picker.customRange
+        ? `${shortDate(picker.customRange.start)} – ${shortDate(picker.customRange.end)}`
+        : 'Custom',
       data: customIncome,
     },
   ];
-  const activeIncome = timeframes[timeframe]?.data ?? incomeData;
-
-  const openRangePicker = () => {
-    setDraft(customRange?.start ?? new Date());
-    setDraftStart(null);
-    setPicking('start');
-  };
-
-  const handleTimeframePress = (i: number) => {
-    setTimeframe(i);
-    if (i === 2) {
-      // Tapping Custom (even when already active) restarts range selection.
-      openRangePicker();
-    } else {
-      // Leaving Custom closes any open picker.
-      setPicking(null);
-    }
-  };
-
-  const cancelPicker = () => {
-    setPicking(null);
-    // Abandoned before ever configuring a range → fall back to Week.
-    if (!customRange) setTimeframe(0);
-  };
-
-  const resetCustom = () => {
-    setCustomRange(null);
-    setPicking(null);
-    setTimeframe(0);
-  };
-
-  const handlePickerChange = (event: { type?: string }, selected?: Date) => {
-    if (Platform.OS === 'android') {
-      if (event?.type === 'dismissed' || !selected) {
-        cancelPicker();
-        return;
-      }
-      commitPicker(selected);
-      return;
-    }
-    if (selected) setDraft(selected);
-  };
-
-  const commitPicker = (value: Date) => {
-    if (picking === 'start') {
-      setDraftStart(value);
-      setDraft(value);
-      setPicking('end');
-    } else if (picking === 'end') {
-      const start = draftStart ?? value;
-      // Guard against an end earlier than start by swapping.
-      const range = value < start ? { start: value, end: start } : { start, end: value };
-      setCustomRange(range);
-      setPicking(null);
-    }
-  };
+  const activeIncome = timeframes[picker.timeframe]?.data ?? incomeData;
 
   return (
     <View style={styles.chartCard}>
@@ -177,12 +121,12 @@ export function AnalyticsChartCard({
 
       <View style={styles.timeframeRow}>
         {timeframes.map((tf, i) => {
-          const active = i === timeframe;
-          const showReset = tf.key === 'custom' && customRange;
+          const active = i === picker.timeframe;
+          const showReset = tf.key === 'custom' && picker.customRange;
           return (
             <TouchableOpacity
               key={tf.key}
-              onPress={() => handleTimeframePress(i)}
+              onPress={() => picker.selectTimeframe(i, tf.key === 'custom')}
               style={[styles.timeframeBtn, active && styles.timeframeBtnActive]}
               activeOpacity={0.8}
             >
@@ -194,7 +138,7 @@ export function AnalyticsChartCard({
               </Text>
               {showReset && (
                 <TouchableOpacity
-                  onPress={resetCustom}
+                  onPress={picker.reset}
                   activeOpacity={0.8}
                   accessibilityLabel="Reset custom range"
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -211,25 +155,25 @@ export function AnalyticsChartCard({
         })}
       </View>
 
-      {picking && (
+      {picker.picking && (
         <View style={styles.picker}>
           <Text style={styles.pickerLabel}>
-            {picking === 'start' ? 'Select start date' : 'Select end date'}
+            {picker.picking === 'start' ? 'Select start date' : 'Select end date'}
           </Text>
           <DateTimePicker
-            value={draft}
+            value={picker.draft}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handlePickerChange}
+            onChange={picker.handleChange}
             themeVariant="dark"
           />
           {Platform.OS === 'ios' && (
             <View style={styles.pickerActions}>
-              <TouchableOpacity style={styles.pickerBtn} onPress={cancelPicker}>
+              <TouchableOpacity style={styles.pickerBtn} onPress={picker.cancel}>
                 <Text style={styles.pickerCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.pickerBtn} onPress={() => commitPicker(draft)}>
-                <Text style={styles.pickerDoneText}>{picking === 'start' ? 'Next' : 'Done'}</Text>
+              <TouchableOpacity style={styles.pickerBtn} onPress={() => picker.commit(picker.draft)}>
+                <Text style={styles.pickerDoneText}>{picker.picking === 'start' ? 'Next' : 'Done'}</Text>
               </TouchableOpacity>
             </View>
           )}

@@ -23,7 +23,7 @@ import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useExerciseStore } from '../../../store/exerciseStore';
-import type { ProgramExercise } from '../../../mocks';
+import type { ProgramExercise } from '../../../types';
 import type { Exercise } from '../../../services/exerciseApi';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Gallery'>;

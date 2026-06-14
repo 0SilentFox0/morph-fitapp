@@ -27,17 +27,16 @@ import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { formatDate, formatTime } from '../../utils';
-import type { Transaction, TransactionStatus, TransactionType } from '../../mocks';
+import type { Transaction, TransactionType } from '../../types';
+import {
+  TRANSACTION_TYPES,
+  TRANSACTION_STATUSES,
+  PAYMENT_METHODS,
+} from '../../constants/transactions';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { useDateTimePicker } from '../../hooks/useDateTimePicker';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
-
-const TYPE_OPTIONS: TransactionType[] = ['Training', 'Subscription'];
-const STATUS_OPTIONS: { label: string; value: TransactionStatus; color: string }[] = [
-  { label: 'Completed', value: 'completed', color: colors.Success },
-  { label: 'Pending', value: 'pending', color: colors.Warning },
-  { label: 'Canceled', value: 'canceled', color: colors.Error },
-];
-const PAYMENT_METHODS = ['Card', 'Cash', 'Bank transfer', 'PayPal'];
 
 interface SegmentOption {
   label: string;
@@ -90,12 +89,12 @@ export function AddTransactionScreen() {
   const [time, setTime] = React.useState(new Date());
   const [statusIndex, setStatusIndex] = React.useState(0);
   const [method, setMethod] = React.useState('');
-  const [methodOpen, setMethodOpen] = React.useState(false);
-  const [showDate, setShowDate] = React.useState(false);
-  const [showTime, setShowTime] = React.useState(false);
+  const methodMenu = useDisclosure();
+  const datePicker = useDateTimePicker(setDate);
+  const timePicker = useDateTimePicker(setTime);
 
-  const type = TYPE_OPTIONS[typeIndex] as TransactionType;
-  const status = STATUS_OPTIONS[statusIndex];
+  const type = TRANSACTION_TYPES[typeIndex] as TransactionType;
+  const status = TRANSACTION_STATUSES[statusIndex];
 
   const preview: Transaction = {
     id: 'preview',
@@ -107,14 +106,6 @@ export function AddTransactionScreen() {
     ...(typeIndex === 1 ? { sessionsUsed: 0, sessionsTotal: 9 } : {}),
   };
 
-  const handleDateChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') setShowDate(false);
-    if (selected) setDate(selected);
-  };
-  const handleTimeChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') setShowTime(false);
-    if (selected) setTime(selected);
-  };
 
   return (
     <View style={styles.container}>
@@ -147,41 +138,41 @@ export function AddTransactionScreen() {
         />
 
         <View style={styles.dateRow}>
-          <DatePickerInput value={formatDate(date)} onPress={() => setShowDate(true)} />
+          <DatePickerInput value={formatDate(date)} onPress={datePicker.open} />
           <TimePickerInput
             value={formatTime(time)}
-            onPress={() => setShowTime(true)}
+            onPress={timePicker.open}
             style={styles.timeField}
           />
         </View>
 
-        {showDate && (
+        {datePicker.visible && (
           <View style={styles.picker}>
             <DateTimePicker
               value={date}
               mode="date"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleDateChange}
+              onChange={datePicker.handleChange}
               themeVariant="dark"
             />
             {Platform.OS === 'ios' && (
-              <TouchableOpacity style={styles.done} onPress={() => setShowDate(false)}>
+              <TouchableOpacity style={styles.done} onPress={datePicker.close}>
                 <Text style={styles.doneText}>Done</Text>
               </TouchableOpacity>
             )}
           </View>
         )}
-        {showTime && (
+        {timePicker.visible && (
           <View style={styles.picker}>
             <DateTimePicker
               value={time}
               mode="time"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleTimeChange}
+              onChange={timePicker.handleChange}
               themeVariant="dark"
             />
             {Platform.OS === 'ios' && (
-              <TouchableOpacity style={styles.done} onPress={() => setShowTime(false)}>
+              <TouchableOpacity style={styles.done} onPress={timePicker.close}>
                 <Text style={styles.doneText}>Done</Text>
               </TouchableOpacity>
             )}
@@ -190,7 +181,7 @@ export function AddTransactionScreen() {
 
         <View style={styles.spacer}>
           <Segmented
-            options={STATUS_OPTIONS.map((s) => ({ label: s.label, activeColor: s.color }))}
+            options={TRANSACTION_STATUSES.map((s) => ({ label: s.label, activeColor: s.color }))}
             value={statusIndex}
             onChange={setStatusIndex}
           />
@@ -200,9 +191,9 @@ export function AddTransactionScreen() {
           <DropdownSelect
             value={method}
             placeholder="Payment method"
-            onPress={() => setMethodOpen((o) => !o)}
+            onPress={methodMenu.toggle}
           />
-          {methodOpen && (
+          {methodMenu.visible && (
             <Card style={styles.methodMenu}>
               {PAYMENT_METHODS.map((m) => (
                 <TouchableOpacity
@@ -210,7 +201,7 @@ export function AddTransactionScreen() {
                   style={styles.methodItem}
                   onPress={() => {
                     setMethod(m);
-                    setMethodOpen(false);
+                    methodMenu.close();
                   }}
                 >
                   <Text style={styles.methodText}>{m}</Text>

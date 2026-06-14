@@ -11,7 +11,7 @@ import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { exportTransactions } from '../../utils';
+import { exportTransactions, searchItems } from '../../utils';
 import { mockTransactions } from '../../mocks';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'Transactions'>;
@@ -29,9 +29,7 @@ export function TransactionsScreen() {
       if (activeFilter === 2) return t.type === 'Subscription';
       return true;
     });
-    const q = search.trim().toLowerCase();
-    if (!q) return byFilter;
-    return byFilter.filter((t) => t.clientName.toLowerCase().includes(q));
+    return searchItems(search, byFilter, (t) => [t.clientName]);
   }, [activeFilter, search]);
 
   return (

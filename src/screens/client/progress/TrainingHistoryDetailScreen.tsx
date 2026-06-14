@@ -10,7 +10,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { mockTrainingPrograms, exerciseCatalog, exerciseMuscleMap } from '../../../mocks';
-import type { ExerciseSet } from '../../../mocks';
+import type { ExerciseSet } from '../../../types';
 import { computeTotals } from '../../../utils/muscleStats';
 import { formatDate } from '../../../utils';
 import { MUSCLE_LABELS, type MuscleGroup } from '../../../constants/muscles';

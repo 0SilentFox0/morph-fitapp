@@ -1,6 +1,6 @@
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { mockClients, mockSessions, CURRENT_USER_NAME } from '../../mocks';
-import type { CompletedTraining } from '../../mocks';
+import type { CompletedTraining } from '../../types';
 
 const seed = useTrainingHistoryStore.getState().history;
 

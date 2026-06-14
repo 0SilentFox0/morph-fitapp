@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScheduleCard, PagerDots } from '../../../components/ui';
-import type { Session } from '../../../mocks';
+import type { Session } from '../../../types';
 import { colors } from '../../../theme/colors';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme';

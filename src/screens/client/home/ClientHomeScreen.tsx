@@ -17,6 +17,7 @@ import {
 } from '../../../components/ui';
 import { UpcomingCarousel } from './UpcomingCarousel';
 import { useClientTabSwipe } from '../useClientTabSwipe';
+import { useTabNavigation } from '../../../hooks/useTabNavigation';
 import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
@@ -31,7 +32,6 @@ import { computeWeekStreak } from '../../../utils/achievements';
 import { MUSCLE_GROUPS, MUSCLE_LABELS } from '../../../constants/muscles';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'ClientHome'>;
-type TabNav = { navigate: (name: string, params?: object) => void };
 
 const formatKg = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`);
 
@@ -48,7 +48,7 @@ export function ClientHomeScreen() {
   const history = getCurrentUserHistory();
   const upcoming = getUpcomingSessions();
 
-  const tabNav = navigation.getParent() as unknown as TabNav | undefined;
+  const tabNav = useTabNavigation();
   const goToTab = (tab: string) => tabNav?.navigate(tab);
   const tabSwipe = useClientTabSwipe('ClientHomeTab');
 

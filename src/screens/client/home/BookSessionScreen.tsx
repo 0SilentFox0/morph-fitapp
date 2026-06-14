@@ -16,6 +16,7 @@ import { TRAINING_TYPES } from '../../../constants';
 import { useTrainersStore } from '../../../store/trainersStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { formatDate, formatTime } from '../../../utils';
+import { useDisclosure } from '../../../hooks/useDisclosure';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'BookSession'>;
 type Route = RouteProp<ClientHomeStackParamList, 'BookSession'>;
@@ -30,14 +31,14 @@ export function BookSessionScreen() {
   const [type, setType] = React.useState<string>(TRAINING_TYPES[0]);
   const [date, setDate] = React.useState(new Date());
   const [time, setTime] = React.useState(new Date());
-  const [typePickerOpen, setTypePickerOpen] = React.useState(false);
-  const [trainerPickerOpen, setTrainerPickerOpen] = React.useState(false);
+  const typePicker = useDisclosure();
+  const trainerPicker = useDisclosure();
 
   const trainer = trainers.find((t) => t.id === trainerId);
 
   const handleRequest = () => {
     if (!trainer) {
-      setTrainerPickerOpen(true);
+      trainerPicker.open();
       return;
     }
     addSession({
@@ -59,7 +60,7 @@ export function BookSessionScreen() {
         <TouchableOpacity
           style={styles.selectRow}
           activeOpacity={0.8}
-          onPress={() => setTrainerPickerOpen(true)}
+          onPress={trainerPicker.open}
         >
           {trainer ? (
             <View style={styles.trainerSelected}>
@@ -79,7 +80,7 @@ export function BookSessionScreen() {
         <TouchableOpacity
           style={styles.selectRow}
           activeOpacity={0.8}
-          onPress={() => setTypePickerOpen(true)}
+          onPress={typePicker.open}
         >
           <Text style={styles.selectValue}>{type}</Text>
           <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
@@ -95,14 +96,14 @@ export function BookSessionScreen() {
       </ScrollView>
 
       <TypePickerModal
-        visible={typePickerOpen}
-        onClose={() => setTypePickerOpen(false)}
+        visible={typePicker.visible}
+        onClose={typePicker.close}
         options={TRAINING_TYPES}
         value={type}
         onChange={setType}
       />
 
-      <Overlay visible={trainerPickerOpen} onClose={() => setTrainerPickerOpen(false)}>
+      <Overlay visible={trainerPicker.visible} onClose={trainerPicker.close}>
         <View style={styles.pickerSheet}>
           <Text style={styles.pickerTitle}>Choose a trainer</Text>
           {trainers.map((t) => (
@@ -112,7 +113,7 @@ export function BookSessionScreen() {
               activeOpacity={0.8}
               onPress={() => {
                 setTrainerId(t.id);
-                setTrainerPickerOpen(false);
+                trainerPicker.close();
               }}
             >
               <Avatar name={t.name} uri={t.avatar} size={36} />

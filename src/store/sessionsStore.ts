@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import { mockSessions } from '../mocks';
-import type { Session, SessionStatus } from '../mocks';
+import { getSeedSessions } from '../services/repositories';
+import type { Session, SessionStatus } from '../types';
+import { searchItems } from '../utils/search';
+import { updateById, removeById } from './collection';
 
 export type { Session, SessionStatus };
 
@@ -15,10 +17,11 @@ interface SessionsState {
   getUpcomingSessions: () => Session[];
 }
 
-let nextId = mockSessions.length + 1;
+const seedSessions = getSeedSessions();
+let nextId = seedSessions.length + 1;
 
 export const useSessionsStore = create<SessionsState>((set, get) => ({
-  sessions: mockSessions,
+  sessions: seedSessions,
 
   addSession: (session) => {
     const id = String(nextId++);
@@ -28,17 +31,11 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
   },
 
   updateSession: (id, updates) => {
-    set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === id ? { ...s, ...updates } : s,
-      ),
-    }));
+    set((state) => ({ sessions: updateById(state.sessions, id, updates) }));
   },
 
   deleteSession: (id) => {
-    set((state) => ({
-      sessions: state.sessions.filter((s) => s.id !== id),
-    }));
+    set((state) => ({ sessions: removeById(state.sessions, id) }));
   },
 
   getSessionsByDateKey: (dateKey) => {
@@ -57,16 +54,12 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
     });
   },
 
-  searchSessions: (query) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return get().sessions;
-    return get().sessions.filter(
-      (s) =>
-        s.title.toLowerCase().includes(q) ||
-        s.type.toLowerCase().includes(q) ||
-        s.participants.some((p) => p.name.toLowerCase().includes(q)),
-    );
-  },
+  searchSessions: (query) =>
+    searchItems(query, get().sessions, (s) => [
+      s.title,
+      s.type,
+      ...s.participants.map((p) => p.name),
+    ]),
 
   getTodaySessions: () => {
     return get().sessions.filter((s) => s.date === 'Today');

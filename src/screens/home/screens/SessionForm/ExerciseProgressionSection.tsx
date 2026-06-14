@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTrainingHistoryStore } from '../../../../store/trainingHistoryStore';
 import { applyProgression, PROGRESSION_STEPS } from '../../../../utils';
-import type { TrainingProgram, ExerciseSet } from '../../../../mocks';
+import type { TrainingProgram, ExerciseSet } from '../../../../types';
 import { colors } from '../../../../theme/colors';
 import { radius } from '../../../../theme';
 import { typography } from '../../../../theme/typography';

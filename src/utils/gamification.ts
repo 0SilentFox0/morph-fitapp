@@ -1,4 +1,4 @@
-import type { CompletedTraining } from '../mocks';
+import type { CompletedTraining } from '../types';
 import { computeWeekStreak } from './achievements';
 
 /**

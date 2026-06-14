@@ -6,7 +6,7 @@ import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import type { Session, SessionStatus } from '../../mocks';
+import type { Session, SessionStatus } from '../../types';
 
 interface ScheduleCardProps {
   session: Session;

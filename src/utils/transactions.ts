@@ -1,5 +1,5 @@
 import { Alert, Share } from 'react-native';
-import type { Transaction } from '../mocks';
+import type { Transaction } from '../types';
 
 /** Serialize transactions to a CSV string (one header row + one row per item). */
 export function transactionsToCsv(transactions: Transaction[]): string {

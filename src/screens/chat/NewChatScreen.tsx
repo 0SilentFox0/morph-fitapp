@@ -17,6 +17,7 @@ import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
+import { searchByName } from '../../utils';
 import { mockClients } from '../../mocks';
 
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'NewChat'>;
@@ -26,11 +27,7 @@ export function NewChatScreen() {
   const getOrCreateConversation = useChatStore((s) => s.getOrCreateConversation);
   const [search, setSearch] = React.useState('');
 
-  const filteredClients = React.useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return mockClients;
-    return mockClients.filter((c) => c.name.toLowerCase().includes(q));
-  }, [search]);
+  const filteredClients = React.useMemo(() => searchByName(search, mockClients), [search]);
 
   const handleSelectClient = (clientId: string, name: string) => {
     const conv = getOrCreateConversation(clientId, {

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ProgramExercise } from '../../../../mocks';
+import type { ProgramExercise } from '../../../../types';
 
 /**
  * Tracks which gallery exercises the user has picked. Exercises already in the

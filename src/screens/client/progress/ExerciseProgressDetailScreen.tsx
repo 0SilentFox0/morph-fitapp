@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { getChartWidth } from '../../../utils/layout';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import type { ProgressStackParamList } from '../../../navigation/types';
@@ -11,7 +12,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseCatalog } from '../../../mocks';
-import type { ExerciseSet } from '../../../mocks';
+import type { ExerciseSet } from '../../../types';
 import {
   exerciseSessionSeries,
   listExerciseProgress,
@@ -67,7 +68,7 @@ export function ExerciseProgressDetailScreen() {
     [history, exerciseId],
   );
 
-  const chartWidth = Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
+  const chartWidth = getChartWidth(spacing.md * 2);
   const suffix = METRICS.find((m) => m.key === metric)!.suffix;
 
   return (
