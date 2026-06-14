@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useRoute, type RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { TrainersStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
@@ -11,20 +11,20 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainersStore } from '../../../store/trainersStore';
 import { useChatStore } from '../../../store/chatStore';
+import { useTabNavigation } from '../../../hooks/useTabNavigation';
 
 type Route = RouteProp<TrainersStackParamList, 'TrainerProfile'>;
 
 // Cross-tab navigation: from the Trainers stack up to the client tab navigator.
-type TabNav = { navigate: (name: string, params?: object) => void };
 
 export function TrainerProfileScreen() {
-  const navigation = useNavigation();
   const route = useRoute<Route>();
   const { trainerId } = route.params;
 
   const trainer = useTrainersStore((s) => s.getTrainer(trainerId));
   const connect = useTrainersStore((s) => s.connect);
   const getOrCreateConversation = useChatStore((s) => s.getOrCreateConversation);
+  const tabNav = useTabNavigation();
 
   if (!trainer) {
     return (
@@ -36,8 +36,6 @@ export function TrainerProfileScreen() {
       </View>
     );
   }
-
-  const tabNav = navigation.getParent() as unknown as TabNav | undefined;
 
   const handleMessage = () => {
     const conversation = getOrCreateConversation(trainer.id, {
