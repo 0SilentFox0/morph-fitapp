@@ -64,7 +64,7 @@ export function UpcomingCarousel({ sessions, trainerName, onPressSession, onBook
           </View>
         ))}
       </ScrollView>
-      <PagerDots count={sessions.length} activeIndex={index} />
+      <PagerDots count={sessions.length} activeIndex={Math.min(index, sessions.length - 1)} />
     </View>
   );
 }

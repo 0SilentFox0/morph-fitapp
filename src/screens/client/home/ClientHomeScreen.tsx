@@ -68,7 +68,7 @@ export function ClientHomeScreen() {
   }, [history]);
 
   const nextSessions = React.useMemo(() => upcoming.slice(0, 5), [upcoming]);
-  const myTrainer = trainers.find((t) => t.connection !== 'none');
+  const myTrainer = React.useMemo(() => trainers.find((t) => t.connection !== 'none'), [trainers]);
 
   return (
     <HorizontalSwipe style={styles.container} onSwipeLeft={tabSwipe.onSwipeLeft} onSwipeRight={tabSwipe.onSwipeRight}>
