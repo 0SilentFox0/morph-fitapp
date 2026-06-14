@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { mockTrainers } from '../mocks';
+import { getSeedTrainers } from '../services/repositories';
 import type { Trainer, ConnectionStatus } from '../types';
 import { searchItems } from '../utils/search';
 
@@ -25,7 +25,7 @@ interface TrainersState {
 }
 
 export const useTrainersStore = create<TrainersState>((set, get) => ({
-  trainers: mockTrainers,
+  trainers: getSeedTrainers(),
   filterSpecialty: null,
   onlineOnly: false,
 

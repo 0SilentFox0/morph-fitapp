@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { mockTrainingHistory, CURRENT_USER_NAME } from '../mocks';
+import { getSeedTrainingHistory, getCurrentUserName } from '../services/repositories';
 import type { CompletedTraining, ExerciseSet } from '../types';
 
 export type { CompletedTraining };
@@ -19,14 +19,14 @@ interface TrainingHistoryState {
 }
 
 export const useTrainingHistoryStore = create<TrainingHistoryState>((set, get) => ({
-  history: mockTrainingHistory,
+  history: getSeedTrainingHistory(),
 
   getClientHistory: (clientName) => {
     const key = normalizeName(clientName);
     return get().history.filter((h) => normalizeName(h.clientName) === key);
   },
 
-  getCurrentUserHistory: () => get().getClientHistory(CURRENT_USER_NAME),
+  getCurrentUserHistory: () => get().getClientHistory(getCurrentUserName()),
 
   getLastSets: (clientName, exerciseId) => {
     const key = normalizeName(clientName);

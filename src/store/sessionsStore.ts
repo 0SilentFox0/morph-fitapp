@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { mockSessions } from '../mocks';
+import { getSeedSessions } from '../services/repositories';
 import type { Session, SessionStatus } from '../types';
 import { searchItems } from '../utils/search';
 import { updateById, removeById } from './collection';
@@ -17,10 +17,11 @@ interface SessionsState {
   getUpcomingSessions: () => Session[];
 }
 
-let nextId = mockSessions.length + 1;
+const seedSessions = getSeedSessions();
+let nextId = seedSessions.length + 1;
 
 export const useSessionsStore = create<SessionsState>((set, get) => ({
-  sessions: mockSessions,
+  sessions: seedSessions,
 
   addSession: (session) => {
     const id = String(nextId++);
