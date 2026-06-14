@@ -5,6 +5,13 @@ const STORAGE_KEY = 'fitconnect.tokens';
 
 let cache: TokenResponse | null = null;
 
+async function readCache(): Promise<TokenResponse | null> {
+  if (cache) return cache;
+  const raw = await AsyncStorage.getItem(STORAGE_KEY);
+  cache = raw ? (JSON.parse(raw) as TokenResponse) : null;
+  return cache;
+}
+
 /**
  * Persists Sanctum access/refresh tokens. In-memory cache is the source of
  * truth at runtime; AsyncStorage survives app restarts. `load()` hydrates the
@@ -22,19 +29,11 @@ export const tokenStore = {
   },
 
   async getAccessToken(): Promise<string | null> {
-    if (cache) return cache.access_token;
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    cache = JSON.parse(raw) as TokenResponse;
-    return cache.access_token;
+    return (await readCache())?.access_token ?? null;
   },
 
   async getRefreshToken(): Promise<string | null> {
-    if (cache) return cache.refresh_token;
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    cache = JSON.parse(raw) as TokenResponse;
-    return cache.refresh_token;
+    return (await readCache())?.refresh_token ?? null;
   },
 
   async clear(): Promise<void> {
