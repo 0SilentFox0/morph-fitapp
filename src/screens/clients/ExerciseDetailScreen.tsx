@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TextInput,
   TouchableOpacity,
 } from 'react-native';
 import {
@@ -20,11 +19,11 @@ import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import {
   SetSelector,
-  Toggle,
   RestTimerControl,
   ClientSwitcherStrip,
   type SwitcherClient,
 } from '../../components/ui';
+import { SetEditor } from './ExerciseDetail/SetEditor';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { formatClock } from '../../utils';
 import { mockTrainingPrograms } from '../../mocks';
@@ -179,40 +178,14 @@ export function ExerciseDetailScreen() {
         )}
 
         <Text style={[styles.label, styles.labelSpaced]}>Main info</Text>
-        <View style={styles.field}>
-          <TextInput
-            style={styles.fieldInput}
-            keyboardType="decimal-pad"
-            inputMode="decimal"
-            selectTextOnFocus
-            value={String(currentSet.weight)}
-            onChangeText={(t) =>
-              updateSet(client.clientId, exercise.id, setIndex, { weight: Number(t) || 0 })
-            }
-          />
-          <Text style={styles.fieldSuffix}>kg</Text>
-        </View>
-        <View style={styles.field}>
-          <TextInput
-            style={styles.fieldInput}
-            keyboardType="number-pad"
-            inputMode="numeric"
-            selectTextOnFocus
-            value={String(currentSet.reps)}
-            onChangeText={(t) =>
-              updateSet(client.clientId, exercise.id, setIndex, { reps: Number(t) || 0 })
-            }
-          />
-          <Text style={styles.fieldSuffix}>x</Text>
-        </View>
-
-        <View style={styles.failureRow}>
-          <Toggle
-            value={currentSet.note === 'failure'}
-            onValueChange={() => toggleRepToFailure(client.clientId, exercise.id, setIndex)}
-          />
-          <Text style={styles.failureLabel}>rep to failure</Text>
-        </View>
+        <SetEditor
+          weight={currentSet.weight}
+          reps={currentSet.reps}
+          toFailure={currentSet.note === 'failure'}
+          onWeightChange={(weight) => updateSet(client.clientId, exercise.id, setIndex, { weight })}
+          onRepsChange={(reps) => updateSet(client.clientId, exercise.id, setIndex, { reps })}
+          onToggleFailure={() => toggleRepToFailure(client.clientId, exercise.id, setIndex)}
+        />
 
         <Text style={[styles.label, styles.labelSpaced]}>Trainer Notes</Text>
         <View style={styles.notes}>
@@ -308,38 +281,6 @@ const styles = StyleSheet.create({
   },
   labelSpaced: {
     marginTop: spacing.lg,
-  },
-  field: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.neutral1,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  fieldInput: {
-    flex: 1,
-    fontSize: typography.sizes.base,
-    color: colors.neutral9,
-    padding: 0,
-  },
-  fieldSuffix: {
-    fontSize: typography.sizes.base,
-    color: colors.textMuted,
-    marginLeft: spacing.sm,
-  },
-  failureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  failureLabel: {
-    fontSize: typography.sizes.xs,
-    color: colors.text,
   },
   notes: {
     backgroundColor: colors.neutral1,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { radius } from '../../../theme';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -8,16 +8,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ScreenHeader } from '../../../components/layout';
-import { Input, Button, DropdownSelect, Overlay } from '../../../components/ui';
+import { Input, Button, DropdownSelect } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useShallow } from 'zustand/react/shallow';
-import { TRAINING_TYPES } from '../../../constants';
 import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
 import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
+import { TagPickerModal } from './AddToLibraryForm/TagPickerModal';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useMirror } from '../../../hooks/useMirror';
 
@@ -224,38 +224,21 @@ export function AddToLibraryFormScreen() {
         />
       </ScrollView>
 
-      <Overlay visible={tagModal.visible} onClose={tagModal.close}>
-        <Controller
-          control={control}
-          name="tag"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.modalContent}>
-              <FlatList
-                data={TRAINING_TYPES}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[styles.modalOption, value === item && styles.modalOptionActive]}
-                    onPress={() => {
-                      onChange(item);
-                      tagModal.close();
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.modalOptionText,
-                        value === item && styles.modalOptionTextActive,
-                      ]}
-                    >
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-        />
-      </Overlay>
+      <Controller
+        control={control}
+        name="tag"
+        render={({ field: { onChange, value } }) => (
+          <TagPickerModal
+            visible={tagModal.visible}
+            value={value}
+            onClose={tagModal.close}
+            onSelect={(tag) => {
+              onChange(tag);
+              tagModal.close();
+            }}
+          />
+        )}
+      />
     </View>
   );
 }
@@ -324,27 +307,5 @@ const styles = StyleSheet.create({
   },
   buttonSecondary: {
     marginTop: spacing.md,
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.sm,
-    maxHeight: 400,
-  },
-  modalOption: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  modalOptionActive: {
-    backgroundColor: colors.neutral3,
-  },
-  modalOptionText: {
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  modalOptionTextActive: {
-    color: colors.accent,
-    fontWeight: typography.weights.semibold,
   },
 });
