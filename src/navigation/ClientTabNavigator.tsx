@@ -1,27 +1,22 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getFocusedRouteNameFromRoute, type RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import type { ClientTabParamList } from './types';
 import { colors } from '../theme/colors';
 import { radius } from '../theme';
-import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon } from '../components/icons/TabBarIcons';
+import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon, TrainTabIcon } from '../components/icons/TabBarIcons';
 
 import { ChatStackNavigator } from './ChatStackNavigator';
 import { ClientHomeStackNavigator } from './client/ClientHomeStackNavigator';
 import { TrainersStackNavigator } from './client/TrainersStackNavigator';
 import { ProgressStackNavigator } from './client/ProgressStackNavigator';
-import { makeClientPlaceholder } from '../screens/client/ClientPlaceholderScreen';
+import { TrainStackNavigator } from './client/TrainStackNavigator';
 import { useChatStore } from '../store/chatStore';
 
 const Tab = createBottomTabNavigator<ClientTabParamList>();
-
-// The Add tab is never shown — the FAB intercepts the press and routes to the
-// booking flow inside the Home stack (mirrors the trainer AddTab pattern).
-const AddTabScreen = makeClientPlaceholder('Book a session', 'add');
 
 function TabBarBackground() {
   return (
@@ -34,14 +29,6 @@ function TabBarBackground() {
       />
       <View style={[StyleSheet.absoluteFill, styles.tabBarOverlay]} />
     </View>
-  );
-}
-
-function AddButton({ onPress }: { onPress: () => void }) {
-  return (
-    <TouchableOpacity style={styles.addButton} onPress={onPress} activeOpacity={0.8}>
-      <Ionicons name="add" size={20} color={colors.text} />
-    </TouchableOpacity>
   );
 }
 
@@ -99,22 +86,11 @@ export function ClientTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="ClientAddTab"
-        component={AddTabScreen}
-        options={({ navigation }) => {
-          const nav = navigation as unknown as { navigate: (n: string, p: object) => void };
-          const goToBooking = () => nav.navigate('ClientHomeTab', { screen: 'BookSession' });
-          return {
-            tabBarLabel: () => null,
-            tabBarIcon: () => <AddButton onPress={goToBooking} />,
-            tabBarButton: (props) => (
-              <TouchableOpacity
-                {...(props as React.ComponentProps<typeof TouchableOpacity>)}
-                onPress={goToBooking}
-                activeOpacity={0.8}
-              />
-            ),
-          };
+        name="TrainTab"
+        component={TrainStackNavigator}
+        options={{
+          tabBarLabel: 'Train',
+          tabBarIcon: ({ focused, color }) => <TrainTabIcon color={color} focused={focused} />,
         }}
       />
       <Tab.Screen
@@ -169,15 +145,6 @@ const styles = StyleSheet.create({
   tabBarLabel: { fontSize: 12, fontWeight: '400', lineHeight: 20 },
   tabBarIcon: { marginBottom: 2 },
   tabBarItem: { justifyContent: 'center', alignItems: 'center' },
-  addButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 96,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
   chatIconWrap: { position: 'relative' },
   chatBadge: {
     position: 'absolute',

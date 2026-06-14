@@ -79,9 +79,18 @@ export type ChatStackParamList = {
 export type ClientTabParamList = {
   ClientHomeTab: undefined;
   TrainersTab: undefined;
-  ClientAddTab: undefined;
+  TrainTab: undefined;
   ChatTab: undefined;
   ProgressTab: undefined;
+};
+
+export type TrainStackParamList = LiveTrainingParamList & {
+  TrainHome: undefined;
+  WorkoutBuilder: undefined;
+  WorkoutOverview:
+    | { source: 'program'; programId: string }
+    | { source: 'assigned'; sessionId: string }
+    | { source: 'custom'; exercises: ProgramExercise[] };
 };
 
 export type ClientHomeStackParamList = {
