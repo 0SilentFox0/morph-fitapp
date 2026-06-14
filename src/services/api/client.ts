@@ -1,6 +1,10 @@
 import { API_BASE_URL, API_TIMEOUT_MS } from '../../config/env';
 import { tokenStore } from './tokenStore';
 import type { z } from 'zod';
+import { dataEnvelope } from '../../schemas/api/envelope';
+import { TokenResponseSchema } from '../../schemas/api/models';
+
+const refreshEnvelope = dataEnvelope(TokenResponseSchema);
 
 /** Error thrown for any non-2xx response. `fieldErrors` is populated on 422. */
 export class ApiError extends Error {
@@ -87,24 +91,20 @@ async function ensureRefreshed(): Promise<boolean> {
     refreshPromise = (async () => {
       const refresh_token = await tokenStore.getRefreshToken();
       if (!refresh_token) return false;
-      try {
-        const res = await rawRequest('POST', '/auth/refresh', { body: { refresh_token }, auth: false });
-        if (!res.ok) return false;
-        const json = (await res.json()) as { data: import('../../schemas/api/models').TokenResponse };
-        await tokenStore.setTokens(json.data);
-        return true;
-      } catch {
-        return false;
-      }
+      const res = await rawRequest('POST', '/auth/refresh', { body: { refresh_token }, auth: false });
+      if (!res.ok) return false; // refresh token definitively rejected
+      const json = await res.json();
+      const parsed = refreshEnvelope.safeParse(json);
+      if (!parsed.success) return false; // unexpected shape — treat as failed refresh
+      await tokenStore.setTokens(parsed.data.data);
+      return true;
     })();
-    void refreshPromise.then(() => {
+    refreshPromise = refreshPromise.finally(() => {
       refreshPromise = null;
-    });
+    }) as Promise<boolean>;
   }
   return refreshPromise;
 }
-
-const PUBLIC_AUTH_PATHS = new Set(['/auth/login', '/auth/refresh']);
 
 /** Make a typed request against the backend. */
 export async function request<T = unknown>(
@@ -115,7 +115,9 @@ export async function request<T = unknown>(
   const auth = opts.auth !== false;
   let res = await rawRequest(method, path, { body: opts.body, query: opts.query, auth });
 
-  if (res.status === 401 && auth && !PUBLIC_AUTH_PATHS.has(path)) {
+  if (res.status === 401 && auth) {
+    // ensureRefreshed() may throw on transient errors (network failure, timeout).
+    // Only clear tokens / notify on a definitive refresh failure (returns false).
     const refreshed = await ensureRefreshed();
     if (refreshed) {
       res = await rawRequest(method, path, { body: opts.body, query: opts.query, auth });
@@ -127,7 +129,7 @@ export async function request<T = unknown>(
   }
 
   if (!res.ok) {
-    if (res.status === 401 && auth && !PUBLIC_AUTH_PATHS.has(path)) {
+    if (res.status === 401 && auth) {
       await tokenStore.clear();
       onUnauthorized?.();
     }

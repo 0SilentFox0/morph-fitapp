@@ -62,4 +62,30 @@ describe('api client', () => {
     expect(onUnauth).toHaveBeenCalled();
     expect(await tokenStore.getAccessToken()).toBeNull();
   });
+
+  it('does NOT clear tokens when the refresh request throws a network error', async () => {
+    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    const onUnauth = jest.fn();
+    setUnauthorizedHandler(onUnauth);
+    jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValueOnce(okJson({ message: 'Unauthenticated' }, 401)) // original
+      .mockRejectedValueOnce(new Error('network down')); // refresh throws
+    await expect(request('GET', '/me')).rejects.toThrow('network down');
+    expect(onUnauth).not.toHaveBeenCalled();
+    expect(await tokenStore.getAccessToken()).toBe('old'); // tokens preserved
+  });
+
+  it('treats a malformed refresh response as a failed refresh (clears tokens)', async () => {
+    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    const onUnauth = jest.fn();
+    setUnauthorizedHandler(onUnauth);
+    jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValueOnce(okJson({ message: 'Unauthenticated' }, 401)) // original
+      .mockResolvedValueOnce(okJson({ data: { nonsense: true } })); // refresh 200 but wrong shape
+    await expect(request('GET', '/me')).rejects.toBeInstanceOf(ApiError);
+    expect(onUnauth).toHaveBeenCalled();
+    expect(await tokenStore.getAccessToken()).toBeNull();
+  });
 });
