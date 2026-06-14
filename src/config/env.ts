@@ -1,8 +1,13 @@
 /**
- * EXPO_PUBLIC_API_BASE_URL is read at build time by Metro from `.env` or
- * the shell environment. Falls back to the public wger.de instance.
+ * EXPO_PUBLIC_* vars are read at build time by Metro from `.env` or the shell.
+ *
+ * API_BASE_URL  → FitConnect backend (Laravel/Sanctum), used by src/services/api.
+ * WGER_API_BASE_URL → legacy public exercise catalogue, used by src/services/apiClient.
  */
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://wger.de/api/v2';
+  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://morph-server.desmait.tech/api/v1';
 
-export const API_TIMEOUT_MS = 10_000;
+export const WGER_API_BASE_URL =
+  process.env.EXPO_PUBLIC_WGER_API_BASE_URL ?? 'https://wger.de/api/v2';
+
+export const API_TIMEOUT_MS = 15_000;

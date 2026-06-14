@@ -1,4 +1,4 @@
-import { API_BASE_URL, API_TIMEOUT_MS } from '../config/env';
+import { WGER_API_BASE_URL, API_TIMEOUT_MS } from '../config/env';
 
 /**
  * Wraps fetch with a configurable timeout and JSON parsing.
@@ -8,7 +8,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
   try {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
+    const res = await fetch(`${WGER_API_BASE_URL}${path}`, {
       ...init,
       signal: controller.signal,
       headers: { Accept: 'application/json', ...(init?.headers ?? {}) },
