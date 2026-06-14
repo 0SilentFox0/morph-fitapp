@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,7 +20,7 @@ import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useProgramsStore } from '../../store/programsStore';
-import { seedActiveClient, trainingMetric, buildLineChart } from '../../utils';
+import { seedActiveClient, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -31,7 +30,7 @@ import { spacing } from '../../theme/spacing';
 type Route = RouteProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 
-const CHART_WIDTH = Dimensions.get('window').width - spacing.lg * 2 - 20;
+const CHART_WIDTH = getChartWidth(20);
 
 const chartConfig = {
   backgroundColor: colors.neutral1,

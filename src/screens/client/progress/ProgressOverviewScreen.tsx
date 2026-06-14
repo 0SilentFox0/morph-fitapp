@@ -9,7 +9,7 @@ import { ScreenHeader } from '../../../components/layout';
 import { BodyMap, SectionTitle, HorizontalSwipe } from '../../../components/ui';
 import { overallVolumeSeries } from '../../../utils/exerciseProgress';
 import { useClientTabSwipe } from '../useClientTabSwipe';
-import { colors } from '../../../theme/colors';
+import { colors, heatColors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
@@ -26,8 +26,6 @@ const TIMEFRAMES: { key: Timeframe; label: string }[] = [
   { key: 'week', label: 'This week' },
   { key: 'all', label: 'All time' },
 ];
-
-const HEAT_COLORS = ['#5E1A08', '#8C1E03', '#AE451F', '#BF4F33', '#E7775B'];
 
 const formatKg = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`;
@@ -155,7 +153,7 @@ export function ProgressOverviewScreen() {
           <View style={styles.legend}>
             <Text style={styles.legendLabel}>Less</Text>
             <View style={styles.legendBar}>
-              {HEAT_COLORS.map((c) => (
+              {heatColors.map((c) => (
                 <View key={c} style={[styles.legendSwatch, { backgroundColor: c }]} />
               ))}
             </View>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { getChartWidth } from '../../utils/layout';
 import { LineChart } from 'react-native-chart-kit';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,7 +23,7 @@ type Route = RouteProp<ClientsStackParamList, 'TrainingSummary'>;
 const TABS = ['Summary', 'Exercises'];
 const TIMEFRAME = ['Week', 'Month', 'Custom'];
 
-const CHART_WIDTH = Dimensions.get('window').width - spacing.lg * 2 - 20;
+const CHART_WIDTH = getChartWidth(20);
 
 const chartConfig = {
   backgroundColor: colors.neutral1,

@@ -7,15 +7,9 @@ import {
   MUSCLE_GROUPS,
   type MuscleGroup,
 } from '../../constants/muscles';
-import { colors } from '../../theme/colors';
+import { colors, heatColors } from '../../theme/colors';
 
-/**
- * Heat-map ramp (low → high load), drawn from the theme primary scale so it sits
- * with the rest of the palette. `intensity` on a body part is a 1-based index
- * into this array (the library convention).
- */
-const HEAT_COLORS = ['#5E1A08', '#8C1E03', '#AE451F', '#BF4F33', '#E7775B'] as const;
-const BANDS = HEAT_COLORS.length;
+const BANDS = heatColors.length;
 
 /** Quantize a 0..1 intensity into a 1..BANDS color band; 0 means "not worked". */
 function toBand(intensity: number): number {
@@ -61,7 +55,7 @@ export function BodyMap({ intensities, view, onMusclePress, scale = 1 }: BodyMap
         side={view}
         gender="male"
         scale={scale}
-        colors={HEAT_COLORS as unknown as string[]}
+        colors={heatColors as unknown as string[]}
         defaultFill={colors.neutral4}
         border={colors.neutral2}
         onBodyPartPress={handlePress}

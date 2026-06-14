@@ -26,3 +26,16 @@ export const colors = {
 } as const;
 
 export type ColorToken = keyof typeof colors;
+
+/**
+ * Heat-map ramp (low → high load): the warm bands of the primary scale, so it
+ * stays in sync with the rest of the palette. `intensity` indexes into this
+ * 1-based (react-native-body-highlighter convention).
+ */
+export const heatColors = [
+  darkTheme.primary4,
+  darkTheme.primary5,
+  darkTheme.primary6,
+  darkTheme.primary7,
+  darkTheme.primary8,
+] as const;

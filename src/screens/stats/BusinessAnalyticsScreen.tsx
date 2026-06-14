@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { StatsStackParamList } from '../../navigation/types';
@@ -11,7 +11,7 @@ import { TransactionCard } from './Analytics/TransactionCard';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { exportTransactions, searchItems } from '../../utils';
+import { exportTransactions, searchItems, getChartWidth } from '../../utils';
 import { mockTransactions, mockAnalyticsData } from '../../mocks';
 import { useGamificationStore } from '../../store/gamificationStore';
 import { LEAGUE_TIERS } from '../../utils/leagues';
@@ -32,7 +32,7 @@ export function BusinessAnalyticsScreen() {
     ? LEAGUE_TIERS.find((t) => t.key === trainerOverview.league.key)
     : null;
 
-  const chartWidth = React.useMemo(() => Dimensions.get('window').width - spacing.lg * 2 - 20, []);
+  const chartWidth = React.useMemo(() => getChartWidth(20), []);
   const incomeData = React.useMemo(() => mockAnalyticsData.incomeOverTime, []);
   const sourceData = React.useMemo(
     () => ({

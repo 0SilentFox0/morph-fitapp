@@ -27,17 +27,14 @@ import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { formatDate, formatTime } from '../../utils';
-import type { Transaction, TransactionStatus, TransactionType } from '../../types';
+import type { Transaction, TransactionType } from '../../types';
+import {
+  TRANSACTION_TYPES,
+  TRANSACTION_STATUSES,
+  PAYMENT_METHODS,
+} from '../../constants/transactions';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
-
-const TYPE_OPTIONS: TransactionType[] = ['Training', 'Subscription'];
-const STATUS_OPTIONS: { label: string; value: TransactionStatus; color: string }[] = [
-  { label: 'Completed', value: 'completed', color: colors.Success },
-  { label: 'Pending', value: 'pending', color: colors.Warning },
-  { label: 'Canceled', value: 'canceled', color: colors.Error },
-];
-const PAYMENT_METHODS = ['Card', 'Cash', 'Bank transfer', 'PayPal'];
 
 interface SegmentOption {
   label: string;
@@ -94,8 +91,8 @@ export function AddTransactionScreen() {
   const [showDate, setShowDate] = React.useState(false);
   const [showTime, setShowTime] = React.useState(false);
 
-  const type = TYPE_OPTIONS[typeIndex] as TransactionType;
-  const status = STATUS_OPTIONS[statusIndex];
+  const type = TRANSACTION_TYPES[typeIndex] as TransactionType;
+  const status = TRANSACTION_STATUSES[statusIndex];
 
   const preview: Transaction = {
     id: 'preview',
@@ -190,7 +187,7 @@ export function AddTransactionScreen() {
 
         <View style={styles.spacer}>
           <Segmented
-            options={STATUS_OPTIONS.map((s) => ({ label: s.label, activeColor: s.color }))}
+            options={TRANSACTION_STATUSES.map((s) => ({ label: s.label, activeColor: s.color }))}
             value={statusIndex}
             onChange={setStatusIndex}
           />
