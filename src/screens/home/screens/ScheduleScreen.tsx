@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  PanResponder,
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -21,6 +20,7 @@ import { WeekStrip } from './Schedule/WeekStrip';
 import { MonthGrid } from './Schedule/MonthGrid';
 import { WeekColumns } from './Schedule/WeekColumns';
 import { buildDaysFromToday, type ScheduleViewMode } from './Schedule/scheduleUtils';
+import { useVerticalSwipeCycle } from '../../../hooks/useVerticalSwipeCycle';
 import type { SessionOptionAction } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
@@ -30,7 +30,7 @@ import type { Session } from '../../../types';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
-const SWIPE_THRESHOLD = 60;
+const VIEW_MODES: readonly ScheduleViewMode[] = ['day', 'week', 'month'];
 
 export function ScheduleScreen() {
   const navigation = useNavigation<Nav>();
@@ -73,21 +73,7 @@ export function ScheduleScreen() {
     [days, selectedDayIndex]
   );
 
-  const panResponder = React.useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 20,
-        onPanResponderRelease: (_, g) => {
-          if (g.dy > SWIPE_THRESHOLD) {
-            setViewMode((m) => (m === 'day' ? 'week' : m === 'week' ? 'month' : m));
-          } else if (g.dy < -SWIPE_THRESHOLD) {
-            setViewMode((m) => (m === 'month' ? 'week' : m === 'week' ? 'day' : m));
-          }
-        },
-      }),
-    []
-  );
+  const swipeHandlers = useVerticalSwipeCycle(VIEW_MODES, viewMode, setViewMode);
 
   const handleSessionOption = (action: SessionOptionAction) => {
     if (!optionsSession) return;
@@ -181,7 +167,7 @@ export function ScheduleScreen() {
         onNext={() => shiftMonth(1)}
       />
 
-      <View {...panResponder.panHandlers}>
+      <View {...swipeHandlers}>
         {viewMode === 'day' && (
           <DayStrip days={days} selectedIndex={selectedDayIndex} onSelect={setSelectedDayIndex} />
         )}
