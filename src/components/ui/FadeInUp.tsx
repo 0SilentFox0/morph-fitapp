@@ -1,5 +1,5 @@
 // src/components/ui/FadeInUp.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, type ViewProps } from 'react-native';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 
@@ -12,7 +12,9 @@ interface FadeInUpProps extends ViewProps {
 /** Fades + slides its children up on mount. No-op when reduce-motion is on. */
 export function FadeInUp({ delay = 0, children, style, ...rest }: FadeInUpProps) {
   const reduceMotion = useReduceMotion();
-  const progress = useRef(new Animated.Value(reduceMotion ? 1 : 0)).current;
+  // Held in state (lazy init) rather than a ref so it is not a ref read during
+  // render — satisfies the react-hooks/refs lint rule while staying stable.
+  const [progress] = useState(() => new Animated.Value(reduceMotion ? 1 : 0));
 
   useEffect(() => {
     if (reduceMotion) {
