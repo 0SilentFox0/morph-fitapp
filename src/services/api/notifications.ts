@@ -4,6 +4,8 @@ import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
 import { NotificationSchema } from '../../schemas/api/models';
 import { z } from 'zod';
 
+const UnreadCountSchema = z.object({ count: z.number() });
+
 export interface DeviceTokenInput {
   token: string;
   platform: 'ios' | 'android';
@@ -15,7 +17,7 @@ export const listNotifications = (query?: Query) =>
   api.get('/notifications', { query, schema: paginatedEnvelope(NotificationSchema) });
 
 export const unreadCount = () =>
-  api.get('/notifications/unread-count', { schema: dataEnvelope(z.object({ count: z.number() })) });
+  api.get('/notifications/unread-count', { schema: dataEnvelope(UnreadCountSchema) });
 
 export const markNotificationRead = (id: string) => api.post(`/notifications/${id}/read`);
 export const markAllNotificationsRead = () => api.post('/notifications/read-all');

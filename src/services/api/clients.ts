@@ -48,7 +48,7 @@ export const listMeasurements = (clientId: string, query?: Query) =>
 export const recordMeasurement = (clientId: string, body: MeasurementInput) =>
   api.post(`/clients/${clientId}/measurements`, { body, schema: dataEnvelope(BodyMeasurementSchema) });
 
-export const measurementHistory = (clientId: string, query: Query) =>
+export const measurementHistory = (clientId: string, query?: Query) =>
   api.get(`/clients/${clientId}/measurements/history`, { query });
 
 export const listPersonalRecords = (clientId: string) =>

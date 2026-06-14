@@ -36,6 +36,9 @@ export const updateProgram = (id: string, body: Partial<ProgramInput>) =>
 
 export const archiveProgram = (id: string) => api.post(`/programs/${id}/archive`);
 
+// Body shape per the live OpenAPI spec: { client_id: string }. NOTE: the internal
+// backend feature doc (docs/backend/features/programs.md) shows a plural { client_ids: [] };
+// if the running backend rejects this, switch to client_ids. Following the documented API.
 export const assignProgram = (id: string, client_id: string) =>
   api.post(`/programs/${id}/assign`, { body: { client_id } });
 
