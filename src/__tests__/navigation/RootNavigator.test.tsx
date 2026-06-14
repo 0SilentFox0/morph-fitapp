@@ -16,14 +16,14 @@ describe('RootNavigator gate', () => {
     expect(screen.getByTestId('root-loading')).toBeTruthy();
   });
 
-  it('renders without crashing when unauthenticated', async () => {
+  it('renders without crashing when unauthenticated', () => {
     useAuthStore.setState({ status: 'unauthenticated', user: null });
-    await expect(render(<RootNavigator />)).resolves.not.toThrow();
+    expect(() => render(<RootNavigator />)).not.toThrow();
   });
 
-  it('renders without crashing when authenticated and onboarded', async () => {
+  it('renders without crashing when authenticated and onboarded', () => {
     useAuthStore.setState({ status: 'authenticated', user: null });
     useAppStore.setState({ isOnboarded: true, userRole: 'trainer' });
-    await expect(render(<RootNavigator />)).resolves.not.toThrow();
+    expect(() => render(<RootNavigator />)).not.toThrow();
   });
 });

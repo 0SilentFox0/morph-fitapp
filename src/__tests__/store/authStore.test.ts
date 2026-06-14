@@ -2,6 +2,7 @@ import { act } from '@testing-library/react-native';
 import { useAuthStore } from '../../store/authStore';
 import { useAppStore } from '../../store/appStore';
 import { tokenStore } from '../../services/api/tokenStore';
+import { ApiError } from '../../services/api/client';
 import * as authApi from '../../services/api/auth';
 import * as usersApi from '../../services/api/users';
 
@@ -40,5 +41,25 @@ describe('authStore', () => {
     });
     expect(useAuthStore.getState().status).toBe('unauthenticated');
     expect(useAuthStore.getState().user).toBeNull();
+  });
+
+  it('loadSession stays out of loading and preserves token on a transient (non-401) error', async () => {
+    await tokenStore.setTokens({ access_token: 'a', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    jest.spyOn(usersApi, 'getMe').mockRejectedValue(new Error('network down'));
+    await act(async () => {
+      await useAuthStore.getState().loadSession();
+    });
+    expect(useAuthStore.getState().status).toBe('unauthenticated');
+    expect(await tokenStore.getAccessToken()).toBe('a'); // token preserved
+  });
+
+  it('loadSession clears token on a 401', async () => {
+    await tokenStore.setTokens({ access_token: 'a', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    jest.spyOn(usersApi, 'getMe').mockRejectedValue(new ApiError(401, 'Unauthenticated'));
+    await act(async () => {
+      await useAuthStore.getState().loadSession();
+    });
+    expect(useAuthStore.getState().status).toBe('unauthenticated');
+    expect(await tokenStore.getAccessToken()).toBeNull(); // token cleared
   });
 });

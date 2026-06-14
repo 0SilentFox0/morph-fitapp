@@ -2,6 +2,10 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Session, TrainingProgram, ProgramExercise } from '../types';
 import type { MuscleGroup } from '../constants/muscles';
 
+export type AuthStackParamList = {
+  Login: undefined;
+};
+
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
   Welcome: undefined;
