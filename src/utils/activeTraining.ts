@@ -44,7 +44,7 @@ export function seedParticipant(
   program: TrainingProgram,
   opts: SeedOptions = {},
 ): SessionParticipant {
-  const exercises = (program.exercises ?? []).map((e) => ({ ...e }));
+  const exercises = (program.exercises ?? []).map((e) => ({ ...e, sets: e.sets.map((s) => ({ ...s })) }));
   const { prevSets, setLog } = buildLogs(participant.name, exercises, opts);
 
   return {

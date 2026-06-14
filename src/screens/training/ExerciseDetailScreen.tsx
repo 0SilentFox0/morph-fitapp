@@ -25,6 +25,7 @@ import {
 } from '../../components/ui';
 import { SetEditor } from './ExerciseDetail/SetEditor';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { mockTrainingPrograms } from '../../mocks';
 import { formatClock } from '../../utils';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -67,7 +68,10 @@ export function ExerciseDetailScreen() {
   // source of truth, so switching participants preserves each one's progress.
   React.useEffect(() => {
     if (routeParticipantId && routeExerciseIndex != null) {
-      openExercise(routeParticipantId, routeProgramId ?? null, routeExerciseIndex);
+      const openedProgram = routeProgramId
+        ? mockTrainingPrograms.find((p) => p.id === routeProgramId)
+        : undefined;
+      openExercise(routeParticipantId, routeProgramId ?? null, routeExerciseIndex, openedProgram?.exercises);
       setActiveParticipant(routeParticipantId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

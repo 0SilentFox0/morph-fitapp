@@ -68,6 +68,7 @@ export function TrainingSummaryScreen() {
   const addCompletedTraining = useTrainingHistoryStore((s) => s.addCompletedTraining);
   const endTraining = useActiveTrainingStore((s) => s.endTraining);
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+  // label-only: exercises come from participant.exercises, this is just for the type tag
   const program = participant?.programId
     ? mockTrainingPrograms.find((p) => p.id === participant.programId)
     : undefined;
@@ -95,10 +96,13 @@ export function TrainingSummaryScreen() {
     };
   });
 
+  const doneRef = React.useRef(false);
   const handleDone = () => {
+    if (doneRef.current) return;
+    doneRef.current = true;
     if (participant) {
       addCompletedTraining({
-        id: `ct-${participant.participantId}-${participant.exercises.length}`,
+        id: `ct-${participant.participantId}-${Date.now()}`,
         clientName: participant.name,
         programId: participant.programId ?? 'custom',
         date: 'Today',

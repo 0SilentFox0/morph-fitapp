@@ -44,7 +44,7 @@ interface ActiveTrainingState {
   setExerciseIndex: (participantId: string, index: number) => void;
   setSetIndex: (participantId: string, index: number) => void;
   /** Points a participant at a specific program + exercise (used when an exercise is tapped). */
-  openExercise: (participantId: string, programId: string | null, exerciseIndex: number) => void;
+  openExercise: (participantId: string, programId: string | null, exerciseIndex: number, exercises?: ProgramExercise[]) => void;
   /** Seeds an editable set log for an exercise the first time it is opened. */
   ensureSetLog: (participantId: string, exerciseId: number, sets: ExerciseSet[]) => void;
   updateSet: (
@@ -101,13 +101,14 @@ export const useActiveTrainingStore = create<ActiveTrainingState>((set, get) => 
       participants: mapParticipant(state.participants, participantId, (c) => ({ ...c, setIndex: index })),
     })),
 
-  openExercise: (participantId, programId, exerciseIndex) =>
+  openExercise: (participantId, programId, exerciseIndex, exercises) =>
     set((state) => ({
       participants: mapParticipant(state.participants, participantId, (c) => ({
         ...c,
         programId,
         exerciseIndex,
         setIndex: 0,
+        ...(exercises ? { exercises } : {}),
       })),
     })),
 

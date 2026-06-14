@@ -94,4 +94,20 @@ describe('useActiveTrainingStore', () => {
     expect(c.exerciseIndex).toBe(3);
     expect(c.setIndex).toBe(0);
   });
+
+  it('openExercise replaces exercises when a program list is provided', () => {
+    useActiveTrainingStore.getState().startTraining([makeParticipant()]);
+    const next = [
+      { id: 7, name: 'New', category: 'C', imageUrl: null, sets: [{ weight: 60, reps: 5 }] },
+    ];
+    useActiveTrainingStore.getState().openExercise('c1', 'p9', 0, next);
+    expect(useActiveTrainingStore.getState().participants[0]!.exercises).toEqual(next);
+  });
+
+  it('openExercise keeps existing exercises when none are provided', () => {
+    useActiveTrainingStore.getState().startTraining([makeParticipant()]);
+    const before = useActiveTrainingStore.getState().participants[0]!.exercises;
+    useActiveTrainingStore.getState().openExercise('c1', 'p9', 0);
+    expect(useActiveTrainingStore.getState().participants[0]!.exercises).toEqual(before);
+  });
 });
