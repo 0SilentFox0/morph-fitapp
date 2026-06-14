@@ -24,6 +24,6 @@ describe('LoginScreen', () => {
     await fireEvent.changeText(getByTestId('login-email'), 'a@b.com');
     await fireEvent.changeText(getByTestId('login-password'), 'bad');
     await fireEvent.press(getByTestId('login-submit'));
-    expect(screen.getByText('Invalid credentials')).toBeTruthy();
+    expect(await screen.findByText('Invalid credentials')).toBeTruthy();
   });
 });

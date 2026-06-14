@@ -51,6 +51,8 @@ export function LoginScreen() {
         placeholderTextColor={colors.textMuted}
         autoCapitalize="none"
         keyboardType="email-address"
+        textContentType="emailAddress"
+        returnKeyType="next"
         value={email}
         onChangeText={handleEmailChange}
       />
@@ -60,6 +62,9 @@ export function LoginScreen() {
         placeholder="Password"
         placeholderTextColor={colors.textMuted}
         secureTextEntry
+        textContentType="password"
+        returnKeyType="go"
+        onSubmitEditing={onSubmit}
         value={password}
         onChangeText={handlePasswordChange}
       />
@@ -68,6 +73,8 @@ export function LoginScreen() {
 
       <Pressable
         testID="login-submit"
+        accessibilityRole="button"
+        accessibilityLabel="Sign in"
         style={[styles.button, submitting && styles.buttonDisabled]}
         onPress={onSubmit}
         disabled={submitting}
