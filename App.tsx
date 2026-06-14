@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { useAuthStore } from './src/store/authStore';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { ThemeProvider } from './src/theme/ThemeContext';
 import { colors } from './src/theme/colors';
@@ -23,6 +24,10 @@ const AppTheme = {
 };
 
 export default function App() {
+  useEffect(() => {
+    void useAuthStore.getState().loadSession();
+  }, []);
+
   return (
     <ThemeProvider>
       <SafeAreaProvider>
