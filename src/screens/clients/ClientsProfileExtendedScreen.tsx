@@ -21,7 +21,7 @@ import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useProgramsStore } from '../../store/programsStore';
-import { seedActiveClient, trainingMetric } from '../../utils';
+import { seedActiveClient, trainingMetric, buildLineChart } from '../../utils';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -81,13 +81,7 @@ export function ClientsProfileExtendedScreen() {
     navigation.navigate('ClientProfile', { clientId: client.clientId });
   };
 
-  const chartData =
-    history.length > 0
-      ? {
-          labels: history.map((h) => h.date),
-          datasets: [{ data: history.map(trainingMetric) }],
-        }
-      : null;
+  const chartData = buildLineChart(history, (h) => h.date, trainingMetric);
 
   return (
     <View style={styles.container}>

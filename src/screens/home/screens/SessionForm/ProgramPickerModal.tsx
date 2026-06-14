@@ -7,6 +7,7 @@ import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import type { TrainingProgram } from '../../../../types';
 import { radius } from '../../../../theme';
+import { programMeta } from '../../../../utils';
 
 export interface ProgramPickerModalProps {
   visible: boolean;
@@ -16,10 +17,6 @@ export interface ProgramPickerModalProps {
   onChange: (programId: string) => void;
 }
 
-function programMeta(p: TrainingProgram): string {
-  const count = p.exercises?.length ?? p.videoCount;
-  return `${p.tag} · ${count} exercises`;
-}
 
 export function ProgramPickerModal({
   visible,

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { searchItems } from '../utils/search';
 
 /** Avatar tint pairs (background + foreground) for initials placeholders, per Figma. */
 export type AvatarTint = 'primary' | 'blue' | 'success';
@@ -138,15 +139,6 @@ function previewOf(msg: ChatMessage): string {
   }
 }
 
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  if (diff < 604800000) return d.toLocaleDateString([], { weekday: 'short' });
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-}
-
 export const useChatStore = create<ChatState>((set, get) => ({
   conversations: initialConversations,
   messagesByConversation: initialMessages,
@@ -217,15 +209,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
-  searchConversations: (query) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return get().conversations;
-    return get().conversations.filter((c) =>
-      c.participant.name.toLowerCase().includes(q)
-    );
-  },
+  searchConversations: (query) =>
+    searchItems(query, get().conversations, (c) => [c.participant.name]),
 
   getUnreadCount: () => get().conversations.reduce((acc, c) => acc + c.unreadCount, 0),
 }));
-
-export { formatTime };

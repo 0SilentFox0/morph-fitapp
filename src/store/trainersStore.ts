@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { mockTrainers } from '../mocks';
 import type { Trainer, ConnectionStatus } from '../types';
+import { searchItems } from '../utils/search';
 
 export type { Trainer, ConnectionStatus };
 
@@ -31,16 +32,10 @@ export const useTrainersStore = create<TrainersState>((set, get) => ({
   getTrainer: (id) => get().trainers.find((t) => t.id === id),
 
   search: (query, specialty) => {
-    const q = query.trim().toLowerCase();
-    return get().trainers.filter((t) => {
-      if (specialty && !t.specialties.includes(specialty)) return false;
-      if (!q) return true;
-      return (
-        t.name.toLowerCase().includes(q) ||
-        t.headline.toLowerCase().includes(q) ||
-        t.specialties.some((s) => s.toLowerCase().includes(q))
-      );
-    });
+    const bySpecialty = specialty
+      ? get().trainers.filter((t) => t.specialties.includes(specialty))
+      : get().trainers;
+    return searchItems(query, bySpecialty, (t) => [t.name, t.headline, ...t.specialties]);
   },
 
   visibleTrainers: (query) => {

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { formatTime } from '../../store/chatStore';
+import { formatRelativeTime } from '../../utils';
 
 interface SessionMessageCardProps {
   title: string;
@@ -54,7 +54,7 @@ export function SessionMessageCard({
             {started ? 'Session in progress' : 'Start Session'}
           </Text>
         </TouchableOpacity>
-        <Text style={styles.time}>{formatTime(sentAt)}</Text>
+        <Text style={styles.time}>{formatRelativeTime(sentAt)}</Text>
       </View>
     </View>
   );

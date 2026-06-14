@@ -11,7 +11,7 @@ import { TransactionCard } from './Analytics/TransactionCard';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { exportTransactions } from '../../utils';
+import { exportTransactions, searchItems } from '../../utils';
 import { mockTransactions, mockAnalyticsData } from '../../mocks';
 import { useGamificationStore } from '../../store/gamificationStore';
 import { LEAGUE_TIERS } from '../../utils/leagues';
@@ -49,13 +49,10 @@ export function BusinessAnalyticsScreen() {
     []
   );
 
-  const preview = React.useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const list = q
-      ? mockTransactions.filter((t) => t.clientName.toLowerCase().includes(q))
-      : mockTransactions;
-    return list.slice(0, 5);
-  }, [search]);
+  const preview = React.useMemo(
+    () => searchItems(search, mockTransactions, (t) => [t.clientName]).slice(0, 5),
+    [search],
+  );
 
   return (
     <View style={styles.container}>

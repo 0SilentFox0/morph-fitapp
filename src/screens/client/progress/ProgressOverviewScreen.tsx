@@ -15,14 +15,9 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseMuscleMap } from '../../../mocks';
-import {
-  computeMuscleStats,
-  toIntensities,
-  computeTotals,
-  filterByTimeframe,
-  type Timeframe,
-} from '../../../utils/muscleStats';
-import { MUSCLE_GROUPS, MUSCLE_LABELS } from '../../../constants/muscles';
+import type { Timeframe } from '../../../utils/muscleStats';
+import { computeProgressOverview } from '../../../utils/progress';
+import { MUSCLE_LABELS } from '../../../constants/muscles';
 
 type Nav = NativeStackNavigationProp<ProgressStackParamList, 'ProgressOverview'>;
 
@@ -81,18 +76,10 @@ export function ProgressOverviewScreen() {
   const overallSeries = React.useMemo(() => overallVolumeSeries(fullHistory), [fullHistory]);
   const chartWidth = Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
 
-  const { intensities, totals, topMuscles } = React.useMemo(() => {
-    const filtered = filterByTimeframe(fullHistory, timeframe, new Date());
-    const stats = computeMuscleStats(filtered, exerciseMuscleMap);
-    const sorted = MUSCLE_GROUPS.filter((g) => stats[g].exerciseCount > 0).sort(
-      (a, b) => stats[b].totalWeight - stats[a].totalWeight,
-    );
-    return {
-      intensities: toIntensities(stats),
-      totals: computeTotals(filtered),
-      topMuscles: sorted.map((g) => ({ group: g, stat: stats[g] })),
-    };
-  }, [fullHistory, timeframe]);
+  const { intensities, totals, topMuscles } = React.useMemo(
+    () => computeProgressOverview(fullHistory, exerciseMuscleMap, timeframe, new Date()),
+    [fullHistory, timeframe],
+  );
 
   return (
     <HorizontalSwipe

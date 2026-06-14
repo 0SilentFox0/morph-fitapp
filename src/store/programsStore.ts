@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { TrainingProgram, ProgramExercise } from '../types';
+import { searchItems } from '../utils/search';
 
 export interface DraftProgramData {
   title: string;
@@ -81,15 +82,7 @@ export const useProgramsStore = create<ProgramsState>((set, get) => ({
 
   getProgram: (id) => get().programs.find((p) => p.id === id),
 
-  searchPrograms: (query) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return get().programs;
-    return get().programs.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.tag.toLowerCase().includes(q)
-    );
-  },
+  searchPrograms: (query) => searchItems(query, get().programs, (p) => [p.name, p.tag]),
 
   setPrograms: (programs) => set({ programs }),
 }));

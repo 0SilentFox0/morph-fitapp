@@ -4,7 +4,7 @@ import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import { formatTime } from '../../store/chatStore';
+import { formatRelativeTime } from '../../utils';
 
 interface MessageBubbleProps {
   text: string;
@@ -26,7 +26,7 @@ export function MessageBubble({ text, sentAt, isFromMe, style }: MessageBubblePr
         <Text style={styles.text}>{text}</Text>
       </View>
       <Text style={[styles.time, isFromMe ? styles.timeRight : styles.timeLeft]}>
-        {formatTime(sentAt)}
+        {formatRelativeTime(sentAt)}
       </Text>
     </View>
   );

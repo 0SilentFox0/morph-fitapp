@@ -29,29 +29,10 @@ import { ParticipantsSection } from './SessionForm/ParticipantsSection';
 import { DateTimePickerSection } from './SessionForm/DateTimePickerSection';
 import { ExerciseProgressionSection } from './SessionForm/ExerciseProgressionSection';
 import type { ExerciseSet } from '../../../types';
+import { programMeta, buildParticipants } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;
-
-function participantIdForName(name: string): string {
-  return `p-${name.replace(/\s+/g, '-').toLowerCase()}`;
-}
-
-function buildParticipants(
-  names: string[],
-  existing?: { id: string; name: string; avatar?: string }[],
-): { id: string; name: string; avatar?: string }[] {
-  return names.map((name) => {
-    const prev = existing?.find((p) => p.name === name);
-    if (prev) return { id: prev.id, name: prev.name, avatar: prev.avatar };
-    return { id: participantIdForName(name), name };
-  });
-}
-
-function programMeta(p: { tag: string; exercises?: unknown[]; videoCount: number }): string {
-  const count = p.exercises?.length ?? p.videoCount;
-  return `${p.tag} · ${count} exercises`;
-}
 
 export function SessionFormScreen() {
   const navigation = useNavigation<Nav>();

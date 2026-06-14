@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { mockSessions } from '../mocks';
 import type { Session, SessionStatus } from '../types';
+import { searchItems } from '../utils/search';
 
 export type { Session, SessionStatus };
 
@@ -57,16 +58,12 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
     });
   },
 
-  searchSessions: (query) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return get().sessions;
-    return get().sessions.filter(
-      (s) =>
-        s.title.toLowerCase().includes(q) ||
-        s.type.toLowerCase().includes(q) ||
-        s.participants.some((p) => p.name.toLowerCase().includes(q)),
-    );
-  },
+  searchSessions: (query) =>
+    searchItems(query, get().sessions, (s) => [
+      s.title,
+      s.type,
+      ...s.participants.map((p) => p.name),
+    ]),
 
   getTodaySessions: () => {
     return get().sessions.filter((s) => s.date === 'Today');
