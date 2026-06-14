@@ -10,4 +10,5 @@ export const API_BASE_URL =
 export const WGER_API_BASE_URL =
   process.env.EXPO_PUBLIC_WGER_API_BASE_URL ?? 'https://wger.de/api/v2';
 
+// 15s: the FitConnect backend can be slower to respond than the legacy wger API.
 export const API_TIMEOUT_MS = 15_000;
