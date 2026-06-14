@@ -16,6 +16,8 @@ interface TrainingHistoryState {
   getCurrentUserHistory: () => CompletedTraining[];
   /** Sets logged for an exercise in the client's most recent training, or null. */
   getLastSets: (clientName: string, exerciseId: number) => ExerciseSet[] | null;
+  /** Appends a completed training (newest last, matching seed chronology). */
+  addCompletedTraining: (training: CompletedTraining) => void;
 }
 
 export const useTrainingHistoryStore = create<TrainingHistoryState>((set, get) => ({
@@ -40,4 +42,7 @@ export const useTrainingHistoryStore = create<TrainingHistoryState>((set, get) =
     const newest = matches[matches.length - 1]!;
     return newest.exercises.find((e) => e.exerciseId === exerciseId)?.sets ?? null;
   },
+
+  addCompletedTraining: (training) =>
+    set((state) => ({ history: [...state.history, training] })),
 }));

@@ -43,14 +43,21 @@ export type HomeStackParamList = {
   CardioClassForm: { program?: TrainingProgram } | undefined;
 };
 
-export type ClientsStackParamList = {
+/**
+ * Live-training routes shared by the trainer Clients stack and the client Train
+ * stack — both mount the same ExerciseDetail/TrainingSummary screens.
+ */
+export type LiveTrainingParamList = {
+  ExerciseDetail: { participantId: string; programId: string | null; exerciseIndex: number };
+  TrainingSummary: { participantId?: string };
+};
+
+export type ClientsStackParamList = LiveTrainingParamList & {
   ClientsList: undefined;
   Filters: undefined;
   ClientProfile: { clientId?: string } | undefined;
   ProgramDetail: { programId: string };
-  ExerciseDetail: { clientId: string; programId: string; exerciseIndex: number };
   ClientsProfileExtended: { clientId?: string } | undefined;
-  TrainingSummary: { clientId?: string } | undefined;
 };
 
 export type StatsStackParamList = {

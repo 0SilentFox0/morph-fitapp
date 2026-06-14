@@ -20,7 +20,7 @@ import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useProgramsStore } from '../../store/programsStore';
-import { seedActiveClient, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
+import { seedParticipant, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
@@ -49,7 +49,7 @@ export function ClientsProfileExtendedScreen() {
   const navigation = useNavigation<Nav>();
   const clientId = route.params?.clientId;
 
-  const fromTraining = useActiveTrainingStore((s) => s.clients.find((c) => c.clientId === clientId));
+  const fromTraining = useActiveTrainingStore((s) => s.participants.find((c) => c.participantId === clientId));
   const startTraining = useActiveTrainingStore((s) => s.startTraining);
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
   const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
@@ -72,13 +72,13 @@ export function ClientsProfileExtendedScreen() {
       programs.find((p) => p.id === programId) ??
       mockTrainingPrograms.find((p) => p.id === programId);
     if (!program) return;
-    const client = seedActiveClient(
+    const participant = seedParticipant(
       { id: clientId ?? name, name, avatar: fromTraining?.avatar },
       program,
       { lookupPrevSets: getLastSets },
     );
-    startTraining([client], client.clientId);
-    navigation.navigate('ClientProfile', { clientId: client.clientId });
+    startTraining([participant], participant.participantId);
+    navigation.navigate('ClientProfile', { clientId: participant.participantId });
   };
 
   const chartData = buildLineChart(history, (h) => h.date, trainingMetric);

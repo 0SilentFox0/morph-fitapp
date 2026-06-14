@@ -1,101 +1,109 @@
 import { create } from 'zustand';
-import type { ExerciseSet } from '../types';
+import type { ExerciseSet, ProgramExercise } from '../types';
 
 export type { ExerciseSet };
 
-/** Rest-timer state, tracked per client so each can rest independently. */
+/** Rest-timer state, tracked per participant so each can rest independently. */
 export interface RestState {
   running: boolean;
   remainingSec: number;
   durationSec: number;
 }
 
-/** One client in the currently-active (possibly multi-client) training group. */
-export interface ActiveClient {
-  clientId: string;
+/**
+ * One participant in the currently-active training session. Role-agnostic: a
+ * trainer-led session may hold several (a switchable group), a client's own
+ * session holds exactly one (themself).
+ */
+export interface SessionParticipant {
+  participantId: string;
   name: string;
   avatar?: string;
-  programId: string;
+  /** Source program id, or null for an ad-hoc (hand-built) workout. */
+  programId: string | null;
+  /** The exercises this participant is working through — the source of truth
+   *  for the live screens (no global program lookup, so ad-hoc works). */
+  exercises: ProgramExercise[];
   exerciseIndex: number;
   setIndex: number;
   /** Editable set values logged during the session, keyed by exercise id. */
   setLog: Record<number, ExerciseSet[]>;
-  /** Read-only reference: the same exercises' sets from the client's previous training. */
+  /** Read-only reference: the same exercises' sets from the previous training. */
   prevSets: Record<number, ExerciseSet[]>;
   rest: RestState;
 }
 
 interface ActiveTrainingState {
-  clients: ActiveClient[];
-  activeClientId: string | null;
+  participants: SessionParticipant[];
+  activeParticipantId: string | null;
 
-  startTraining: (clients: ActiveClient[], activeClientId?: string) => void;
+  startTraining: (participants: SessionParticipant[], activeParticipantId?: string) => void;
   endTraining: () => void;
-  setActiveClient: (clientId: string) => void;
+  setActiveParticipant: (participantId: string) => void;
 
-  setExerciseIndex: (clientId: string, index: number) => void;
-  setSetIndex: (clientId: string, index: number) => void;
-  /** Points a client at a specific program + exercise (used when an exercise is tapped). */
-  openExercise: (clientId: string, programId: string, exerciseIndex: number) => void;
+  setExerciseIndex: (participantId: string, index: number) => void;
+  setSetIndex: (participantId: string, index: number) => void;
+  /** Points a participant at a specific program + exercise (used when an exercise is tapped). */
+  openExercise: (participantId: string, programId: string | null, exerciseIndex: number) => void;
   /** Seeds an editable set log for an exercise the first time it is opened. */
-  ensureSetLog: (clientId: string, exerciseId: number, sets: ExerciseSet[]) => void;
+  ensureSetLog: (participantId: string, exerciseId: number, sets: ExerciseSet[]) => void;
   updateSet: (
-    clientId: string,
+    participantId: string,
     exerciseId: number,
     setIndex: number,
     patch: Partial<ExerciseSet>,
   ) => void;
-  toggleRepToFailure: (clientId: string, exerciseId: number, setIndex: number) => void;
+  toggleRepToFailure: (participantId: string, exerciseId: number, setIndex: number) => void;
 
-  startRest: (clientId: string, durationSec: number) => void;
-  /** Advances the active client's rest timer by one second. Driven by useRestTimer. */
+  startRest: (participantId: string, durationSec: number) => void;
+  /** Advances every running participant's rest timer by one second. Driven by useRestTimer. */
   tickRest: () => void;
-  stopRest: (clientId: string) => void;
+  stopRest: (participantId: string) => void;
 }
 
-function mapClient(
-  clients: ActiveClient[],
-  clientId: string,
-  fn: (c: ActiveClient) => ActiveClient,
-): ActiveClient[] {
-  return clients.map((c) => (c.clientId === clientId ? fn(c) : c));
+function mapParticipant(
+  participants: SessionParticipant[],
+  participantId: string,
+  fn: (c: SessionParticipant) => SessionParticipant,
+): SessionParticipant[] {
+  return participants.map((c) => (c.participantId === participantId ? fn(c) : c));
 }
 
 export const useActiveTrainingStore = create<ActiveTrainingState>((set, get) => ({
-  clients: [],
-  activeClientId: null,
+  participants: [],
+  activeParticipantId: null,
 
-  startTraining: (clients, activeClientId) => {
-    const fallback = clients[0]?.clientId ?? null;
-    const exists = clients.some((c) => c.clientId === activeClientId);
-    set({ clients, activeClientId: exists ? activeClientId! : fallback });
+  startTraining: (participants, activeParticipantId) => {
+    const fallback = participants[0]?.participantId ?? null;
+    const exists = participants.some((c) => c.participantId === activeParticipantId);
+    set({ participants, activeParticipantId: exists ? activeParticipantId! : fallback });
   },
 
-  endTraining: () => set({ clients: [], activeClientId: null }),
+  endTraining: () => set({ participants: [], activeParticipantId: null }),
 
-  setActiveClient: (clientId) => {
-    if (get().clients.some((c) => c.clientId === clientId)) {
-      set({ activeClientId: clientId });
+  setActiveParticipant: (participantId) => {
+    if (get().participants.some((c) => c.participantId === participantId)) {
+      set({ activeParticipantId: participantId });
     }
   },
 
-  setExerciseIndex: (clientId, index) =>
+  setExerciseIndex: (participantId, index) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => ({
+      participants: mapParticipant(state.participants, participantId, (c) => ({
         ...c,
         exerciseIndex: index,
         setIndex: 0,
       })),
     })),
 
-  setSetIndex: (clientId, index) =>
+  setSetIndex: (participantId, index) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => ({ ...c, setIndex: index })),
+      participants: mapParticipant(state.participants, participantId, (c) => ({ ...c, setIndex: index })),
     })),
 
-  openExercise: (clientId, programId, exerciseIndex) =>
+  openExercise: (participantId, programId, exerciseIndex) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => ({
+      participants: mapParticipant(state.participants, participantId, (c) => ({
         ...c,
         programId,
         exerciseIndex,
@@ -103,18 +111,18 @@ export const useActiveTrainingStore = create<ActiveTrainingState>((set, get) => 
       })),
     })),
 
-  ensureSetLog: (clientId, exerciseId, sets) =>
+  ensureSetLog: (participantId, exerciseId, sets) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) =>
+      participants: mapParticipant(state.participants, participantId, (c) =>
         c.setLog[exerciseId]
           ? c
           : { ...c, setLog: { ...c.setLog, [exerciseId]: sets.map((s) => ({ ...s })) } },
       ),
     })),
 
-  updateSet: (clientId, exerciseId, setIndex, patch) =>
+  updateSet: (participantId, exerciseId, setIndex, patch) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => {
+      participants: mapParticipant(state.participants, participantId, (c) => {
         const sets = c.setLog[exerciseId];
         if (!sets || !sets[setIndex]) return c;
         const nextSets = sets.map((s, i) => (i === setIndex ? { ...s, ...patch } : s));
@@ -122,9 +130,9 @@ export const useActiveTrainingStore = create<ActiveTrainingState>((set, get) => 
       }),
     })),
 
-  toggleRepToFailure: (clientId, exerciseId, setIndex) =>
+  toggleRepToFailure: (participantId, exerciseId, setIndex) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => {
+      participants: mapParticipant(state.participants, participantId, (c) => {
         const sets = c.setLog[exerciseId];
         if (!sets || !sets[setIndex]) return c;
         const nextSets = sets.map(
@@ -137,28 +145,26 @@ export const useActiveTrainingStore = create<ActiveTrainingState>((set, get) => 
       }),
     })),
 
-  startRest: (clientId, durationSec) =>
+  startRest: (participantId, durationSec) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => ({
+      participants: mapParticipant(state.participants, participantId, (c) => ({
         ...c,
         rest: { running: true, remainingSec: durationSec, durationSec },
       })),
     })),
 
-  // Ticks every running client — a client's rest keeps counting down even
-  // while the trainer is looking at someone else, so their avatar badge stays live.
   tickRest: () =>
     set((state) => ({
-      clients: state.clients.map((c) => {
+      participants: state.participants.map((c) => {
         if (!c.rest.running) return c;
         const remainingSec = Math.max(0, c.rest.remainingSec - 1);
         return { ...c, rest: { ...c.rest, remainingSec, running: remainingSec > 0 } };
       }),
     })),
 
-  stopRest: (clientId) =>
+  stopRest: (participantId) =>
     set((state) => ({
-      clients: mapClient(state.clients, clientId, (c) => ({
+      participants: mapParticipant(state.participants, participantId, (c) => ({
         ...c,
         rest: { ...c.rest, running: false },
       })),
