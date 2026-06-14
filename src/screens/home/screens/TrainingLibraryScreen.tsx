@@ -25,7 +25,6 @@ type Nav = NativeStackNavigationProp<HomeStackParamList, 'TrainingLibrary'>;
 
 export function TrainingLibraryScreen() {
   const navigation = useNavigation<Nav>();
-  const programs = useProgramsStore((s) => s.programs);
   const searchPrograms = useProgramsStore((s) => s.searchPrograms);
   const deleteProgram = useProgramsStore((s) => s.deleteProgram);
 
@@ -40,7 +39,7 @@ export function TrainingLibraryScreen() {
     navigation.navigate('AddToLibraryForm', { program: p });
   };
 
-  const handleCreateSession = (p: TrainingProgram) => {
+  const handleCreateSession = (_p: TrainingProgram) => {
     navigation.navigate('SessionForm', {});
   };
 

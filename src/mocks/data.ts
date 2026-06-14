@@ -6,8 +6,6 @@
 import type { MuscleGroup } from '../constants/muscles';
 import type {
   Session,
-  ExerciseSet,
-  ProgramExercise,
   TrainingProgram,
   ExerciseInfo,
   Client,
