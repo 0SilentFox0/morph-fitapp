@@ -22,6 +22,7 @@ import { useSessionsStore } from '../../../store/sessionsStore';
 import { useProgramsStore } from '../../../store/programsStore';
 import { TRAINING_TYPES } from '../../../constants';
 import { formatDate, formatTime } from '../../../utils';
+import { useDisclosure } from '../../../hooks/useDisclosure';
 import { sessionSchema, type SessionFormValues } from '../../../schemas/session';
 import { TypePickerModal } from './SessionForm/TypePickerModal';
 import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
@@ -63,8 +64,8 @@ export function SessionFormScreen() {
     mode: 'onBlur',
   });
 
-  const [typePickerVisible, setTypePickerVisible] = React.useState(false);
-  const [programPickerVisible, setProgramPickerVisible] = React.useState(false);
+  const typePicker = useDisclosure();
+  const programPicker = useDisclosure();
   const [plannedSets, setPlannedSets] = React.useState<Record<number, ExerciseSet[]>>({});
 
   const titleValue = watch('title');
@@ -156,7 +157,7 @@ export function SessionFormScreen() {
         <DropdownSelect
           value={typeValue}
           placeholder="Select type"
-          onPress={() => setTypePickerVisible(true)}
+          onPress={typePicker.open}
           style={styles.field}
         />
 
@@ -165,7 +166,7 @@ export function SessionFormScreen() {
         </Text>
         <TouchableOpacity
           style={[styles.programPicker, errors.programId ? styles.programPickerError : null]}
-          onPress={() => setProgramPickerVisible(true)}
+          onPress={programPicker.open}
           activeOpacity={0.8}
         >
           {selectedProgram ? (
@@ -205,16 +206,16 @@ export function SessionFormScreen() {
       </ScrollView>
 
       <TypePickerModal
-        visible={typePickerVisible}
-        onClose={() => setTypePickerVisible(false)}
+        visible={typePicker.visible}
+        onClose={typePicker.close}
         options={TRAINING_TYPES}
         value={typeValue}
         onChange={(t) => setValue('type', t, { shouldValidate: true })}
       />
 
       <ProgramPickerModal
-        visible={programPickerVisible}
-        onClose={() => setProgramPickerVisible(false)}
+        visible={programPicker.visible}
+        onClose={programPicker.close}
         programs={programs}
         value={programIdValue || undefined}
         onChange={(id) => setValue('programId', id, { shouldValidate: true })}

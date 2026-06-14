@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -7,6 +6,7 @@ import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import { formatDate, formatTime } from '../../../../utils';
 import { radius } from '../../../../theme';
+import { useDisclosure } from '../../../../hooks/useDisclosure';
 
 export interface DateTimePickerSectionProps {
   date: Date;
@@ -21,16 +21,16 @@ export function DateTimePickerSection({
   onDateChange,
   onTimeChange,
 }: DateTimePickerSectionProps) {
-  const [showDate, setShowDate] = React.useState(false);
-  const [showTime, setShowTime] = React.useState(false);
+  const datePicker = useDisclosure();
+  const timePicker = useDisclosure();
 
   const handleDateChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') setShowDate(false);
+    if (Platform.OS === 'android') datePicker.close();
     if (selected) onDateChange(selected);
   };
 
   const handleTimeChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') setShowTime(false);
+    if (Platform.OS === 'android') timePicker.close();
     if (selected) onTimeChange(selected);
   };
 
@@ -40,7 +40,7 @@ export function DateTimePickerSection({
       <View style={styles.row}>
         <TouchableOpacity
           style={styles.field}
-          onPress={() => setShowDate(true)}
+          onPress={datePicker.open}
           activeOpacity={0.8}
         >
           <Ionicons name="calendar-outline" size={16} color={colors.neutral8} />
@@ -48,7 +48,7 @@ export function DateTimePickerSection({
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.field}
-          onPress={() => setShowTime(true)}
+          onPress={timePicker.open}
           activeOpacity={0.8}
         >
           <Ionicons name="time-outline" size={16} color={colors.neutral8} />
@@ -56,7 +56,7 @@ export function DateTimePickerSection({
         </TouchableOpacity>
       </View>
 
-      {showDate && (
+      {datePicker.visible && (
         <View style={styles.native}>
           <DateTimePicker
             value={date}
@@ -66,14 +66,14 @@ export function DateTimePickerSection({
             themeVariant="dark"
           />
           {Platform.OS === 'ios' && (
-            <TouchableOpacity style={styles.done} onPress={() => setShowDate(false)}>
+            <TouchableOpacity style={styles.done} onPress={datePicker.close}>
               <Text style={styles.doneText}>Done</Text>
             </TouchableOpacity>
           )}
         </View>
       )}
 
-      {showTime && (
+      {timePicker.visible && (
         <View style={styles.native}>
           <DateTimePicker
             value={time}
@@ -83,7 +83,7 @@ export function DateTimePickerSection({
             themeVariant="dark"
           />
           {Platform.OS === 'ios' && (
-            <TouchableOpacity style={styles.done} onPress={() => setShowTime(false)}>
+            <TouchableOpacity style={styles.done} onPress={timePicker.close}>
               <Text style={styles.doneText}>Done</Text>
             </TouchableOpacity>
           )}

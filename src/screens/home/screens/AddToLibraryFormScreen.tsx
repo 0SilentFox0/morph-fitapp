@@ -18,6 +18,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { TRAINING_TYPES } from '../../../constants';
 import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
 import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
+import { useDisclosure } from '../../../hooks/useDisclosure';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
@@ -99,7 +100,7 @@ export function AddToLibraryFormScreen() {
     if (!isEdit) setStoreDescription(watchedDescription);
   }, [watchedDescription, isEdit, setStoreDescription]);
 
-  const [showTagModal, setShowTagModal] = React.useState(false);
+  const tagModal = useDisclosure();
 
   const onContinue = (data: ProgramDraftValues) => {
     if (isEdit && program) {
@@ -183,7 +184,7 @@ export function AddToLibraryFormScreen() {
             <DropdownSelect
               value={value}
               placeholder="Select category"
-              onPress={() => setShowTagModal(true)}
+              onPress={tagModal.open}
               style={styles.dropdown}
             />
           )}
@@ -230,7 +231,7 @@ export function AddToLibraryFormScreen() {
         />
       </ScrollView>
 
-      <Overlay visible={showTagModal} onClose={() => setShowTagModal(false)}>
+      <Overlay visible={tagModal.visible} onClose={tagModal.close}>
         <Controller
           control={control}
           name="tag"
@@ -244,7 +245,7 @@ export function AddToLibraryFormScreen() {
                     style={[styles.modalOption, value === item && styles.modalOptionActive]}
                     onPress={() => {
                       onChange(item);
-                      setShowTagModal(false);
+                      tagModal.close();
                     }}
                   >
                     <Text

@@ -21,6 +21,7 @@ import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useProgramsStore } from '../../store/programsStore';
 import { seedActiveClient, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
+import { useDisclosure } from '../../hooks/useDisclosure';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
@@ -58,7 +59,7 @@ export function ClientsProfileExtendedScreen() {
   const name =
     fromTraining?.name ?? mockClients.find((c) => c.id === clientId)?.name ?? 'Brooklyn Simmons';
 
-  const [pickerVisible, setPickerVisible] = React.useState(false);
+  const programPicker = useDisclosure();
 
   const history = getClientHistory(name);
   const nextSession = sessions.find(
@@ -66,7 +67,7 @@ export function ClientsProfileExtendedScreen() {
   );
 
   const handleStart = (programId: string) => {
-    setPickerVisible(false);
+    programPicker.close();
     const program =
       programs.find((p) => p.id === programId) ??
       mockTrainingPrograms.find((p) => p.id === programId);
@@ -109,7 +110,7 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </View>
 
-        <Button title="Start training" onPress={() => setPickerVisible(true)} style={styles.startBtn} />
+        <Button title="Start training" onPress={programPicker.open} style={styles.startBtn} />
 
         <View style={styles.sectionHeader}>
           <SectionTitle style={styles.sectionTitleInline}>Next training</SectionTitle>
@@ -207,8 +208,8 @@ export function ClientsProfileExtendedScreen() {
       </ScrollView>
 
       <ProgramPickerModal
-        visible={pickerVisible}
-        onClose={() => setPickerVisible(false)}
+        visible={programPicker.visible}
+        onClose={programPicker.close}
         programs={programs}
         value={undefined}
         onChange={handleStart}

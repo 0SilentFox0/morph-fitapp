@@ -22,6 +22,7 @@ import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
 import { ChatOptionsSheet, ChatAttachmentSheet, type ChatOptionAction } from './components';
+import { useDisclosure } from '../../hooks/useDisclosure';
 
 type Route = RouteProp<ChatStackParamList, 'ChatThread'>;
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatThread'>;
@@ -41,8 +42,8 @@ export function ChatThreadScreen() {
   const markAsRead = useChatStore((s) => s.markAsRead);
 
   const [input, setInput] = React.useState('');
-  const [optionsVisible, setOptionsVisible] = React.useState(false);
-  const [attachVisible, setAttachVisible] = React.useState(false);
+  const optionsSheet = useDisclosure();
+  const attachSheet = useDisclosure();
   const scrollRef = React.useRef<ScrollView>(null);
   const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -76,7 +77,7 @@ export function ChatThreadScreen() {
 
   const handlePickAttachment = (uri: string) => {
     // Mock app: represent a sent photo as a text message referencing it.
-    setAttachVisible(false);
+    attachSheet.close();
     void uri;
     sendMessage(conversationId, '📷 Photo');
     scrollToEndSoon();
@@ -96,7 +97,7 @@ export function ChatThreadScreen() {
   };
 
   const handleOption = (action: ChatOptionAction) => {
-    setOptionsVisible(false);
+    optionsSheet.close();
     switch (action) {
       case 'reschedule':
         sendMessage(conversationId, 'Requested to reschedule the session.');
@@ -150,7 +151,7 @@ export function ChatThreadScreen() {
         </Text>
         <TouchableOpacity
           style={styles.headerBtn}
-          onPress={() => setOptionsVisible(true)}
+          onPress={optionsSheet.open}
           hitSlop={8}
         >
           <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
@@ -210,7 +211,7 @@ export function ChatThreadScreen() {
       <View style={[styles.inputRow, { paddingBottom: spacing.md + insets.bottom }]}>
         <TouchableOpacity
           style={styles.iconBox}
-          onPress={() => setAttachVisible(true)}
+          onPress={attachSheet.open}
           activeOpacity={0.7}
         >
           <Ionicons name="link-outline" size={24} color={colors.neutral8} />
@@ -242,15 +243,15 @@ export function ChatThreadScreen() {
       </View>
 
       <ChatOptionsSheet
-        visible={optionsVisible}
+        visible={optionsSheet.visible}
         title={title}
-        onClose={() => setOptionsVisible(false)}
+        onClose={optionsSheet.close}
         onSelect={handleOption}
       />
 
       <ChatAttachmentSheet
-        visible={attachVisible}
-        onClose={() => setAttachVisible(false)}
+        visible={attachSheet.visible}
+        onClose={attachSheet.close}
         onPick={handlePickAttachment}
       />
     </KeyboardAvoidingView>
