@@ -24,7 +24,7 @@ function syncRole(user: User): void {
   useAppStore.getState().setUserName(user.name);
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   status: 'loading',
   user: null,
 

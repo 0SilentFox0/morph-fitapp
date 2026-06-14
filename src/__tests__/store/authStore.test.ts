@@ -9,7 +9,7 @@ const user = { id: 'u1', email: 'a@b.com', name: 'Jane', role: 'trainer', create
 
 beforeEach(async () => {
   await tokenStore.clear();
-  act(() => useAuthStore.setState({ status: 'loading', user: null }));
+  useAuthStore.setState({ status: 'loading', user: null });
   jest.restoreAllMocks();
 });
 
@@ -34,7 +34,7 @@ describe('authStore', () => {
 
   it('logout clears the user', async () => {
     jest.spyOn(authApi, 'logout').mockResolvedValue();
-    act(() => useAuthStore.setState({ status: 'authenticated', user: user as never }));
+    useAuthStore.setState({ status: 'authenticated', user: user as never });
     await act(async () => {
       await useAuthStore.getState().logout();
     });
