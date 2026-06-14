@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Session, TrainingProgram, ProgramExercise } from '../mocks';
+import type { Session, TrainingProgram, ProgramExercise } from '../types';
 import type { MuscleGroup } from '../constants/muscles';
 
 export type OnboardingStackParamList = {

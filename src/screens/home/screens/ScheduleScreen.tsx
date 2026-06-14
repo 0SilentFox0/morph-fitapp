@@ -26,7 +26,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme';
 import { useSessionsStore } from '../../../store/sessionsStore';
-import type { Session, SessionStatus } from '../../../mocks';
+import type { Session, SessionStatus } from '../../../types';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 

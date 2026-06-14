@@ -1,4 +1,4 @@
-import type { SetNote } from '../mocks';
+import type { SetNote } from '../types';
 
 export const TRAINING_TYPES = [
   'Cardio',

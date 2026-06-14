@@ -5,7 +5,7 @@ import { Overlay } from '../../../../components/ui';
 import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
-import type { TrainingProgram } from '../../../../mocks';
+import type { TrainingProgram } from '../../../../types';
 import { radius } from '../../../../theme';
 
 export interface ProgramPickerModalProps {

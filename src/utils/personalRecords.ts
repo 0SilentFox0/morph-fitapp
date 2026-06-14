@@ -1,4 +1,4 @@
-import type { CompletedTraining } from '../mocks';
+import type { CompletedTraining } from '../types';
 
 export interface PersonalRecord {
   exerciseId: number;

@@ -17,7 +17,7 @@ import { useSessionsStore } from '../../../store/sessionsStore';
 import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { deriveGroupFromSession } from '../../../utils';
-import type { Session } from '../../../mocks';
+import type { Session } from '../../../types';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 

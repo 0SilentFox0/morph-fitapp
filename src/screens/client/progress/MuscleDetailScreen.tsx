@@ -11,7 +11,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseMuscleMap, exerciseCatalog } from '../../../mocks';
-import type { ExerciseSet } from '../../../mocks';
+import type { ExerciseSet } from '../../../types';
 import { computeMuscleStats, muscleTrend } from '../../../utils/muscleStats';
 import { MUSCLE_LABELS } from '../../../constants/muscles';
 

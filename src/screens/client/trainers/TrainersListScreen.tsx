@@ -12,7 +12,7 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useTrainersStore } from '../../../store/trainersStore';
 import { useClientTabSwipe } from '../useClientTabSwipe';
-import type { Trainer } from '../../../mocks';
+import type { Trainer } from '../../../types';
 
 type Nav = NativeStackNavigationProp<TrainersStackParamList, 'TrainersList'>;
 

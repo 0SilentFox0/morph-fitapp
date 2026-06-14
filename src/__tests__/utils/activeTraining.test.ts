@@ -1,5 +1,5 @@
 import { deriveActiveGroup, seedActiveClient } from '../../utils/activeTraining';
-import type { Session, TrainingProgram } from '../../mocks';
+import type { Session, TrainingProgram } from '../../types';
 
 const programs: TrainingProgram[] = [
   {

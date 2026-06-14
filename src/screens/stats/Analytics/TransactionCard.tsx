@@ -5,7 +5,7 @@ import { colors } from '../../../theme/colors';
 import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
-import type { Transaction, TransactionStatus } from '../../../mocks';
+import type { Transaction, TransactionStatus } from '../../../types';
 
 const statusColors: Record<TransactionStatus, string> = {
   completed: colors.Success,

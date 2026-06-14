@@ -1,5 +1,5 @@
 import { activeDayKeys, computeWeekStreak, computeBadges } from '../../utils/achievements';
-import type { CompletedTraining } from '../../mocks';
+import type { CompletedTraining } from '../../types';
 
 const make = (id: string, date: string, weight = 0, reps = 10): CompletedTraining => ({
   id,

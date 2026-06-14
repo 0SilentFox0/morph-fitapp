@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { TrainingProgram, ProgramExercise } from '../mocks';
+import type { TrainingProgram, ProgramExercise } from '../types';
 
 export interface DraftProgramData {
   title: string;

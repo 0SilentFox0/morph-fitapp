@@ -27,7 +27,7 @@ import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { formatDate, formatTime } from '../../utils';
-import type { Transaction, TransactionStatus, TransactionType } from '../../mocks';
+import type { Transaction, TransactionStatus, TransactionType } from '../../types';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
 

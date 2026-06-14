@@ -1,4 +1,4 @@
-import type { CompletedTraining } from '../mocks';
+import type { CompletedTraining } from '../types';
 import { computeTotals } from './muscleStats';
 
 /** Local YYYY-MM-DD key for a parseable training date, or null. */

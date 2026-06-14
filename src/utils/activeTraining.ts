@@ -1,4 +1,4 @@
-import type { Session, TrainingProgram, ProgramExercise, ExerciseSet } from '../mocks';
+import type { Session, TrainingProgram, ProgramExercise, ExerciseSet } from '../types';
 import type { ActiveClient } from '../store/activeTrainingStore';
 
 type Participant = Session['participants'][number];

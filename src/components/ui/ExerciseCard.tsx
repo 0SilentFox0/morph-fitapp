@@ -5,7 +5,7 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { useDraftProgramStore } from '../../store/draftProgramStore';
-import type { ProgramExercise, ExerciseSet } from '../../mocks';
+import type { ProgramExercise, ExerciseSet } from '../../types';
 import { SET_NOTES, SET_NOTE_CYCLE } from '../../constants';
 import { radius } from '../../theme';
 

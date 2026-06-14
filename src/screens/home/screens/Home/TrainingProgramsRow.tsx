@@ -7,7 +7,7 @@ import { colors } from '../../../../theme/colors';
 import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import { radius } from '../../../../theme';
-import type { TrainingProgram } from '../../../../mocks';
+import type { TrainingProgram } from '../../../../types';
 
 export interface TrainingProgramsRowProps {
   programs: TrainingProgram[];

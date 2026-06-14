@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { mockSessions } from '../mocks';
-import type { Session, SessionStatus } from '../mocks';
+import type { Session, SessionStatus } from '../types';
 
 export type { Session, SessionStatus };
 

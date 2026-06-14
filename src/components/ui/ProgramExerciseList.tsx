@@ -7,7 +7,7 @@ import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
-import type { TrainingProgram } from '../../mocks';
+import type { TrainingProgram } from '../../types';
 
 interface ProgramExerciseListProps {
   program: TrainingProgram;

@@ -2,7 +2,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { UpcomingCarousel } from '../../../screens/client/home/UpcomingCarousel';
-import type { Session } from '../../../mocks';
+import type { Session } from '../../../types';
 
 const make = (id: string, title: string): Session => ({
   id,

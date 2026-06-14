@@ -28,7 +28,7 @@ import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
 import { ParticipantsSection } from './SessionForm/ParticipantsSection';
 import { DateTimePickerSection } from './SessionForm/DateTimePickerSection';
 import { ExerciseProgressionSection } from './SessionForm/ExerciseProgressionSection';
-import type { ExerciseSet } from '../../../mocks';
+import type { ExerciseSet } from '../../../types';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;

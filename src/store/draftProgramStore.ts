@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '../services/storage';
-import type { ProgramExercise, ExerciseSet } from '../mocks';
+import type { ProgramExercise, ExerciseSet } from '../types';
 
 interface DraftProgramState {
   title: string;

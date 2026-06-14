@@ -19,7 +19,7 @@ import { radius } from '../../../theme';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
-import type { TrainingProgram } from '../../../mocks';
+import type { TrainingProgram } from '../../../types';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'TrainingLibrary'>;
 

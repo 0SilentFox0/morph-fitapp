@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '../services/storage';
-import { mockMeasurements, type MeasurementEntry } from '../mocks';
+import { mockMeasurements } from '../mocks';
+import type { MeasurementEntry } from '../types';
 
 export type { MeasurementEntry };
 export type MeasurementField = 'weightKg' | 'chestCm' | 'waistCm' | 'armCm';

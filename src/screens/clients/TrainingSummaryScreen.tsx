@@ -11,7 +11,7 @@ import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { trainingMetric } from '../../utils';
 import { mockTrainingPrograms } from '../../mocks';
-import type { ExerciseSet, ProgramExercise } from '../../mocks';
+import type { ExerciseSet, ProgramExercise } from '../../types';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { typography } from '../../theme/typography';

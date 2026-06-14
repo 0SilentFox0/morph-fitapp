@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { mockTrainers, type Trainer, type ConnectionStatus } from '../mocks';
+import { mockTrainers } from '../mocks';
+import type { Trainer, ConnectionStatus } from '../types';
 
 export type { Trainer, ConnectionStatus };
 

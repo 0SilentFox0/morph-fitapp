@@ -4,124 +4,19 @@
  */
 
 import type { MuscleGroup } from '../constants/muscles';
-
-// ─── Types ─────────────────────────────────────────────────────────────────
-
-export type SessionStatus = 'completed' | 'pending' | 'canceled';
-
-export interface Session {
-  id: string;
-  title: string;
-  type: string;
-  date: string;
-  time: string;
-  status: SessionStatus;
-  participants: { id: string; name: string; avatar?: string }[];
-  programId?: string;
-  /**
-   * Planned (target) sets per exercise id, computed at creation from the
-   * client's previous training + progression %. Seeds the live defaults.
-   */
-  plannedSets?: Record<number, ExerciseSet[]>;
-}
-
-export type SetNote = 'regular' | 'failure' | 'dropset' | 'short_rest' | 'long_rest';
-
-export interface ExerciseSet {
-  weight: number;
-  reps: number;
-  note?: SetNote;
-}
-
-export interface ProgramExercise {
-  id: number;
-  name: string;
-  category: string;
-  imageUrl: string | null;
-  sets: ExerciseSet[];
-  /** Short duration label shown in exercise lists, e.g. "5m". */
-  durationLabel?: string;
-  /** Free-text guidance shown on the live Exercise screen. */
-  trainerNotes?: string;
-  /** Muscle groups this exercise loads — source of the per-muscle progress stats. */
-  muscles?: MuscleGroup[];
-}
-
-export interface TrainingProgram {
-  id: string;
-  name: string;
-  tag: string;
-  videoCount: number;
-  views: number;
-  likes: number;
-  thumbnail?: string;
-  /** e.g. "$5/month" */
-  price?: string;
-  description?: string;
-  exercises?: ProgramExercise[];
-}
-
-export interface Client {
-  id: string;
-  name: string;
-  avatar?: string;
-  lastSession?: string;
-  tag: string;
-}
-
-/** A client's logged sets for one exercise in a past (completed) training. */
-export interface LoggedExercise {
-  exerciseId: number;
-  sets: ExerciseSet[];
-}
-
-/** A past training a client completed — source of "previous metrics". */
-export interface CompletedTraining {
-  id: string;
-  /** Keyed by client display name (ids differ between mocks and the form). */
-  clientName: string;
-  programId: string;
-  date: string;
-  exercises: LoggedExercise[];
-}
-
-export type TransactionStatus = 'completed' | 'pending' | 'canceled';
-export type TransactionType = 'Training' | 'Subscription';
-
-export interface Transaction {
-  id: string;
-  clientName: string;
-  date: string;
-  amount: string;
-  type: TransactionType;
-  status: TransactionStatus;
-  /** Sessions used / total — shown as a progress bar for Subscription transactions. */
-  sessionsUsed?: number;
-  sessionsTotal?: number;
-}
-
-export interface ChartDataPoint {
-  label: string;
-  value: number;
-}
-
-export interface IncomeOverTimeData {
-  labels: string[];
-  datasets: { data: number[] }[];
-}
-
-export interface RevenueBySourceData {
-  subscriptions: number;
-  trainings: number;
-}
-
-export interface AnalyticsData {
-  totalEarningsPerMonth: number;
-  fromSubscriptions: number;
-  fromTrainings: number;
-  incomeOverTime: IncomeOverTimeData;
-  revenueBySource: RevenueBySourceData;
-}
+import type {
+  Session,
+  ExerciseSet,
+  ProgramExercise,
+  TrainingProgram,
+  ExerciseInfo,
+  Client,
+  CompletedTraining,
+  Transaction,
+  AnalyticsData,
+  MeasurementEntry,
+  Trainer,
+} from '../types';
 
 // ─── Training placeholder images (fitness/workout themed) ───────────────────
 
@@ -383,14 +278,6 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     price: '$5/month',
   },
 ];
-
-/** Minimal per-exercise reference info, derived from the program definitions. */
-export interface ExerciseInfo {
-  id: number;
-  name: string;
-  category: string;
-  muscles: MuscleGroup[];
-}
 
 /** exercise id → reference info, deduped across all program definitions. */
 export const exerciseCatalog: Record<number, ExerciseInfo> =
@@ -751,16 +638,6 @@ export const mockAnalyticsData: AnalyticsData = {
 
 // ─── Body measurements (client progress) ────────────────────────────────────
 
-export interface MeasurementEntry {
-  id: string;
-  /** ISO date the measurement was taken. */
-  date: string;
-  weightKg: number;
-  chestCm?: number;
-  waistCm?: number;
-  armCm?: number;
-}
-
 /** Seed bodyweight/measurement history for the current client, oldest → newest. */
 export const mockMeasurements: MeasurementEntry[] = [
   { id: 'm1', date: '2026-05-16T08:00:00Z', weightKg: 82.4, chestCm: 102, waistCm: 88, armCm: 36 },
@@ -771,29 +648,6 @@ export const mockMeasurements: MeasurementEntry[] = [
 ];
 
 // ─── Trainers (client-side discovery) ───────────────────────────────────────
-
-export type ConnectionStatus = 'none' | 'pending' | 'connected';
-
-export interface Trainer {
-  id: string;
-  name: string;
-  avatar?: string;
-  /** Short professional headline, e.g. "Strength & Conditioning Coach". */
-  headline: string;
-  bio: string;
-  /** Training types / focus areas — also used for filtering. */
-  specialties: string[];
-  location: string;
-  /** Average rating 0–5. */
-  rating: number;
-  reviews: number;
-  pricePerSession: string;
-  experienceYears: number;
-  certifications: string[];
-  /** Offers online sessions. */
-  online: boolean;
-  connection: ConnectionStatus;
-}
 
 export const mockTrainers: Trainer[] = [
   {

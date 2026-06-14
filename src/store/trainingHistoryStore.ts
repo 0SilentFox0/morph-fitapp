@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { mockTrainingHistory, CURRENT_USER_NAME } from '../mocks';
-import type { CompletedTraining, ExerciseSet } from '../mocks';
+import type { CompletedTraining, ExerciseSet } from '../types';
 
 export type { CompletedTraining };
 

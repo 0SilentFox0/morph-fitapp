@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import { ScheduleCard } from '../../components/ui/ScheduleCard';
-import type { Session } from '../../mocks';
+import type { Session } from '../../types';
 
 const session: Session = {
   id: 's1',
