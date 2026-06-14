@@ -2,7 +2,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -16,6 +15,7 @@ import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Avatar, SectionTitle, Button, Tag } from '../../components/ui';
 import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
+import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
@@ -180,30 +180,13 @@ export function ClientsProfileExtendedScreen() {
         {history.length === 0 ? (
           <Text style={styles.emptyNote}>No completed trainings yet.</Text>
         ) : (
-          [...history].reverse().map((h) => {
-            const program = mockTrainingPrograms.find((p) => p.id === h.programId);
-            const exerciseCount = h.exercises.length;
-            return (
-              <View key={h.id} style={styles.historyCard}>
-                {program?.thumbnail ? (
-                  <Image source={{ uri: program.thumbnail }} style={styles.historyThumb} />
-                ) : (
-                  <View style={styles.historyThumb} />
-                )}
-                <View style={styles.historyInfo}>
-                  <View style={styles.historyTitleRow}>
-                    <Text style={styles.historyName}>{program?.name ?? 'Training'}</Text>
-                    <Text style={styles.historyDate}>{h.date}</Text>
-                  </View>
-                  <Text style={styles.historyType}>{program?.tag ?? '—'}</Text>
-                  <View style={styles.statRow}>
-                    <Stat icon="barbell-outline" value={`${exerciseCount} ex`} />
-                    <Stat icon="trending-up-outline" value={trainingMetric(h)} />
-                  </View>
-                </View>
-              </View>
-            );
-          })
+          [...history].reverse().map((h) => (
+            <TrainingHistoryCard
+              key={h.id}
+              training={h}
+              program={mockTrainingPrograms.find((p) => p.id === h.programId)}
+            />
+          ))
         )}
       </ScrollView>
 
@@ -222,15 +205,6 @@ function IconSquare({ icon }: { icon: keyof typeof Ionicons.glyphMap }) {
   return (
     <View style={styles.iconSquare}>
       <Ionicons name={icon} size={16} color={colors.white} />
-    </View>
-  );
-}
-
-function Stat({ icon, value }: { icon: keyof typeof Ionicons.glyphMap; value: string | number }) {
-  return (
-    <View style={styles.stat}>
-      <Ionicons name={icon} size={14} color={colors.textSecondary} />
-      <Text style={styles.statText}>{value}</Text>
     </View>
   );
 }
@@ -367,55 +341,5 @@ const styles = StyleSheet.create({
   },
   chart: {
     borderRadius: radius.sm,
-  },
-  historyCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  historyThumb: {
-    width: 96,
-    height: 96,
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral1,
-    marginRight: spacing.md,
-  },
-  historyInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  historyTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  historyName: {
-    fontSize: typography.sizes.base,
-    color: colors.text,
-  },
-  historyDate: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-  },
-  historyType: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
-  },
-  statRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.sm,
-  },
-  stat: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  statText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
   },
 });

@@ -19,48 +19,18 @@ import { MonthSelector } from './Schedule/MonthSelector';
 import { DayStrip } from './Schedule/DayStrip';
 import { WeekStrip } from './Schedule/WeekStrip';
 import { MonthGrid } from './Schedule/MonthGrid';
+import { WeekColumns } from './Schedule/WeekColumns';
 import { buildDaysFromToday, type ScheduleViewMode } from './Schedule/scheduleUtils';
 import type { SessionOptionAction } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
-import { radius } from '../../../theme';
 import { useSessionsStore } from '../../../store/sessionsStore';
-import type { Session, SessionStatus } from '../../../types';
+import type { Session } from '../../../types';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
 const SWIPE_THRESHOLD = 60;
-
-const WEEK_STATUS_BAR: Record<SessionStatus, string> = {
-  completed: colors.Success,
-  pending: colors.Warning,
-  canceled: colors.error6,
-};
-
-/** Compact session card used inside the week view's per-day columns. */
-function WeekMiniCard({
-  session,
-  onPress,
-}: {
-  session: Session;
-  onPress: (s: Session) => void;
-}) {
-  return (
-    <TouchableOpacity style={styles.miniCard} activeOpacity={0.8} onPress={() => onPress(session)}>
-      <View style={[styles.miniBar, { backgroundColor: WEEK_STATUS_BAR[session.status] }]} />
-      <View style={styles.miniBody}>
-        <Text style={styles.miniTitle} numberOfLines={2}>
-          {session.title}
-        </Text>
-        <Text style={styles.miniTime}>{session.time}</Text>
-        <View style={styles.miniTypeTag}>
-          <Text style={styles.miniTypeText}>{session.type}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 export function ScheduleScreen() {
   const navigation = useNavigation<Nav>();
@@ -267,29 +237,11 @@ export function ScheduleScreen() {
                 />
               )))}
         {viewMode === 'week' && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.weekColumns}
-          >
-            {weekDays.map((day) => {
-              const sess = getSessionsByDateKey(day.dateKey).filter(matchesSearch);
-              return (
-                <View key={day.dateKey} style={styles.weekColumn}>
-                  <Text style={styles.weekColumnTitle}>
-                    {day.label} {day.date}
-                  </Text>
-                  {sess.length === 0 ? (
-                    <Text style={styles.weekColumnEmpty}>No sessions</Text>
-                  ) : (
-                    sess.map((s) => (
-                      <WeekMiniCard key={s.id} session={s} onPress={handleSessionPress} />
-                    ))
-                  )}
-                </View>
-              );
-            })}
-          </ScrollView>
+          <WeekColumns
+            weekDays={weekDays}
+            getSessions={(dateKey) => getSessionsByDateKey(dateKey).filter(matchesSearch)}
+            onSessionPress={handleSessionPress}
+          />
         )}
         {viewMode === 'month' &&
           monthSelectedKey &&
@@ -350,63 +302,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
     paddingBottom: spacing['2xl'] + spacing.tabBarInset,
-  },
-  weekColumns: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    paddingRight: spacing.lg,
-  },
-  weekColumn: {
-    width: 160,
-  },
-  weekColumnTitle: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  weekColumnEmpty: {
-    fontSize: typography.sizes.xs,
-    color: colors.textMuted,
-  },
-  miniCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.neutral2,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
-    borderTopLeftRadius: 2,
-    borderBottomLeftRadius: 2,
-    marginBottom: spacing.sm,
-    overflow: 'hidden',
-  },
-  miniBar: {
-    width: 2,
-  },
-  miniBody: {
-    flex: 1,
-    padding: spacing.sm,
-    gap: spacing.xs,
-  },
-  miniTitle: {
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.medium,
-    color: colors.text,
-    lineHeight: 16,
-  },
-  miniTime: {
-    fontSize: 11,
-    color: colors.neutral9,
-  },
-  miniTypeTag: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.surfaceSubtle,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
-  },
-  miniTypeText: {
-    fontSize: 11,
-    color: colors.text,
   },
   monthDetail: {
     marginTop: spacing.sm,
