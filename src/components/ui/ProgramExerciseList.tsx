@@ -43,9 +43,11 @@ export function ProgramExerciseList({
     <Card style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.name}>{program.name}</Text>
-        <TouchableOpacity onPress={onEditProgram} hitSlop={8}>
-          <Ionicons name="pencil" size={20} color={colors.text} />
-        </TouchableOpacity>
+        {onEditProgram && (
+          <TouchableOpacity onPress={onEditProgram} hitSlop={8}>
+            <Ionicons name="pencil" size={20} color={colors.text} />
+          </TouchableOpacity>
+        )}
       </View>
 
       {!!program.description && <Text style={styles.desc}>{program.description}</Text>}

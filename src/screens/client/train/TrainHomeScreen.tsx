@@ -68,7 +68,7 @@ export function TrainHomeScreen() {
             <Card style={styles.programCard}>
               <Text style={styles.assignedTitle}>{p.name}</Text>
               <View style={styles.tagsRow}>
-                <Tag label={`${p.exercises!.length} exercises`} variant="default" />
+                <Tag label={`${p.exercises?.length ?? 0} exercises`} variant="default" />
                 <Tag label={p.tag} variant="default" />
               </View>
             </Card>

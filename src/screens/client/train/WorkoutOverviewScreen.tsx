@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { TrainStackParamList } from '../../../navigation/types';
-import type { ProgramExercise, TrainingProgram } from '../../../types';
+import type { ExerciseSet, ProgramExercise, TrainingProgram } from '../../../types';
 import { ScreenHeader } from '../../../components/layout';
 import { ProgramExerciseList, Button } from '../../../components/ui';
 import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
@@ -35,31 +35,32 @@ export function WorkoutOverviewScreen() {
   const sessions = useSessionsStore((s) => s.sessions);
 
   // Resolve the program/exercises for whichever path led here.
-  const { program, exercises } = React.useMemo(() => {
+  const { program, exercises, plannedSets } = React.useMemo(() => {
     if (params.source === 'custom') {
       const prog = customProgram(params.exercises);
-      return { program: prog, exercises: params.exercises };
+      return { program: prog, exercises: params.exercises, plannedSets: undefined as Record<number, ExerciseSet[]> | undefined };
     }
     if (params.source === 'assigned') {
       const session = sessions.find((s) => s.id === params.sessionId);
       const prog =
-        mockTrainingPrograms.find((p) => p.id === session?.programId && (p.exercises?.length ?? 0) > 0) ??
-        mockTrainingPrograms.find((p) => (p.exercises?.length ?? 0) > 0)!;
-      return { program: prog, exercises: prog.exercises ?? [] };
+        mockTrainingPrograms.find((p) => p.id === session?.programId && (p.exercises?.length ?? 0) > 0) ?? null;
+      return { program: prog, exercises: prog?.exercises ?? [], plannedSets: session?.plannedSets };
     }
     const prog =
-      mockTrainingPrograms.find((p) => p.id === params.programId) ??
-      mockTrainingPrograms.find((p) => (p.exercises?.length ?? 0) > 0)!;
-    return { program: prog, exercises: prog.exercises ?? [] };
+      mockTrainingPrograms.find((p) => p.id === params.programId && (p.exercises?.length ?? 0) > 0) ?? null;
+    return { program: prog, exercises: prog?.exercises ?? [], plannedSets: undefined };
   }, [params, sessions]);
 
   const start = (exerciseIndex: number) => {
     const me = getCurrentUser();
     const lookup = (name: string, exId: number) => getLastSets(name, exId);
-    const participant =
-      params.source === 'custom'
-        ? seedCustomParticipant(me, exercises, { lookupPrevSets: lookup })
-        : seedParticipant(me, program, { lookupPrevSets: lookup });
+    let participant;
+    if (params.source === 'custom') {
+      participant = seedCustomParticipant(me, exercises, { lookupPrevSets: lookup });
+    } else {
+      if (!program) return;
+      participant = seedParticipant(me, program, { plannedSets, lookupPrevSets: lookup });
+    }
     startTraining([participant]);
     navigation.navigate('ExerciseDetail', {
       participantId: me.id,
@@ -70,15 +71,15 @@ export function WorkoutOverviewScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title={program.name} onBack={() => navigation.goBack()} />
+      <ScreenHeader title={program?.name ?? 'Workout'} onBack={() => navigation.goBack()} />
       <ScrollView
         contentContainerStyle={[styles.content, { paddingBottom: spacing['2xl'] + insets.bottom + 64 }]}
         showsVerticalScrollIndicator={false}
       >
-        {exercises.length === 0 ? (
-          <Text style={styles.empty}>This workout has no exercises yet.</Text>
-        ) : (
+        {program && exercises.length > 0 ? (
           <ProgramExerciseList program={program} onSelectExercise={(i) => start(i)} />
+        ) : (
+          <Text style={styles.empty}>This workout has no exercises yet.</Text>
         )}
       </ScrollView>
       <View style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}>
