@@ -34,6 +34,7 @@ import {
   PAYMENT_METHODS,
 } from '../../constants/transactions';
 import { useDisclosure } from '../../hooks/useDisclosure';
+import { useDateTimePicker } from '../../hooks/useDateTimePicker';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
 
@@ -89,8 +90,8 @@ export function AddTransactionScreen() {
   const [statusIndex, setStatusIndex] = React.useState(0);
   const [method, setMethod] = React.useState('');
   const methodMenu = useDisclosure();
-  const datePicker = useDisclosure();
-  const timePicker = useDisclosure();
+  const datePicker = useDateTimePicker(setDate);
+  const timePicker = useDateTimePicker(setTime);
 
   const type = TRANSACTION_TYPES[typeIndex] as TransactionType;
   const status = TRANSACTION_STATUSES[statusIndex];
@@ -105,14 +106,6 @@ export function AddTransactionScreen() {
     ...(typeIndex === 1 ? { sessionsUsed: 0, sessionsTotal: 9 } : {}),
   };
 
-  const handleDateChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') datePicker.close();
-    if (selected) setDate(selected);
-  };
-  const handleTimeChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') timePicker.close();
-    if (selected) setTime(selected);
-  };
 
   return (
     <View style={styles.container}>
@@ -159,7 +152,7 @@ export function AddTransactionScreen() {
               value={date}
               mode="date"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleDateChange}
+              onChange={datePicker.handleChange}
               themeVariant="dark"
             />
             {Platform.OS === 'ios' && (
@@ -175,7 +168,7 @@ export function AddTransactionScreen() {
               value={time}
               mode="time"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleTimeChange}
+              onChange={timePicker.handleChange}
               themeVariant="dark"
             />
             {Platform.OS === 'ios' && (

@@ -6,7 +6,7 @@ import { typography } from '../../../../theme/typography';
 import { spacing } from '../../../../theme/spacing';
 import { formatDate, formatTime } from '../../../../utils';
 import { radius } from '../../../../theme';
-import { useDisclosure } from '../../../../hooks/useDisclosure';
+import { useDateTimePicker } from '../../../../hooks/useDateTimePicker';
 
 export interface DateTimePickerSectionProps {
   date: Date;
@@ -21,18 +21,8 @@ export function DateTimePickerSection({
   onDateChange,
   onTimeChange,
 }: DateTimePickerSectionProps) {
-  const datePicker = useDisclosure();
-  const timePicker = useDisclosure();
-
-  const handleDateChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') datePicker.close();
-    if (selected) onDateChange(selected);
-  };
-
-  const handleTimeChange = (_: unknown, selected?: Date) => {
-    if (Platform.OS === 'android') timePicker.close();
-    if (selected) onTimeChange(selected);
-  };
+  const datePicker = useDateTimePicker(onDateChange);
+  const timePicker = useDateTimePicker(onTimeChange);
 
   return (
     <>
@@ -62,7 +52,7 @@ export function DateTimePickerSection({
             value={date}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleDateChange}
+            onChange={datePicker.handleChange}
             themeVariant="dark"
           />
           {Platform.OS === 'ios' && (
@@ -79,7 +69,7 @@ export function DateTimePickerSection({
             value={time}
             mode="time"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleTimeChange}
+            onChange={timePicker.handleChange}
             themeVariant="dark"
           />
           {Platform.OS === 'ios' && (
