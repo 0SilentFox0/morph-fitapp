@@ -303,6 +303,7 @@ export type Program = z.infer<typeof ProgramSchema>;
 export type ProgramExercise = z.infer<typeof ProgramExerciseSchema>;
 export type ClientProgram = z.infer<typeof ClientProgramSchema>;
 export type Session = z.infer<typeof SessionSchema>;
+export type SessionParticipant = z.infer<typeof SessionParticipantSchema>;
 export type Exercise = z.infer<typeof ExerciseSchema>;
 export type WorkoutLog = z.infer<typeof WorkoutLogSchema>;
 export type WorkoutLogExercise = z.infer<typeof WorkoutLogExerciseSchema>;
