@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { mockSessions } from '../mocks';
 import type { Session, SessionStatus } from '../types';
 import { searchItems } from '../utils/search';
+import { updateById, removeById } from './collection';
 
 export type { Session, SessionStatus };
 
@@ -29,17 +30,11 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
   },
 
   updateSession: (id, updates) => {
-    set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === id ? { ...s, ...updates } : s,
-      ),
-    }));
+    set((state) => ({ sessions: updateById(state.sessions, id, updates) }));
   },
 
   deleteSession: (id) => {
-    set((state) => ({
-      sessions: state.sessions.filter((s) => s.id !== id),
-    }));
+    set((state) => ({ sessions: removeById(state.sessions, id) }));
   },
 
   getSessionsByDateKey: (dateKey) => {

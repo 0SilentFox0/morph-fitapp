@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '../services/storage';
 import type { ProgramExercise, ExerciseSet } from '../types';
+import { updateById, removeById } from './collection';
 
 interface DraftProgramState {
   title: string;
@@ -47,12 +48,10 @@ export const useDraftProgramStore = create<DraftProgramState>()(
         }),
 
       removeExercise: (id) =>
-        set((s) => ({ exercises: s.exercises.filter((e) => e.id !== id) })),
+        set((s) => ({ exercises: removeById(s.exercises, id) })),
 
       updateExerciseSets: (id, sets) =>
-        set((s) => ({
-          exercises: s.exercises.map((e) => (e.id === id ? { ...e, sets } : e)),
-        })),
+        set((s) => ({ exercises: updateById(s.exercises, id, { sets }) })),
 
       addSet: (exerciseId) =>
         set((s) => ({

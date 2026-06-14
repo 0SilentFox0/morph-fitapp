@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { TrainingProgram, ProgramExercise } from '../types';
 import { searchItems } from '../utils/search';
+import { updateById, removeById } from './collection';
 
 export interface DraftProgramData {
   title: string;
@@ -67,17 +68,11 @@ export const useProgramsStore = create<ProgramsState>((set, get) => ({
   },
 
   updateProgram: (id, updates) => {
-    set((state) => ({
-      programs: state.programs.map((p) =>
-        p.id === id ? { ...p, ...updates } : p
-      ),
-    }));
+    set((state) => ({ programs: updateById(state.programs, id, updates) }));
   },
 
   deleteProgram: (id) => {
-    set((state) => ({
-      programs: state.programs.filter((p) => p.id !== id),
-    }));
+    set((state) => ({ programs: removeById(state.programs, id) }));
   },
 
   getProgram: (id) => get().programs.find((p) => p.id === id),
