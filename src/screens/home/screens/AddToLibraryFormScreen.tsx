@@ -19,6 +19,7 @@ import { TRAINING_TYPES } from '../../../constants';
 import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
 import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
 import { useDisclosure } from '../../../hooks/useDisclosure';
+import { useMirror } from '../../../hooks/useMirror';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
@@ -88,17 +89,9 @@ export function AddToLibraryFormScreen() {
   // Mirror form changes back into draftProgramStore so the persisted draft
   // stays current if the user navigates away mid-edit.
   const watchedTitle = watch('title');
-  const watchedTag = watch('tag');
-  const watchedDescription = watch('description');
-  React.useEffect(() => {
-    if (!isEdit) setStoreTitle(watchedTitle);
-  }, [watchedTitle, isEdit, setStoreTitle]);
-  React.useEffect(() => {
-    if (!isEdit) setStoreTag(watchedTag);
-  }, [watchedTag, isEdit, setStoreTag]);
-  React.useEffect(() => {
-    if (!isEdit) setStoreDescription(watchedDescription);
-  }, [watchedDescription, isEdit, setStoreDescription]);
+  useMirror(watchedTitle, !isEdit, setStoreTitle);
+  useMirror(watch('tag'), !isEdit, setStoreTag);
+  useMirror(watch('description'), !isEdit, setStoreDescription);
 
   const tagModal = useDisclosure();
 
