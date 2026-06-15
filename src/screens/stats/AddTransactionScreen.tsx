@@ -20,90 +20,39 @@ import {
   DropdownSelect,
   Button,
   Card,
+  Segmented,
 } from '../../components/ui';
 import { TransactionCard } from './Analytics/TransactionCard';
 import theme from '../../theme';
 const { colors, radius, typography, spacing } = theme;
 import { formatDate, formatTime } from '../../utils';
-import type { Transaction, TransactionType } from '../../types';
-import {
-  TRANSACTION_TYPES,
-  TRANSACTION_STATUSES,
-  PAYMENT_METHODS,
-} from '../../constants/transactions';
-import { useDisclosure } from '../../hooks/ui/useDisclosure';
-import { useDateTimePicker } from '../../hooks/datetime/useDateTimePicker';
+import { TRANSACTION_STATUSES, PAYMENT_METHODS } from '../../constants/transactions';
+import { useTransactionForm } from './useTransactionForm';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
-
-interface SegmentOption {
-  label: string;
-  activeColor?: string;
-}
-
-function Segmented({
-  options,
-  value,
-  onChange,
-}: {
-  options: SegmentOption[];
-  value: number;
-  onChange: (i: number) => void;
-}) {
-  return (
-    <View style={styles.segmented}>
-      {options.map((o, i) => {
-        const active = i === value;
-        return (
-          <TouchableOpacity
-            key={o.label}
-            style={[styles.segment, active && styles.segmentActive]}
-            onPress={() => onChange(i)}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.segmentText,
-                active && { color: o.activeColor ?? colors.text, fontWeight: typography.weights.semibold },
-              ]}
-            >
-              {o.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
 
 export function AddTransactionScreen() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
 
-  const [clientName, setClientName] = React.useState('');
-  const [typeIndex, setTypeIndex] = React.useState(0);
-  const [amount, setAmount] = React.useState('');
-  const [date, setDate] = React.useState(new Date());
-  const [time, setTime] = React.useState(new Date());
-  const [statusIndex, setStatusIndex] = React.useState(0);
-  const [method, setMethod] = React.useState('');
-  const methodMenu = useDisclosure();
-  const datePicker = useDateTimePicker(setDate);
-  const timePicker = useDateTimePicker(setTime);
-
-  const type = TRANSACTION_TYPES[typeIndex] as TransactionType;
-  const status = TRANSACTION_STATUSES[statusIndex];
-
-  const preview: Transaction = {
-    id: 'preview',
-    clientName: clientName || 'Client Name',
-    date: formatDate(date),
-    amount: amount ? (amount.startsWith('$') ? amount : `$${amount}`) : '$40',
-    type,
-    status: status?.value ?? 'completed',
-    ...(typeIndex === 1 ? { sessionsUsed: 0, sessionsTotal: 9 } : {}),
-  };
-
+  const {
+    clientName,
+    setClientName,
+    typeIndex,
+    setTypeIndex,
+    amount,
+    setAmount,
+    date,
+    time,
+    statusIndex,
+    setStatusIndex,
+    method,
+    setMethod,
+    methodMenu,
+    datePicker,
+    timePicker,
+    preview,
+  } = useTransactionForm();
 
   return (
     <View style={styles.container}>
@@ -247,28 +196,6 @@ const styles = StyleSheet.create({
   },
   timeField: {
     minWidth: 0,
-  },
-  segmented: {
-    flexDirection: 'row',
-    backgroundColor: colors.neutral1,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    borderRadius: radius.sm,
-    padding: 2,
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.sm - 2,
-  },
-  segmentActive: {
-    backgroundColor: colors.neutral3,
-  },
-  segmentText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
   },
   picker: {
     backgroundColor: colors.neutral2,

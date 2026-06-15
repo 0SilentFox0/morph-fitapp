@@ -52,3 +52,5 @@ export { PagerDots } from './PagerDots';
 export { PricingInsightHint } from './PricingInsightHint';
 export { StreakBanner } from './StreakBanner';
 export { QuickActions } from './QuickActions';
+export { Segmented } from './Segmented';
+export type { SegmentOption, SegmentedProps } from './Segmented';
