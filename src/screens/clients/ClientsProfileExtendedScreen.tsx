@@ -7,15 +7,16 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
-import { Avatar, SectionTitle, Button, Tag } from '../../components/ui';
+import { Avatar, SectionTitle, Button } from '../../components/ui';
 import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
 import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
+import { NextTrainingCard } from './ClientProfile/NextTrainingCard';
+import { ClientInfoSection } from './ClientProfile/ClientInfoSection';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
@@ -104,50 +105,9 @@ export function ClientsProfileExtendedScreen() {
         <View style={styles.sectionHeader}>
           <SectionTitle style={styles.sectionTitleInline}>Next training</SectionTitle>
         </View>
-        {nextSession ? (
-          <LinearGradient
-            colors={[colors.neutral2, colors.neutral2, 'rgba(140,30,3,0.35)']}
-            locations={[0, 0.55, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.nextCard}
-          >
-            <Text style={styles.nextTitle}>{nextSession.title}</Text>
-            <Tag label={nextSession.type} variant="default" style={styles.nextTag} />
-            <View style={styles.completedRow}>
-              <View style={styles.dateChip}>
-                <Ionicons name="calendar-outline" size={14} color={colors.neutral1} />
-                <Text style={styles.dateChipText}>
-                  {nextSession.date}: {nextSession.time}
-                </Text>
-              </View>
-            </View>
-          </LinearGradient>
-        ) : (
-          <Text style={styles.emptyNote}>No upcoming sessions.</Text>
-        )}
+        <NextTrainingCard session={nextSession} />
 
-        <View style={styles.infoRowFull}>
-          <IconSquare icon="flag" />
-          <Text style={styles.infoLabel}>Target:</Text>
-          <Text style={styles.infoValue}>Fat loss, Endurance</Text>
-        </View>
-        <View style={styles.infoColumns}>
-          <View style={styles.infoCol}>
-            <IconSquare icon="rocket" />
-            <Text style={styles.infoLabel}>Level:</Text>
-            <Text style={styles.infoValue} numberOfLines={1}>
-              Intermediate
-            </Text>
-          </View>
-          <View style={styles.infoCol}>
-            <IconSquare icon="walk" />
-            <Text style={styles.infoLabel}>Type:</Text>
-            <Text style={styles.infoValue} numberOfLines={1}>
-              HIIT, Cardio
-            </Text>
-          </View>
-        </View>
+        <ClientInfoSection />
 
         {chartData && (
           <>
@@ -186,14 +146,6 @@ export function ClientsProfileExtendedScreen() {
         value={undefined}
         onChange={handleStart}
       />
-    </View>
-  );
-}
-
-function IconSquare({ icon }: { icon: keyof typeof Ionicons.glyphMap }) {
-  return (
-    <View style={styles.iconSquare}>
-      <Ionicons name={icon} size={16} color={colors.white} />
     </View>
   );
 }
@@ -244,82 +196,10 @@ const styles = StyleSheet.create({
   sectionTitleInline: {
     marginBottom: spacing.md,
   },
-  nextCard: {
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-    overflow: 'hidden',
-  },
-  nextTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  nextTag: {
-    marginTop: spacing.sm,
-  },
-  completedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  dateChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.neutral9,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-  },
-  dateChipText: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral1,
-  },
   emptyNote: {
     fontSize: typography.sizes.sm,
     color: colors.textMuted,
     marginBottom: spacing.lg,
-  },
-  infoRowFull: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  infoColumns: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  infoCol: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-  },
-  iconSquare: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.sm,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  infoLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
-  },
-  infoValue: {
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-    flexShrink: 1,
   },
   chartCard: {
     backgroundColor: colors.neutral1,
