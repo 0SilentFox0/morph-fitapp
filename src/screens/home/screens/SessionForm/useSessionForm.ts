@@ -1,12 +1,16 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSessionsStore } from '../../../../store/sessionsStore';
-import { useProgramsStore } from '../../../../store/programsStore';
+
 import { useDisclosure } from '../../../../hooks/ui/useDisclosure';
-import { sessionSchema, type SessionFormValues } from '../../../../schemas/session';
-import { formatDate, formatTime, buildParticipants } from '../../../../utils';
-import type { Session, ExerciseSet } from '../../../../types';
+import {
+  type SessionFormValues,
+  sessionSchema,
+} from '../../../../schemas/session';
+import { useProgramsStore } from '../../../../store/programsStore';
+import { useSessionsStore } from '../../../../store/sessionsStore';
+import type { ExerciseSet, Session } from '../../../../types';
+import { buildParticipants, formatDate, formatTime } from '../../../../utils';
 
 /**
  * All session create/edit form orchestration: react-hook-form + zod validation,
@@ -14,9 +18,14 @@ import type { Session, ExerciseSet } from '../../../../types';
  * save handler. `onComplete` runs after a successful save (the screen wires it
  * to navigation), keeping this hook free of navigation context and unit-testable.
  */
-export function useSessionForm(session: Session | undefined, onComplete: () => void) {
+export function useSessionForm(
+  session: Session | undefined,
+  onComplete: () => void
+) {
   const addSession = useSessionsStore((s) => s.addSession);
+
   const updateSession = useSessionsStore((s) => s.updateSession);
+
   const programs = useProgramsStore((s) => s.programs);
 
   const {
@@ -39,20 +48,32 @@ export function useSessionForm(session: Session | undefined, onComplete: () => v
   });
 
   const typePicker = useDisclosure();
+
   const programPicker = useDisclosure();
-  const [plannedSets, setPlannedSets] = React.useState<Record<number, ExerciseSet[]>>({});
+
+  const [plannedSets, setPlannedSets] = React.useState<
+    Record<number, ExerciseSet[]>
+  >({});
 
   const titleValue = watch('title');
+
   const dateValue = watch('date');
+
   const timeValue = watch('time');
+
   const typeValue = watch('type');
+
   const programIdValue = watch('programId');
+
   const participantsValue = watch('participants');
 
   const selectedProgram = programs.find((p) => p.id === programIdValue);
+
   // Progression pre-fill is per-client, so it only applies to Personal (1-participant) sessions.
   const isPersonal = participantsValue.length === 1;
-  const showProgression = isPersonal && (selectedProgram?.exercises?.length ?? 0) > 0;
+
+  const showProgression =
+    isPersonal && (selectedProgram?.exercises?.length ?? 0) > 0;
 
   const onSubmit = (data: SessionFormValues) => {
     const common = {
@@ -64,11 +85,13 @@ export function useSessionForm(session: Session | undefined, onComplete: () => v
       programId: data.programId,
       plannedSets: showProgression ? plannedSets : undefined,
     };
+
     if (session) {
       updateSession(session.id, common);
     } else {
       addSession({ ...common, status: 'pending' });
     }
+
     onComplete();
   };
 

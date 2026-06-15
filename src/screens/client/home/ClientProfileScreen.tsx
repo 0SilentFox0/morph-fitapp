@@ -1,31 +1,44 @@
 import React from 'react';
-import { formatKg } from '../../../utils';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../../components/layout';
 import { Avatar, Button, SectionTitle, Tag } from '../../../components/ui';
 import theme from '../../../theme';
+import { formatKg } from '../../../utils';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { computeTotals } from '../../../utils/progress/muscleStats';
 
-
 export function ClientProfileScreen() {
   const userName = useAppStore((s) => s.userName);
+
   const points = useAppStore((s) => s.points);
+
   const setUserRole = useAppStore((s) => s.setUserRole);
+
   const resetApp = useAppStore((s) => s.reset);
+
   const resetOnboarding = useOnboardingStore((s) => s.reset);
+
   const trainingTypes = useOnboardingStore((s) => s.trainingTypes);
-  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+
+  const getCurrentUserHistory = useTrainingHistoryStore(
+    (s) => s.getCurrentUserHistory
+  );
+
   useTrainingHistoryStore((s) => s.history);
+
   const history = getCurrentUserHistory();
 
   const totals = computeTotals(history);
 
   const handleSwitchToTrainer = () => setUserRole('trainer');
+
   const handleResetOnboarding = () => {
     resetOnboarding();
     resetApp();
@@ -94,14 +107,34 @@ function StatTile({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.md },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.md,
+  },
   header: { alignItems: 'center', gap: 4 },
-  name: { fontSize: typography.sizes['2xl'], fontWeight: typography.weights.bold, color: colors.text, marginTop: spacing.sm },
+  name: {
+    fontSize: typography.sizes['2xl'],
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+    marginTop: spacing.sm,
+  },
   pointsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   points: { fontSize: typography.sizes.sm, color: colors.textSecondary },
   statsRow: { flexDirection: 'row', gap: spacing.sm },
-  statTile: { flex: 1, backgroundColor: colors.cardBg, borderRadius: radius.md, paddingVertical: spacing.md, alignItems: 'center', gap: 2 },
-  statValue: { fontSize: typography.sizes.xl, fontWeight: typography.weights.bold, color: colors.text },
+  statTile: {
+    flex: 1,
+    backgroundColor: colors.cardBg,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    gap: 2,
+  },
+  statValue: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   devSection: { gap: spacing.sm, marginTop: spacing.lg },

@@ -1,12 +1,12 @@
-import { api } from './client';
-import type { Query } from './client';
 import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
 import {
-  ClientSchema,
-  ClientInvitationSchema,
   BodyMeasurementSchema,
+  ClientInvitationSchema,
+  ClientSchema,
   PersonalRecordSchema,
 } from '../../schemas/api/models';
+import type { Query } from './client';
+import { api } from './client';
 
 export interface ClientInput {
   name: string;
@@ -18,7 +18,15 @@ export interface ClientInput {
 }
 
 export interface MeasurementInput {
-  metric_type: 'weight' | 'height' | 'body_fat_percent' | 'chest' | 'waist' | 'hips' | 'biceps' | 'thigh';
+  metric_type:
+    | 'weight'
+    | 'height'
+    | 'body_fat_percent'
+    | 'chest'
+    | 'waist'
+    | 'hips'
+    | 'biceps'
+    | 'thigh';
   value: number;
   unit: string;
   measured_at: string;
@@ -40,16 +48,26 @@ export const archiveClient = (id: string) => api.post(`/clients/${id}/archive`);
 export const restoreClient = (id: string) => api.post(`/clients/${id}/restore`);
 
 export const inviteClient = (id: string) =>
-  api.post(`/clients/${id}/invite`, { schema: dataEnvelope(ClientInvitationSchema) });
+  api.post(`/clients/${id}/invite`, {
+    schema: dataEnvelope(ClientInvitationSchema),
+  });
 
 export const listMeasurements = (clientId: string, query?: Query) =>
-  api.get(`/clients/${clientId}/measurements`, { query, schema: paginatedEnvelope(BodyMeasurementSchema) });
+  api.get(`/clients/${clientId}/measurements`, {
+    query,
+    schema: paginatedEnvelope(BodyMeasurementSchema),
+  });
 
 export const recordMeasurement = (clientId: string, body: MeasurementInput) =>
-  api.post(`/clients/${clientId}/measurements`, { body, schema: dataEnvelope(BodyMeasurementSchema) });
+  api.post(`/clients/${clientId}/measurements`, {
+    body,
+    schema: dataEnvelope(BodyMeasurementSchema),
+  });
 
 export const measurementHistory = (clientId: string, query?: Query) =>
   api.get(`/clients/${clientId}/measurements/history`, { query });
 
 export const listPersonalRecords = (clientId: string) =>
-  api.get(`/clients/${clientId}/personal-records`, { schema: paginatedEnvelope(PersonalRecordSchema) });
+  api.get(`/clients/${clientId}/personal-records`, {
+    schema: paginatedEnvelope(PersonalRecordSchema),
+  });

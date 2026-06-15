@@ -1,7 +1,15 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../theme';
+
 const { colors, radius, typography } = theme;
 
 /**
@@ -35,17 +43,27 @@ export function DatePickerInput({
         onChangeText={onChangeText}
         editable={editable}
       />
-      <Ionicons name="calendar-outline" size={18} color={colors.neutral9} style={styles.icon} />
+      <Ionicons
+        name="calendar-outline"
+        size={18}
+        color={colors.neutral9}
+        style={styles.icon}
+      />
     </>
   );
 
   if (onPress) {
     return (
-      <TouchableOpacity style={[styles.wrapper, style]} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[styles.wrapper, style]}
+        onPress={onPress}
+        activeOpacity={0.8}
+      >
         {content}
       </TouchableOpacity>
     );
   }
+
   return <View style={[styles.wrapper, style]}>{content}</View>;
 }
 

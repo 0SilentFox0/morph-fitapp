@@ -1,19 +1,31 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../../components/layout';
-import { ScheduleCard, SessionOptionsMenu, SearchInput, EmptyState } from '../../../components/ui';
-import { MonthSelector } from './Schedule/MonthSelector';
-import { DayStrip } from './Schedule/DayStrip';
-import { WeekStrip } from './Schedule/WeekStrip';
-import { MonthGrid } from './Schedule/MonthGrid';
-import { WeekColumns } from './Schedule/WeekColumns';
-import { useSchedule } from './Schedule/useSchedule';
-import type { Session } from '../../../types';
+import {
+  EmptyState,
+  ScheduleCard,
+  SearchInput,
+  SessionOptionsMenu,
+} from '../../../components/ui';
+import type { HomeStackParamList } from '../../../navigation/types';
 import theme from '../../../theme';
+import type { Session } from '../../../types';
+import { DayStrip } from './Schedule/DayStrip';
+import { MonthGrid } from './Schedule/MonthGrid';
+import { MonthSelector } from './Schedule/MonthSelector';
+import { useSchedule } from './Schedule/useSchedule';
+import { WeekColumns } from './Schedule/WeekColumns';
+import { WeekStrip } from './Schedule/WeekStrip';
 
 const { colors, typography, spacing } = theme;
 
@@ -21,9 +33,10 @@ type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
 export function ScheduleScreen() {
   const navigation = useNavigation<Nav>();
+
   const openSession = React.useCallback(
     (s: Session) => navigation.navigate('SessionForm', { session: s }),
-    [navigation],
+    [navigation]
   );
 
   const {
@@ -72,7 +85,9 @@ export function ScheduleScreen() {
         style={styles.header}
         onBack={() => navigation.goBack()}
         rightElement={
-          <TouchableOpacity onPress={() => navigation.navigate('SessionForm', {})}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SessionForm', {})}
+          >
             <Ionicons name="add" size={24} color={colors.text} />
           </TouchableOpacity>
         }
@@ -86,7 +101,11 @@ export function ScheduleScreen() {
 
       <View {...swipeHandlers}>
         {viewMode === 'day' && (
-          <DayStrip days={days} selectedIndex={selectedDayIndex} onSelect={setSelectedDayIndex} />
+          <DayStrip
+            days={days}
+            selectedIndex={selectedDayIndex}
+            onSelect={setSelectedDayIndex}
+          />
         )}
 
         {viewMode === 'week' && (
@@ -116,7 +135,11 @@ export function ScheduleScreen() {
       </View>
 
       <View style={styles.searchWrapper}>
-        <SearchInput value={search} onChangeText={setSearch} placeholder="Search" />
+        <SearchInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="Search"
+        />
       </View>
 
       <ScrollView
@@ -138,7 +161,9 @@ export function ScheduleScreen() {
         {viewMode === 'week' && (
           <WeekColumns
             weekDays={weekDays}
-            getSessions={(dateKey) => getSessionsByDateKey(dateKey).filter(matchesSearch)}
+            getSessions={(dateKey) =>
+              getSessionsByDateKey(dateKey).filter(matchesSearch)
+            }
             onSessionPress={openSession}
           />
         )}
@@ -146,7 +171,10 @@ export function ScheduleScreen() {
           monthSelectedKey &&
           (() => {
             const selDay = days.find((d) => d.dateKey === monthSelectedKey);
-            const monthSessions = getSessionsByDateKey(monthSelectedKey).filter(matchesSearch);
+
+            const monthSessions =
+              getSessionsByDateKey(monthSelectedKey).filter(matchesSearch);
+
             return (
               <View style={styles.monthDetail}>
                 <Text style={styles.monthDetailTitle}>

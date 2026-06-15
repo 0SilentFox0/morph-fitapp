@@ -1,54 +1,87 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import type { ProgressStackParamList } from '../../../navigation/types';
-import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { useAppStore } from '../../../store/appStore';
 import { useGamificationStore } from '../../../store/gamificationStore';
-import { activeDayKeys, computeWeekStreak, computeBadges } from '../../../utils/game/achievements';
+import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
+import {
+  activeDayKeys,
+  computeBadges,
+  computeWeekStreak,
+} from '../../../utils/game/achievements';
 import { LEAGUE_TIERS } from '../../../utils/game/leagues';
 
 type Nav = NativeStackNavigationProp<ProgressStackParamList, 'Achievements'>;
 
 const WEEKS = 5;
+
 const DAYS = WEEKS * 7;
+
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export function AchievementsScreen() {
   const navigation = useNavigation<Nav>();
-  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+
+  const getCurrentUserHistory = useTrainingHistoryStore(
+    (s) => s.getCurrentUserHistory
+  );
+
   useTrainingHistoryStore((s) => s.history);
+
   const history = getCurrentUserHistory();
+
   const points = useAppStore((s) => s.points);
+
   const overview = useGamificationStore((s) => s.overview);
+
   const loadOverview = useGamificationStore((s) => s.loadOverview);
 
   useEffect(() => {
     loadOverview();
   }, [loadOverview]);
 
-  const tier = overview ? LEAGUE_TIERS.find((t) => t.key === overview.league.key) : null;
+  const tier = overview
+    ? LEAGUE_TIERS.find((t) => t.key === overview.league.key)
+    : null;
 
   const now = new Date();
+
   const active = activeDayKeys(history);
+
   const streak = computeWeekStreak(history, now);
+
   const badges = computeBadges(history, points, now);
+
   const earnedCount = badges.filter((b) => b.earned).length;
 
   // Build a 5-week grid ending today. Start at the Sunday WEEKS-1 weeks back.
   const gridStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
   gridStart.setDate(gridStart.getDate() - gridStart.getDay() - (WEEKS - 1) * 7);
+
   const days = Array.from({ length: DAYS }, (_, i) => {
     const d = new Date(gridStart);
+
     d.setDate(gridStart.getDate() + i);
+
     return d;
   });
 
@@ -57,17 +90,25 @@ export function AchievementsScreen() {
       <ScreenHeader title="Achievements" transparent />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {tier && overview && (
-          <TouchableOpacity style={styles.leagueCard} onPress={() => navigation.navigate('League')}>
+          <TouchableOpacity
+            style={styles.leagueCard}
+            onPress={() => navigation.navigate('League')}
+          >
             <View style={[styles.leagueBadge, { borderColor: tier.color }]}>
               <Ionicons name={tier.icon} size={26} color={tier.color} />
             </View>
             <View style={styles.leagueText}>
               <Text style={styles.leagueName}>{tier.name} league</Text>
               <Text style={styles.leagueSub}>
-                Top {Math.max(1, Math.round((1 - overview.percentile) * 100))}% · rank #{overview.rank}
+                Top {Math.max(1, Math.round((1 - overview.percentile) * 100))}%
+                · rank #{overview.rank}
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={colors.textMuted}
+            />
           </TouchableOpacity>
         )}
 
@@ -79,7 +120,9 @@ export function AchievementsScreen() {
           </View>
           <View style={styles.statCard}>
             <Ionicons name="medal" size={22} color={colors.accent} />
-            <Text style={styles.statValue}>{earnedCount}/{badges.length}</Text>
+            <Text style={styles.statValue}>
+              {earnedCount}/{badges.length}
+            </Text>
             <Text style={styles.statLabel}>badges</Text>
           </View>
           <View style={styles.statCard}>
@@ -93,13 +136,17 @@ export function AchievementsScreen() {
         <View style={styles.calendarCard}>
           <View style={styles.weekHeader}>
             {WEEKDAY_LABELS.map((l, i) => (
-              <Text key={i} style={styles.weekHeaderText}>{l}</Text>
+              <Text key={i} style={styles.weekHeaderText}>
+                {l}
+              </Text>
             ))}
           </View>
           <View style={styles.calendarGrid}>
             {days.map((d, i) => {
               const isActive = active.has(dayKey(d));
+
               const isToday = dayKey(d) === dayKey(now);
+
               return (
                 <View
                   key={i}
@@ -117,13 +164,23 @@ export function AchievementsScreen() {
         <SectionTitle>Badges</SectionTitle>
         <View style={styles.badgeGrid}>
           {badges.map((b) => (
-            <View key={b.id} style={[styles.badgeCard, !b.earned && styles.badgeLocked]}>
+            <View
+              key={b.id}
+              style={[styles.badgeCard, !b.earned && styles.badgeLocked]}
+            >
               <Ionicons
                 name={b.icon as keyof typeof Ionicons.glyphMap}
                 size={26}
                 color={b.earned ? colors.accent : colors.textMuted}
               />
-              <Text style={[styles.badgeLabel, !b.earned && styles.badgeLabelLocked]}>{b.label}</Text>
+              <Text
+                style={[
+                  styles.badgeLabel,
+                  !b.earned && styles.badgeLabelLocked,
+                ]}
+              >
+                {b.label}
+              </Text>
               <Text style={styles.badgeDesc}>{b.description}</Text>
             </View>
           ))}
@@ -136,7 +193,11 @@ export function AchievementsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.md },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.md,
+  },
   leagueCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -155,7 +216,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral1,
   },
   leagueText: { flex: 1 },
-  leagueName: { fontSize: typography.sizes.base, fontWeight: typography.weights.bold, color: colors.text },
+  leagueName: {
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   leagueSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   statsRow: { flexDirection: 'row', gap: spacing.sm },
   statCard: {
@@ -166,11 +231,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-  statValue: { fontSize: typography.sizes.lg, fontWeight: typography.weights.bold, color: colors.text },
+  statValue: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  calendarCard: { backgroundColor: colors.neutral1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.sm },
+  calendarCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
   weekHeader: { flexDirection: 'row', justifyContent: 'space-around' },
-  weekHeaderText: { flex: 1, textAlign: 'center', fontSize: typography.sizes.xs, color: colors.textMuted },
+  weekHeaderText: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: typography.sizes.xs,
+    color: colors.textMuted,
+  },
   calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   dayCell: {
     width: `${100 / 7}%`,
@@ -192,7 +271,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   badgeLocked: { opacity: 0.55 },
-  badgeLabel: { fontSize: typography.sizes.base, color: colors.text, fontWeight: typography.weights.semibold },
+  badgeLabel: {
+    fontSize: typography.sizes.base,
+    color: colors.text,
+    fontWeight: typography.weights.semibold,
+  },
   badgeLabelLocked: { color: colors.textSecondary },
   badgeDesc: { fontSize: typography.sizes.xs, color: colors.textSecondary },
 });

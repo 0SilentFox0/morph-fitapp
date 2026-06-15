@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { BodyMap } from '../../../../components/ui';
 import theme from '../../../../theme';
+
 const { colors, heatColors, radius, typography, spacing } = theme;
 
 interface BodyMapCardProps {
@@ -12,12 +14,18 @@ interface BodyMapCardProps {
 }
 
 /** Front/back muscle heat-map with a face toggle and a "less → more" legend. */
-export function BodyMapCard({ intensities, view, onViewChange, onMusclePress }: BodyMapCardProps) {
+export function BodyMapCard({
+  intensities,
+  view,
+  onViewChange,
+  onMusclePress,
+}: BodyMapCardProps) {
   return (
     <View style={styles.mapCard}>
       <View style={styles.faceToggle}>
         {(['front', 'back'] as const).map((f) => {
           const active = f === view;
+
           return (
             <TouchableOpacity
               key={f}
@@ -33,13 +41,20 @@ export function BodyMapCard({ intensities, view, onViewChange, onMusclePress }: 
         })}
       </View>
 
-      <BodyMap intensities={intensities} view={view} onMusclePress={onMusclePress} />
+      <BodyMap
+        intensities={intensities}
+        view={view}
+        onMusclePress={onMusclePress}
+      />
 
       <View style={styles.legend}>
         <Text style={styles.legendLabel}>Less</Text>
         <View style={styles.legendBar}>
           {heatColors.map((c) => (
-            <View key={c} style={[styles.legendSwatch, { backgroundColor: c }]} />
+            <View
+              key={c}
+              style={[styles.legendSwatch, { backgroundColor: c }]}
+            />
           ))}
         </View>
         <Text style={styles.legendLabel}>More</Text>
@@ -62,12 +77,23 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     padding: 3,
   },
-  faceBtn: { paddingHorizontal: spacing.lg, paddingVertical: 6, borderRadius: radius.pill },
+  faceBtn: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+  },
   faceBtnActive: { backgroundColor: colors.accent },
   faceText: { fontSize: typography.sizes.sm, color: colors.textSecondary },
-  faceTextActive: { color: colors.white, fontWeight: typography.weights.semibold },
+  faceTextActive: {
+    color: colors.white,
+    fontWeight: typography.weights.semibold,
+  },
   legend: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   legendLabel: { fontSize: typography.sizes.xs, color: colors.textMuted },
-  legendBar: { flexDirection: 'row', borderRadius: radius.sm, overflow: 'hidden' },
+  legendBar: {
+    flexDirection: 'row',
+    borderRadius: radius.sm,
+    overflow: 'hidden',
+  },
   legendSwatch: { width: 22, height: 8 },
 });

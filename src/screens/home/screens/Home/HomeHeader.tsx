@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Avatar } from '../../../../components/ui';
 import theme from '../../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 export interface HomeHeaderProps {
@@ -14,9 +16,16 @@ export interface HomeHeaderProps {
 }
 
 /** Home dashboard top bar: profile shortcut, points pill, notifications. */
-export function HomeHeader({ userName, points, showNotifDot, onProfilePress }: HomeHeaderProps) {
+export function HomeHeader({
+  userName,
+  points,
+  showNotifDot,
+  onProfilePress,
+}: HomeHeaderProps) {
   const insets = useSafeAreaInsets();
+
   const name = userName || 'Trainer';
+
   return (
     <View
       style={[

@@ -42,9 +42,13 @@ function toConsole(event: LogEvent): void {
         : event.level === 'info'
           ? (console.info ?? console.log)
           : (console.debug ?? console.log);
+
   const args: unknown[] = [event.message];
+
   if (event.error !== undefined) args.push(event.error);
+
   if (event.context !== undefined) args.push(event.context);
+
   method(...args);
 }
 
@@ -52,11 +56,13 @@ function emit(event: LogEvent): void {
   if (sink) {
     try {
       sink(event);
+
       return;
     } catch {
       // A logging transport must never crash the app; fall through to console.
     }
   }
+
   toConsole(event);
 }
 
@@ -70,7 +76,11 @@ export const logger = {
   warn(message: string, context?: Record<string, unknown>): void {
     emit({ level: 'warn', message, context });
   },
-  error(message: string, error?: unknown, context?: Record<string, unknown>): void {
+  error(
+    message: string,
+    error?: unknown,
+    context?: Record<string, unknown>
+  ): void {
     emit({ level: 'error', message, error, context });
   },
 };

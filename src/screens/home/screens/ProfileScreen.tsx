@@ -1,21 +1,42 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Card, Tag, Avatar, SectionTitle, Button } from '../../../components/ui';
+import {
+  Avatar,
+  Button,
+  Card,
+  SectionTitle,
+  Tag,
+} from '../../../components/ui';
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
+import { useShallow } from 'zustand/react/shallow';
+
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { useShallow } from 'zustand/react/shallow';
 
 export function ProfileScreen() {
   const navigation = useNavigation();
+
   const userName = useAppStore((s) => s.userName);
+
   const points = useAppStore((s) => s.points);
+
   const resetApp = useAppStore((s) => s.reset);
+
   const setUserRole = useAppStore((s) => s.setUserRole);
+
   const resetOnboarding = useOnboardingStore((s) => s.reset);
 
   // Dev-only: clear the profile so RootNavigator drops back to onboarding,
@@ -28,6 +49,7 @@ export function ProfileScreen() {
   // Dev-only: jump to the client experience without re-onboarding. The client
   // profile has the reverse toggle back to the trainer view.
   const handleSwitchToClient = () => setUserRole('client');
+
   const {
     name,
     profilePhotoUri,
@@ -55,22 +77,29 @@ export function ProfileScreen() {
   );
 
   const displayName = userName || name || 'Trainer';
+
   const displayLocation = locations.length ? locations.join(', ') : 'Not set';
+
   const displayExperience = experienceYears || 'Not set';
+
   const displayAvailability = workDays.length
     ? `${workDays.map((d) => d.slice(0, 3)).join(', ')}: ${workTimeStart} - ${workTimeEnd}`
     : `${workTimeStart} - ${workTimeEnd}`;
+
   const displayTrainingTypes = trainingTypes.length
     ? trainingTypes
     : ['Yoga', 'Cardio', 'HIIT', 'Mobility', 'Strength', 'Pilates'];
+
   const displayClientTypes = clientTypes.length
     ? clientTypes
     : ['Beginners', 'Women 40+', 'Office Workers', 'Athletes'];
+
   const profileTitle = trainingTypes.length
     ? `${trainingTypes.slice(0, 2).join(' & ')} Coach`
     : 'Fitness Coach';
 
   const totalFields = 6;
+
   const filledFields = [
     name.trim().length > 0,
     trainingTypes.length > 0,
@@ -79,6 +108,7 @@ export function ProfileScreen() {
     experienceYears.length > 0,
     profilePhotoUri != null,
   ].filter(Boolean).length;
+
   const completionPct = Math.round((filledFields / totalFields) * 100);
 
   return (
@@ -88,7 +118,10 @@ export function ProfileScreen() {
         showBack
         onBack={() => navigation.goBack()}
         rightElement={
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Edit profile">
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Edit profile"
+          >
             <Ionicons name="pencil" size={24} color={colors.text} />
           </TouchableOpacity>
         }
@@ -137,7 +170,8 @@ export function ProfileScreen() {
           <View style={styles.certRow}>
             <Ionicons name="ribbon" size={20} color={colors.Success} />
             <Text style={styles.certText}>
-              {certifications.length} certification{certifications.length > 1 ? 's' : ''}
+              {certifications.length} certification
+              {certifications.length > 1 ? 's' : ''}
             </Text>
           </View>
         )}
@@ -186,7 +220,10 @@ export function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+  },
   profileHeader: { alignItems: 'center', marginBottom: spacing.xl },
   avatarWrap: { position: 'relative' },
   completionBadge: {
@@ -210,7 +247,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
-  pointsRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.sm },
+  pointsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
   pointsText: {
     fontSize: typography.sizes.sm,
     color: colors.accent,
@@ -231,9 +273,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   certText: { fontSize: typography.sizes.sm, color: colors.Success },
-  card: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.lg },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
   availabilityCard: { backgroundColor: colors.primary2 },
   availabilityText: { fontSize: typography.sizes.base, color: colors.text },
-  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
   devResetBtn: { marginTop: spacing.md },
 });

@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 type Status = 'completed' | 'pending' | 'canceled';

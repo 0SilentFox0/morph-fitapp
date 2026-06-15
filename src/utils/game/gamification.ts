@@ -44,40 +44,58 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 function weekKey(d: Date): string {
   const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
   copy.setDate(copy.getDate() - copy.getDay()); // back to Sunday
+
   return `${copy.getFullYear()}-${copy.getMonth()}-${copy.getDate()}`;
 }
 
 /** Distinct calendar weeks (Sun-anchored) that contain at least one training. */
 export function activeWeeks(history: CompletedTraining[]): number {
   const weeks = new Set<string>();
+
   for (const t of history) {
     const d = new Date(t.date);
+
     if (!Number.isNaN(d.getTime())) weeks.add(weekKey(d));
   }
+
   return weeks.size;
 }
 
 /** Average sessions per active week over a trailing window ending at `now`. */
-export function sessionsPerActiveWeek(history: CompletedTraining[], now: Date): number {
-  const cutoff = now.getTime() - GAMIFICATION_CONFIG.consistency.freqWindowWeeks * WEEK_MS;
+export function sessionsPerActiveWeek(
+  history: CompletedTraining[],
+  now: Date
+): number {
+  const cutoff =
+    now.getTime() - GAMIFICATION_CONFIG.consistency.freqWindowWeeks * WEEK_MS;
+
   const recent = history.filter((t) => {
     const ts = new Date(t.date).getTime();
+
     return !Number.isNaN(ts) && ts >= cutoff;
   });
+
   if (recent.length === 0) return 0;
+
   const weeks = new Set(recent.map((t) => weekKey(new Date(t.date))));
+
   return recent.length / weeks.size;
 }
 
 /** Whole days since the most recent training, or Infinity when there is none. */
 export function daysSinceLast(history: CompletedTraining[], now: Date): number {
   let latest = -Infinity;
+
   for (const t of history) {
     const ts = new Date(t.date).getTime();
+
     if (!Number.isNaN(ts) && ts > latest) latest = ts;
   }
+
   if (latest === -Infinity) return Infinity;
+
   return Math.max(0, (now.getTime() - latest) / (24 * 60 * 60 * 1000));
 }
 
@@ -102,13 +120,18 @@ export interface ConsistencyResult {
 export function computeConsistency(
   history: CompletedTraining[],
   lifetimePoints: number,
-  now: Date,
+  now: Date
 ): ConsistencyResult {
   const c = GAMIFICATION_CONFIG.consistency;
+
   const weeks = activeWeeks(history);
+
   const streak = Math.min(computeWeekStreak(history, now), c.streakCap);
+
   const freq = Math.min(sessionsPerActiveWeek(history, now), c.freqCap);
+
   const dsl = daysSinceLast(history, now);
+
   const decay = dsl === Infinity ? 0 : Math.exp(-dsl / c.tauDays);
 
   const base =
@@ -116,13 +139,20 @@ export function computeConsistency(
     c.wStreak * streak +
     c.wFreq * freq +
     c.wPoints * Math.log1p(Math.max(0, lifetimePoints));
+
   const raw = base * decay;
+
   const normalized = raw / (raw + c.normalizeK);
 
   return {
     raw,
     normalized,
-    parts: { activeWeeks: weeks, streakWeeks: streak, sessionsPerWeek: freq, decay },
+    parts: {
+      activeWeeks: weeks,
+      streakWeeks: streak,
+      sessionsPerWeek: freq,
+      decay,
+    },
   };
 }
 
@@ -130,8 +160,12 @@ export function computeConsistency(
  * Composite score (0..1): consistency-dominant blend of the normalized
  * consistency and the strength percentile (also 0..1).
  */
-export function computeComposite(consistencyNormalized: number, strengthPercentile: number): number {
+export function computeComposite(
+  consistencyNormalized: number,
+  strengthPercentile: number
+): number {
   const { wConsistency, wStrength } = GAMIFICATION_CONFIG.composite;
+
   return wConsistency * consistencyNormalized + wStrength * strengthPercentile;
 }
 
@@ -141,13 +175,16 @@ export function computeComposite(consistencyNormalized: number, strengthPercenti
  */
 export function percentileOf(value: number, pool: number[]): number {
   if (pool.length === 0) return 0;
+
   const below = pool.reduce((n, v) => n + (v < value ? 1 : 0), 0);
+
   return below / pool.length;
 }
 
 /** Points earned so far given completed-session and PR counts (GAME-001). */
 export function pointsFor(sessionCount: number, prCount: number): number {
   const { sessionCompleted, prSet } = GAMIFICATION_CONFIG.points;
+
   return sessionCount * sessionCompleted + prCount * prSet;
 }
 
@@ -163,9 +200,10 @@ export function softCap(value: number, k: number): number {
 export function computeTrainerComposite(
   trainings: number,
   activeClients: number,
-  clientRecords: number,
+  clientRecords: number
 ): number {
   const t = GAMIFICATION_CONFIG.trainer;
+
   return (
     t.wTrainings * softCap(trainings, t.kTrainings) +
     t.wClients * softCap(activeClients, t.kClients) +

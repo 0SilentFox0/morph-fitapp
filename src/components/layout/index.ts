@@ -1,4 +1,4 @@
-export { ScreenHeader } from './ScreenHeader';
+export { OfflineBanner } from './OfflineBanner';
 export { ProgressIndicator } from './ProgressIndicator';
 export { ScreenBackground } from './ScreenBackground';
-export { OfflineBanner } from './OfflineBanner';
+export { ScreenHeader } from './ScreenHeader';

@@ -1,31 +1,41 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ChatStackParamList } from '../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../components/layout';
-import { SearchInput, Avatar } from '../../components/ui';
+import { Avatar, SearchInput } from '../../components/ui';
+import type { ChatStackParamList } from '../../navigation/types';
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
+import { mockClients } from '../../mocks';
 import { useChatStore } from '../../store/chatStore';
 import { searchByName } from '../../utils';
-import { mockClients } from '../../mocks';
 
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'NewChat'>;
 
 export function NewChatScreen() {
   const navigation = useNavigation<Nav>();
-  const getOrCreateConversation = useChatStore((s) => s.getOrCreateConversation);
+
+  const getOrCreateConversation = useChatStore(
+    (s) => s.getOrCreateConversation
+  );
+
   const [search, setSearch] = React.useState('');
 
-  const filteredClients = React.useMemo(() => searchByName(search, mockClients), [search]);
+  const filteredClients = React.useMemo(
+    () => searchByName(search, mockClients),
+    [search]
+  );
 
   const handleSelectClient = (clientId: string, name: string) => {
     const conv = getOrCreateConversation(clientId, {
@@ -33,6 +43,7 @@ export function NewChatScreen() {
       name,
       tint: 'primary',
     });
+
     // Replace this screen so Back returns to the chat list, not the picker.
     navigation.replace('ChatThread', { conversationId: conv.id });
   };
@@ -67,7 +78,11 @@ export function NewChatScreen() {
               <Text style={styles.clientName}>{client.name}</Text>
               <Text style={styles.clientTag}>{client.tag}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={colors.textMuted}
+            />
           </TouchableOpacity>
         ))}
       </ScrollView>

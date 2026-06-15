@@ -1,19 +1,27 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ChatStackParamList } from '../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../components/layout';
-import { SearchInput, Avatar, EmptyState, MessageReceipt } from '../../components/ui';
+import {
+  Avatar,
+  EmptyState,
+  MessageReceipt,
+  SearchInput,
+} from '../../components/ui';
+import type { ChatStackParamList } from '../../navigation/types';
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { useChatStore } from '../../store/chatStore';
 import { formatRelativeTime } from '../../utils';
 
@@ -21,11 +29,14 @@ type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatList'>;
 
 export function ChatListScreen() {
   const navigation = useNavigation<Nav>();
+
   // Subscribe to conversations so list updates when new chats are added
   useChatStore((s) => s.conversations);
+
   const searchConversations = useChatStore((s) => s.searchConversations);
 
   const [search, setSearch] = React.useState('');
+
   const filtered = React.useMemo(
     () => searchConversations(search),
     [search, searchConversations]
@@ -74,7 +85,9 @@ export function ChatListScreen() {
             <TouchableOpacity
               key={conv.id}
               style={styles.convCard}
-              onPress={() => navigation.navigate('ChatThread', { conversationId: conv.id })}
+              onPress={() =>
+                navigation.navigate('ChatThread', { conversationId: conv.id })
+              }
               activeOpacity={0.7}
             >
               <Avatar
@@ -89,7 +102,9 @@ export function ChatListScreen() {
                     {conv.participant.name}
                   </Text>
                   {conv.lastMessageAt && (
-                    <Text style={styles.convTime}>{formatRelativeTime(conv.lastMessageAt)}</Text>
+                    <Text style={styles.convTime}>
+                      {formatRelativeTime(conv.lastMessageAt)}
+                    </Text>
                   )}
                 </View>
                 <View style={styles.convFooter}>

@@ -14,12 +14,15 @@ type Identifiable = { id: string | number };
 export function updateById<T extends Identifiable>(
   items: T[],
   id: NoInfer<T>['id'],
-  updates: Partial<NoInfer<T>>,
+  updates: Partial<NoInfer<T>>
 ): T[] {
   return items.map((item) => (item.id === id ? { ...item, ...updates } : item));
 }
 
 /** New array without the item matching `id`. */
-export function removeById<T extends Identifiable>(items: T[], id: NoInfer<T>['id']): T[] {
+export function removeById<T extends Identifiable>(
+  items: T[],
+  id: NoInfer<T>['id']
+): T[] {
   return items.filter((item) => item.id !== id);
 }

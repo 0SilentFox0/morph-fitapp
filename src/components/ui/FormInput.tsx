@@ -1,6 +1,15 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle,
+} from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, radius, typography } = theme;
 
 /**

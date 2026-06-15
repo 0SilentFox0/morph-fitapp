@@ -1,16 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { Tag } from '../../../components/ui';
-import type { Session } from '../../../types';
 import theme from '../../../theme';
+import type { Session } from '../../../types';
 
 const { colors, radius, typography, spacing } = theme;
 
 /** "Next training" card: the client's upcoming pending session, or an empty note. */
-export function NextTrainingCard({ session }: { session: Session | undefined }) {
-  if (!session) return <Text style={styles.emptyNote}>No upcoming sessions.</Text>;
+export function NextTrainingCard({
+  session,
+}: {
+  session: Session | undefined;
+}) {
+  if (!session)
+    return <Text style={styles.emptyNote}>No upcoming sessions.</Text>;
+
   return (
     <LinearGradient
       colors={[colors.neutral2, colors.neutral2, 'rgba(140,30,3,0.35)']}
@@ -34,11 +41,28 @@ export function NextTrainingCard({ session }: { session: Session | undefined }) 
 }
 
 const styles = StyleSheet.create({
-  emptyNote: { fontSize: typography.sizes.sm, color: colors.textMuted, marginBottom: spacing.lg },
-  nextCard: { borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.lg, overflow: 'hidden' },
-  nextTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.semibold, color: colors.text },
+  emptyNote: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
+    marginBottom: spacing.lg,
+  },
+  nextCard: {
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    overflow: 'hidden',
+  },
+  nextTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.semibold,
+    color: colors.text,
+  },
   nextTag: { marginTop: spacing.sm },
-  completedRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md },
+  completedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
   dateChip: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,15 +1,16 @@
 import { create } from 'zustand';
+
 import {
-  fetchMyGamification,
-  fetchCompositeLeaderboard,
-  fetchCanonicalLeaderboard,
+  type CanonicalExercise,
   fetchCanonicalExercises,
+  fetchCanonicalLeaderboard,
+  fetchCompositeLeaderboard,
+  fetchMyGamification,
   fetchPointsLedger,
   fetchTrainerGamification,
   fetchTrainerLeaderboard,
   type GamificationState,
   type LeaderboardEntry,
-  type CanonicalExercise,
   type PointsLedgerEntry,
   type TrainerGamificationState,
 } from '../services/gamificationApi';
@@ -36,69 +37,79 @@ interface GamificationStoreState {
 
 const MESSAGE = 'Could not load gamification data. Pull to retry.';
 
-export const useGamificationStore = create<GamificationStoreState>((set, get) => ({
-  overview: null,
-  composite: [],
-  canonical: {},
-  canonicalExercises: [],
-  ledger: [],
-  trainerOverview: null,
-  trainerBoard: [],
-  loading: false,
-  error: null,
+export const useGamificationStore = create<GamificationStoreState>(
+  (set, get) => ({
+    overview: null,
+    composite: [],
+    canonical: {},
+    canonicalExercises: [],
+    ledger: [],
+    trainerOverview: null,
+    trainerBoard: [],
+    loading: false,
+    error: null,
 
-  loadOverview: async () => {
-    set({ loading: true, error: null });
-    try {
-      const [overview, canonicalExercises] = await Promise.all([
-        fetchMyGamification(),
-        fetchCanonicalExercises(),
-      ]);
-      set({ overview, canonicalExercises, loading: false });
-    } catch {
-      set({ loading: false, error: MESSAGE });
-    }
-  },
+    loadOverview: async () => {
+      set({ loading: true, error: null });
+      try {
+        const [overview, canonicalExercises] = await Promise.all([
+          fetchMyGamification(),
+          fetchCanonicalExercises(),
+        ]);
 
-  loadComposite: async () => {
-    set({ loading: true, error: null });
-    try {
-      const page = await fetchCompositeLeaderboard();
-      set({ composite: page.data, loading: false });
-    } catch {
-      set({ loading: false, error: MESSAGE });
-    }
-  },
+        set({ overview, canonicalExercises, loading: false });
+      } catch {
+        set({ loading: false, error: MESSAGE });
+      }
+    },
 
-  loadCanonical: async (canonicalKey) => {
-    set({ loading: true, error: null });
-    try {
-      const page = await fetchCanonicalLeaderboard(canonicalKey);
-      set({ canonical: { ...get().canonical, [canonicalKey]: page.data }, loading: false });
-    } catch {
-      set({ loading: false, error: MESSAGE });
-    }
-  },
+    loadComposite: async () => {
+      set({ loading: true, error: null });
+      try {
+        const page = await fetchCompositeLeaderboard();
 
-  loadLedger: async () => {
-    try {
-      const page = await fetchPointsLedger();
-      set({ ledger: page.data });
-    } catch {
-      set({ error: MESSAGE });
-    }
-  },
+        set({ composite: page.data, loading: false });
+      } catch {
+        set({ loading: false, error: MESSAGE });
+      }
+    },
 
-  loadTrainer: async () => {
-    set({ loading: true, error: null });
-    try {
-      const [trainerOverview, board] = await Promise.all([
-        fetchTrainerGamification(),
-        fetchTrainerLeaderboard(),
-      ]);
-      set({ trainerOverview, trainerBoard: board.data, loading: false });
-    } catch {
-      set({ loading: false, error: MESSAGE });
-    }
-  },
-}));
+    loadCanonical: async (canonicalKey) => {
+      set({ loading: true, error: null });
+      try {
+        const page = await fetchCanonicalLeaderboard(canonicalKey);
+
+        set({
+          canonical: { ...get().canonical, [canonicalKey]: page.data },
+          loading: false,
+        });
+      } catch {
+        set({ loading: false, error: MESSAGE });
+      }
+    },
+
+    loadLedger: async () => {
+      try {
+        const page = await fetchPointsLedger();
+
+        set({ ledger: page.data });
+      } catch {
+        set({ error: MESSAGE });
+      }
+    },
+
+    loadTrainer: async () => {
+      set({ loading: true, error: null });
+      try {
+        const [trainerOverview, board] = await Promise.all([
+          fetchTrainerGamification(),
+          fetchTrainerLeaderboard(),
+        ]);
+
+        set({ trainerOverview, trainerBoard: board.data, loading: false });
+      } catch {
+        set({ loading: false, error: MESSAGE });
+      }
+    },
+  })
+);

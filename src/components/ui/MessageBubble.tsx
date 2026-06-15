@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { formatRelativeTime } from '../../utils';
 
 interface MessageBubbleProps {
@@ -17,13 +20,31 @@ interface MessageBubbleProps {
  * neutral-4 (#303030) aligned left. The timestamp sits below the bubble,
  * muted, outside the rounded surface.
  */
-export function MessageBubble({ text, sentAt, isFromMe, style }: MessageBubbleProps) {
+export function MessageBubble({
+  text,
+  sentAt,
+  isFromMe,
+  style,
+}: MessageBubbleProps) {
   return (
-    <View style={[styles.wrapper, isFromMe ? styles.wrapperRight : styles.wrapperLeft, style]}>
-      <View style={[styles.bubble, isFromMe ? styles.bubbleSent : styles.bubbleReceived]}>
+    <View
+      style={[
+        styles.wrapper,
+        isFromMe ? styles.wrapperRight : styles.wrapperLeft,
+        style,
+      ]}
+    >
+      <View
+        style={[
+          styles.bubble,
+          isFromMe ? styles.bubbleSent : styles.bubbleReceived,
+        ]}
+      >
         <Text style={styles.text}>{text}</Text>
       </View>
-      <Text style={[styles.time, isFromMe ? styles.timeRight : styles.timeLeft]}>
+      <Text
+        style={[styles.time, isFromMe ? styles.timeRight : styles.timeLeft]}
+      >
         {formatRelativeTime(sentAt)}
       </Text>
     </View>

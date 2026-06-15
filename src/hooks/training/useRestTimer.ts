@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 
 /**
@@ -9,11 +10,16 @@ import { useActiveTrainingStore } from '../../store/activeTrainingStore';
  */
 export function useRestTimer() {
   const tickRest = useActiveTrainingStore((s) => s.tickRest);
-  const anyRunning = useActiveTrainingStore((s) => s.participants.some((c) => c.rest.running));
+
+  const anyRunning = useActiveTrainingStore((s) =>
+    s.participants.some((c) => c.rest.running)
+  );
 
   useEffect(() => {
     if (!anyRunning) return;
+
     const id = setInterval(() => tickRest(), 1000);
+
     return () => clearInterval(id);
   }, [anyRunning, tickRest]);
 }

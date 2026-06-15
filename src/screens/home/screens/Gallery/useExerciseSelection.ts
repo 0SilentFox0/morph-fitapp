@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { ProgramExercise } from '../../../../types';
 
 /**
@@ -16,10 +17,13 @@ export function useExerciseSelection(draftExercises: ProgramExercise[]) {
   const toggleSelect = React.useCallback(
     (id: number) => {
       if (existingIds.has(id)) return;
+
       setSelected((prev) => {
         const next = new Set(prev);
+
         if (next.has(id)) next.delete(id);
         else next.add(id);
+
         return next;
       });
     },

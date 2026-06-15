@@ -1,19 +1,22 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { AsyncBoundary, Avatar, Card, Tag } from '../../components/ui';
 import type { ClientsStackParamList } from '../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
-import { Card, Tag, Avatar, AsyncBoundary } from '../../components/ui';
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { useAsyncResource } from '../../hooks/data/useAsyncResource';
 import { loadClients } from '../../services/clientsService';
 import { searchItems } from '../../utils';
@@ -22,12 +25,16 @@ type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsList'>;
 
 export function ClientsListScreen() {
   const navigation = useNavigation<Nav>();
+
   const [search, setSearch] = React.useState('');
-  const { data, status, error, refetch } = useAsyncResource(() => loadClients());
+
+  const { data, status, error, refetch } = useAsyncResource(() =>
+    loadClients()
+  );
 
   const clients = React.useMemo(
     () => searchItems(search, data ?? [], (c) => [c.name, c.tag]),
-    [search, data],
+    [search, data]
   );
 
   return (
@@ -73,14 +80,22 @@ export function ClientsListScreen() {
             <Card
               key={client.id}
               style={styles.clientCard}
-              onPress={() => navigation.navigate('ClientsProfileExtended', { clientId: client.id })}
+              onPress={() =>
+                navigation.navigate('ClientsProfileExtended', {
+                  clientId: client.id,
+                })
+              }
             >
               <Avatar name={client.name} size={48} />
               <View style={styles.clientInfo}>
                 <Text style={styles.clientName}>{client.name}</Text>
                 {client.lastSession ? (
                   <View style={styles.clientMeta}>
-                    <Ionicons name="information-circle" size={16} color={colors.textMuted} />
+                    <Ionicons
+                      name="information-circle"
+                      size={16}
+                      color={colors.textMuted}
+                    />
                     <Text style={styles.clientDate}>{client.lastSession}</Text>
                   </View>
                 ) : null}

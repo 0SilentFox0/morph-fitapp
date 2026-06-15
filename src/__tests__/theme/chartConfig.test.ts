@@ -11,6 +11,7 @@ describe('createChartConfig', () => {
 
   it('exposes the chart-kit colour/label callbacks', () => {
     const cfg = createChartConfig();
+
     expect(typeof cfg.color).toBe('function');
     expect(cfg.color(0.5)).toContain('rgba(');
     expect(typeof cfg.labelColor).toBe('function');

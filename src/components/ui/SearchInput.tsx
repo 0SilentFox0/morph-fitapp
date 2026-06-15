@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, TextInput, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../theme';
+
 const { colors, radius, typography } = theme;
 
 /**
@@ -30,7 +32,12 @@ export function SearchInput({
         value={value}
         onChangeText={onChangeText}
       />
-      <Ionicons name="search" size={24} color={colors.neutral9} style={styles.icon} />
+      <Ionicons
+        name="search"
+        size={24}
+        color={colors.neutral9}
+        style={styles.icon}
+      />
     </View>
   );
 }

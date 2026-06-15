@@ -9,13 +9,13 @@ import { MUSCLE_GROUPS } from '../../constants/muscles';
 import type { CompletedTraining } from '../../types';
 import {
   computeMuscleStats,
-  toIntensities,
   computeTotals,
   filterByTimeframe,
   type MuscleStat,
   type MuscleStats,
   type SessionTotals,
   type Timeframe,
+  toIntensities,
 } from './muscleStats';
 
 export interface RankedMuscle {
@@ -40,10 +40,12 @@ export function computeProgressOverview(
   history: CompletedTraining[],
   muscleMap: Record<number, MuscleGroup[]>,
   timeframe: Timeframe,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): ProgressOverview {
   const filtered = filterByTimeframe(history, timeframe, now);
+
   const stats = computeMuscleStats(filtered, muscleMap);
+
   return {
     intensities: toIntensities(stats),
     totals: computeTotals(filtered),

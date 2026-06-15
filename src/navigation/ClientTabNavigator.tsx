@@ -1,20 +1,31 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { getFocusedRouteNameFromRoute, type RouteProp } from '@react-navigation/native';
-import type { ClientTabParamList } from './types';
-import theme from '../theme';
-const { colors, radius } = theme;
-import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon, TrainTabIcon } from '../components/icons/TabBarIcons';
+import {
+  getFocusedRouteNameFromRoute,
+  type RouteProp,
+} from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
 
-import { ChatStackNavigator } from './ChatStackNavigator';
-import { ClientHomeStackNavigator } from './client/ClientHomeStackNavigator';
-import { TrainersStackNavigator } from './client/TrainersStackNavigator';
-import { ProgressStackNavigator } from './client/ProgressStackNavigator';
-import { TrainStackNavigator } from './client/TrainStackNavigator';
+import theme from '../theme';
+import type { ClientTabParamList } from './types';
+
+const { colors, radius } = theme;
+
+import {
+  ChatTabIcon,
+  HomeTabIcon,
+  ProfileTabIcon,
+  StatsTabIcon,
+  TrainTabIcon,
+} from '../components/icons/TabBarIcons';
 import { useChatStore } from '../store/chatStore';
+import { ClientHomeStackNavigator } from './client/ClientHomeStackNavigator';
+import { ProgressStackNavigator } from './client/ProgressStackNavigator';
+import { TrainersStackNavigator } from './client/TrainersStackNavigator';
+import { TrainStackNavigator } from './client/TrainStackNavigator';
+import { ChatStackNavigator } from './ChatStackNavigator';
 
 const Tab = createBottomTabNavigator<ClientTabParamList>();
 
@@ -25,7 +36,9 @@ function TabBarBackground() {
         intensity={80}
         tint="dark"
         style={StyleSheet.absoluteFill}
-        {...(Platform.OS === 'android' && { experimentalBlurMethod: 'dimezisBlurView' as const })}
+        {...(Platform.OS === 'android' && {
+          experimentalBlurMethod: 'dimezisBlurView' as const,
+        })}
       />
       <View style={[StyleSheet.absoluteFill, styles.tabBarOverlay]} />
     </View>
@@ -34,8 +47,15 @@ function TabBarBackground() {
 
 const TAB_BAR_BASE_HEIGHT = 60;
 
-function ChatTabIconWithBadge({ color, focused }: { color: string; focused: boolean }) {
+function ChatTabIconWithBadge({
+  color,
+  focused,
+}: {
+  color: string;
+  focused: boolean;
+}) {
   const unreadCount = useChatStore((s) => s.getUnreadCount());
+
   return (
     <View style={styles.chatIconWrap}>
       <ChatTabIcon color={color} focused={focused} />
@@ -48,7 +68,9 @@ const CHAT_FULLSCREEN_ROUTES = ['ChatThread', 'NewChat'];
 
 export function ClientTabNavigator() {
   const insets = useSafeAreaInsets();
+
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
+
   const baseTabBarStyle = [
     styles.tabBar,
     { height: tabBarHeight, paddingBottom: insets.bottom },
@@ -74,7 +96,9 @@ export function ClientTabNavigator() {
         component={ClientHomeStackNavigator}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ focused, color }) => <HomeTabIcon color={color} focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <HomeTabIcon color={color} focused={focused} />
+          ),
         }}
       />
       <Tab.Screen
@@ -82,7 +106,9 @@ export function ClientTabNavigator() {
         component={TrainersStackNavigator}
         options={{
           tabBarLabel: 'Trainers',
-          tabBarIcon: ({ focused, color }) => <ProfileTabIcon color={color} focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <ProfileTabIcon color={color} focused={focused} />
+          ),
         }}
       />
       <Tab.Screen
@@ -90,14 +116,20 @@ export function ClientTabNavigator() {
         component={TrainStackNavigator}
         options={{
           tabBarLabel: 'Train',
-          tabBarIcon: ({ focused, color }) => <TrainTabIcon color={color} focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TrainTabIcon color={color} focused={focused} />
+          ),
         }}
       />
       <Tab.Screen
         name="ChatTab"
         component={ChatStackNavigator}
         options={({ route }) => {
-          const focused = getFocusedRouteNameFromRoute(route as RouteProp<ClientTabParamList>) ?? '';
+          const focused =
+            getFocusedRouteNameFromRoute(
+              route as RouteProp<ClientTabParamList>
+            ) ?? '';
+
           return {
             tabBarLabel: 'Chat',
             tabBarIcon: ({ focused: tabFocused, color }) => (
@@ -114,7 +146,9 @@ export function ClientTabNavigator() {
         component={ProgressStackNavigator}
         options={{
           tabBarLabel: 'Progress',
-          tabBarIcon: ({ focused, color }) => <StatsTabIcon color={color} focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <StatsTabIcon color={color} focused={focused} />
+          ),
         }}
       />
     </Tab.Navigator>
@@ -140,7 +174,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   tabBarOverlay: {
-    backgroundColor: Platform.OS === 'ios' ? 'rgba(29,29,29,0.35)' : 'rgba(29,29,29,0.92)',
+    backgroundColor:
+      Platform.OS === 'ios' ? 'rgba(29,29,29,0.35)' : 'rgba(29,29,29,0.92)',
   },
   tabBarLabel: { fontSize: 12, fontWeight: '400', lineHeight: 20 },
   tabBarIcon: { marginBottom: 2 },

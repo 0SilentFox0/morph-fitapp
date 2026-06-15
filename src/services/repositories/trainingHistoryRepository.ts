@@ -1,4 +1,4 @@
-import { mockTrainingHistory, CURRENT_USER_NAME } from '../../mocks';
+import { CURRENT_USER_NAME, mockTrainingHistory } from '../../mocks';
 import type { CompletedTraining } from '../../types';
 
 /** Seed completed-training history for the store. Single swap point for the backend. */

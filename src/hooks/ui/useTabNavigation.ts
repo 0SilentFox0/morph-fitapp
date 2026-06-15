@@ -12,5 +12,6 @@ export interface TabNavigation {
  */
 export function useTabNavigation(): TabNavigation | undefined {
   const navigation = useNavigation();
+
   return navigation.getParent() as unknown as TabNavigation | undefined;
 }

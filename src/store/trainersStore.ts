@@ -1,9 +1,10 @@
 import { create } from 'zustand';
+
 import { getSeedTrainers } from '../services/repositories';
-import type { Trainer, ConnectionStatus } from '../types';
+import type { ConnectionStatus, Trainer } from '../types';
 import { searchItems } from '../utils/common/search';
 
-export type { Trainer, ConnectionStatus };
+export type { ConnectionStatus, Trainer };
 
 interface TrainersState {
   trainers: Trainer[];
@@ -35,12 +36,20 @@ export const useTrainersStore = create<TrainersState>((set, get) => ({
     const bySpecialty = specialty
       ? get().trainers.filter((t) => t.specialties.includes(specialty))
       : get().trainers;
-    return searchItems(query, bySpecialty, (t) => [t.name, t.headline, ...t.specialties]);
+
+    return searchItems(query, bySpecialty, (t) => [
+      t.name,
+      t.headline,
+      ...t.specialties,
+    ]);
   },
 
   visibleTrainers: (query) => {
     const { search, filterSpecialty, onlineOnly } = get();
-    return search(query, filterSpecialty).filter((t) => (onlineOnly ? t.online : true));
+
+    return search(query, filterSpecialty).filter((t) =>
+      onlineOnly ? t.online : true
+    );
   },
 
   setFilterSpecialty: (specialty) => set({ filterSpecialty: specialty }),
@@ -48,6 +57,7 @@ export const useTrainersStore = create<TrainersState>((set, get) => ({
   clearFilters: () => set({ filterSpecialty: null, onlineOnly: false }),
   activeFilterCount: () => {
     const { filterSpecialty, onlineOnly } = get();
+
     return (filterSpecialty ? 1 : 0) + (onlineOnly ? 1 : 0);
   },
 
@@ -56,7 +66,7 @@ export const useTrainersStore = create<TrainersState>((set, get) => ({
       trainers: state.trainers.map((t) =>
         t.id === id && t.connection === 'none'
           ? { ...t, connection: 'pending' as ConnectionStatus }
-          : t,
+          : t
       ),
     })),
 }));

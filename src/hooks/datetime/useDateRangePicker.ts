@@ -38,9 +38,13 @@ export interface DateRangePicker {
  */
 export function useDateRangePicker(): DateRangePicker {
   const [timeframe, setTimeframe] = useState(0);
+
   const [customRange, setCustomRange] = useState<DateRange | null>(null);
+
   const [picking, setPicking] = useState<null | 'start' | 'end'>(null);
+
   const [draft, setDraft] = useState(() => new Date());
+
   const [draftStart, setDraftStart] = useState<Date | null>(null);
 
   const openRangePicker = useCallback(() => {
@@ -52,6 +56,7 @@ export function useDateRangePicker(): DateRangePicker {
   const selectTimeframe = useCallback(
     (index: number, isCustom: boolean) => {
       setTimeframe(index);
+
       if (isCustom) {
         // Tapping Custom (even when already active) restarts range selection.
         openRangePicker();
@@ -60,11 +65,12 @@ export function useDateRangePicker(): DateRangePicker {
         setPicking(null);
       }
     },
-    [openRangePicker],
+    [openRangePicker]
   );
 
   const cancel = useCallback(() => {
     setPicking(null);
+
     // Abandoned before ever configuring a range → fall back to the first option.
     if (!customRange) setTimeframe(0);
   }, [customRange]);
@@ -83,13 +89,16 @@ export function useDateRangePicker(): DateRangePicker {
         setPicking('end');
       } else if (picking === 'end') {
         const start = draftStart ?? value;
+
         // Guard against an end earlier than start by swapping.
-        const range = value < start ? { start: value, end: start } : { start, end: value };
+        const range =
+          value < start ? { start: value, end: start } : { start, end: value };
+
         setCustomRange(range);
         setPicking(null);
       }
     },
-    [picking, draftStart],
+    [picking, draftStart]
   );
 
   const handleChange = useCallback(
@@ -97,14 +106,18 @@ export function useDateRangePicker(): DateRangePicker {
       if (Platform.OS === 'android') {
         if (event?.type === 'dismissed' || !selected) {
           cancel();
+
           return;
         }
+
         commit(selected);
+
         return;
       }
+
       if (selected) setDraft(selected);
     },
-    [cancel, commit],
+    [cancel, commit]
   );
 
   return {

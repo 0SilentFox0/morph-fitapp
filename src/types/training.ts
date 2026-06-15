@@ -5,7 +5,12 @@
 
 import type { MuscleGroup } from '../constants/muscles';
 
-export type SetNote = 'regular' | 'failure' | 'dropset' | 'short_rest' | 'long_rest';
+export type SetNote =
+  | 'regular'
+  | 'failure'
+  | 'dropset'
+  | 'short_rest'
+  | 'long_rest';
 
 export interface ExerciseSet {
   weight: number;

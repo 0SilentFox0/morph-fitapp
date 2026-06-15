@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../theme';
+
 const { colors, spacing, radius } = theme;
+
 import { logger } from '../services/logger';
 
 interface Props {
@@ -40,6 +43,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
         </View>
       );
     }
+
     return this.props.children;
   }
 }

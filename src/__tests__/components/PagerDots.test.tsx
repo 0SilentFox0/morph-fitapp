@@ -1,6 +1,7 @@
 // src/__tests__/components/PagerDots.test.tsx
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
+
 import { PagerDots } from '../../components/ui/PagerDots';
 
 describe('PagerDots', () => {

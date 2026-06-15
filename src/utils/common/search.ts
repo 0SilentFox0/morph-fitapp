@@ -18,16 +18,23 @@ export function normalizeQuery(query: string): string {
 export function searchItems<T>(
   query: string,
   items: T[],
-  fields: (item: T) => Array<string | null | undefined>,
+  fields: (item: T) => Array<string | null | undefined>
 ): T[] {
   const q = normalizeQuery(query);
+
   if (!q) return items;
+
   return items.filter((item) =>
-    fields(item).some((value) => value != null && value.toLowerCase().includes(q)),
+    fields(item).some(
+      (value) => value != null && value.toLowerCase().includes(q)
+    )
   );
 }
 
 /** Convenience for the common `{ name: string }` case. */
-export function searchByName<T extends { name: string }>(query: string, items: T[]): T[] {
+export function searchByName<T extends { name: string }>(
+  query: string,
+  items: T[]
+): T[] {
   return searchItems(query, items, (item) => [item.name]);
 }

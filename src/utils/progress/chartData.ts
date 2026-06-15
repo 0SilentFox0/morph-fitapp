@@ -15,9 +15,10 @@ export interface LineChartData {
 export function buildLineChart<T>(
   items: T[],
   label: (item: T) => string,
-  value: (item: T) => number,
+  value: (item: T) => number
 ): LineChartData | null {
   if (items.length === 0) return null;
+
   return {
     labels: items.map(label),
     datasets: [{ data: items.map(value) }],

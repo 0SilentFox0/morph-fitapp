@@ -1,8 +1,12 @@
-import type { ClientTabParamList } from '../../navigation/types';
 import { useTabNavigation } from '../../hooks/ui/useTabNavigation';
+import type { ClientTabParamList } from '../../navigation/types';
 
 /** Tabs reachable by horizontal swipe, left → right (the central "+" is excluded). */
-const SWIPE_ORDER: (keyof ClientTabParamList)[] = ['ClientHomeTab', 'TrainersTab', 'ProgressTab'];
+const SWIPE_ORDER: (keyof ClientTabParamList)[] = [
+  'ClientHomeTab',
+  'TrainersTab',
+  'ProgressTab',
+];
 
 /**
  * Swipe handlers for a client tab's root screen: swipe left advances to the next
@@ -11,16 +15,22 @@ const SWIPE_ORDER: (keyof ClientTabParamList)[] = ['ClientHomeTab', 'TrainersTab
  */
 export function useClientTabSwipe(current: keyof ClientTabParamList) {
   const tabNav = useTabNavigation();
+
   const idx = SWIPE_ORDER.indexOf(current);
 
   const goTo = (i: number) => {
     const target = SWIPE_ORDER[i];
+
     if (!target) return;
+
     tabNav?.navigate(target);
   };
 
   return {
-    onSwipeLeft: idx >= 0 && idx < SWIPE_ORDER.length - 1 ? () => goTo(idx + 1) : undefined,
+    onSwipeLeft:
+      idx >= 0 && idx < SWIPE_ORDER.length - 1
+        ? () => goTo(idx + 1)
+        : undefined,
     onSwipeRight: idx > 0 ? () => goTo(idx - 1) : undefined,
   };
 }

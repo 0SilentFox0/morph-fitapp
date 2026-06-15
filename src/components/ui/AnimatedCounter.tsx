@@ -1,6 +1,7 @@
 // src/components/ui/AnimatedCounter.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Text, type TextProps } from 'react-native';
+
 import { useReduceMotion } from '../../hooks/ui/useReduceMotion';
 
 interface AnimatedCounterProps extends TextProps {
@@ -19,21 +20,37 @@ export function AnimatedCounter({
   ...rest
 }: AnimatedCounterProps) {
   const reduceMotion = useReduceMotion();
+
   // Keep latest formatter without retriggering the animation effect.
   const formatRef = useRef(format);
+
   formatRef.current = format;
 
   const anim = useRef(new Animated.Value(reduceMotion ? value : 0)).current;
-  const [display, setDisplay] = useState(() => formatRef.current(reduceMotion ? value : 0));
+
+  const [display, setDisplay] = useState(() =>
+    formatRef.current(reduceMotion ? value : 0)
+  );
 
   useEffect(() => {
     if (reduceMotion) {
       setDisplay(formatRef.current(value));
+
       return;
     }
-    const id = anim.addListener(({ value: v }) => setDisplay(formatRef.current(Math.round(v))));
-    const animation = Animated.timing(anim, { toValue: value, duration, useNativeDriver: false });
+
+    const id = anim.addListener(({ value: v }) =>
+      setDisplay(formatRef.current(Math.round(v)))
+    );
+
+    const animation = Animated.timing(anim, {
+      toValue: value,
+      duration,
+      useNativeDriver: false,
+    });
+
     animation.start();
+
     return () => {
       animation.stop();
       anim.removeListener(id);

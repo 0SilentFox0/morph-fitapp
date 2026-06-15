@@ -1,9 +1,9 @@
 import { apiReadiness } from '../config/apiReadiness';
-import { withMockFallback } from './mockFallback';
-import * as clientsApi from './api/clients';
 import { mockClients } from '../mocks';
-import type { Client } from '../types';
 import type { Client as ApiClient } from '../schemas/api/models';
+import type { Client } from '../types';
+import * as clientsApi from './api/clients';
+import { withMockFallback } from './mockFallback';
 
 const TYPE_LABELS: Record<ApiClient['type'], string> = {
   personal: 'Personal',
@@ -30,8 +30,9 @@ export async function loadClients(): Promise<Client[]> {
     apiReadiness.clients,
     async () => {
       const res = await clientsApi.listClients({ per_page: 100 });
+
       return res.data.filter((c) => !c.archived_at).map(apiClientToUi);
     },
-    () => mockClients,
+    () => mockClients
   );
 }

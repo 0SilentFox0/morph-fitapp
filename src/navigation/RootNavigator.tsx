@@ -1,23 +1,30 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
+
+import { ConnectionErrorScreen } from '../screens/ConnectionErrorScreen';
 import { useAppStore } from '../store/appStore';
 import { useAuthStore } from '../store/authStore';
-import { OnboardingNavigator } from './OnboardingNavigator';
-import { MainTabNavigator } from './MainTabNavigator';
-import { ClientTabNavigator } from './ClientTabNavigator';
-import { AuthNavigator } from './AuthNavigator';
-import { ConnectionErrorScreen } from '../screens/ConnectionErrorScreen';
 import theme from '../theme';
+import { AuthNavigator } from './AuthNavigator';
+import { ClientTabNavigator } from './ClientTabNavigator';
+import { MainTabNavigator } from './MainTabNavigator';
+import { OnboardingNavigator } from './OnboardingNavigator';
+
 const { colors } = theme;
 
 export function RootNavigator() {
   const status = useAuthStore((state) => state.status);
+
   const isOnboarded = useAppStore((state) => state.isOnboarded);
+
   const userRole = useAppStore((state) => state.userRole);
 
   if (status === 'loading') {
     return (
-      <View testID="root-loading" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        testID="root-loading"
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
         <ActivityIndicator color={colors.accent} />
       </View>
     );

@@ -1,5 +1,9 @@
-import { deriveActiveGroup, seedParticipant, seedCustomParticipant } from '../../utils/training/activeTraining';
-import type { Session, TrainingProgram, ProgramExercise } from '../../types';
+import type { ProgramExercise, Session, TrainingProgram } from '../../types';
+import {
+  deriveActiveGroup,
+  seedCustomParticipant,
+  seedParticipant,
+} from '../../utils/training/activeTraining';
 
 const programs: TrainingProgram[] = [
   {
@@ -10,7 +14,13 @@ const programs: TrainingProgram[] = [
     views: 0,
     likes: 0,
     exercises: [
-      { id: 1, name: 'Ex', category: 'C', imageUrl: null, sets: [{ weight: 40, reps: 10 }] },
+      {
+        id: 1,
+        name: 'Ex',
+        category: 'C',
+        imageUrl: null,
+        sets: [{ weight: 40, reps: 10 }],
+      },
     ],
   },
   {
@@ -20,9 +30,24 @@ const programs: TrainingProgram[] = [
     videoCount: 1,
     views: 0,
     likes: 0,
-    exercises: [{ id: 2, name: 'Ex2', category: 'C', imageUrl: null, sets: [{ weight: 0, reps: 20 }] }],
+    exercises: [
+      {
+        id: 2,
+        name: 'Ex2',
+        category: 'C',
+        imageUrl: null,
+        sets: [{ weight: 0, reps: 20 }],
+      },
+    ],
   },
-  { id: 'p3', name: 'No exercises', tag: 'X', videoCount: 0, views: 0, likes: 0 },
+  {
+    id: 'p3',
+    name: 'No exercises',
+    tag: 'X',
+    videoCount: 0,
+    views: 0,
+    likes: 0,
+  },
 ];
 
 function session(over: Partial<Session>): Session {
@@ -40,26 +65,56 @@ function session(over: Partial<Session>): Session {
 
 describe('deriveActiveGroup', () => {
   it('returns empty when there are no pending sessions today', () => {
-    expect(deriveActiveGroup([session({ status: 'completed' })], programs)).toEqual([]);
-    expect(deriveActiveGroup([session({ date: 'Tomorrow' })], programs)).toEqual([]);
+    expect(
+      deriveActiveGroup([session({ status: 'completed' })], programs)
+    ).toEqual([]);
+    expect(
+      deriveActiveGroup([session({ date: 'Tomorrow' })], programs)
+    ).toEqual([]);
   });
 
   it('groups by time slot and picks the busiest slot', () => {
     const sessions: Session[] = [
-      session({ id: 'a', time: '10:00am', participants: [{ id: 'c1', name: 'Alice' }] }),
-      session({ id: 'b', time: '2:00pm', participants: [{ id: 'c2', name: 'Bob' }], programId: 'p1' }),
-      session({ id: 'c', time: '2:00pm', participants: [{ id: 'c3', name: 'Cara' }], programId: 'p2' }),
+      session({
+        id: 'a',
+        time: '10:00am',
+        participants: [{ id: 'c1', name: 'Alice' }],
+      }),
+      session({
+        id: 'b',
+        time: '2:00pm',
+        participants: [{ id: 'c2', name: 'Bob' }],
+        programId: 'p1',
+      }),
+      session({
+        id: 'c',
+        time: '2:00pm',
+        participants: [{ id: 'c3', name: 'Cara' }],
+        programId: 'p2',
+      }),
     ];
+
     const group = deriveActiveGroup(sessions, programs);
+
     expect(group.map((c) => c.participantId)).toEqual(['c2', 'c3']);
   });
 
   it('assigns each participant its session program, falling back to one with exercises', () => {
     const sessions: Session[] = [
-      session({ id: 'a', participants: [{ id: 'c1', name: 'Alice' }], programId: 'p2' }),
-      session({ id: 'b', participants: [{ id: 'c2', name: 'Bob' }], programId: 'p3' }),
+      session({
+        id: 'a',
+        participants: [{ id: 'c1', name: 'Alice' }],
+        programId: 'p2',
+      }),
+      session({
+        id: 'b',
+        participants: [{ id: 'c2', name: 'Bob' }],
+        programId: 'p3',
+      }),
     ];
+
     const group = deriveActiveGroup(sessions, programs);
+
     expect(group[0]!.programId).toBe('p2');
     expect(['p1', 'p2']).toContain(group[1]!.programId);
   });
@@ -68,12 +123,14 @@ describe('deriveActiveGroup', () => {
 describe('seedParticipant', () => {
   it('copies the program exercises onto the participant', () => {
     const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!);
+
     expect(p.exercises).toHaveLength(1);
     expect(p.programId).toBe('p1');
   });
 
   it('clones each exercise set into the editable setLog', () => {
     const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!);
+
     expect(p.setLog[1]).toEqual([{ weight: 40, reps: 10 }]);
     p.setLog[1]![0]!.weight = 99;
     expect(programs[0]!.exercises![0]!.sets[0]!.weight).toBe(40);
@@ -82,17 +139,23 @@ describe('seedParticipant', () => {
   it('seeds prevSets from the lookup and defaults setLog to previous values', () => {
     const lookup = (_name: string, exerciseId: number) =>
       exerciseId === 1 ? [{ weight: 35, reps: 12 }] : null;
-    const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!, { lookupPrevSets: lookup });
+
+    const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!, {
+      lookupPrevSets: lookup,
+    });
+
     expect(p.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
     expect(p.setLog[1]).toEqual([{ weight: 35, reps: 12 }]);
   });
 
   it('prefers planned sets over previous and template for setLog', () => {
     const lookup = () => [{ weight: 35, reps: 12 }];
+
     const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!, {
       plannedSets: { 1: [{ weight: 50, reps: 9 }] },
       lookupPrevSets: lookup,
     });
+
     expect(p.setLog[1]).toEqual([{ weight: 50, reps: 9 }]);
     expect(p.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
   });
@@ -100,11 +163,18 @@ describe('seedParticipant', () => {
 
 describe('seedCustomParticipant', () => {
   const customExercises: ProgramExercise[] = [
-    { id: 7, name: 'Custom', category: 'C', imageUrl: null, sets: [{ weight: 20, reps: 15 }] },
+    {
+      id: 7,
+      name: 'Custom',
+      category: 'C',
+      imageUrl: null,
+      sets: [{ weight: 20, reps: 15 }],
+    },
   ];
 
   it('builds an ad-hoc participant with programId null and the given exercises', () => {
     const p = seedCustomParticipant({ id: 'me', name: 'You' }, customExercises);
+
     expect(p.programId).toBeNull();
     expect(p.exercises).toHaveLength(1);
     expect(p.setLog[7]).toEqual([{ weight: 20, reps: 15 }]);
@@ -112,6 +182,7 @@ describe('seedCustomParticipant', () => {
 
   it('does not mutate the source exercises', () => {
     const p = seedCustomParticipant({ id: 'me', name: 'You' }, customExercises);
+
     p.setLog[7]![0]!.weight = 99;
     expect(customExercises[0]!.sets[0]!.weight).toBe(20);
   });

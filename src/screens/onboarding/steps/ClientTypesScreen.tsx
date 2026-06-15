@@ -1,6 +1,7 @@
 import React from 'react';
+
+import { CLIENT_LEVELS, CLIENT_TYPES } from '../../../constants';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { CLIENT_TYPES, CLIENT_LEVELS } from '../../../constants';
 import { MultiSelectStep } from '../components/MultiSelectStep';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
@@ -10,10 +11,15 @@ import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
  * level), where picking one option replaces the previous choice.
  */
 export function ClientTypesScreen() {
-  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('ClientTypes');
+  const { navigation, isClient, step, totalSteps } =
+    useOnboardingScreen('ClientTypes');
+
   const clientTypes = useOnboardingStore((s) => s.clientTypes);
+
   const toggleClientType = useOnboardingStore((s) => s.toggleClientType);
+
   const selfLevel = useOnboardingStore((s) => s.selfLevel);
+
   const setField = useOnboardingStore((s) => s.setField);
 
   const goNext = () => navigation.navigate('WhereTrain');
@@ -27,7 +33,9 @@ export function ClientTypesScreen() {
         subtitle="Pick the option that best fits you"
         options={CLIENT_LEVELS}
         selected={selfLevel ? [selfLevel] : []}
-        onToggle={(value) => setField('selfLevel', selfLevel === value ? '' : value)}
+        onToggle={(value) =>
+          setField('selfLevel', selfLevel === value ? '' : value)
+        }
         warning="We recommend selecting your level"
         onNext={goNext}
         onBack={navigation.goBack}

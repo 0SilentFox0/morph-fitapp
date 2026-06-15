@@ -1,17 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../../components/layout';
 import { EmptyState } from '../../../components/ui';
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
-import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
+
 import { exerciseCatalog } from '../../../mocks';
+import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { computePRs } from '../../../utils/progress/personalRecords';
 
 export function PersonalRecordsScreen() {
-  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+  const getCurrentUserHistory = useTrainingHistoryStore(
+    (s) => s.getCurrentUserHistory
+  );
+
   useTrainingHistoryStore((s) => s.history);
+
   const prs = computePRs(getCurrentUserHistory());
 
   return (
@@ -19,13 +26,24 @@ export function PersonalRecordsScreen() {
       <ScreenHeader title="Personal records" transparent />
       {prs.length === 0 ? (
         <View style={styles.emptyWrap}>
-          <EmptyState icon="trophy-outline" title="No records yet" subtitle="Log a few sessions to start setting PRs." />
+          <EmptyState
+            icon="trophy-outline"
+            title="No records yet"
+            subtitle="Log a few sessions to start setting PRs."
+          />
         </View>
       ) : (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.content}
+        >
           {prs.map((pr) => {
-            const name = exerciseCatalog[pr.exerciseId]?.name ?? `Exercise ${pr.exerciseId}`;
+            const name =
+              exerciseCatalog[pr.exerciseId]?.name ??
+              `Exercise ${pr.exerciseId}`;
+
             const isWeighted = pr.maxWeight > 0;
+
             return (
               <View key={pr.exerciseId} style={styles.card}>
                 <View style={styles.iconWrap}>
@@ -56,7 +74,11 @@ export function PersonalRecordsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.sm },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.sm,
+  },
   emptyWrap: { flex: 1, justifyContent: 'center' },
   card: {
     flexDirection: 'row',
@@ -75,7 +97,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardMain: { flex: 1, gap: 2 },
-  name: { fontSize: typography.sizes.base, color: colors.text, fontWeight: typography.weights.semibold },
+  name: {
+    fontSize: typography.sizes.base,
+    color: colors.text,
+    fontWeight: typography.weights.semibold,
+  },
   detail: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  headline: { fontSize: typography.sizes.lg, color: colors.accent, fontWeight: typography.weights.bold },
+  headline: {
+    fontSize: typography.sizes.lg,
+    color: colors.accent,
+    fontWeight: typography.weights.bold,
+  },
 });

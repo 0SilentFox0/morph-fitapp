@@ -1,5 +1,5 @@
-import { apiTransactionToUi } from '../../utils/common/transactions';
 import type { Transaction as ApiTransaction } from '../../schemas/api/models';
+import { apiTransactionToUi } from '../../utils/common/transactions';
 
 const base: ApiTransaction = {
   id: 't1',
@@ -18,6 +18,7 @@ const base: ApiTransaction = {
 describe('apiTransactionToUi', () => {
   it('maps a paid one-off payment to a completed Training row', () => {
     const ui = apiTransactionToUi(base, { c1: 'Sarah Mitchell' });
+
     expect(ui).toMatchObject({
       id: 't1',
       clientName: 'Sarah Mitchell',
@@ -31,18 +32,23 @@ describe('apiTransactionToUi', () => {
   it('maps a package payment to a Subscription row and keeps pending status', () => {
     const ui = apiTransactionToUi(
       { ...base, client_package_id: 'p1', status: 'pending' },
-      { c1: 'Sarah Mitchell' },
+      { c1: 'Sarah Mitchell' }
     );
+
     expect(ui.type).toBe('Subscription');
     expect(ui.status).toBe('pending');
   });
 
   it('falls back to a generic client label when the id is unknown', () => {
     expect(apiTransactionToUi(base, {}).clientName).toBe('Client');
-    expect(apiTransactionToUi({ ...base, client_id: null }).clientName).toBe('Client');
+    expect(apiTransactionToUi({ ...base, client_id: null }).clientName).toBe(
+      'Client'
+    );
   });
 
   it('formats non-USD currency with its symbol', () => {
-    expect(apiTransactionToUi({ ...base, amount: 1500, currency: 'UAH' }, {}).amount).toBe('₴1500');
+    expect(
+      apiTransactionToUi({ ...base, amount: 1500, currency: 'UAH' }, {}).amount
+    ).toBe('₴1500');
   });
 });

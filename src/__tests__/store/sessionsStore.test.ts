@@ -22,23 +22,33 @@ beforeEach(() => {
 describe('useSessionsStore', () => {
   it('addSession appends a session with a unique string id', () => {
     const before = useSessionsStore.getState().sessions.length;
+
     useSessionsStore.getState().addSession(makeSession({ title: 'A' }));
     useSessionsStore.getState().addSession(makeSession({ title: 'B' }));
 
     const sessions = useSessionsStore.getState().sessions;
+
     expect(sessions).toHaveLength(before + 2);
+
     const added = sessions.slice(-2);
+
     expect(typeof added[0]!.id).toBe('string');
     expect(added[0]!.id).not.toBe(added[1]!.id);
   });
 
   it('updateSession merges updates by id', () => {
     useSessionsStore.getState().addSession(makeSession({ title: 'Original' }));
+
     const id = useSessionsStore.getState().sessions.at(-1)!.id;
 
-    useSessionsStore.getState().updateSession(id, { title: 'Renamed', status: 'completed' });
+    useSessionsStore
+      .getState()
+      .updateSession(id, { title: 'Renamed', status: 'completed' });
 
-    const updated = useSessionsStore.getState().sessions.find((s) => s.id === id)!;
+    const updated = useSessionsStore
+      .getState()
+      .sessions.find((s) => s.id === id)!;
+
     expect(updated.title).toBe('Renamed');
     expect(updated.status).toBe('completed');
     expect(updated.type).toBe('Strength');
@@ -46,11 +56,14 @@ describe('useSessionsStore', () => {
 
   it('deleteSession removes the matching session', () => {
     useSessionsStore.getState().addSession(makeSession({ title: 'ToDelete' }));
+
     const id = useSessionsStore.getState().sessions.at(-1)!.id;
 
     useSessionsStore.getState().deleteSession(id);
 
-    expect(useSessionsStore.getState().sessions.some((s) => s.id === id)).toBe(false);
+    expect(useSessionsStore.getState().sessions.some((s) => s.id === id)).toBe(
+      false
+    );
   });
 
   it('searchSessions matches title, type, and participant name; empty query returns all', () => {
@@ -109,6 +122,7 @@ describe('useSessionsStore', () => {
       .getState()
       .getUpcomingSessions()
       .map((s) => s.id);
+
     expect(ids).toEqual(['a', 'c']);
   });
 

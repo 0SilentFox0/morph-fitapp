@@ -1,16 +1,16 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { ClientsStackParamList } from './types';
+
 import { ScreenBackground } from '../components/layout';
 import { useRestTimer } from '../hooks/training/useRestTimer';
-
-import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
-import { FiltersScreen } from '../screens/clients/FiltersScreen';
 import { ClientProfileScreen } from '../screens/clients/ClientProfileScreen';
+import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
+import { ClientsProfileExtendedScreen } from '../screens/clients/ClientsProfileExtendedScreen';
+import { FiltersScreen } from '../screens/clients/FiltersScreen';
 import { ProgramDetailScreen } from '../screens/clients/ProgramDetailScreen';
 import { ExerciseDetailScreen } from '../screens/training/ExerciseDetailScreen';
-import { ClientsProfileExtendedScreen } from '../screens/clients/ClientsProfileExtendedScreen';
 import { TrainingSummaryScreen } from '../screens/training/TrainingSummaryScreen';
+import type { ClientsStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<ClientsStackParamList>();
 
@@ -19,7 +19,9 @@ export function ClientsStackNavigator() {
 
   return (
     <Stack.Navigator
-      screenLayout={({ children }) => <ScreenBackground>{children}</ScreenBackground>}
+      screenLayout={({ children }) => (
+        <ScreenBackground>{children}</ScreenBackground>
+      )}
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',
@@ -33,7 +35,10 @@ export function ClientsStackNavigator() {
       <Stack.Screen name="ClientProfile" component={ClientProfileScreen} />
       <Stack.Screen name="ProgramDetail" component={ProgramDetailScreen} />
       <Stack.Screen name="ExerciseDetail" component={ExerciseDetailScreen} />
-      <Stack.Screen name="ClientsProfileExtended" component={ClientsProfileExtendedScreen} />
+      <Stack.Screen
+        name="ClientsProfileExtended"
+        component={ClientsProfileExtendedScreen}
+      />
       <Stack.Screen name="TrainingSummary" component={TrainingSummaryScreen} />
     </Stack.Navigator>
   );

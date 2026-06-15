@@ -1,7 +1,10 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+
 import theme from '../../../theme';
+
 const { colors, typography, spacing } = theme;
+
 import { OnboardingLayout } from './OnboardingLayout';
 import { OptionGroup, OptionGroupLayout } from './OptionGroup';
 
@@ -50,6 +53,7 @@ export function MultiSelectStep({
 
   const handleNext = () => {
     if (selected.length === 0) setShowWarning(true);
+
     onNext();
   };
 
@@ -63,12 +67,21 @@ export function MultiSelectStep({
       onBack={onBack}
       onSkip={onSkip}
     >
-      <OptionGroup options={options} selected={selected} onToggle={handleToggle} layout={layout} />
+      <OptionGroup
+        options={options}
+        selected={selected}
+        onToggle={handleToggle}
+        layout={layout}
+      />
       {showWarning && <Text style={styles.warning}>{warning}</Text>}
     </OnboardingLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  warning: { fontSize: typography.sizes.xs, color: colors.Warning, marginTop: spacing.md },
+  warning: {
+    fontSize: typography.sizes.xs,
+    color: colors.Warning,
+    marginTop: spacing.md,
+  },
 });

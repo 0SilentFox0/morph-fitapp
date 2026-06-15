@@ -1,5 +1,10 @@
 import React from 'react';
-import { MessageBubble, SessionMessageCard, SystemMessageCard } from '../../../components/ui';
+
+import {
+  MessageBubble,
+  SessionMessageCard,
+  SystemMessageCard,
+} from '../../../components/ui';
 import type { ChatMessage } from '../../../store/chatStore';
 
 interface MessageListProps {
@@ -15,7 +20,12 @@ export function MessageList({ messages, onStartSession }: MessageListProps) {
         switch (msg.kind) {
           case 'text':
             return (
-              <MessageBubble key={msg.id} text={msg.text} sentAt={msg.sentAt} isFromMe={msg.isFromMe} />
+              <MessageBubble
+                key={msg.id}
+                text={msg.text}
+                sentAt={msg.sentAt}
+                isFromMe={msg.isFromMe}
+              />
             );
           case 'session':
             return (

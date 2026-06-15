@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../../theme';
 
 const { colors, radius, typography, spacing } = theme;
@@ -52,7 +53,11 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     marginBottom: spacing.md,
   },
-  infoColumns: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
+  infoColumns: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
   infoCol: {
     flex: 1,
     flexDirection: 'row',
@@ -71,5 +76,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   infoLabel: { fontSize: typography.sizes.sm, color: colors.textSecondary },
-  infoValue: { fontSize: typography.sizes.sm, color: colors.text, flexShrink: 1 },
+  infoValue: {
+    fontSize: typography.sizes.sm,
+    color: colors.text,
+    flexShrink: 1,
+  },
 });

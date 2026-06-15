@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import type { TrainingProgram, ProgramExercise } from '../types';
+
+import type { ProgramExercise, TrainingProgram } from '../types';
 import { searchItems } from '../utils/common/search';
-import { updateById, removeById } from './collection';
+import { removeById, updateById } from './collection';
 
 export interface DraftProgramData {
   title: string;
@@ -30,11 +31,56 @@ const TRAINING_IMAGES = [
 ];
 
 const initialPrograms: TrainingProgram[] = [
-  { id: '1', name: 'HIIT Power', tag: 'HIIT', videoCount: 10, views: 24, likes: 340, thumbnail: TRAINING_IMAGES[0], price: '$5/month' },
-  { id: '2', name: 'Cardio Burn', tag: 'Cardio', videoCount: 8, views: 18, likes: 210, thumbnail: TRAINING_IMAGES[1], price: '$5/month' },
-  { id: '3', name: 'Strength Builder', tag: 'Strength', videoCount: 12, views: 45, likes: 520, thumbnail: TRAINING_IMAGES[2], price: '$5/month' },
-  { id: '4', name: 'Yoga Flow', tag: 'Yoga', videoCount: 15, views: 62, likes: 380, thumbnail: TRAINING_IMAGES[3], price: '$5/month' },
-  { id: '5', name: 'Core Crush', tag: 'HIIT', videoCount: 6, views: 31, likes: 195, thumbnail: TRAINING_IMAGES[4], price: '$5/month' },
+  {
+    id: '1',
+    name: 'HIIT Power',
+    tag: 'HIIT',
+    videoCount: 10,
+    views: 24,
+    likes: 340,
+    thumbnail: TRAINING_IMAGES[0],
+    price: '$5/month',
+  },
+  {
+    id: '2',
+    name: 'Cardio Burn',
+    tag: 'Cardio',
+    videoCount: 8,
+    views: 18,
+    likes: 210,
+    thumbnail: TRAINING_IMAGES[1],
+    price: '$5/month',
+  },
+  {
+    id: '3',
+    name: 'Strength Builder',
+    tag: 'Strength',
+    videoCount: 12,
+    views: 45,
+    likes: 520,
+    thumbnail: TRAINING_IMAGES[2],
+    price: '$5/month',
+  },
+  {
+    id: '4',
+    name: 'Yoga Flow',
+    tag: 'Yoga',
+    videoCount: 15,
+    views: 62,
+    likes: 380,
+    thumbnail: TRAINING_IMAGES[3],
+    price: '$5/month',
+  },
+  {
+    id: '5',
+    name: 'Core Crush',
+    tag: 'HIIT',
+    videoCount: 6,
+    views: 31,
+    likes: 195,
+    thumbnail: TRAINING_IMAGES[4],
+    price: '$5/month',
+  },
 ];
 
 let nextId = 6;
@@ -44,13 +90,17 @@ export const useProgramsStore = create<ProgramsState>((set, get) => ({
 
   addProgram: (program) => {
     const id = String(nextId++);
+
     const thumbIndex = (nextId - 1) % TRAINING_IMAGES.length;
+
     const newProgram: TrainingProgram = {
       ...program,
       id,
       thumbnail: program.thumbnail ?? TRAINING_IMAGES[thumbIndex],
     };
+
     set((state) => ({ programs: [newProgram, ...state.programs] }));
+
     return newProgram;
   },
 
@@ -77,7 +127,8 @@ export const useProgramsStore = create<ProgramsState>((set, get) => ({
 
   getProgram: (id) => get().programs.find((p) => p.id === id),
 
-  searchPrograms: (query) => searchItems(query, get().programs, (p) => [p.name, p.tag]),
+  searchPrograms: (query) =>
+    searchItems(query, get().programs, (p) => [p.name, p.tag]),
 
   setPrograms: (programs) => set({ programs }),
 }));

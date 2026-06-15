@@ -1,6 +1,7 @@
 // src/__tests__/components/ScheduleCard.test.tsx
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
+
 import { ScheduleCard } from '../../components/ui/ScheduleCard';
 import type { Session } from '../../types';
 
@@ -23,7 +24,12 @@ describe('ScheduleCard client variant', () => {
 
   it('hides the options menu and start button', async () => {
     await render(
-      <ScheduleCard session={session} variant="client" onStart={jest.fn()} onOptionsPress={jest.fn()} />,
+      <ScheduleCard
+        session={session}
+        variant="client"
+        onStart={jest.fn()}
+        onOptionsPress={jest.fn()}
+      />
     );
     expect(screen.queryByTestId('schedule-card-options')).toBeNull();
     expect(screen.queryByText('Start training')).toBeNull();
@@ -32,12 +38,24 @@ describe('ScheduleCard client variant', () => {
   it('shows the trainer pill only when trainerName is provided', async () => {
     await render(<ScheduleCard session={session} variant="client" />);
     expect(screen.queryByText('w/ Coach Sam')).toBeNull();
-    await render(<ScheduleCard session={session} variant="client" trainerName="Coach Sam" />);
+    await render(
+      <ScheduleCard
+        session={session}
+        variant="client"
+        trainerName="Coach Sam"
+      />
+    );
     expect(screen.getByText('w/ Coach Sam')).toBeTruthy();
   });
 
   it('trainer variant still shows the options menu', async () => {
-    await render(<ScheduleCard session={session} variant="trainer" onOptionsPress={jest.fn()} />);
+    await render(
+      <ScheduleCard
+        session={session}
+        variant="trainer"
+        onOptionsPress={jest.fn()}
+      />
+    );
     expect(screen.getByTestId('schedule-card-options')).toBeTruthy();
   });
 });

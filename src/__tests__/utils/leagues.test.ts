@@ -1,9 +1,9 @@
 import {
   LEAGUE_TIERS,
-  resolveTier,
   nextTier,
-  tierProgress,
+  resolveTier,
   tierByKey,
+  tierProgress,
 } from '../../utils/game/leagues';
 
 describe('resolveTier', () => {
@@ -53,7 +53,9 @@ describe('tierProgress', () => {
 describe('LEAGUE_TIERS', () => {
   it('tiles [0,1) contiguously with strictly increasing ordinals', () => {
     for (let i = 1; i < LEAGUE_TIERS.length; i++) {
-      expect(LEAGUE_TIERS[i]!.minPercentile).toBeCloseTo(LEAGUE_TIERS[i - 1]!.maxPercentile);
+      expect(LEAGUE_TIERS[i]!.minPercentile).toBeCloseTo(
+        LEAGUE_TIERS[i - 1]!.maxPercentile
+      );
       expect(LEAGUE_TIERS[i]!.ordinal).toBe(LEAGUE_TIERS[i - 1]!.ordinal + 1);
     }
     expect(LEAGUE_TIERS[0]!.minPercentile).toBe(0);

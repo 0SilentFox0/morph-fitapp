@@ -4,6 +4,7 @@ import { formatKg } from '../../utils/format/format';
 describe('numericDate', () => {
   it('formats a parseable date as M/D (local)', () => {
     const d = new Date(2026, 5, 15, 12, 0, 0); // local June 15
+
     expect(numericDate(d.toISOString())).toBe('6/15');
   });
 

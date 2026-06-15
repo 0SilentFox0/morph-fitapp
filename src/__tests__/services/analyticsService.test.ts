@@ -1,7 +1,7 @@
-import { loadBusinessAnalytics } from '../../services/analyticsService';
-import * as transactionsApi from '../../services/api/transactions';
-import * as clientsApi from '../../services/api/clients';
 import { mockAnalyticsData } from '../../mocks';
+import { loadBusinessAnalytics } from '../../services/analyticsService';
+import * as clientsApi from '../../services/api/clients';
+import * as transactionsApi from '../../services/api/transactions';
 
 const apiTx = {
   id: 't1',
@@ -24,9 +24,9 @@ describe('loadBusinessAnalytics', () => {
     jest
       .spyOn(transactionsApi, 'listTransactions')
       .mockResolvedValue({ data: [apiTx] } as never);
-    jest
-      .spyOn(clientsApi, 'listClients')
-      .mockResolvedValue({ data: [{ id: 'c1', name: 'Sarah Mitchell' }] } as never);
+    jest.spyOn(clientsApi, 'listClients').mockResolvedValue({
+      data: [{ id: 'c1', name: 'Sarah Mitchell' }],
+    } as never);
 
     const result = await loadBusinessAnalytics();
 

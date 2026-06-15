@@ -1,7 +1,15 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { Avatar } from './Avatar';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import theme from '../../theme';
+import { Avatar } from './Avatar';
+
 const { colors, typography, spacing } = theme;
 
 export interface SwitcherClient {
@@ -42,7 +50,9 @@ export function ClientSwitcherStrip({
       >
         {clients.map((client) => {
           const active = client.id === activeId;
+
           const firstName = client.name.split(' ')[0];
+
           return (
             <TouchableOpacity
               key={client.id}
@@ -59,7 +69,10 @@ export function ClientSwitcherStrip({
                 )}
               </View>
               <Text
-                style={[styles.name, active ? styles.nameActive : styles.nameInactive]}
+                style={[
+                  styles.name,
+                  active ? styles.nameActive : styles.nameInactive,
+                ]}
                 numberOfLines={1}
               >
                 {firstName}
@@ -68,7 +81,9 @@ export function ClientSwitcherStrip({
           );
         })}
       </ScrollView>
-      {!!activeSubtitle && <Text style={styles.subtitle}>{activeSubtitle}</Text>}
+      {!!activeSubtitle && (
+        <Text style={styles.subtitle}>{activeSubtitle}</Text>
+      )}
     </View>
   );
 }

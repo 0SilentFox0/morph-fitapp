@@ -1,16 +1,18 @@
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { RootNavigator } from './src/navigation/RootNavigator';
-import { useAuthStore } from './src/store/authStore';
-import { ErrorBoundary } from './src/components/ErrorBoundary';
-import { OfflineBanner } from './src/components/layout';
-import { ThemeProvider } from './src/theme/ThemeContext';
-import { colors } from './src/theme/colors';
 // Importing the store registers the API client's connectivity bridge.
 import './src/store/connectivityStore';
+
+import React, { useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { OfflineBanner } from './src/components/layout';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { useAuthStore } from './src/store/authStore';
+import { colors } from './src/theme/colors';
+import { ThemeProvider } from './src/theme/ThemeContext';
 
 const AppTheme = {
   ...DefaultTheme,

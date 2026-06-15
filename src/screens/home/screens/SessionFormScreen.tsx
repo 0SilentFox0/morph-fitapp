@@ -1,36 +1,43 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
+
 import theme from '../../../theme';
+
 const { radius, colors, typography, spacing } = theme;
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { Controller } from 'react-hook-form';
-import { FormInput, DropdownSelect, Button } from '../../../components/ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { Button, DropdownSelect, FormInput } from '../../../components/ui';
 import { TRAINING_TYPES } from '../../../constants';
-import { TypePickerModal } from './SessionForm/TypePickerModal';
-import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
-import { ParticipantsSection } from './SessionForm/ParticipantsSection';
+import type { HomeStackParamList } from '../../../navigation/types';
+import { programMeta } from '../../../utils';
 import { DateTimePickerSection } from './SessionForm/DateTimePickerSection';
 import { ExerciseProgressionSection } from './SessionForm/ExerciseProgressionSection';
+import { ParticipantsSection } from './SessionForm/ParticipantsSection';
+import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
+import { TypePickerModal } from './SessionForm/TypePickerModal';
 import { useSessionForm } from './SessionForm/useSessionForm';
-import { programMeta } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;
 
 export function SessionFormScreen() {
   const navigation = useNavigation<Nav>();
+
   const route = useRoute<SessionFormRoute>();
+
   const insets = useSafeAreaInsets();
+
   const session = route.params?.session;
 
   const {
@@ -54,8 +61,16 @@ export function SessionFormScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md) }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
+      <View
+        style={[
+          styles.header,
+          { paddingTop: Math.max(insets.top, spacing.md) },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.headerBtn}
+        >
           <Ionicons name="chevron-back" size={20} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{titleValue || 'New Session'}</Text>
@@ -93,7 +108,9 @@ export function SessionFormScreen() {
 
         <ParticipantsSection
           value={participantsValue}
-          onChange={(next) => setValue('participants', next, { shouldDirty: true })}
+          onChange={(next) =>
+            setValue('participants', next, { shouldDirty: true })
+          }
         />
 
         <Text style={styles.sectionLabel}>Type</Text>
@@ -108,7 +125,10 @@ export function SessionFormScreen() {
           Program <Text style={styles.required}>*</Text>
         </Text>
         <TouchableOpacity
-          style={[styles.programPicker, errors.programId ? styles.programPickerError : null]}
+          style={[
+            styles.programPicker,
+            errors.programId ? styles.programPickerError : null,
+          ]}
           onPress={programPicker.open}
           activeOpacity={0.8}
         >
@@ -117,15 +137,31 @@ export function SessionFormScreen() {
               <Ionicons name="barbell" size={18} color={colors.accent} />
               <View style={styles.programInfo}>
                 <Text style={styles.programName}>{selectedProgram.name}</Text>
-                <Text style={styles.programMetaText}>{programMeta(selectedProgram)}</Text>
+                <Text style={styles.programMetaText}>
+                  {programMeta(selectedProgram)}
+                </Text>
               </View>
-              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+              <Ionicons
+                name="chevron-down"
+                size={18}
+                color={colors.textMuted}
+              />
             </View>
           ) : (
             <View style={styles.programPlaceholder}>
-              <Ionicons name="barbell-outline" size={18} color={colors.textMuted} />
-              <Text style={styles.programPlaceholderText}>Select a training program</Text>
-              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+              <Ionicons
+                name="barbell-outline"
+                size={18}
+                color={colors.textMuted}
+              />
+              <Text style={styles.programPlaceholderText}>
+                Select a training program
+              </Text>
+              <Ionicons
+                name="chevron-down"
+                size={18}
+                color={colors.textMuted}
+              />
             </View>
           )}
         </TouchableOpacity>
@@ -141,11 +177,7 @@ export function SessionFormScreen() {
           />
         ) : null}
 
-        <Button
-          title="Apply"
-          onPress={submit}
-          style={styles.applyButton}
-        />
+        <Button title="Apply" onPress={submit} style={styles.applyButton} />
       </ScrollView>
 
       <TypePickerModal

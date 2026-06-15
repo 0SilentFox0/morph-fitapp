@@ -1,8 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { useAuthStore } from '../store/authStore';
 import theme from '../theme';
+
 const { colors, spacing, radius } = theme;
 
 /**
@@ -25,10 +33,15 @@ export function ConnectionErrorScreen() {
 
   return (
     <View testID="connection-error" style={styles.container}>
-      <Ionicons name="cloud-offline-outline" size={56} color={colors.textMuted} />
+      <Ionicons
+        name="cloud-offline-outline"
+        size={56}
+        color={colors.textMuted}
+      />
       <Text style={styles.title}>Can&apos;t reach the server</Text>
       <Text style={styles.message}>
-        Check your internet connection and try again. You&apos;re still signed in.
+        Check your internet connection and try again. You&apos;re still signed
+        in.
       </Text>
       <TouchableOpacity
         onPress={retry}

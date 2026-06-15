@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../../theme';
 
 const { colors, radius, typography, spacing } = theme;
@@ -14,11 +15,24 @@ interface MessageInputBarProps {
 }
 
 /** Bottom compose bar: attach button, text field, and send/mic toggle. */
-export function MessageInputBar({ value, onChangeText, onSend, onAttach, bottomInset }: MessageInputBarProps) {
+export function MessageInputBar({
+  value,
+  onChangeText,
+  onSend,
+  onAttach,
+  bottomInset,
+}: MessageInputBarProps) {
   const hasInput = value.trim().length > 0;
+
   return (
-    <View style={[styles.inputRow, { paddingBottom: spacing.md + bottomInset }]}>
-      <TouchableOpacity style={styles.iconBox} onPress={onAttach} activeOpacity={0.7}>
+    <View
+      style={[styles.inputRow, { paddingBottom: spacing.md + bottomInset }]}
+    >
+      <TouchableOpacity
+        style={styles.iconBox}
+        onPress={onAttach}
+        activeOpacity={0.7}
+      >
         <Ionicons name="link-outline" size={24} color={colors.neutral8} />
       </TouchableOpacity>
 
@@ -39,7 +53,11 @@ export function MessageInputBar({ value, onChangeText, onSend, onAttach, bottomI
         disabled={!hasInput}
         activeOpacity={0.7}
       >
-        <Ionicons name={hasInput ? 'send' : 'mic-outline'} size={20} color={hasInput ? colors.accent : colors.neutral8} />
+        <Ionicons
+          name={hasInput ? 'send' : 'mic-outline'}
+          size={20}
+          color={hasInput ? colors.accent : colors.neutral8}
+        />
       </TouchableOpacity>
     </View>
   );

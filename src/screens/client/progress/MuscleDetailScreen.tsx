@@ -1,25 +1,29 @@
 import React from 'react';
-import { numericDate, formatKg } from '../../../utils';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { getChartWidth } from '../../../utils/common/layout';
-import { useRoute, type RouteProp } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
-import type { ProgressStackParamList } from '../../../navigation/types';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { type RouteProp, useRoute } from '@react-navigation/native';
+
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
+import type { ProgressStackParamList } from '../../../navigation/types';
 import theme from '../../../theme';
+import { formatKg, numericDate } from '../../../utils';
+import { getChartWidth } from '../../../utils/common/layout';
+
 const { colors, createChartConfig, radius, typography, spacing } = theme;
-import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
-import { exerciseMuscleMap, exerciseCatalog } from '../../../mocks';
-import type { ExerciseSet } from '../../../types';
-import { computeMuscleStats, muscleTrend } from '../../../utils/progress/muscleStats';
+
 import { MUSCLE_LABELS } from '../../../constants/muscles';
+import { exerciseCatalog, exerciseMuscleMap } from '../../../mocks';
+import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
+import type { ExerciseSet } from '../../../types';
+import {
+  computeMuscleStats,
+  muscleTrend,
+} from '../../../utils/progress/muscleStats';
 
 type Route = RouteProp<ProgressStackParamList, 'MuscleDetail'>;
 
 const chartConfig = createChartConfig();
-
-
 
 function summarizeSets(sets: ExerciseSet[]): string {
   return sets
@@ -29,16 +33,23 @@ function summarizeSets(sets: ExerciseSet[]): string {
 
 export function MuscleDetailScreen() {
   const route = useRoute<Route>();
+
   const muscle = route.params.muscle;
-  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+
+  const getCurrentUserHistory = useTrainingHistoryStore(
+    (s) => s.getCurrentUserHistory
+  );
+
   const history = getCurrentUserHistory();
 
   const { stat, trend, exercises } = React.useMemo(() => {
     const stats = computeMuscleStats(history, exerciseMuscleMap);
+
     const trendPoints = muscleTrend(history, muscle, exerciseMuscleMap);
 
     // Distinct exercises that hit this muscle, with their most recent logged sets.
     const lastSets = new Map<number, ExerciseSet[]>();
+
     for (const training of history) {
       for (const logged of training.exercises) {
         if (exerciseMuscleMap[logged.exerciseId]?.includes(muscle)) {
@@ -46,6 +57,7 @@ export function MuscleDetailScreen() {
         }
       }
     }
+
     return {
       stat: stats[muscle],
       trend: trendPoints,
@@ -95,13 +107,17 @@ export function MuscleDetailScreen() {
 
         <SectionTitle>Exercises</SectionTitle>
         {exercises.length === 0 ? (
-          <Text style={styles.empty}>No exercises logged for this muscle yet.</Text>
+          <Text style={styles.empty}>
+            No exercises logged for this muscle yet.
+          </Text>
         ) : (
           <View style={styles.exerciseList}>
             {exercises.map((ex) => (
               <View key={ex.id} style={styles.exerciseRow}>
                 <Text style={styles.exerciseName}>{ex.name}</Text>
-                <Text style={styles.exerciseSets}>{summarizeSets(ex.sets)}</Text>
+                <Text style={styles.exerciseSets}>
+                  {summarizeSets(ex.sets)}
+                </Text>
               </View>
             ))}
           </View>
@@ -123,7 +139,11 @@ function StatTile({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.md },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.md,
+  },
   statsRow: { flexDirection: 'row', gap: spacing.sm },
   statTile: {
     flex: 1,
@@ -133,9 +153,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-  statValue: { fontSize: typography.sizes.xl, fontWeight: typography.weights.bold, color: colors.text },
+  statValue: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  chartCard: { backgroundColor: colors.neutral1, borderRadius: radius.lg, padding: spacing.md },
+  chartCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+  },
   chart: { borderRadius: radius.sm },
   empty: { color: colors.textSecondary, fontSize: typography.sizes.sm },
   exerciseList: { gap: spacing.xs },
@@ -145,6 +173,10 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: 4,
   },
-  exerciseName: { fontSize: typography.sizes.base, color: colors.text, fontWeight: typography.weights.medium },
+  exerciseName: {
+    fontSize: typography.sizes.base,
+    color: colors.text,
+    fontWeight: typography.weights.medium,
+  },
   exerciseSets: { fontSize: typography.sizes.sm, color: colors.textSecondary },
 });

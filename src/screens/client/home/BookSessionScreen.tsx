@@ -1,35 +1,58 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { ClientHomeStackParamList } from '../../../navigation/types';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Button, SectionTitle, Avatar, Overlay } from '../../../components/ui';
+import { Avatar, Button, Overlay, SectionTitle } from '../../../components/ui';
+import type { ClientHomeStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
 import { DateTimePickerSection } from '../../home/screens/SessionForm/DateTimePickerSection';
 import { TypePickerModal } from '../../home/screens/SessionForm/TypePickerModal';
-import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { TRAINING_TYPES } from '../../../constants';
-import { useTrainersStore } from '../../../store/trainersStore';
-import { useSessionsStore } from '../../../store/sessionsStore';
-import { formatDate, formatTime } from '../../../utils';
 import { useDisclosure } from '../../../hooks/ui/useDisclosure';
+import { useSessionsStore } from '../../../store/sessionsStore';
+import { useTrainersStore } from '../../../store/trainersStore';
+import { formatDate, formatTime } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'BookSession'>;
 type Route = RouteProp<ClientHomeStackParamList, 'BookSession'>;
 
 export function BookSessionScreen() {
   const navigation = useNavigation<Nav>();
+
   const route = useRoute<Route>();
+
   const trainers = useTrainersStore((s) => s.trainers);
+
   const addSession = useSessionsStore((s) => s.addSession);
 
-  const [trainerId, setTrainerId] = React.useState<string | undefined>(route.params?.trainerId);
+  const [trainerId, setTrainerId] = React.useState<string | undefined>(
+    route.params?.trainerId
+  );
+
   const [type, setType] = React.useState<string>(TRAINING_TYPES[0]);
+
   const [date, setDate] = React.useState(new Date());
+
   const [time, setTime] = React.useState(new Date());
+
   const typePicker = useDisclosure();
+
   const trainerPicker = useDisclosure();
 
   const trainer = trainers.find((t) => t.id === trainerId);
@@ -37,15 +60,19 @@ export function BookSessionScreen() {
   const handleRequest = () => {
     if (!trainer) {
       trainerPicker.open();
+
       return;
     }
+
     addSession({
       title: `Session with ${trainer.name}`,
       type,
       date: formatDate(date),
       time: formatTime(time),
       status: 'pending',
-      participants: [{ id: trainer.id, name: trainer.name, avatar: trainer.avatar }],
+      participants: [
+        { id: trainer.id, name: trainer.name, avatar: trainer.avatar },
+      ],
     });
     navigation.navigate('RequestSubmitted');
   };
@@ -85,11 +112,21 @@ export function BookSessionScreen() {
         </TouchableOpacity>
 
         <SectionTitle>When</SectionTitle>
-        <DateTimePickerSection date={date} time={time} onDateChange={setDate} onTimeChange={setTime} />
+        <DateTimePickerSection
+          date={date}
+          time={time}
+          onDateChange={setDate}
+          onTimeChange={setTime}
+        />
 
-        <Button title="Send request" onPress={handleRequest} style={styles.submit} />
+        <Button
+          title="Send request"
+          onPress={handleRequest}
+          style={styles.submit}
+        />
         <Text style={styles.hint}>
-          Your trainer will confirm the session. You can track its status on your home screen.
+          Your trainer will confirm the session. You can track its status on
+          your home screen.
         </Text>
       </ScrollView>
 
@@ -119,7 +156,9 @@ export function BookSessionScreen() {
                 <Text style={styles.selectValue}>{t.name}</Text>
                 <Text style={styles.selectSub}>{t.headline}</Text>
               </View>
-              {t.id === trainerId && <Ionicons name="checkmark" size={18} color={colors.accent} />}
+              {t.id === trainerId && (
+                <Ionicons name="checkmark" size={18} color={colors.accent} />
+              )}
             </TouchableOpacity>
           ))}
         </View>
@@ -131,7 +170,11 @@ export function BookSessionScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.sm },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.sm,
+  },
   selectRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -140,12 +183,21 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
   },
-  trainerSelected: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  trainerSelected: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   selectValue: { fontSize: typography.sizes.base, color: colors.text },
   selectSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   placeholder: { fontSize: typography.sizes.base, color: colors.textMuted },
   submit: { marginTop: spacing.lg },
-  hint: { fontSize: typography.sizes.xs, color: colors.textMuted, textAlign: 'center', marginTop: spacing.sm },
+  hint: {
+    fontSize: typography.sizes.xs,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   pickerSheet: {
     gap: spacing.sm,
     width: '86%',
@@ -153,7 +205,17 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.lg,
   },
-  pickerTitle: { fontSize: typography.sizes.lg, color: colors.text, fontWeight: typography.weights.semibold, marginBottom: spacing.xs },
-  pickerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.sm },
+  pickerTitle: {
+    fontSize: typography.sizes.lg,
+    color: colors.text,
+    fontWeight: typography.weights.semibold,
+    marginBottom: spacing.xs,
+  },
+  pickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
   pickerRowMain: { flex: 1 },
 });

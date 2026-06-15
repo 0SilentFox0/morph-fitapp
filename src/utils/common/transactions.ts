@@ -1,13 +1,20 @@
 import { Alert, Share } from 'react-native';
-import type { Transaction, TransactionStatus } from '../../types';
+
 import type { Transaction as ApiTransaction } from '../../schemas/api/models';
+import type { Transaction, TransactionStatus } from '../../types';
 import { formatDate } from '../format/date';
 
-const CURRENCY_SYMBOLS: Record<string, string> = { USD: '$', EUR: '€', UAH: '₴', GBP: '£' };
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  EUR: '€',
+  UAH: '₴',
+  GBP: '£',
+};
 
 /** "$65" / "₴1500" — symbol when known, otherwise the ISO code as a prefix. */
 function formatMoney(amount: number, currency: string): string {
   const symbol = CURRENCY_SYMBOLS[currency] ?? `${currency} `;
+
   return `${symbol}${amount}`;
 }
 
@@ -24,7 +31,7 @@ const STATUS_MAP: Record<ApiTransaction['status'], TransactionStatus> = {
  */
 export function apiTransactionToUi(
   t: ApiTransaction,
-  clientNameById: Record<string, string> = {},
+  clientNameById: Record<string, string> = {}
 ): Transaction {
   return {
     id: t.id,
@@ -39,9 +46,11 @@ export function apiTransactionToUi(
 /** Serialize transactions to a CSV string (one header row + one row per item). */
 export function transactionsToCsv(transactions: Transaction[]): string {
   const header = 'Client,Date,Amount,Type,Status';
+
   const rows = transactions.map((t) =>
     [t.clientName, t.date, t.amount, t.type, t.status].join(',')
   );
+
   return [header, ...rows].join('\n');
 }
 
@@ -49,13 +58,18 @@ export function transactionsToCsv(transactions: Transaction[]): string {
  * Export the given transactions via the native share sheet (CSV payload).
  * Used by the "download" action on the analytics / transactions screens.
  */
-export async function exportTransactions(transactions: Transaction[]): Promise<void> {
+export async function exportTransactions(
+  transactions: Transaction[]
+): Promise<void> {
   try {
     await Share.share({
       title: 'Transactions export',
       message: transactionsToCsv(transactions),
     });
   } catch {
-    Alert.alert('Export failed', 'Could not export transactions. Please try again.');
+    Alert.alert(
+      'Export failed',
+      'Could not export transactions. Please try again.'
+    );
   }
 }

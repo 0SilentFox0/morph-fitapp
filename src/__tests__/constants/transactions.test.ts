@@ -1,6 +1,6 @@
 import {
-  TRANSACTION_STATUSES,
   TRANSACTION_STATUS_COLORS,
+  TRANSACTION_STATUSES,
 } from '../../constants/transactions';
 
 describe('transaction constants', () => {
@@ -12,7 +12,7 @@ describe('transaction constants', () => {
 
   it('covers every status with a color', () => {
     expect(Object.keys(TRANSACTION_STATUS_COLORS).sort()).toEqual(
-      TRANSACTION_STATUSES.map((s) => s.value).sort(),
+      TRANSACTION_STATUSES.map((s) => s.value).sort()
     );
   });
 });

@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+
 import { ClientTypesScreen } from '../../../../screens/onboarding/steps/ClientTypesScreen';
 import { useAppStore } from '../../../../store/appStore';
 import { useOnboardingStore } from '../../../../store/onboardingStore';
 
 const mockNavigate = jest.fn();
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate, goBack: jest.fn() }),
 }));
@@ -43,7 +45,10 @@ describe('ClientTypesScreen', () => {
 
     await press('Beginners');
     await press('Pro');
-    expect(useOnboardingStore.getState().clientTypes).toEqual(['Beginners', 'Pro']);
+    expect(useOnboardingStore.getState().clientTypes).toEqual([
+      'Beginners',
+      'Pro',
+    ]);
   });
 
   it('advances to WhereTrain on Next', async () => {

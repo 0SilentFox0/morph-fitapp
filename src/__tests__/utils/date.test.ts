@@ -1,9 +1,9 @@
 import {
-  formatDate,
-  formatTime,
-  formatShortDate,
-  formatRelativeTime,
   DAY_MS,
+  formatDate,
+  formatRelativeTime,
+  formatShortDate,
+  formatTime,
 } from '../../utils/format/date';
 
 describe('formatDate', () => {
@@ -19,16 +19,19 @@ describe('formatDate', () => {
 describe('formatTime', () => {
   it('formats midnight as 12:00am', () => {
     const d = new Date(2026, 0, 1, 0, 0);
+
     expect(formatTime(d)).toBe('12:00am');
   });
 
   it('formats noon as 12:00pm', () => {
     const d = new Date(2026, 0, 1, 12, 0);
+
     expect(formatTime(d)).toBe('12:00pm');
   });
 
   it('pads minutes and uses 12-hour clock', () => {
     const d = new Date(2026, 0, 1, 13, 5);
+
     expect(formatTime(d)).toBe('1:05pm');
   });
 
@@ -58,22 +61,25 @@ describe('formatRelativeTime', () => {
 
   it('shows clock time for timestamps within the last day', () => {
     const earlier = new Date(2026, 0, 10, 9, 30);
+
     expect(formatRelativeTime(earlier, now)).toBe(
-      earlier.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      earlier.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     );
   });
 
   it('shows the weekday within the last week', () => {
     const threeDaysAgo = new Date(now.getTime() - 3 * DAY_MS);
+
     expect(formatRelativeTime(threeDaysAgo, now)).toBe(
-      threeDaysAgo.toLocaleDateString([], { weekday: 'short' }),
+      threeDaysAgo.toLocaleDateString([], { weekday: 'short' })
     );
   });
 
   it('shows a short month/day for older timestamps', () => {
     const twoWeeksAgo = new Date(now.getTime() - 14 * DAY_MS);
+
     expect(formatRelativeTime(twoWeeksAgo, now)).toBe(
-      twoWeeksAgo.toLocaleDateString([], { month: 'short', day: 'numeric' }),
+      twoWeeksAgo.toLocaleDateString([], { month: 'short', day: 'numeric' })
     );
   });
 

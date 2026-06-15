@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { zustandStorage } from '../services/storage';
-import type { ProgramExercise, ExerciseSet } from '../types';
-import { updateById, removeById } from './collection';
+import type { ExerciseSet, ProgramExercise } from '../types';
+import { removeById, updateById } from './collection';
 
 interface DraftProgramState {
   title: string;
@@ -19,11 +20,18 @@ interface DraftProgramState {
   updateExerciseSets: (id: number, sets: ExerciseSet[]) => void;
   addSet: (exerciseId: number) => void;
   removeSet: (exerciseId: number, setIndex: number) => void;
-  updateSet: (exerciseId: number, setIndex: number, update: Partial<ExerciseSet>) => void;
+  updateSet: (
+    exerciseId: number,
+    setIndex: number,
+    update: Partial<ExerciseSet>
+  ) => void;
   reset: () => void;
 }
 
-const INITIAL: Pick<DraftProgramState, 'title' | 'tag' | 'description' | 'exercises'> = {
+const INITIAL: Pick<
+  DraftProgramState,
+  'title' | 'tag' | 'description' | 'exercises'
+> = {
   title: '',
   tag: 'Cardio',
   description: '',
@@ -43,7 +51,9 @@ export const useDraftProgramStore = create<DraftProgramState>()(
       addExercises: (newExercises) =>
         set((s) => {
           const existingIds = new Set(s.exercises.map((e) => e.id));
+
           const unique = newExercises.filter((e) => !existingIds.has(e.id));
+
           return { exercises: [...s.exercises, ...unique] };
         }),
 
@@ -57,10 +67,15 @@ export const useDraftProgramStore = create<DraftProgramState>()(
         set((s) => ({
           exercises: s.exercises.map((e) => {
             if (e.id !== exerciseId) return e;
+
             const lastSet = e.sets[e.sets.length - 1];
+
             return {
               ...e,
-              sets: [...e.sets, { weight: lastSet?.weight ?? 20, reps: lastSet?.reps ?? 10 }],
+              sets: [
+                ...e.sets,
+                { weight: lastSet?.weight ?? 20, reps: lastSet?.reps ?? 10 },
+              ],
             };
           }),
         })),
@@ -69,7 +84,9 @@ export const useDraftProgramStore = create<DraftProgramState>()(
         set((s) => ({
           exercises: s.exercises.map((e) => {
             if (e.id !== exerciseId) return e;
+
             if (e.sets.length <= 1) return e;
+
             return { ...e, sets: e.sets.filter((_, i) => i !== setIndex) };
           }),
         })),
@@ -78,9 +95,12 @@ export const useDraftProgramStore = create<DraftProgramState>()(
         set((s) => ({
           exercises: s.exercises.map((e) => {
             if (e.id !== exerciseId) return e;
+
             return {
               ...e,
-              sets: e.sets.map((st, i) => (i === setIndex ? { ...st, ...update } : st)),
+              sets: e.sets.map((st, i) =>
+                i === setIndex ? { ...st, ...update } : st
+              ),
             };
           }),
         })),
@@ -96,6 +116,6 @@ export const useDraftProgramStore = create<DraftProgramState>()(
         description: state.description,
         exercises: state.exercises,
       }),
-    },
-  ),
+    }
+  )
 );

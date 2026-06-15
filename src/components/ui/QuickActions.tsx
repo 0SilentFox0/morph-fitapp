@@ -1,8 +1,10 @@
 // src/components/ui/QuickActions.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../theme';
+
 const { colors, spacing, radius, typography } = theme;
 
 interface QuickActionsProps {
@@ -12,11 +14,25 @@ interface QuickActionsProps {
 }
 
 /** Row of one-tap shortcuts to the most common client tasks. */
-export function QuickActions({ onBook, onMessage, onProgress }: QuickActionsProps) {
+export function QuickActions({
+  onBook,
+  onMessage,
+  onProgress,
+}: QuickActionsProps) {
   const items = [
     { key: 'book', icon: 'add-circle-outline', label: 'Book', onPress: onBook },
-    { key: 'message', icon: 'chatbubble-ellipses-outline', label: 'Message', onPress: onMessage },
-    { key: 'progress', icon: 'stats-chart-outline', label: 'Progress', onPress: onProgress },
+    {
+      key: 'message',
+      icon: 'chatbubble-ellipses-outline',
+      label: 'Message',
+      onPress: onMessage,
+    },
+    {
+      key: 'progress',
+      icon: 'stats-chart-outline',
+      label: 'Progress',
+      onPress: onProgress,
+    },
   ] as const;
 
   return (

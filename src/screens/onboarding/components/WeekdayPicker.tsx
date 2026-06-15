@@ -1,11 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
-import { useOnboardingStore } from '../../../store/onboardingStore';
+
 import { useShallow } from 'zustand/react/shallow';
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+import { useOnboardingStore } from '../../../store/onboardingStore';
+
+const DAYS = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
 const DAY_SHORT: Record<string, string> = {
   Monday: 'Mon',
   Tuesday: 'Tue',
@@ -19,13 +32,17 @@ const DAY_SHORT: Record<string, string> = {
 /** Weekday multi-select chips for the onboarding schedule step. */
 export function WeekdayPicker() {
   const { workDays, toggleWorkDay } = useOnboardingStore(
-    useShallow((s) => ({ workDays: s.workDays, toggleWorkDay: s.toggleWorkDay }))
+    useShallow((s) => ({
+      workDays: s.workDays,
+      toggleWorkDay: s.toggleWorkDay,
+    }))
   );
 
   return (
     <View style={styles.daysRow}>
       {DAYS.map((day) => {
         const sel = workDays.includes(day);
+
         return (
           <TouchableOpacity
             key={day}
@@ -35,7 +52,9 @@ export function WeekdayPicker() {
             accessibilityState={{ checked: sel }}
             accessibilityLabel={day}
           >
-            <Text style={[styles.dayText, sel && styles.dayTextSelected]}>{DAY_SHORT[day]}</Text>
+            <Text style={[styles.dayText, sel && styles.dayTextSelected]}>
+              {DAY_SHORT[day]}
+            </Text>
           </TouchableOpacity>
         );
       })}
@@ -44,7 +63,12 @@ export function WeekdayPicker() {
 }
 
 const styles = StyleSheet.create({
-  daysRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
+  daysRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
   dayChip: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,

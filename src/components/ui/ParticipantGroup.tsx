@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Avatar } from './Avatar';
+import { StyleSheet, Text, View } from 'react-native';
+
 import theme from '../../theme';
+import { Avatar } from './Avatar';
+
 const { colors, typography, spacing, radius } = theme;
 
 export interface ParticipantInfo {
@@ -23,7 +25,9 @@ export const ParticipantGroup = React.memo(function ParticipantGroup({
 
   if (participants.length === 1) {
     const first = participants[0];
+
     if (!first) return null;
+
     return (
       <View style={styles.singleTag}>
         <Avatar name={first.name} uri={first.avatar} size={18} />
@@ -33,6 +37,7 @@ export const ParticipantGroup = React.memo(function ParticipantGroup({
   }
 
   const visible = participants.slice(0, maxVisible);
+
   const overflow = participants.length - maxVisible;
 
   return (

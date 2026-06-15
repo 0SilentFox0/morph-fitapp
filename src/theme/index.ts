@@ -1,18 +1,18 @@
-import { colors, heatColors } from './colors';
-import { typography } from './typography';
-import { spacing } from './spacing';
-import { radius } from './radius';
 import { createChartConfig } from './chartConfig';
+import { colors, heatColors } from './colors';
+import { radius } from './radius';
+import { spacing } from './spacing';
+import { typography } from './typography';
 
-export { colors, heatColors } from './colors';
-export type { ColorToken } from './colors';
-export { typography } from './typography';
-export { spacing } from './spacing';
-export { radius } from './radius';
-export { darkTheme } from './themes';
-export type { ThemeColors } from './themes';
-export { ThemeProvider, useTheme } from './ThemeContext';
 export { createChartConfig } from './chartConfig';
+export type { ColorToken } from './colors';
+export { colors, heatColors } from './colors';
+export { radius } from './radius';
+export { spacing } from './spacing';
+export { ThemeProvider, useTheme } from './ThemeContext';
+export type { ThemeColors } from './themes';
+export { darkTheme } from './themes';
+export { typography } from './typography';
 
 /**
  * Aggregated design tokens for grouped consumption:
@@ -20,5 +20,13 @@ export { createChartConfig } from './chartConfig';
  *   import theme from '../../theme';
  *   const { colors, spacing, typography, radius } = theme;
  */
-const theme = { colors, heatColors, typography, spacing, radius, createChartConfig };
+const theme = {
+  colors,
+  heatColors,
+  typography,
+  spacing,
+  radius,
+  createChartConfig,
+};
+
 export default theme;

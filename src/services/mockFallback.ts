@@ -8,7 +8,7 @@
 export async function withMockFallback<T>(
   ready: boolean,
   live: () => Promise<T>,
-  mock: () => T | Promise<T>,
+  mock: () => T | Promise<T>
 ): Promise<T> {
   return ready ? live() : mock();
 }

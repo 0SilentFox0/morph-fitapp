@@ -1,16 +1,23 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
 import { Button, ChoiceCard } from '../../../components/ui';
 import theme from '../../../theme';
+
 const { spacing } = theme;
+
 import { useAppStore } from '../../../store/appStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function ChooseRoleScreen() {
   const { navigation } = useOnboardingScreen('ChooseRole');
+
   const setUserRole = useAppStore((s) => s.setUserRole);
-  const [selected, setSelected] = React.useState<'client' | 'trainer'>('trainer');
+
+  const [selected, setSelected] = React.useState<'client' | 'trainer'>(
+    'trainer'
+  );
 
   const handleApply = (role: 'client' | 'trainer') => {
     setUserRole(role);
@@ -42,7 +49,11 @@ export function ChooseRoleScreen() {
         />
       </View>
 
-      <Button title="Continue" onPress={() => handleApply(selected)} style={styles.button} />
+      <Button
+        title="Continue"
+        onPress={() => handleApply(selected)}
+        style={styles.button}
+      />
     </OnboardingLayout>
   );
 }

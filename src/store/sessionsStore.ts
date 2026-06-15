@@ -1,8 +1,9 @@
 import { create } from 'zustand';
+
 import { getSeedSessions } from '../services/repositories';
 import type { Session, SessionStatus } from '../types';
 import { searchItems } from '../utils/common/search';
-import { updateById, removeById } from './collection';
+import { removeById, updateById } from './collection';
 
 export type { Session, SessionStatus };
 
@@ -18,6 +19,7 @@ interface SessionsState {
 }
 
 const seedSessions = getSeedSessions();
+
 let nextId = seedSessions.length + 1;
 
 export const useSessionsStore = create<SessionsState>((set, get) => ({
@@ -25,6 +27,7 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
 
   addSession: (session) => {
     const id = String(nextId++);
+
     set((state) => ({
       sessions: [...state.sessions, { ...session, id }],
     }));
@@ -40,16 +43,24 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
 
   getSessionsByDateKey: (dateKey) => {
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
+
     const todayKey = today.toISOString().slice(0, 10);
+
     const tomorrow = new Date(today);
+
     tomorrow.setDate(tomorrow.getDate() + 1);
+
     const tomorrowKey = tomorrow.toISOString().slice(0, 10);
 
     return get().sessions.filter((s) => {
       if (s.date === 'Today' && dateKey === todayKey) return true;
+
       if (s.date === 'Tomorrow' && dateKey === tomorrowKey) return true;
+
       if (s.date === dateKey) return true;
+
       return false;
     });
   },

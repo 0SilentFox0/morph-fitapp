@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 export interface SummaryRow {
@@ -22,7 +24,10 @@ export function ExercisesTable({ rows }: { rows: SummaryRow[] }) {
         <Text style={[styles.tableCell, styles.tableHeader]}>Reps</Text>
       </View>
       {rows.map((r, i) => (
-        <View key={r.id} style={[styles.tableRow, i % 2 === 0 && styles.tableRowHighlight]}>
+        <View
+          key={r.id}
+          style={[styles.tableRow, i % 2 === 0 && styles.tableRowHighlight]}
+        >
           <Text style={styles.tableCell}>{r.name}</Text>
           <Text style={styles.tableCell}>{r.weight}</Text>
           <Text style={styles.tableCell}>{r.sets}</Text>

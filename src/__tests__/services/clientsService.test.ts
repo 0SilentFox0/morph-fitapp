@@ -1,6 +1,6 @@
-import { apiClientToUi, loadClients } from '../../services/clientsService';
-import * as clientsApi from '../../services/api/clients';
 import type { Client as ApiClient } from '../../schemas/api/models';
+import * as clientsApi from '../../services/api/clients';
+import { apiClientToUi, loadClients } from '../../services/clientsService';
 
 const apiClient: ApiClient = {
   id: 'c1',
@@ -40,7 +40,15 @@ describe('apiClientToUi', () => {
 describe('loadClients', () => {
   it('returns mapped live clients and excludes archived ones', async () => {
     jest.spyOn(clientsApi, 'listClients').mockResolvedValue({
-      data: [apiClient, { ...apiClient, id: 'c2', name: 'Archived', archived_at: '2026-01-01T00:00:00Z' }],
+      data: [
+        apiClient,
+        {
+          ...apiClient,
+          id: 'c2',
+          name: 'Archived',
+          archived_at: '2026-01-01T00:00:00Z',
+        },
+      ],
     } as never);
 
     const result = await loadClients();

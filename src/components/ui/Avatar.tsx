@@ -1,6 +1,15 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, typography } = theme;
 
 /** Tinted initials placeholders used by the chat list, per Figma node 2006:10239. */
@@ -34,7 +43,10 @@ export function Avatar({ uri, name = '?', size = 40, tint }: AvatarProps) {
     return (
       <Image
         source={{ uri }}
-        style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}
+        style={[
+          styles.avatar,
+          { width: size, height: size, borderRadius: size / 2 },
+        ]}
       />
     );
   }
@@ -44,12 +56,20 @@ export function Avatar({ uri, name = '?', size = 40, tint }: AvatarProps) {
     height: size,
     borderRadius: size / 2,
   };
+
   const initialsStyle: TextStyle = { fontSize: size * 0.4 };
 
   if (tint) {
     const scheme = TINTS[tint];
+
     return (
-      <View style={[styles.placeholder, placeholderStyle, { backgroundColor: scheme.bg }]}>
+      <View
+        style={[
+          styles.placeholder,
+          placeholderStyle,
+          { backgroundColor: scheme.bg },
+        ]}
+      >
         <Text style={[styles.initials, initialsStyle, { color: scheme.fg }]}>
           {getInitials(name)}
         </Text>

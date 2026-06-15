@@ -1,5 +1,7 @@
 import { Dimensions } from 'react-native';
+
 import theme from '../../theme';
+
 const { spacing } = theme;
 
 /**

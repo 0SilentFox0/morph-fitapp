@@ -5,10 +5,7 @@ import { z } from 'zod';
  * Exercises are stored separately in draftProgramStore.
  */
 export const programDraftSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(2, 'Title must be at least 2 characters'),
+  title: z.string().trim().min(2, 'Title must be at least 2 characters'),
   tag: z.string().min(1, 'Please select a category'),
   description: z.string(),
 });

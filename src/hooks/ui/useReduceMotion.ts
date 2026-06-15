@@ -12,10 +12,16 @@ export function useReduceMotion(): boolean {
 
   useEffect(() => {
     let mounted = true;
+
     AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
       if (mounted) setReduceMotion(enabled);
     });
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+
+    const sub = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion
+    );
+
     return () => {
       mounted = false;
       sub.remove();

@@ -1,30 +1,33 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Button, AsyncBoundary } from '../../../components/ui';
+import { AsyncBoundary, Button } from '../../../components/ui';
 import type { AsyncStatus } from '../../../hooks/data/useAsyncResource';
+import type { HomeStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
 import { CategoryFilterBar } from './Gallery/CategoryFilterBar';
 import { ExerciseGridItem } from './Gallery/ExerciseGridItem';
 import { useExerciseSelection } from './Gallery/useExerciseSelection';
-import theme from '../../../theme';
+
 const { colors, typography, spacing } = theme;
-import { useProgramsStore } from '../../../store/programsStore';
+
+import type { Exercise } from '../../../services/exerciseApi';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useExerciseStore } from '../../../store/exerciseStore';
+import { useProgramsStore } from '../../../store/programsStore';
 import type { ProgramExercise } from '../../../types';
-import type { Exercise } from '../../../services/exerciseApi';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Gallery'>;
 
@@ -44,32 +47,51 @@ function exerciseToProgram(ex: Exercise): ProgramExercise {
 
 export function GalleryScreen() {
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
 
   const draftTitle = useDraftProgramStore((s) => s.title);
+
   const draftTag = useDraftProgramStore((s) => s.tag);
+
   const draftDescription = useDraftProgramStore((s) => s.description);
+
   const draftExercises = useDraftProgramStore((s) => s.exercises);
+
   const addDraftExercises = useDraftProgramStore((s) => s.addExercises);
+
   const resetDraft = useDraftProgramStore((s) => s.reset);
 
   const addProgram = useProgramsStore((s) => s.addProgram);
 
   const exercises = useExerciseStore((s) => s.exercises);
+
   const loading = useExerciseStore((s) => s.loading);
+
   const loadingMore = useExerciseStore((s) => s.loadingMore);
+
   const error = useExerciseStore((s) => s.error);
+
   const loadExercises = useExerciseStore((s) => s.loadExercises);
+
   const loadMore = useExerciseStore((s) => s.loadMore);
+
   const searchQuery = useExerciseStore((s) => s.searchQuery);
+
   const setSearchQuery = useExerciseStore((s) => s.setSearchQuery);
+
   const filteredExercises = useExerciseStore((s) => s.filteredExercises);
+
   const categories = useExerciseStore((s) => s.categories);
+
   const loadCategories = useExerciseStore((s) => s.loadCategories);
+
   const selectedCategory = useExerciseStore((s) => s.selectedCategory);
+
   const setSelectedCategory = useExerciseStore((s) => s.setSelectedCategory);
 
-  const { selected, toggleSelect, existingIds } = useExerciseSelection(draftExercises);
+  const { selected, toggleSelect, existingIds } =
+    useExerciseSelection(draftExercises);
 
   React.useEffect(() => {
     if (exercises.length === 0) {
@@ -84,14 +106,18 @@ export function GalleryScreen() {
   );
 
   const handleContinue = () => {
-    const newExercises = displayExercises.filter((e) => selected.has(e.id)).map(exerciseToProgram);
+    const newExercises = displayExercises
+      .filter((e) => selected.has(e.id))
+      .map(exerciseToProgram);
 
     addDraftExercises(newExercises);
     navigation.goBack();
   };
 
   const handleSaveDraft = () => {
-    const newExercises = displayExercises.filter((e) => selected.has(e.id)).map(exerciseToProgram);
+    const newExercises = displayExercises
+      .filter((e) => selected.has(e.id))
+      .map(exerciseToProgram);
 
     const allExercises = [...draftExercises, ...newExercises];
 
@@ -132,7 +158,9 @@ export function GalleryScreen() {
   );
 
   const renderFooter = () =>
-    loadingMore ? <ActivityIndicator color={colors.accent} style={styles.loadingMore} /> : null;
+    loadingMore ? (
+      <ActivityIndicator color={colors.accent} style={styles.loadingMore} />
+    ) : null;
 
   // Initial load only: errors/spinners during pagination are handled in-list.
   const status: AsyncStatus = loading
@@ -182,7 +210,12 @@ export function GalleryScreen() {
         />
       </AsyncBoundary>
       {status === 'success' && (
-        <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) + 80 }]}>
+        <View
+          style={[
+            styles.bottomBar,
+            { paddingBottom: Math.max(insets.bottom, 16) + 80 },
+          ]}
+        >
           <Button
             title="Save"
             onPress={handleContinue}

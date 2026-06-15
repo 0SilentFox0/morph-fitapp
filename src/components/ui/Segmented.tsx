@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../../theme';
 
 const { colors, radius, typography } = theme;
@@ -22,6 +23,7 @@ export function Segmented({ options, value, onChange }: SegmentedProps) {
     <View style={styles.segmented}>
       {options.map((o, i) => {
         const active = i === value;
+
         return (
           <TouchableOpacity
             key={o.label}
@@ -32,7 +34,10 @@ export function Segmented({ options, value, onChange }: SegmentedProps) {
             <Text
               style={[
                 styles.segmentText,
-                active && { color: o.activeColor ?? colors.text, fontWeight: typography.weights.semibold },
+                active && {
+                  color: o.activeColor ?? colors.text,
+                  fontWeight: typography.weights.semibold,
+                },
               ]}
             >
               {o.label}

@@ -1,27 +1,43 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { getChartWidth } from '../../utils/common/layout';
 import { LineChart } from 'react-native-chart-kit';
-import { useRoute, useNavigation, type RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { LiveTrainingParamList } from '../../navigation/types';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../components/layout';
 import { Card, SectionTitle } from '../../components/ui';
-import { ExercisesTable } from './components/ExercisesTable';
+import { mockTrainingPrograms } from '../../mocks';
+import type { LiveTrainingParamList } from '../../navigation/types';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
-import { trainingMetric } from '../../utils';
-import { topSet, totalDurationLabel } from '../../utils/training/trainingSummary';
-import { mockTrainingPrograms } from '../../mocks';
 import theme from '../../theme';
+import { trainingMetric } from '../../utils';
+import { getChartWidth } from '../../utils/common/layout';
+import {
+  topSet,
+  totalDurationLabel,
+} from '../../utils/training/trainingSummary';
+import { ExercisesTable } from './components/ExercisesTable';
+
 const { colors, createChartConfig, radius, typography, spacing } = theme;
 
 type Route = RouteProp<LiveTrainingParamList, 'TrainingSummary'>;
 type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'TrainingSummary'>;
 
 const TABS = ['Summary', 'Exercises'];
+
 const TIMEFRAME = ['Week', 'Month', 'Custom'];
 
 const CHART_WIDTH = getChartWidth(20);
@@ -30,26 +46,43 @@ const chartConfig = createChartConfig();
 
 export function TrainingSummaryScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
+
   const participantId = route.params?.participantId;
+
   const [activeTab, setActiveTab] = React.useState(0);
+
   const [timeframe, setTimeframe] = React.useState(0);
 
   const participant = useActiveTrainingStore(
-    (s) => s.participants.find((c) => c.participantId === participantId) ?? s.participants[0] ?? null,
+    (s) =>
+      s.participants.find((c) => c.participantId === participantId) ??
+      s.participants[0] ??
+      null
   );
-  const addCompletedTraining = useTrainingHistoryStore((s) => s.addCompletedTraining);
+
+  const addCompletedTraining = useTrainingHistoryStore(
+    (s) => s.addCompletedTraining
+  );
+
   const endTraining = useActiveTrainingStore((s) => s.endTraining);
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+
   // label-only: exercises come from participant.exercises, this is just for the type tag
   const program = participant?.programId
     ? mockTrainingPrograms.find((p) => p.id === participant.programId)
     : undefined;
+
   const exercises = participant?.exercises ?? [];
+
   const typeLabel = program?.tag ?? 'Custom';
 
   const history = participant ? getClientHistory(participant.name) : [];
+
   const chartData =
     history.length > 0
       ? {
@@ -60,7 +93,9 @@ export function TrainingSummaryScreen() {
 
   const rows = exercises.map((ex) => {
     const sets = participant?.setLog[ex.id] ?? ex.sets;
+
     const top = topSet(sets);
+
     return {
       id: ex.id,
       name: ex.name,
@@ -71,9 +106,12 @@ export function TrainingSummaryScreen() {
   });
 
   const doneRef = React.useRef(false);
+
   const handleDone = () => {
     if (doneRef.current) return;
+
     doneRef.current = true;
+
     if (participant) {
       addCompletedTraining({
         id: `ct-${participant.participantId}-${Date.now()}`,
@@ -86,6 +124,7 @@ export function TrainingSummaryScreen() {
         })),
       });
     }
+
     endTraining();
     navigation.popToTop();
   };
@@ -97,7 +136,13 @@ export function TrainingSummaryScreen() {
         rightElement={
           <View style={styles.headerRight}>
             <TouchableOpacity onPress={handleDone} hitSlop={8}>
-              <Text style={{ color: colors.accent, fontWeight: typography.weights.semibold, fontSize: typography.sizes.base }}>
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontWeight: typography.weights.semibold,
+                  fontSize: typography.sizes.base,
+                }}
+              >
                 Done
               </Text>
             </TouchableOpacity>
@@ -105,7 +150,11 @@ export function TrainingSummaryScreen() {
               <Ionicons name="pencil" size={24} color={colors.text} />
             </TouchableOpacity>
             <TouchableOpacity>
-              <Ionicons name="ellipsis-vertical" size={24} color={colors.text} />
+              <Ionicons
+                name="ellipsis-vertical"
+                size={24}
+                color={colors.text}
+              />
             </TouchableOpacity>
           </View>
         }
@@ -119,7 +168,9 @@ export function TrainingSummaryScreen() {
         <View style={styles.summaryRow}>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Duration</Text>
-            <Text style={styles.summaryValue}>{totalDurationLabel(exercises)}</Text>
+            <Text style={styles.summaryValue}>
+              {totalDurationLabel(exercises)}
+            </Text>
           </Card>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Type</Text>
@@ -133,9 +184,17 @@ export function TrainingSummaryScreen() {
             <TouchableOpacity
               key={t}
               onPress={() => setTimeframe(i)}
-              style={[styles.timeframeBtn, i === timeframe && styles.timeframeBtnActive]}
+              style={[
+                styles.timeframeBtn,
+                i === timeframe && styles.timeframeBtnActive,
+              ]}
             >
-              <Text style={[styles.timeframeText, i === timeframe && styles.timeframeTextActive]}>
+              <Text
+                style={[
+                  styles.timeframeText,
+                  i === timeframe && styles.timeframeTextActive,
+                ]}
+              >
                 {t}
               </Text>
             </TouchableOpacity>
@@ -163,19 +222,26 @@ export function TrainingSummaryScreen() {
         <SectionTitle>Trainer Notes</SectionTitle>
         <Card style={styles.notesCard}>
           <Text style={styles.notesText}>
-            {exercises[0]?.trainerNotes ?? 'No notes recorded for this session.'}
+            {exercises[0]?.trainerNotes ??
+              'No notes recorded for this session.'}
           </Text>
         </Card>
       </ScrollView>
 
-      <View style={[styles.tabBar, { paddingBottom: spacing.md + insets.bottom }]}>
+      <View
+        style={[styles.tabBar, { paddingBottom: spacing.md + insets.bottom }]}
+      >
         {TABS.map((t, i) => (
           <TouchableOpacity
             key={t}
             onPress={() => setActiveTab(i)}
             style={[styles.tab, i === activeTab && styles.tabActive]}
           >
-            <Text style={[styles.tabText, i === activeTab && styles.tabTextActive]}>{t}</Text>
+            <Text
+              style={[styles.tabText, i === activeTab && styles.tabTextActive]}
+            >
+              {t}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>

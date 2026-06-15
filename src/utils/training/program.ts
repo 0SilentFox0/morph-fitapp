@@ -3,15 +3,16 @@
  * session form and the program picker.
  */
 
-import type { TrainingProgram, Session } from '../../types';
+import type { Session, TrainingProgram } from '../../types';
 
 type SessionParticipant = Session['participants'][number];
 
 /** One-line "tag · N exercises" summary shown under a program. */
 export function programMeta(
-  program: Pick<TrainingProgram, 'tag' | 'videoCount' | 'exercises'>,
+  program: Pick<TrainingProgram, 'tag' | 'videoCount' | 'exercises'>
 ): string {
   const count = program.exercises?.length ?? program.videoCount;
+
   return `${program.tag} · ${count} exercises`;
 }
 
@@ -26,11 +27,13 @@ export function participantIdForName(name: string): string {
  */
 export function buildParticipants(
   names: string[],
-  existing?: SessionParticipant[],
+  existing?: SessionParticipant[]
 ): SessionParticipant[] {
   return names.map((name) => {
     const prev = existing?.find((p) => p.name === name);
+
     if (prev) return { id: prev.id, name: prev.name, avatar: prev.avatar };
+
     return { id: participantIdForName(name), name };
   });
 }

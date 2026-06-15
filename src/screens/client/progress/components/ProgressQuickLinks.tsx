@@ -1,13 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
+
 import type { ProgressStackParamList } from '../../../../navigation/types';
 import theme from '../../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
-type Nav = NativeStackNavigationProp<ProgressStackParamList, 'ProgressOverview'>;
+type Nav = NativeStackNavigationProp<
+  ProgressStackParamList,
+  'ProgressOverview'
+>;
 
 const QUICK_LINKS: {
   label: string;
@@ -16,9 +21,17 @@ const QUICK_LINKS: {
 }[] = [
   { label: 'My league', icon: 'ribbon-outline', route: 'League' },
   { label: 'Leaderboards', icon: 'podium-outline', route: 'Leaderboard' },
-  { label: 'Exercise progress', icon: 'barbell-outline', route: 'ExerciseProgress' },
+  {
+    label: 'Exercise progress',
+    icon: 'barbell-outline',
+    route: 'ExerciseProgress',
+  },
   { label: 'Training history', icon: 'time-outline', route: 'TrainingHistory' },
-  { label: 'Personal records', icon: 'trophy-outline', route: 'PersonalRecords' },
+  {
+    label: 'Personal records',
+    icon: 'trophy-outline',
+    route: 'PersonalRecords',
+  },
   { label: 'Measurements', icon: 'analytics-outline', route: 'Measurements' },
   { label: 'Achievements', icon: 'medal-outline', route: 'Achievements' },
 ];
@@ -26,6 +39,7 @@ const QUICK_LINKS: {
 /** Grid of navigation shortcuts at the bottom of the progress overview. */
 export function ProgressQuickLinks() {
   const navigation = useNavigation<Nav>();
+
   return (
     <View style={styles.linksGrid}>
       {QUICK_LINKS.map((link) => (
@@ -55,5 +69,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
   },
-  linkLabel: { fontSize: typography.sizes.sm, color: colors.text, flexShrink: 1 },
+  linkLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.text,
+    flexShrink: 1,
+  },
 });

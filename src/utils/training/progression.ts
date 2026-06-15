@@ -1,4 +1,4 @@
-import type { ExerciseSet, CompletedTraining } from '../../types';
+import type { CompletedTraining, ExerciseSet } from '../../types';
 
 /** Progression percentages offered at session creation. */
 export const PROGRESSION_STEPS = [0, 5, 10, 15] as const;
@@ -16,10 +16,12 @@ function roundTo(value: number, step: number): number {
 export function applyProgression(
   sets: ExerciseSet[],
   weightPct: number,
-  repsPct: number,
+  repsPct: number
 ): ExerciseSet[] {
   const wf = 1 + weightPct / 100;
+
   const rf = 1 + repsPct / 100;
+
   return sets.map((s) => ({
     ...s,
     weight: roundTo(s.weight * wf, 0.5),
@@ -31,7 +33,11 @@ export function applyProgression(
 export function trainingMetric(t: CompletedTraining): number {
   return t.exercises.reduce(
     (sum, ex) =>
-      sum + ex.sets.reduce((s, set) => s + (set.weight > 0 ? set.weight * set.reps : set.reps), 0),
-    0,
+      sum +
+      ex.sets.reduce(
+        (s, set) => s + (set.weight > 0 ? set.weight * set.reps : set.reps),
+        0
+      ),
+    0
   );
 }

@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, PanResponder, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
+import {
+  PanResponder,
+  type StyleProp,
+  StyleSheet,
+  View,
+  type ViewStyle,
+} from 'react-native';
 
 export interface HorizontalSwipeProps {
   children: React.ReactNode;
@@ -32,8 +38,11 @@ export function HorizontalSwipe({
     () =>
       PanResponder.create({
         onMoveShouldSetPanResponder: (_e, g) => {
-          const horizontal = Math.abs(g.dx) > 24 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5;
+          const horizontal =
+            Math.abs(g.dx) > 24 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5;
+
           if (!horizontal) return false;
+
           return g.dx < 0 ? !!onSwipeLeft : !!onSwipeRight;
         },
         onPanResponderRelease: (_e, g) => {
@@ -41,7 +50,7 @@ export function HorizontalSwipe({
           else if (g.dx >= threshold) onSwipeRight?.();
         },
       }),
-    [onSwipeLeft, onSwipeRight, threshold],
+    [onSwipeLeft, onSwipeRight, threshold]
   );
 
   return (

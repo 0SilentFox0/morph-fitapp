@@ -1,9 +1,12 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
-import { trainingMetric } from '../../../utils';
+
 import type { CompletedTraining, TrainingProgram } from '../../../types';
+import { trainingMetric } from '../../../utils';
 
 export interface TrainingHistoryCardProps {
   training: CompletedTraining;
@@ -12,12 +15,19 @@ export interface TrainingHistoryCardProps {
 }
 
 /** One completed-training row in a client's training history list. */
-export function TrainingHistoryCard({ training, program }: TrainingHistoryCardProps) {
+export function TrainingHistoryCard({
+  training,
+  program,
+}: TrainingHistoryCardProps) {
   const exerciseCount = training.exercises.length;
+
   return (
     <View style={styles.historyCard}>
       {program?.thumbnail ? (
-        <Image source={{ uri: program.thumbnail }} style={styles.historyThumb} />
+        <Image
+          source={{ uri: program.thumbnail }}
+          style={styles.historyThumb}
+        />
       ) : (
         <View style={styles.historyThumb} />
       )}
@@ -36,7 +46,13 @@ export function TrainingHistoryCard({ training, program }: TrainingHistoryCardPr
   );
 }
 
-function Stat({ icon, value }: { icon: keyof typeof Ionicons.glyphMap; value: string | number }) {
+function Stat({
+  icon,
+  value,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  value: string | number;
+}) {
   return (
     <View style={styles.stat}>
       <Ionicons name={icon} size={14} color={colors.textSecondary} />

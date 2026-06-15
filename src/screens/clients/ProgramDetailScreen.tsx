@@ -1,13 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ClientsStackParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
 import { ProgramExerciseList } from '../../components/ui';
-import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { mockTrainingPrograms } from '../../mocks';
+import type { ClientsStackParamList } from '../../navigation/types';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import theme from '../../theme';
+
 const { colors, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ProgramDetail'>;
@@ -15,9 +21,16 @@ type Route = RouteProp<ClientsStackParamList, 'ProgramDetail'>;
 
 export function ProgramDetailScreen() {
   const navigation = useNavigation<Nav>();
+
   const route = useRoute<Route>();
-  const program = mockTrainingPrograms.find((p) => p.id === route.params?.programId);
-  const activeParticipantId = useActiveTrainingStore((s) => s.activeParticipantId);
+
+  const program = mockTrainingPrograms.find(
+    (p) => p.id === route.params?.programId
+  );
+
+  const activeParticipantId = useActiveTrainingStore(
+    (s) => s.activeParticipantId
+  );
 
   if (!program) {
     return (
@@ -42,6 +55,7 @@ export function ProgramDetailScreen() {
           program={program}
           onSelectExercise={(index) => {
             if (!activeParticipantId) return;
+
             navigation.navigate('ExerciseDetail', {
               participantId: activeParticipantId,
               programId: program.id,

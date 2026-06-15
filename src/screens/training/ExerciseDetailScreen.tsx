@@ -1,26 +1,32 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   Image,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
-  useRoute,
-  useNavigation,
   type RouteProp,
+  useNavigation,
+  useRoute,
 } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import type { LiveTrainingParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
-import { SetSelector, RestTimerControl, ClientSwitcherStrip } from '../../components/ui';
+import {
+  ClientSwitcherStrip,
+  RestTimerControl,
+  SetSelector,
+} from '../../components/ui';
+import type { LiveTrainingParamList } from '../../navigation/types';
+import theme from '../../theme';
 import { SetEditor } from './ExerciseDetail/SetEditor';
 import { useActiveExercise } from './ExerciseDetail/useActiveExercise';
-import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 type Route = RouteProp<LiveTrainingParamList, 'ExerciseDetail'>;
@@ -28,10 +34,11 @@ type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'ExerciseDetail'>;
 
 export function ExerciseDetailScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
-  // Params are optional at runtime: the screen can also be reached with an
-  // already-active training (e.g. via the client switcher) and no params.
+
   const vm = useActiveExercise(route.params ?? {});
 
   if (!vm) {
@@ -45,7 +52,16 @@ export function ExerciseDetailScreen() {
     );
   }
 
-  const { participant, exercise, exercises, exerciseIndex, sets, setIndex, currentSet, prevSet } = vm;
+  const {
+    participant,
+    exercise,
+    exercises,
+    exerciseIndex,
+    sets,
+    setIndex,
+    currentSet,
+    prevSet,
+  } = vm;
 
   return (
     <View style={styles.container}>
@@ -53,7 +69,11 @@ export function ExerciseDetailScreen() {
         title="Exercise"
         rightElement={
           <TouchableOpacity
-            onPress={() => navigation.navigate('TrainingSummary', { participantId: participant.participantId })}
+            onPress={() =>
+              navigation.navigate('TrainingSummary', {
+                participantId: participant.participantId,
+              })
+            }
             hitSlop={8}
           >
             <Text style={styles.finish}>Finish</Text>
@@ -80,7 +100,10 @@ export function ExerciseDetailScreen() {
       >
         <View style={styles.video}>
           {exercise.imageUrl && (
-            <Image source={{ uri: exercise.imageUrl }} style={styles.videoImage} />
+            <Image
+              source={{ uri: exercise.imageUrl }}
+              style={styles.videoImage}
+            />
           )}
           <View style={styles.playOverlay}>
             <Ionicons name="play" size={28} color={colors.white} />
@@ -91,7 +114,11 @@ export function ExerciseDetailScreen() {
         </Text>
 
         <Text style={styles.label}>Set</Text>
-        <SetSelector count={sets.length} value={setIndex} onChange={vm.onSetChange} />
+        <SetSelector
+          count={sets.length}
+          value={setIndex}
+          onChange={vm.onSetChange}
+        />
 
         {prevSet && (
           <View style={styles.lastTimeRow}>

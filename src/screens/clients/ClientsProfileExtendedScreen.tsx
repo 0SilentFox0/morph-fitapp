@@ -1,34 +1,48 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { ClientsStackParamList } from '../../navigation/types';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../components/layout';
-import { Avatar, SectionTitle, Button } from '../../components/ui';
-import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
-import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
-import { NextTrainingCard } from './ClientProfile/NextTrainingCard';
-import { ClientInfoSection } from './ClientProfile/ClientInfoSection';
-import { useActiveTrainingStore } from '../../store/activeTrainingStore';
-import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
-import { useSessionsStore } from '../../store/sessionsStore';
-import { useProgramsStore } from '../../store/programsStore';
-import { seedParticipant, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
+import { Avatar, Button, SectionTitle } from '../../components/ui';
 import { useDisclosure } from '../../hooks/ui/useDisclosure';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
+import type { ClientsStackParamList } from '../../navigation/types';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useProgramsStore } from '../../store/programsStore';
+import { useSessionsStore } from '../../store/sessionsStore';
+import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import theme from '../../theme';
+import {
+  buildLineChart,
+  getChartWidth,
+  seedParticipant,
+  trainingMetric,
+} from '../../utils';
+import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
+import { ClientInfoSection } from './ClientProfile/ClientInfoSection';
+import { NextTrainingCard } from './ClientProfile/NextTrainingCard';
+import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
+
 const { colors, createChartConfig, radius, typography, spacing } = theme;
 
 type Route = RouteProp<ClientsStackParamList, 'ClientsProfileExtended'>;
-type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsProfileExtended'>;
+type Nav = NativeStackNavigationProp<
+  ClientsStackParamList,
+  'ClientsProfileExtended'
+>;
 
 const CHART_WIDTH = getChartWidth(20);
 
@@ -36,39 +50,57 @@ const chartConfig = createChartConfig();
 
 export function ClientsProfileExtendedScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const clientId = route.params?.clientId;
 
-  const fromTraining = useActiveTrainingStore((s) => s.participants.find((c) => c.participantId === clientId));
+  const fromTraining = useActiveTrainingStore((s) =>
+    s.participants.find((c) => c.participantId === clientId)
+  );
+
   const startTraining = useActiveTrainingStore((s) => s.startTraining);
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+
   const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
+
   const sessions = useSessionsStore((s) => s.sessions);
+
   const programs = useProgramsStore((s) => s.programs);
 
   const name =
-    fromTraining?.name ?? mockClients.find((c) => c.id === clientId)?.name ?? 'Brooklyn Simmons';
+    fromTraining?.name ??
+    mockClients.find((c) => c.id === clientId)?.name ??
+    'Brooklyn Simmons';
 
   const programPicker = useDisclosure();
 
   const history = getClientHistory(name);
+
   const nextSession = sessions.find(
-    (s) => s.status === 'pending' && s.participants.some((p) => p.name === name),
+    (s) => s.status === 'pending' && s.participants.some((p) => p.name === name)
   );
 
   const handleStart = (programId: string) => {
     programPicker.close();
+
     const program =
       programs.find((p) => p.id === programId) ??
       mockTrainingPrograms.find((p) => p.id === programId);
+
     if (!program) return;
+
     const participant = seedParticipant(
       { id: clientId ?? name, name, avatar: fromTraining?.avatar },
       program,
-      { lookupPrevSets: getLastSets },
+      { lookupPrevSets: getLastSets }
     );
+
     startTraining([participant], participant.participantId);
-    navigation.navigate('ClientProfile', { clientId: participant.participantId });
+    navigation.navigate('ClientProfile', {
+      clientId: participant.participantId,
+    });
   };
 
   const chartData = buildLineChart(history, (h) => h.date, trainingMetric);
@@ -100,10 +132,16 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </View>
 
-        <Button title="Start training" onPress={programPicker.open} style={styles.startBtn} />
+        <Button
+          title="Start training"
+          onPress={programPicker.open}
+          style={styles.startBtn}
+        />
 
         <View style={styles.sectionHeader}>
-          <SectionTitle style={styles.sectionTitleInline}>Next training</SectionTitle>
+          <SectionTitle style={styles.sectionTitleInline}>
+            Next training
+          </SectionTitle>
         </View>
         <NextTrainingCard session={nextSession} />
 
@@ -129,13 +167,15 @@ export function ClientsProfileExtendedScreen() {
         {history.length === 0 ? (
           <Text style={styles.emptyNote}>No completed trainings yet.</Text>
         ) : (
-          [...history].reverse().map((h) => (
-            <TrainingHistoryCard
-              key={h.id}
-              training={h}
-              program={mockTrainingPrograms.find((p) => p.id === h.programId)}
-            />
-          ))
+          [...history]
+            .reverse()
+            .map((h) => (
+              <TrainingHistoryCard
+                key={h.id}
+                training={h}
+                program={mockTrainingPrograms.find((p) => p.id === h.programId)}
+              />
+            ))
         )}
       </ScrollView>
 

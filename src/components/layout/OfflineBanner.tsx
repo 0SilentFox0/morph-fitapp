@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../theme';
+
 const { colors, typography, spacing } = theme;
+
 import { useNetworkStatus } from '../../hooks/data/useNetworkStatus';
 
 /**
@@ -12,11 +15,16 @@ import { useNetworkStatus } from '../../hooks/data/useNetworkStatus';
  */
 export function OfflineBanner() {
   const online = useNetworkStatus();
+
   const insets = useSafeAreaInsets();
+
   if (online) return null;
 
   return (
-    <View style={[styles.banner, { paddingTop: insets.top + spacing.sm }]} pointerEvents="none">
+    <View
+      style={[styles.banner, { paddingTop: insets.top + spacing.sm }]}
+      pointerEvents="none"
+    >
       <Ionicons name="cloud-offline-outline" size={16} color={colors.white} />
       <Text style={styles.text}>No internet connection</Text>
     </View>

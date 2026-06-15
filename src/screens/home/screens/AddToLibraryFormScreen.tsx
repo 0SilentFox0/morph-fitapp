@@ -1,14 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import theme from '../../../theme';
+
 const { radius, colors, typography, spacing } = theme;
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { Controller } from 'react-hook-form';
+import { Ionicons } from '@expo/vector-icons';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Input, Button, DropdownSelect } from '../../../components/ui';
+import { Button, DropdownSelect, Input } from '../../../components/ui';
+import type { HomeStackParamList } from '../../../navigation/types';
 import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
 import { TagPickerModal } from './AddToLibraryForm/TagPickerModal';
 import { useProgramDraftForm } from './AddToLibraryForm/useProgramDraftForm';
@@ -18,15 +28,26 @@ type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
 
 export function AddToLibraryFormScreen() {
   const navigation = useNavigation<Nav>();
+
   const route = useRoute<Route>();
+
   const program = route.params?.program;
 
-  const { control, errors, exercises, tagModal, watchedTitle, isEdit, submit, saveDraft, handleBack } =
-    useProgramDraftForm(program, {
-      goBack: () => navigation.goBack(),
-      goToGallery: () => navigation.navigate('Gallery'),
-      goToLibrary: () => navigation.navigate('TrainingLibrary'),
-    });
+  const {
+    control,
+    errors,
+    exercises,
+    tagModal,
+    watchedTitle,
+    isEdit,
+    submit,
+    saveDraft,
+    handleBack,
+  } = useProgramDraftForm(program, {
+    goBack: () => navigation.goBack(),
+    goToGallery: () => navigation.navigate('Gallery'),
+    goToLibrary: () => navigation.navigate('TrainingLibrary'),
+  });
 
   return (
     <View style={styles.container}>
@@ -59,7 +80,9 @@ export function AddToLibraryFormScreen() {
             />
           )}
         />
-        {errors.title ? <Text style={styles.errorText}>{errors.title.message}</Text> : null}
+        {errors.title ? (
+          <Text style={styles.errorText}>{errors.title.message}</Text>
+        ) : null}
 
         <Controller
           control={control}
@@ -96,11 +119,16 @@ export function AddToLibraryFormScreen() {
           </View>
           <View style={styles.uploadTextBox}>
             <Text style={styles.uploadTitle}>Tap to upload photo</Text>
-            <Text style={styles.uploadHint}>Recommended size: square,{'\n'}min 500x500px</Text>
+            <Text style={styles.uploadHint}>
+              Recommended size: square,{'\n'}min 500x500px
+            </Text>
           </View>
         </TouchableOpacity>
 
-        <ExercisesSection exercises={exercises} onBrowse={() => navigation.navigate('Gallery')} />
+        <ExercisesSection
+          exercises={exercises}
+          onBrowse={() => navigation.navigate('Gallery')}
+        />
 
         <Button
           title={isEdit ? 'Save' : 'Continue'}

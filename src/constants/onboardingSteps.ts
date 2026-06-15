@@ -1,5 +1,5 @@
-import type { UserRole } from '../store/appStore';
 import type { OnboardingStackParamList } from '../navigation/types';
+import type { UserRole } from '../store/appStore';
 
 type StepRoute = keyof OnboardingStackParamList;
 
@@ -41,6 +41,11 @@ export function stepFor(
   role: UserRole | null
 ): { step: number | undefined; totalSteps: number } {
   const sequence = role === 'client' ? CLIENT_STEPS : TRAINER_STEPS;
+
   const index = sequence.indexOf(route);
-  return { step: index >= 0 ? index + 1 : undefined, totalSteps: sequence.length };
+
+  return {
+    step: index >= 0 ? index + 1 : undefined,
+    totalSteps: sequence.length,
+  };
 }

@@ -1,20 +1,28 @@
-import { renderHook, act, waitFor } from '@testing-library/react-native';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
+
 import { useAsyncResource } from '../../hooks/data/useAsyncResource';
 
 function deferred<T>() {
   let resolve!: (v: T) => void;
+
   let reject!: (e: unknown) => void;
+
   const promise = new Promise<T>((res, rej) => {
     resolve = res;
     reject = rej;
   });
+
   return { promise, resolve, reject };
 }
 
 describe('useAsyncResource', () => {
   it('starts loading then resolves to success with data', async () => {
     const def = deferred<number>();
-    const { result } = await renderHook(() => useAsyncResource(() => def.promise));
+
+    const { result } = await renderHook(() =>
+      useAsyncResource(() => def.promise)
+    );
+
     expect(result.current.status).toBe('loading');
 
     await act(async () => {
@@ -28,7 +36,10 @@ describe('useAsyncResource', () => {
 
   it('transitions to error and exposes the error', async () => {
     const def = deferred<number>();
-    const { result } = await renderHook(() => useAsyncResource(() => def.promise));
+
+    const { result } = await renderHook(() =>
+      useAsyncResource(() => def.promise)
+    );
 
     await act(async () => {
       def.reject(new Error('nope'));
@@ -40,7 +51,10 @@ describe('useAsyncResource', () => {
   });
 
   it('refetch re-runs the fetcher', async () => {
-    const fetcher = jest.fn((): Promise<number> => Promise.resolve(fetcher.mock.calls.length));
+    const fetcher = jest.fn(
+      (): Promise<number> => Promise.resolve(fetcher.mock.calls.length)
+    );
+
     const { result } = await renderHook(() => useAsyncResource(fetcher));
 
     await waitFor(() => expect(result.current.status).toBe('success'));
@@ -54,13 +68,17 @@ describe('useAsyncResource', () => {
 
   it('aborts the in-flight signal when unmounted', async () => {
     let captured: AbortSignal | undefined;
+
     const def = deferred<number>();
+
     const { unmount } = await renderHook(() =>
       useAsyncResource((signal) => {
         captured = signal;
+
         return def.promise;
-      }),
+      })
     );
+
     expect(captured?.aborted).toBe(false);
     await act(async () => {
       unmount();
@@ -70,7 +88,11 @@ describe('useAsyncResource', () => {
 
   it('ignores a resolution that arrives after the signal was aborted', async () => {
     const def = deferred<number>();
-    const { result, unmount } = await renderHook(() => useAsyncResource(() => def.promise));
+
+    const { result, unmount } = await renderHook(() =>
+      useAsyncResource(() => def.promise)
+    );
+
     unmount();
     await act(async () => {
       def.resolve(99);

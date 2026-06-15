@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import type { StatsStackParamList } from '../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { Button } from '../../components/ui';
+import type { StatsStackParamList } from '../../navigation/types';
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'YouGotPaid'>;
@@ -27,7 +29,9 @@ export function YouGotPaidScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>You got paid!</Text>
-        <Text style={styles.subtitle}>Track your earnings and manage your finances with ease.</Text>
+        <Text style={styles.subtitle}>
+          Track your earnings and manage your finances with ease.
+        </Text>
 
         <View style={styles.achievementCard}>
           <LinearGradient
@@ -41,7 +45,9 @@ export function YouGotPaidScreen() {
             <Ionicons name="trophy" size={32} color={colors.neutral1} />
           </View>
           <Text style={styles.achievementLabel}>Achievement unlocked</Text>
-          <Text style={styles.achievementTitle}>First Transaction Recorded</Text>
+          <Text style={styles.achievementTitle}>
+            First Transaction Recorded
+          </Text>
           <Text style={styles.achievementDesc}>
             Earn more achievements by uploading content or getting reviews
           </Text>

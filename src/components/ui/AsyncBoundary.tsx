@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, spacing } = theme;
-import { EmptyState } from './EmptyState';
-import { toErrorMessage } from '../../utils';
+
 import type { AsyncStatus } from '../../hooks/data/useAsyncResource';
+import { toErrorMessage } from '../../utils';
+import { EmptyState } from './EmptyState';
 
 export interface AsyncBoundaryProps {
   status: AsyncStatus;

@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { LineChart, BarChart } from 'react-native-chart-kit';
+import { BarChart, LineChart } from 'react-native-chart-kit';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing, createChartConfig } = theme;
+
 import { useIncomeTimeframes } from './useIncomeTimeframes';
 
 const CHART_TABS = ['Income Over Time', 'By Source'];
@@ -32,6 +41,7 @@ export function AnalyticsChartCard({
   chartWidth,
 }: AnalyticsChartCardProps) {
   const [chartTab, setChartTab] = React.useState(0);
+
   const { picker, timeframes, activeIncome } = useIncomeTimeframes(incomeData);
 
   return (
@@ -46,7 +56,12 @@ export function AnalyticsChartCard({
             style={[styles.chartTab, i === chartTab && styles.chartTabActive]}
             activeOpacity={0.8}
           >
-            <Text style={[styles.chartTabText, i === chartTab && styles.chartTabTextActive]}>
+            <Text
+              style={[
+                styles.chartTabText,
+                i === chartTab && styles.chartTabTextActive,
+              ]}
+            >
               {t}
             </Text>
           </TouchableOpacity>
@@ -56,7 +71,9 @@ export function AnalyticsChartCard({
       <View style={styles.timeframeRow}>
         {timeframes.map((tf, i) => {
           const active = i === picker.timeframe;
+
           const showReset = tf.key === 'custom' && picker.customRange;
+
           return (
             <TouchableOpacity
               key={tf.key}
@@ -66,7 +83,10 @@ export function AnalyticsChartCard({
             >
               <Text
                 numberOfLines={1}
-                style={[styles.timeframeText, active && styles.timeframeTextActive]}
+                style={[
+                  styles.timeframeText,
+                  active && styles.timeframeTextActive,
+                ]}
               >
                 {tf.label}
               </Text>
@@ -92,7 +112,9 @@ export function AnalyticsChartCard({
       {picker.picking && (
         <View style={styles.picker}>
           <Text style={styles.pickerLabel}>
-            {picker.picking === 'start' ? 'Select start date' : 'Select end date'}
+            {picker.picking === 'start'
+              ? 'Select start date'
+              : 'Select end date'}
           </Text>
           <DateTimePicker
             value={picker.draft}
@@ -103,11 +125,19 @@ export function AnalyticsChartCard({
           />
           {Platform.OS === 'ios' && (
             <View style={styles.pickerActions}>
-              <TouchableOpacity style={styles.pickerBtn} onPress={picker.cancel}>
+              <TouchableOpacity
+                style={styles.pickerBtn}
+                onPress={picker.cancel}
+              >
                 <Text style={styles.pickerCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.pickerBtn} onPress={() => picker.commit(picker.draft)}>
-                <Text style={styles.pickerDoneText}>{picker.picking === 'start' ? 'Next' : 'Done'}</Text>
+              <TouchableOpacity
+                style={styles.pickerBtn}
+                onPress={() => picker.commit(picker.draft)}
+              >
+                <Text style={styles.pickerDoneText}>
+                  {picker.picking === 'start' ? 'Next' : 'Done'}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -141,11 +171,15 @@ export function AnalyticsChartCard({
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.accent }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: colors.accent }]}
+          />
           <Text style={styles.legendText}>Subscription</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.primary7 }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: colors.primary7 }]}
+          />
           <Text style={styles.legendText}>Training</Text>
         </View>
       </View>

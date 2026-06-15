@@ -4,23 +4,30 @@ import { computeTotals } from '../progress/muscleStats';
 /** Local YYYY-MM-DD key for a parseable training date, or null. */
 function dayKey(date: string): string | null {
   const d = new Date(date);
+
   if (Number.isNaN(d.getTime())) return null;
+
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
 /** Set of day keys that have at least one logged training. */
 export function activeDayKeys(history: CompletedTraining[]): Set<string> {
   const keys = new Set<string>();
+
   for (const t of history) {
     const k = dayKey(t.date);
+
     if (k) keys.add(k);
   }
+
   return keys;
 }
 
 function weekStart(d: Date): Date {
   const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
   copy.setDate(copy.getDate() - copy.getDay()); // back to Sunday
+
   return copy;
 }
 
@@ -29,24 +36,36 @@ function weekStart(d: Date): Date {
  * one training. A gap week breaks the streak. Returns 0 when the current week
  * has no session.
  */
-export function computeWeekStreak(history: CompletedTraining[], now: Date): number {
+export function computeWeekStreak(
+  history: CompletedTraining[],
+  now: Date
+): number {
   const weekKeys = new Set<string>();
+
   for (const t of history) {
     const d = new Date(t.date);
+
     if (Number.isNaN(d.getTime())) continue;
+
     const ws = weekStart(d);
+
     weekKeys.add(`${ws.getFullYear()}-${ws.getMonth()}-${ws.getDate()}`);
   }
 
   let streak = 0;
+
   const cursor = weekStart(now);
+
   // Walk backwards week by week while each week has a session.
   for (;;) {
     const key = `${cursor.getFullYear()}-${cursor.getMonth()}-${cursor.getDate()}`;
+
     if (!weekKeys.has(key)) break;
+
     streak += 1;
     cursor.setDate(cursor.getDate() - 7);
   }
+
   return streak;
 }
 
@@ -65,9 +84,10 @@ export interface Badge {
 export function computeBadges(
   history: CompletedTraining[],
   points: number,
-  now: Date,
+  now: Date
 ): Badge[] {
   const totals = computeTotals(history);
+
   const streak = computeWeekStreak(history, now);
 
   return [

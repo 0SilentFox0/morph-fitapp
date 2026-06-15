@@ -1,38 +1,45 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { StatsStackParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
 import {
-  FormInput,
-  DatePickerInput,
-  TimePickerInput,
-  DropdownSelect,
   Button,
   Card,
+  DatePickerInput,
+  DropdownSelect,
+  FormInput,
   Segmented,
+  TimePickerInput,
 } from '../../components/ui';
-import { TransactionCard } from './Analytics/TransactionCard';
+import type { StatsStackParamList } from '../../navigation/types';
 import theme from '../../theme';
+import { TransactionCard } from './Analytics/TransactionCard';
+
 const { colors, radius, typography, spacing } = theme;
+
+import {
+  PAYMENT_METHODS,
+  TRANSACTION_STATUSES,
+} from '../../constants/transactions';
 import { formatDate, formatTime } from '../../utils';
-import { TRANSACTION_STATUSES, PAYMENT_METHODS } from '../../constants/transactions';
 import { useTransactionForm } from './useTransactionForm';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
 
 export function AddTransactionScreen() {
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
 
   const {
@@ -128,7 +135,10 @@ export function AddTransactionScreen() {
 
         <View style={styles.spacer}>
           <Segmented
-            options={TRANSACTION_STATUSES.map((s) => ({ label: s.label, activeColor: s.color }))}
+            options={TRANSACTION_STATUSES.map((s) => ({
+              label: s.label,
+              activeColor: s.color,
+            }))}
             value={statusIndex}
             onChange={setStatusIndex}
           />
@@ -166,10 +176,16 @@ export function AddTransactionScreen() {
       <View
         style={[
           styles.footer,
-          { paddingBottom: Math.max(insets.bottom, spacing.md) + spacing.tabBarInset },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, spacing.md) + spacing.tabBarInset,
+          },
         ]}
       >
-        <Button title="Save Transaction" onPress={() => navigation.navigate('YouGotPaid')} />
+        <Button
+          title="Save Transaction"
+          onPress={() => navigation.navigate('YouGotPaid')}
+        />
       </View>
     </View>
   );

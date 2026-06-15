@@ -16,6 +16,7 @@ export type MuscleStats = Record<MuscleGroup, MuscleStat>;
 export function emptyMuscleStats(): MuscleStats {
   return MUSCLE_GROUPS.reduce((acc, g) => {
     acc[g] = { totalWeight: 0, exerciseCount: 0, setCount: 0 };
+
     return acc;
   }, {} as MuscleStats);
 }
@@ -29,20 +30,26 @@ export function emptyMuscleStats(): MuscleStats {
  */
 export function computeMuscleStats(
   history: CompletedTraining[],
-  lookup: Record<number, MuscleGroup[]>,
+  lookup: Record<number, MuscleGroup[]>
 ): MuscleStats {
   const stats = emptyMuscleStats();
 
   for (const training of history) {
     for (const logged of training.exercises) {
       const muscles = lookup[logged.exerciseId];
+
       if (!muscles || muscles.length === 0) continue;
 
-      const tonnage = logged.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
+      const tonnage = logged.sets.reduce(
+        (sum, s) => sum + s.weight * s.reps,
+        0
+      );
+
       const setCount = logged.sets.length;
 
       for (const muscle of muscles) {
         const entry = stats[muscle];
+
         entry.totalWeight += tonnage;
         entry.exerciseCount += 1;
         entry.setCount += setCount;
@@ -63,21 +70,27 @@ export type IntensityMetric = keyof MuscleStat;
  */
 export function toIntensities(
   stats: MuscleStats,
-  metric: IntensityMetric = 'totalWeight',
+  metric: IntensityMetric = 'totalWeight'
 ): Record<MuscleGroup, number> {
   const valueOf = (g: MuscleGroup, m: IntensityMetric) => stats[g][m];
 
   let effectiveMetric = metric;
+
   let max = Math.max(...MUSCLE_GROUPS.map((g) => valueOf(g, metric)));
+
   if (max === 0 && metric !== 'setCount') {
     effectiveMetric = 'setCount';
     max = Math.max(...MUSCLE_GROUPS.map((g) => valueOf(g, 'setCount')));
   }
 
-  return MUSCLE_GROUPS.reduce((acc, g) => {
-    acc[g] = max === 0 ? 0 : valueOf(g, effectiveMetric) / max;
-    return acc;
-  }, {} as Record<MuscleGroup, number>);
+  return MUSCLE_GROUPS.reduce(
+    (acc, g) => {
+      acc[g] = max === 0 ? 0 : valueOf(g, effectiveMetric) / max;
+
+      return acc;
+    },
+    {} as Record<MuscleGroup, number>
+  );
 }
 
 export interface SessionTotals {
@@ -90,8 +103,11 @@ export interface SessionTotals {
 /** Overall totals across a history (no per-muscle double counting). */
 export function computeTotals(history: CompletedTraining[]): SessionTotals {
   let tonnage = 0;
+
   let exerciseCount = 0;
+
   let setCount = 0;
+
   for (const training of history) {
     for (const logged of training.exercises) {
       exerciseCount += 1;
@@ -99,6 +115,7 @@ export function computeTotals(history: CompletedTraining[]): SessionTotals {
       tonnage += logged.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
     }
   }
+
   return { tonnage, exerciseCount, setCount, sessionCount: history.length };
 }
 
@@ -114,19 +131,25 @@ export interface TrendPoint {
 export function muscleTrend(
   history: CompletedTraining[],
   muscle: MuscleGroup,
-  lookup: Record<number, MuscleGroup[]>,
+  lookup: Record<number, MuscleGroup[]>
 ): TrendPoint[] {
   const points: TrendPoint[] = [];
+
   for (const training of history) {
     let tonnage = 0;
+
     let worked = false;
+
     for (const logged of training.exercises) {
       if (!lookup[logged.exerciseId]?.includes(muscle)) continue;
+
       worked = true;
       tonnage += logged.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
     }
+
     if (worked) points.push({ date: training.date, tonnage });
   }
+
   return points;
 }
 
@@ -143,15 +166,19 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export function filterByTimeframe(
   history: CompletedTraining[],
   timeframe: Timeframe,
-  now: Date,
+  now: Date
 ): CompletedTraining[] {
   if (timeframe === 'all') return history;
+
   if (timeframe === 'session') {
     return history.length ? [history[history.length - 1]!] : [];
   }
+
   const cutoff = now.getTime() - WEEK_MS;
+
   return history.filter((h) => {
     const t = new Date(h.date).getTime();
+
     return !Number.isNaN(t) && t >= cutoff;
   });
 }

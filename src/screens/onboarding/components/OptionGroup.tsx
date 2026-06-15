@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { ChoiceCard } from '../../../components/ui';
 
 export type OptionGroupLayout = 'chip' | 'list';
@@ -21,7 +24,12 @@ interface OptionGroupProps {
  * Selection state lives with the caller, so the same component serves single-
  * and multi-select flows.
  */
-export function OptionGroup({ options, selected, onToggle, layout = 'chip' }: OptionGroupProps) {
+export function OptionGroup({
+  options,
+  selected,
+  onToggle,
+  layout = 'chip',
+}: OptionGroupProps) {
   if (layout === 'chip') {
     return (
       <View style={styles.grid}>
@@ -42,6 +50,7 @@ export function OptionGroup({ options, selected, onToggle, layout = 'chip' }: Op
     <>
       {options.map((option) => {
         const isSelected = selected.includes(option);
+
         return (
           <TouchableOpacity
             key={option}
@@ -51,7 +60,12 @@ export function OptionGroup({ options, selected, onToggle, layout = 'chip' }: Op
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option}
           >
-            <Text style={[styles.listOptionText, isSelected && styles.listOptionTextSelected]}>
+            <Text
+              style={[
+                styles.listOptionText,
+                isSelected && styles.listOptionTextSelected,
+              ]}
+            >
               {option}
             </Text>
           </TouchableOpacity>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { zustandStorage } from '../services/storage';
 
 export type AccessSetting = 'public' | 'subscribers' | 'private';
@@ -64,7 +65,13 @@ const initialState = {
   freePreview: true,
   accessSetting: 'public' as AccessSetting,
   locations: [] as string[],
-  workDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as string[],
+  workDays: [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+  ] as string[],
   workTimeStart: '09:00',
   workTimeEnd: '18:00',
   sameSlotsEveryWeek: true,
@@ -151,6 +158,6 @@ export const useOnboardingStore = create<OnboardingState>()(
         preferredFormat: state.preferredFormat,
         currentRoute: state.currentRoute,
       }),
-    },
-  ),
+    }
+  )
 );

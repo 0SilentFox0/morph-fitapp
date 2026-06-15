@@ -1,13 +1,35 @@
-import { fetchExercises, fetchCategories, type Exercise } from '../../services/exerciseApi';
+import {
+  type Exercise,
+  fetchCategories,
+  fetchExercises,
+} from '../../services/exerciseApi';
 import { useExerciseStore } from '../../store/exerciseStore';
 
 jest.mock('../../services/exerciseApi');
 
-const mockedFetchExercises = fetchExercises as jest.MockedFunction<typeof fetchExercises>;
-const mockedFetchCategories = fetchCategories as jest.MockedFunction<typeof fetchCategories>;
+const mockedFetchExercises = fetchExercises as jest.MockedFunction<
+  typeof fetchExercises
+>;
 
-function exercise(id: number, name: string, categoryId: number, category: string): Exercise {
-  return { id, name, description: '', category, categoryId, imageUrl: null, muscles: [] };
+const mockedFetchCategories = fetchCategories as jest.MockedFunction<
+  typeof fetchCategories
+>;
+
+function exercise(
+  id: number,
+  name: string,
+  categoryId: number,
+  category: string
+): Exercise {
+  return {
+    id,
+    name,
+    description: '',
+    category,
+    categoryId,
+    imageUrl: null,
+    muscles: [],
+  };
 }
 
 beforeEach(() => {
@@ -36,6 +58,7 @@ describe('useExerciseStore', () => {
     await useExerciseStore.getState().loadExercises();
 
     const state = useExerciseStore.getState();
+
     expect(state.exercises).toHaveLength(1);
     expect(state.loading).toBe(false);
     expect(state.error).toBeNull();
@@ -48,6 +71,7 @@ describe('useExerciseStore', () => {
     await useExerciseStore.getState().loadExercises();
 
     const state = useExerciseStore.getState();
+
     expect(state.error).toBe('network down');
     expect(state.loading).toBe(false);
   });
@@ -57,7 +81,9 @@ describe('useExerciseStore', () => {
 
     await useExerciseStore.getState().loadCategories();
 
-    expect(useExerciseStore.getState().categories).toEqual([{ id: 10, name: 'Legs' }]);
+    expect(useExerciseStore.getState().categories).toEqual([
+      { id: 10, name: 'Legs' },
+    ]);
   });
 
   it('filteredExercises filters by selected category and search query', () => {

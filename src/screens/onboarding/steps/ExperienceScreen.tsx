@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../../../theme';
+
 const { colors, spacing } = theme;
+
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { OnboardingLayout } from '../components/OnboardingLayout';
 import { CertificationUpload } from '../components/CertificationUpload';
 import { InjuriesField } from '../components/InjuriesField';
+import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 const EXPERIENCE_OPTIONS = [
@@ -14,11 +17,15 @@ const EXPERIENCE_OPTIONS = [
   { label: '7–9', sub: 'years' },
   { label: '10+', sub: 'years' },
 ];
+
 const EXPERIENCE_VALUES = ['1-3 years', '4-6 years', '7-9 years', '10+ years'];
 
 export function ExperienceScreen() {
-  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('Experience');
+  const { navigation, isClient, step, totalSteps } =
+    useOnboardingScreen('Experience');
+
   const experienceYears = useOnboardingStore((s) => s.experienceYears);
+
   const setField = useOnboardingStore((s) => s.setField);
 
   const goNext = () => navigation.navigate('TrainingTypes');
@@ -27,9 +34,15 @@ export function ExperienceScreen() {
     <OnboardingLayout
       step={step}
       totalSteps={totalSteps}
-      title={isClient ? 'How long have you been training?' : 'Tell us about your experience'}
+      title={
+        isClient
+          ? 'How long have you been training?'
+          : 'Tell us about your experience'
+      }
       subtitle={
-        isClient ? 'This helps us match you with the right trainer' : 'This helps clients trust your skills'
+        isClient
+          ? 'This helps us match you with the right trainer'
+          : 'This helps clients trust your skills'
       }
       onNext={goNext}
       onBack={navigation.goBack}
@@ -38,7 +51,9 @@ export function ExperienceScreen() {
       <View style={styles.optionsRow}>
         {EXPERIENCE_OPTIONS.map((opt, i) => {
           const val = EXPERIENCE_VALUES[i] ?? '';
+
           const isSelected = experienceYears === val;
+
           return (
             <TouchableOpacity
               key={val}
@@ -47,10 +62,20 @@ export function ExperienceScreen() {
               accessibilityRole="radio"
               accessibilityState={{ checked: isSelected }}
             >
-              <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+              <Text
+                style={[
+                  styles.optionLabel,
+                  isSelected && styles.optionLabelSelected,
+                ]}
+              >
                 {opt.label}
               </Text>
-              <Text style={[styles.optionSub, isSelected && styles.optionSubSelected]}>
+              <Text
+                style={[
+                  styles.optionSub,
+                  isSelected && styles.optionSubSelected,
+                ]}
+              >
                 {opt.sub}
               </Text>
             </TouchableOpacity>

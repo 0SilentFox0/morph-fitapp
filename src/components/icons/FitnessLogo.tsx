@@ -1,6 +1,8 @@
 import React from 'react';
-import Svg, { Path, G, ClipPath, Rect, Defs } from 'react-native-svg';
+import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
+
 import theme from '../../theme';
+
 const { colors } = theme;
 
 interface FitnessLogoProps {
@@ -9,16 +11,29 @@ interface FitnessLogoProps {
   color?: string;
 }
 
-export function FitnessLogo({ width = 138, height = 32, color = colors.white }: FitnessLogoProps) {
+export function FitnessLogo({
+  width = 138,
+  height = 32,
+  color = colors.white,
+}: FitnessLogoProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 138 32" fill="none">
       <G clipPath="url(#clip0)">
         <Path d="M21.3335 0V7.11111H7.11133L14.2224 0H21.3335Z" fill={color} />
-        <Path d="M7.11133 28.4441V21.333H21.3335L14.2224 28.4441H7.11133Z" fill={color} />
+        <Path
+          d="M7.11133 28.4441V21.333H21.3335L14.2224 28.4441H7.11133Z"
+          fill={color}
+        />
         <Path d="M0 14.2224V7.11133H14.2222L7.11111 14.2224H0Z" fill={color} />
         <Path d="M0 21.3328V14.2217H14.2222L7.11111 21.3328H0Z" fill={color} />
-        <Path d="M28.4449 7.11133V14.2224H14.2227L21.3338 7.11133H28.4449Z" fill={color} />
-        <Path d="M28.4449 14.2217V21.3328H14.2227L21.3338 14.2217H28.4449Z" fill={color} />
+        <Path
+          d="M28.4449 7.11133V14.2224H14.2227L21.3338 7.11133H28.4449Z"
+          fill={color}
+        />
+        <Path
+          d="M28.4449 14.2217V21.3328H14.2227L21.3338 14.2217H28.4449Z"
+          fill={color}
+        />
       </G>
       <Path
         d="M53.245 8.70117V11.3776H42.519V14.6623H51.1565V17.3387H42.519V23.2999H39.8223V8.70117H53.245Z"

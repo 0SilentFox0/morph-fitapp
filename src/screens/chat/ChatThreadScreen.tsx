@@ -1,53 +1,71 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ChatStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import type { ChatStackParamList } from '../../navigation/types';
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
+import { useDisclosure } from '../../hooks/ui/useDisclosure';
 import { useChatStore } from '../../store/chatStore';
 import {
-  ChatOptionsSheet,
   ChatAttachmentSheet,
-  MessageList,
-  MessageInputBar,
   type ChatOptionAction,
+  ChatOptionsSheet,
+  MessageInputBar,
+  MessageList,
 } from './components';
-import { useDisclosure } from '../../hooks/ui/useDisclosure';
 
 type Route = RouteProp<ChatStackParamList, 'ChatThread'>;
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatThread'>;
 
 export function ChatThreadScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
+
   const { conversationId } = route.params;
 
-  const conversation = useChatStore((s) => s.conversations.find((c) => c.id === conversationId));
+  const conversation = useChatStore((s) =>
+    s.conversations.find((c) => c.id === conversationId)
+  );
+
   // Default outside the selector: returning a fresh `[]` from the selector makes
   // zustand see a new reference every render (Object.is) and loops forever for
   // conversations with no seeded messages.
-  const messages = useChatStore((s) => s.messagesByConversation[conversationId]) ?? [];
+  const messages =
+    useChatStore((s) => s.messagesByConversation[conversationId]) ?? [];
+
   const sendMessage = useChatStore((s) => s.sendMessage);
+
   const markAsRead = useChatStore((s) => s.markAsRead);
 
   const [input, setInput] = React.useState('');
+
   const optionsSheet = useDisclosure();
+
   const attachSheet = useDisclosure();
+
   const scrollRef = React.useRef<ScrollView>(null);
-  const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   const title = conversation?.participant.name ?? 'Chat';
 
@@ -71,7 +89,9 @@ export function ChatThreadScreen() {
 
   const handleSend = () => {
     const text = input.trim();
+
     if (!text) return;
+
     sendMessage(conversationId, text);
     setInput('');
     scrollToEndSoon();
@@ -138,7 +158,12 @@ export function ChatThreadScreen() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       {/* Header: back, left-aligned title, more menu (Figma node 2006:10369) */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md) }]}>
+      <View
+        style={[
+          styles.header,
+          { paddingTop: Math.max(insets.top, spacing.md) },
+        ]}
+      >
         <TouchableOpacity
           style={styles.headerBtn}
           onPress={() => navigation.goBack()}
@@ -164,9 +189,14 @@ export function ChatThreadScreen() {
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+          onContentSizeChange={() =>
+            scrollRef.current?.scrollToEnd({ animated: false })
+          }
         >
-          <MessageList messages={messages} onStartSession={handleStartSession} />
+          <MessageList
+            messages={messages}
+            onStartSession={handleStartSession}
+          />
         </ScrollView>
       ) : (
         <View style={styles.center}>

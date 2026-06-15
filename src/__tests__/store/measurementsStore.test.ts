@@ -1,4 +1,7 @@
-import { useMeasurementsStore, type MeasurementEntry } from '../../store/measurementsStore';
+import {
+  type MeasurementEntry,
+  useMeasurementsStore,
+} from '../../store/measurementsStore';
 
 const seed = useMeasurementsStore.getState().entries;
 
@@ -18,8 +21,12 @@ describe('useMeasurementsStore', () => {
 
   it('addEntry inserts and keeps entries sorted oldest → newest', () => {
     useMeasurementsStore.setState({ entries: [...sample] });
-    useMeasurementsStore.getState().addEntry({ date: '2026-05-04T00:00:00Z', weightKg: 79.5 });
+    useMeasurementsStore
+      .getState()
+      .addEntry({ date: '2026-05-04T00:00:00Z', weightKg: 79.5 });
+
     const dates = useMeasurementsStore.getState().entries.map((e) => e.date);
+
     expect(dates).toEqual([
       '2026-05-01T00:00:00Z',
       '2026-05-04T00:00:00Z',

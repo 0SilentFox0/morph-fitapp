@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart } from 'react-native-chart-kit';
+
 import { useDateRangePicker } from '../../../hooks/datetime/useDateRangePicker';
 import { formatShortDate } from '../../../utils';
 
@@ -14,7 +15,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 export function deriveMonthIncome(incomeData: LineData): LineData {
   const week = incomeData.datasets[0]?.data ?? [];
+
   const total = week.reduce((sum, n) => sum + n, 0);
+
   return {
     labels: ['W1', 'W2', 'W3', 'W4'],
     datasets: [
@@ -33,21 +36,34 @@ export function deriveMonthIncome(incomeData: LineData): LineData {
 /** Synthesize an income series spanning a custom date range (max 7 points). */
 export function deriveCustomIncome(
   incomeData: LineData,
-  range: { start: Date; end: Date } | null,
+  range: { start: Date; end: Date } | null
 ): LineData {
   if (!range) return incomeData;
+
   const pattern = incomeData.datasets[0]?.data ?? [100];
-  const days = Math.max(1, Math.round((range.end.getTime() - range.start.getTime()) / DAY_MS) + 1);
+
+  const days = Math.max(
+    1,
+    Math.round((range.end.getTime() - range.start.getTime()) / DAY_MS) + 1
+  );
+
   const count = Math.min(days, 7);
+
   const step = days / count;
+
   const data: number[] = [];
+
   const labels: string[] = [];
+
   for (let i = 0; i < count; i++) {
     const dayIndex = Math.floor(i * step);
+
     const d = new Date(range.start.getTime() + dayIndex * DAY_MS);
+
     data.push(pattern[dayIndex % pattern.length] ?? 0);
     labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
   }
+
   return { labels, datasets: [{ data }] };
 }
 
@@ -65,10 +81,14 @@ export interface Timeframe {
 export function useIncomeTimeframes(incomeData: LineData) {
   const picker = useDateRangePicker();
 
-  const monthIncome = React.useMemo(() => deriveMonthIncome(incomeData), [incomeData]);
+  const monthIncome = React.useMemo(
+    () => deriveMonthIncome(incomeData),
+    [incomeData]
+  );
+
   const customIncome = React.useMemo(
     () => deriveCustomIncome(incomeData, picker.customRange),
-    [incomeData, picker.customRange],
+    [incomeData, picker.customRange]
   );
 
   const timeframes: Timeframe[] = [

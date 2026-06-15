@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { useAppStore } from './appStore';
-import { tokenStore } from '../services/api/tokenStore';
-import { setUnauthorizedHandler, ApiError } from '../services/api/client';
-import * as authApi from '../services/api/auth';
-import * as usersApi from '../services/api/users';
+
 import type { User } from '../schemas/api/models';
+import * as authApi from '../services/api/auth';
+import { ApiError, setUnauthorizedHandler } from '../services/api/client';
+import { tokenStore } from '../services/api/tokenStore';
+import * as usersApi from '../services/api/users';
+import { useAppStore } from './appStore';
 
 export type AuthStatus =
   | 'loading'
@@ -34,14 +35,18 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     await authApi.login({ email, password });
+
     const { data } = await usersApi.getMe();
+
     syncRole(data);
     set({ status: 'authenticated', user: data });
   },
 
   register: async (input) => {
     await authApi.register(input);
+
     const { data } = await usersApi.getMe();
+
     syncRole(data);
     set({ status: 'authenticated', user: data });
   },
@@ -62,12 +67,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   loadSession: async () => {
     try {
       await tokenStore.load();
+
       const token = await tokenStore.getAccessToken();
+
       if (!token) {
         set({ status: 'unauthenticated', user: null });
+
         return;
       }
+
       const { data } = await usersApi.getMe();
+
       syncRole(data);
       set({ status: 'authenticated', user: data });
     } catch (err) {
@@ -85,6 +95,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   refreshProfile: async () => {
     const { data } = await usersApi.getMe();
+
     syncRole(data);
     set({ user: data });
   },

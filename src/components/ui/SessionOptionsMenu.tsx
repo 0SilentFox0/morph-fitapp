@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 export type SessionOptionAction = 'reschedule' | 'edit' | 'cancel';
@@ -23,13 +25,30 @@ const OPTIONS: {
   { action: 'cancel', label: 'Cancel session', icon: 'close' },
 ];
 
-export function SessionOptionsMenu({ visible, onClose, onSelect }: SessionOptionsMenuProps) {
+export function SessionOptionsMenu({
+  visible,
+  onClose,
+  onSelect,
+}: SessionOptionsMenuProps) {
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
-        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={onClose}
+        />
         <View style={styles.menuWrap}>
-          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView
+            intensity={40}
+            tint="dark"
+            style={StyleSheet.absoluteFill}
+          />
           <View style={styles.menuOverlay} />
           <View style={styles.menu}>
             {OPTIONS.map((item, index) => (

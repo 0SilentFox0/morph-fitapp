@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, spacing } = theme;
 
 interface ProgressIndicatorProps {
@@ -14,10 +16,7 @@ export function ProgressIndicator({ total, current }: ProgressIndicatorProps) {
       {Array.from({ length: total }).map((_, index) => (
         <View
           key={index}
-          style={[
-            styles.dot,
-            index < current && styles.dotFilled,
-          ]}
+          style={[styles.dot, index < current && styles.dotFilled]}
         />
       ))}
     </View>

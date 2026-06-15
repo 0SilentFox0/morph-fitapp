@@ -1,9 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Overlay } from '../../../components/ui';
 import theme from '../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 interface ChatAttachmentSheetProps {
@@ -24,12 +33,19 @@ const RECENT_PHOTOS: string[] = Array.from(
  * "Recent" header with a close button over a 3-column photo grid, matching
  * Figma node 2006:10559.
  */
-export function ChatAttachmentSheet({ visible, onClose, onPick }: ChatAttachmentSheetProps) {
+export function ChatAttachmentSheet({
+  visible,
+  onClose,
+  onPick,
+}: ChatAttachmentSheetProps) {
   const insets = useSafeAreaInsets();
 
   return (
     <Overlay visible={visible} onClose={onClose} justify="flex-end">
-      <TouchableOpacity activeOpacity={1} style={[styles.sheet, { paddingBottom: insets.bottom + spacing.md }]}>
+      <TouchableOpacity
+        activeOpacity={1}
+        style={[styles.sheet, { paddingBottom: insets.bottom + spacing.md }]}
+      >
         <View style={styles.handle} />
 
         <View style={styles.header}>

@@ -1,25 +1,30 @@
-import { mockTrainingHistory, mockSessions, mockClients, CURRENT_USER_NAME } from './data';
-import type { CompletedTraining } from '../types';
-import { computePRs } from '../utils/progress/personalRecords';
-import { computeWeekStreak } from '../utils/game/achievements';
-import {
-  computeConsistency,
-  computeComposite,
-  computeTrainerComposite,
-  percentileOf,
-  pointsFor,
-  GAMIFICATION_CONFIG,
-} from '../utils/game/gamification';
-import { resolveTier, nextTier, tierProgress } from '../utils/game/leagues';
 import type {
   CanonicalExercise,
   GamificationState,
   LeaderboardEntry,
   PointsLedgerEntry,
+  PricingInsight,
   PublicUser,
   TrainerGamificationState,
-  PricingInsight,
 } from '../services/gamificationApi';
+import type { CompletedTraining } from '../types';
+import { computeWeekStreak } from '../utils/game/achievements';
+import {
+  computeComposite,
+  computeConsistency,
+  computeTrainerComposite,
+  GAMIFICATION_CONFIG,
+  percentileOf,
+  pointsFor,
+} from '../utils/game/gamification';
+import { nextTier, resolveTier, tierProgress } from '../utils/game/leagues';
+import { computePRs } from '../utils/progress/personalRecords';
+import {
+  CURRENT_USER_NAME,
+  mockClients,
+  mockSessions,
+  mockTrainingHistory,
+} from './data';
 
 export const CURRENT_USER_ID = 'me';
 
@@ -52,15 +57,34 @@ const CANONICAL_REFERENCE_1RM: Record<string, number> = {
 const POOL_SIZE = 60;
 
 const FIRST_NAMES = [
-  'Alex', 'Maria', 'Ivan', 'Sofia', 'Dmytro', 'Olha', 'Andriy', 'Kateryna',
-  'Petro', 'Yulia', 'Taras', 'Nina', 'Roman', 'Lena', 'Yurii', 'Vika',
-  'Bohdan', 'Anna', 'Serhii', 'Daria',
+  'Alex',
+  'Maria',
+  'Ivan',
+  'Sofia',
+  'Dmytro',
+  'Olha',
+  'Andriy',
+  'Kateryna',
+  'Petro',
+  'Yulia',
+  'Taras',
+  'Nina',
+  'Roman',
+  'Lena',
+  'Yurii',
+  'Vika',
+  'Bohdan',
+  'Anna',
+  'Serhii',
+  'Daria',
 ];
+
 const LAST_INITIALS = 'KSMTBVRLPGNZDFCH';
 
 /** Deterministic pseudo-random 0..1 from an integer seed (no Math.random). */
 function seeded(n: number): number {
   const x = Math.sin(n * 12.9898 + 78.233) * 43758.5453;
+
   return x - Math.floor(x);
 }
 
@@ -73,16 +97,24 @@ interface PoolMember {
 
 function buildPool(): PoolMember[] {
   const members: PoolMember[] = [];
+
   for (let i = 0; i < POOL_SIZE; i++) {
     const r = seeded(i + 1);
+
     // Skew toward the middle so tiers populate realistically.
     const composite = Math.min(0.98, Math.max(0.02, 0.15 + r * 0.8));
+
     const first = FIRST_NAMES[i % FIRST_NAMES.length]!;
+
     const last = LAST_INITIALS[i % LAST_INITIALS.length]!;
+
     const bests: Record<string, number> = {};
+
     for (const c of CANONICAL_EXERCISES) {
       const ref = CANONICAL_REFERENCE_1RM[c.key] ?? 100;
+
       const jitter = 0.55 + seeded(i * 7 + c.key.length) * 0.5; // 0.55..1.05
+
       bests[c.key] = Math.round(ref * composite * jitter);
     }
     members.push({
@@ -91,39 +123,55 @@ function buildPool(): PoolMember[] {
       bests,
     });
   }
+
   return members;
 }
 
 const POOL = buildPool();
 
 /** Current user's best verified 1RM per canonical, from their training history. */
-function currentUserBests(history: CompletedTraining[]): Record<string, number> {
+function currentUserBests(
+  history: CompletedTraining[]
+): Record<string, number> {
   const prs = computePRs(history);
+
   const bests: Record<string, number> = {};
+
   for (const pr of prs) {
     const canonical = EXERCISE_CANONICAL_MAP[pr.exerciseId];
+
     if (!canonical) continue;
+
     if (!bests[canonical] || pr.best1RM > bests[canonical]!) {
       bests[canonical] = pr.best1RM;
     }
   }
+
   return bests;
 }
 
 function currentUserHistory(): CompletedTraining[] {
   const key = CURRENT_USER_NAME.trim().toLowerCase();
-  return mockTrainingHistory.filter((h) => h.clientName.trim().toLowerCase() === key);
+
+  return mockTrainingHistory.filter(
+    (h) => h.clientName.trim().toLowerCase() === key
+  );
 }
 
 /** Strength percentile (0..1) = mean over the user's canonicals of their pool percentile. */
 function strengthPercentile(bests: Record<string, number>): number {
   const keys = Object.keys(bests);
+
   if (keys.length === 0) return 0;
+
   let sum = 0;
+
   for (const key of keys) {
     const pool = POOL.map((m) => m.bests[key] ?? 0);
+
     sum += percentileOf(bests[key]!, pool);
   }
+
   return sum / keys.length;
 }
 
@@ -137,18 +185,29 @@ interface CurrentUserScore {
 
 function scoreCurrentUser(now: Date): CurrentUserScore {
   const history = currentUserHistory();
+
   const prCount = computePRs(history).length;
+
   const points = pointsFor(history.length, prCount);
+
   const consistency = computeConsistency(history, points, now).normalized;
+
   const bests = currentUserBests(history);
+
   const strength = strengthPercentile(bests);
+
   const composite = computeComposite(consistency, strength);
+
   return { points, consistency, strength, composite, bests };
 }
 
 /** Full composite leaderboard (pool + current user), ranked desc. */
-function compositeRanked(now: Date): { entries: LeaderboardEntry[]; me: CurrentUserScore } {
+function compositeRanked(now: Date): {
+  entries: LeaderboardEntry[];
+  me: CurrentUserScore;
+} {
   const me = scoreCurrentUser(now);
+
   const rows: { user: PublicUser; composite: number; isMe: boolean }[] = [
     ...POOL.map((m) => ({ user: m.user, composite: m.composite, isMe: false })),
     {
@@ -157,8 +216,11 @@ function compositeRanked(now: Date): { entries: LeaderboardEntry[]; me: CurrentU
       isMe: true,
     },
   ];
+
   rows.sort((a, b) => b.composite - a.composite);
+
   const all = rows.map((r) => r.composite);
+
   const entries = rows.map((r, idx) => ({
     rank: idx + 1,
     user: r.user,
@@ -167,14 +229,19 @@ function compositeRanked(now: Date): { entries: LeaderboardEntry[]; me: CurrentU
     leagueKey: resolveTier(percentileOf(r.composite, all)).key,
     isCurrentUser: r.isMe,
   }));
+
   return { entries, me };
 }
 
 export function buildMyGamification(now: Date = new Date()): GamificationState {
   const { entries, me } = compositeRanked(now);
+
   const mine = entries.find((e) => e.isCurrentUser)!;
+
   const tier = resolveTier(mine.percentile);
+
   const next = nextTier(tier);
+
   return {
     userId: CURRENT_USER_ID,
     points: me.points,
@@ -195,22 +262,36 @@ export function buildMyGamification(now: Date = new Date()): GamificationState {
   };
 }
 
-export function buildCompositeLeaderboard(now: Date = new Date()): LeaderboardEntry[] {
+export function buildCompositeLeaderboard(
+  now: Date = new Date()
+): LeaderboardEntry[] {
   return compositeRanked(now).entries;
 }
 
-export function buildCanonicalLeaderboard(canonicalKey: string, now: Date = new Date()): LeaderboardEntry[] {
+export function buildCanonicalLeaderboard(
+  canonicalKey: string,
+  now: Date = new Date()
+): LeaderboardEntry[] {
   const me = scoreCurrentUser(now);
+
   const rows: { user: PublicUser; best: number; isMe: boolean }[] = POOL.filter(
-    (m) => (m.bests[canonicalKey] ?? 0) > 0,
+    (m) => (m.bests[canonicalKey] ?? 0) > 0
   ).map((m) => ({ user: m.user, best: m.bests[canonicalKey]!, isMe: false }));
 
   const myBest = me.bests[canonicalKey];
+
   if (myBest && myBest > 0) {
-    rows.push({ user: { id: CURRENT_USER_ID, name: 'You', avatarUrl: null }, best: myBest, isMe: true });
+    rows.push({
+      user: { id: CURRENT_USER_ID, name: 'You', avatarUrl: null },
+      best: myBest,
+      isMe: true,
+    });
   }
+
   rows.sort((a, b) => b.best - a.best);
+
   const all = rows.map((r) => r.best);
+
   return rows.map((r, idx) => ({
     rank: idx + 1,
     user: r.user,
@@ -231,7 +312,9 @@ const REASON_LABELS: Record<PointsLedgerEntry['reason'], string> = {
 
 export function buildPointsLedger(now: Date = new Date()): PointsLedgerEntry[] {
   const history = currentUserHistory();
+
   const cfg = pointsFor(1, 0); // session points
+
   const entries: PointsLedgerEntry[] = history.map((t, i) => ({
     id: `ledger-${t.id}-${i}`,
     amount: cfg,
@@ -239,6 +322,7 @@ export function buildPointsLedger(now: Date = new Date()): PointsLedgerEntry[] {
     createdAt: t.date,
     label: REASON_LABELS.session_completed,
   }));
+
   // PR awards.
   computePRs(history).forEach((pr, i) => {
     entries.push({
@@ -249,6 +333,7 @@ export function buildPointsLedger(now: Date = new Date()): PointsLedgerEntry[] {
       label: REASON_LABELS.pr_set,
     });
   });
+
   if (computeWeekStreak(history, now) >= 4) {
     entries.push({
       id: 'ledger-streak-4',
@@ -258,8 +343,11 @@ export function buildPointsLedger(now: Date = new Date()): PointsLedgerEntry[] {
       label: REASON_LABELS.streak_milestone,
     });
   }
+
   // Newest first.
-  return entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return entries.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 }
 
 // ─── Trainer gamification (GAME-007) ─────────────────────────────────────────
@@ -271,15 +359,21 @@ interface TrainerPoolMember {
   composite: number;
 }
 
-const TRAINER_POOL: TrainerPoolMember[] = Array.from({ length: TRAINER_POOL_SIZE }, (_, i) => {
-  const r = seeded(i + 101);
-  const first = FIRST_NAMES[(i + 3) % FIRST_NAMES.length]!;
-  const last = LAST_INITIALS[(i + 5) % LAST_INITIALS.length]!;
-  return {
-    user: { id: `t${i + 1}`, name: `${first} ${last}.`, avatarUrl: null },
-    composite: Math.min(0.97, Math.max(0.05, 0.12 + r * 0.82)),
-  };
-});
+const TRAINER_POOL: TrainerPoolMember[] = Array.from(
+  { length: TRAINER_POOL_SIZE },
+  (_, i) => {
+    const r = seeded(i + 101);
+
+    const first = FIRST_NAMES[(i + 3) % FIRST_NAMES.length]!;
+
+    const last = LAST_INITIALS[(i + 5) % LAST_INITIALS.length]!;
+
+    return {
+      user: { id: `t${i + 1}`, name: `${first} ${last}.`, avatarUrl: null },
+      composite: Math.min(0.97, Math.max(0.05, 0.12 + r * 0.82)),
+    };
+  }
+);
 
 interface TrainerScore {
   trainings: number;
@@ -290,23 +384,47 @@ interface TrainerScore {
 
 function scoreCurrentTrainer(): TrainerScore {
   const trainings = mockSessions.filter((s) => s.status === 'completed').length;
+
   const clients = mockClients.length;
+
   const records = mockClients.reduce((sum, c) => {
     const key = c.name.trim().toLowerCase();
-    const history = mockTrainingHistory.filter((h) => h.clientName.trim().toLowerCase() === key);
+
+    const history = mockTrainingHistory.filter(
+      (h) => h.clientName.trim().toLowerCase() === key
+    );
+
     return sum + computePRs(history).length;
   }, 0);
-  return { trainings, clients, records, composite: computeTrainerComposite(trainings, clients, records) };
+
+  return {
+    trainings,
+    clients,
+    records,
+    composite: computeTrainerComposite(trainings, clients, records),
+  };
 }
 
 function trainerRanked(): { entries: LeaderboardEntry[]; me: TrainerScore } {
   const me = scoreCurrentTrainer();
+
   const rows = [
-    ...TRAINER_POOL.map((m) => ({ user: m.user, composite: m.composite, isMe: false })),
-    { user: { id: CURRENT_USER_ID, name: 'You', avatarUrl: null }, composite: me.composite, isMe: true },
+    ...TRAINER_POOL.map((m) => ({
+      user: m.user,
+      composite: m.composite,
+      isMe: false,
+    })),
+    {
+      user: { id: CURRENT_USER_ID, name: 'You', avatarUrl: null },
+      composite: me.composite,
+      isMe: true,
+    },
   ];
+
   rows.sort((a, b) => b.composite - a.composite);
+
   const all = rows.map((r) => r.composite);
+
   const entries = rows.map((r, idx) => ({
     rank: idx + 1,
     user: r.user,
@@ -315,14 +433,19 @@ function trainerRanked(): { entries: LeaderboardEntry[]; me: TrainerScore } {
     leagueKey: resolveTier(percentileOf(r.composite, all)).key,
     isCurrentUser: r.isMe,
   }));
+
   return { entries, me };
 }
 
 export function buildTrainerGamification(): TrainerGamificationState {
   const { entries, me } = trainerRanked();
+
   const mine = entries.find((e) => e.isCurrentUser)!;
+
   const tier = resolveTier(mine.percentile);
+
   const next = nextTier(tier);
+
   return {
     userId: CURRENT_USER_ID,
     league: { key: tier.key, name: tier.name, ordinal: tier.ordinal },
@@ -354,21 +477,30 @@ const PRICE_BASELINE: Record<string, number> = { USD: 45, EUR: 42, UAH: 700 };
 
 function pricePool(currency: string): number[] {
   const base = PRICE_BASELINE[currency] ?? PRICE_BASELINE.USD!;
+
   return Array.from({ length: 50 }, (_, i) => {
     const spread = 0.55 + seeded(i + 201) * 0.9; // 0.55..1.45 of baseline
+
     return Math.round(base * spread);
   });
 }
 
 function quantile(sorted: number[], q: number): number {
   if (sorted.length === 0) return 0;
+
   const idx = Math.min(sorted.length - 1, Math.floor(q * sorted.length));
+
   return sorted[idx]!;
 }
 
-export function buildPricingInsight(currency: string, price: number): PricingInsight {
+export function buildPricingInsight(
+  currency: string,
+  price: number
+): PricingInsight {
   const pool = pricePool(currency);
+
   const sorted = [...pool].sort((a, b) => a - b);
+
   return {
     currency,
     sampleSize: pool.length,

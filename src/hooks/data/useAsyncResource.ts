@@ -26,30 +26,36 @@ interface State<T> {
  */
 export function useAsyncResource<T>(
   fetcher: (signal: AbortSignal) => Promise<T>,
-  deps: React.DependencyList = [],
+  deps: React.DependencyList = []
 ): AsyncResource<T> {
   const [state, setState] = React.useState<State<T>>({
     status: 'loading',
     data: undefined,
     error: undefined,
   });
+
   const [tick, setTick] = React.useState(0);
 
   // Always call the latest fetcher without making its identity a dependency.
   const fetcherRef = React.useRef(fetcher);
+
   fetcherRef.current = fetcher;
 
   React.useEffect(() => {
     const controller = new AbortController();
+
     setState((s) => ({ ...s, status: 'loading', error: undefined }));
     fetcherRef.current(controller.signal).then(
       (data) => {
-        if (!controller.signal.aborted) setState({ status: 'success', data, error: undefined });
+        if (!controller.signal.aborted)
+          setState({ status: 'success', data, error: undefined });
       },
       (error) => {
-        if (!controller.signal.aborted) setState({ status: 'error', data: undefined, error });
-      },
+        if (!controller.signal.aborted)
+          setState({ status: 'error', data: undefined, error });
+      }
     );
+
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick, ...deps]);

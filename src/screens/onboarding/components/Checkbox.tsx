@@ -1,7 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../../theme';
+
 const { colors, spacing } = theme;
 
 interface CheckboxProps {
@@ -21,7 +29,9 @@ export function Checkbox({ checked, onToggle, label, style }: CheckboxProps) {
       accessibilityState={{ checked }}
     >
       <View style={[styles.box, checked && styles.boxChecked]}>
-        {checked && <Ionicons name="checkmark" size={12} color={colors.white} />}
+        {checked && (
+          <Ionicons name="checkmark" size={12} color={colors.white} />
+        )}
       </View>
       <Text style={styles.label}>{label}</Text>
     </TouchableOpacity>

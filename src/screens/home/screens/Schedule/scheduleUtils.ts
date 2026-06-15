@@ -18,10 +18,13 @@ export interface ScheduleDay {
 /** Builds a flat list of the next DAYS_AHEAD days starting today. */
 export function buildDaysFromToday(): ScheduleDay[] {
   const days: ScheduleDay[] = [];
+
   const today = new Date();
+
   today.setHours(0, 0, 0, 0);
   for (let i = 0; i < DAYS_AHEAD; i++) {
     const d = new Date(today);
+
     d.setDate(today.getDate() + i);
     days.push({
       label: DAY_LABELS[d.getDay()] ?? '',
@@ -31,6 +34,7 @@ export function buildDaysFromToday(): ScheduleDay[] {
       month: d.getMonth(),
     });
   }
+
   return days;
 }
 

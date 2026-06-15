@@ -1,7 +1,8 @@
 import React from 'react';
+
 import { useTrainingHistoryStore } from '../../../../store/trainingHistoryStore';
+import type { ExerciseSet, TrainingProgram } from '../../../../types';
 import { applyProgression } from '../../../../utils';
-import type { TrainingProgram, ExerciseSet } from '../../../../types';
 
 type PctState = Record<number, { weightPct: number; repsPct: number }>;
 
@@ -14,17 +15,20 @@ type PctState = Record<number, { weightPct: number; repsPct: number }>;
 export function useExerciseProgression(
   program: TrainingProgram,
   clientName: string,
-  onChange: (plannedSets: Record<number, ExerciseSet[]>) => void,
+  onChange: (plannedSets: Record<number, ExerciseSet[]>) => void
 ) {
   const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
+
   const exercises = program.exercises ?? [];
 
   // Base = previous training values, else the program template.
   const bases = React.useMemo(() => {
     const map: Record<number, ExerciseSet[]> = {};
+
     for (const ex of program.exercises ?? []) {
       map[ex.id] = getLastSets(clientName, ex.id) ?? ex.sets;
     }
+
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [program.id, clientName]);
@@ -37,15 +41,25 @@ export function useExerciseProgression(
 
   React.useEffect(() => {
     const planned: Record<number, ExerciseSet[]> = {};
+
     for (const ex of program.exercises ?? []) {
       const p = pct[ex.id] ?? { weightPct: 0, repsPct: 0 };
-      planned[ex.id] = applyProgression(bases[ex.id] ?? ex.sets, p.weightPct, p.repsPct);
+
+      planned[ex.id] = applyProgression(
+        bases[ex.id] ?? ex.sets,
+        p.weightPct,
+        p.repsPct
+      );
     }
     onChange(planned);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bases, pct]);
 
-  const setExercisePct = (id: number, key: 'weightPct' | 'repsPct', value: number) =>
+  const setExercisePct = (
+    id: number,
+    key: 'weightPct' | 'repsPct',
+    value: number
+  ) =>
     setPct((prev) => ({
       ...prev,
       [id]: { weightPct: 0, repsPct: 0, ...prev[id], [key]: value },

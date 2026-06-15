@@ -1,16 +1,16 @@
-import { apiFetch } from './apiClient';
-import type { LeagueTierKey } from '../utils/game/leagues';
-import { LEAGUE_TIERS } from '../utils/game/leagues';
 import {
-  CANONICAL_EXERCISES,
-  buildMyGamification,
-  buildCompositeLeaderboard,
   buildCanonicalLeaderboard,
+  buildCompositeLeaderboard,
+  buildMyGamification,
   buildPointsLedger,
+  buildPricingInsight,
   buildTrainerGamification,
   buildTrainerLeaderboard,
-  buildPricingInsight,
+  CANONICAL_EXERCISES,
 } from '../mocks/gamification';
+import type { LeagueTierKey } from '../utils/game/leagues';
+import { LEAGUE_TIERS } from '../utils/game/leagues';
+import { apiFetch } from './apiClient';
 
 /**
  * Gamification API client (GAME-001…008).
@@ -149,15 +149,23 @@ export interface PricingInsight {
 
 const DEFAULT_LIMIT = 50;
 
-function paginate<T>(items: T[], cursor = 0, limit = DEFAULT_LIMIT): {
+function paginate<T>(
+  items: T[],
+  cursor = 0,
+  limit = DEFAULT_LIMIT
+): {
   data: T[];
   nextCursor: number | null;
   hasMore: boolean;
 } {
   const start = Math.max(0, cursor);
+
   const slice = items.slice(start, start + limit);
+
   const next = start + limit;
+
   const hasMore = next < items.length;
+
   return { data: slice, nextCursor: hasMore ? next : null, hasMore };
 }
 
@@ -166,18 +174,30 @@ function paginate<T>(items: T[], cursor = 0, limit = DEFAULT_LIMIT): {
 /** GET /v1/me/gamification */
 export async function fetchMyGamification(): Promise<GamificationState> {
   if (USE_MOCK) return buildMyGamification();
-  const res = await apiFetch<{ data: GamificationState }>(`/v1/me/gamification`);
+
+  const res = await apiFetch<{ data: GamificationState }>(
+    `/v1/me/gamification`
+  );
+
   return res.data;
 }
 
 /** GET /v1/me/points/ledger?cursor=&limit= */
-export async function fetchPointsLedger(cursor = 0, limit = DEFAULT_LIMIT): Promise<PointsLedgerPage> {
+export async function fetchPointsLedger(
+  cursor = 0,
+  limit = DEFAULT_LIMIT
+): Promise<PointsLedgerPage> {
   if (USE_MOCK) return paginate(buildPointsLedger(), cursor, limit);
-  return apiFetch<PointsLedgerPage>(`/v1/me/points/ledger?cursor=${cursor}&limit=${limit}`);
+
+  return apiFetch<PointsLedgerPage>(
+    `/v1/me/points/ledger?cursor=${cursor}&limit=${limit}`
+  );
 }
 
 /** GET /v1/leagues?role=client */
-export async function fetchLeagues(role: 'client' | 'trainer' = 'client'): Promise<LeagueTierInfo[]> {
+export async function fetchLeagues(
+  role: 'client' | 'trainer' = 'client'
+): Promise<LeagueTierInfo[]> {
   if (USE_MOCK) {
     return LEAGUE_TIERS.map((t) => ({
       key: t.key,
@@ -187,24 +207,41 @@ export async function fetchLeagues(role: 'client' | 'trainer' = 'client'): Promi
       maxPercentile: t.maxPercentile,
     }));
   }
-  const res = await apiFetch<{ data: LeagueTierInfo[] }>(`/v1/leagues?role=${role}`);
+
+  const res = await apiFetch<{ data: LeagueTierInfo[] }>(
+    `/v1/leagues?role=${role}`
+  );
+
   return res.data;
 }
 
 /** GET /v1/leaderboards/composite?scope=world&cursor=&limit= */
-export async function fetchCompositeLeaderboard(cursor = 0, limit = DEFAULT_LIMIT): Promise<LeaderboardPage> {
+export async function fetchCompositeLeaderboard(
+  cursor = 0,
+  limit = DEFAULT_LIMIT
+): Promise<LeaderboardPage> {
   if (USE_MOCK) return paginate(buildCompositeLeaderboard(), cursor, limit);
-  return apiFetch<LeaderboardPage>(`/v1/leaderboards/composite?scope=world&cursor=${cursor}&limit=${limit}`);
+
+  return apiFetch<LeaderboardPage>(
+    `/v1/leaderboards/composite?scope=world&cursor=${cursor}&limit=${limit}`
+  );
 }
 
 /** GET /v1/leaderboards/composite/me — my rank + immediate neighbors. */
 export async function fetchCompositeLeaderboardMe(): Promise<MyRankWindow> {
   if (USE_MOCK) {
     const all = buildCompositeLeaderboard();
+
     const idx = all.findIndex((e) => e.isCurrentUser);
+
     if (idx === -1) return { me: null, neighbors: [] };
-    return { me: all[idx]!, neighbors: all.slice(Math.max(0, idx - 2), idx + 3) };
+
+    return {
+      me: all[idx]!,
+      neighbors: all.slice(Math.max(0, idx - 2), idx + 3),
+    };
   }
+
   return apiFetch<MyRankWindow>(`/v1/leaderboards/composite/me`);
 }
 
@@ -212,42 +249,63 @@ export async function fetchCompositeLeaderboardMe(): Promise<MyRankWindow> {
 export async function fetchCanonicalLeaderboard(
   canonicalKey: string,
   cursor = 0,
-  limit = DEFAULT_LIMIT,
+  limit = DEFAULT_LIMIT
 ): Promise<LeaderboardPage> {
-  if (USE_MOCK) return paginate(buildCanonicalLeaderboard(canonicalKey), cursor, limit);
+  if (USE_MOCK)
+    return paginate(buildCanonicalLeaderboard(canonicalKey), cursor, limit);
+
   return apiFetch<LeaderboardPage>(
-    `/v1/leaderboards/canonical/${encodeURIComponent(canonicalKey)}?cursor=${cursor}&limit=${limit}`,
+    `/v1/leaderboards/canonical/${encodeURIComponent(canonicalKey)}?cursor=${cursor}&limit=${limit}`
   );
 }
 
 /** GET /v1/canonical-exercises */
 export async function fetchCanonicalExercises(): Promise<CanonicalExercise[]> {
   if (USE_MOCK) return CANONICAL_EXERCISES;
-  const res = await apiFetch<{ data: CanonicalExercise[] }>(`/v1/canonical-exercises`);
+
+  const res = await apiFetch<{ data: CanonicalExercise[] }>(
+    `/v1/canonical-exercises`
+  );
+
   return res.data;
 }
 
 /** GET /v1/me/trainer-gamification (GAME-007) */
 export async function fetchTrainerGamification(): Promise<TrainerGamificationState> {
   if (USE_MOCK) return buildTrainerGamification();
-  const res = await apiFetch<{ data: TrainerGamificationState }>(`/v1/me/trainer-gamification`);
+
+  const res = await apiFetch<{ data: TrainerGamificationState }>(
+    `/v1/me/trainer-gamification`
+  );
+
   return res.data;
 }
 
 /** GET /v1/leaderboards/trainers?scope=world (GAME-007) */
-export async function fetchTrainerLeaderboard(cursor = 0, limit = DEFAULT_LIMIT): Promise<LeaderboardPage> {
+export async function fetchTrainerLeaderboard(
+  cursor = 0,
+  limit = DEFAULT_LIMIT
+): Promise<LeaderboardPage> {
   if (USE_MOCK) return paginate(buildTrainerLeaderboard(), cursor, limit);
-  return apiFetch<LeaderboardPage>(`/v1/leaderboards/trainers?scope=world&cursor=${cursor}&limit=${limit}`);
+
+  return apiFetch<LeaderboardPage>(
+    `/v1/leaderboards/trainers?scope=world&cursor=${cursor}&limit=${limit}`
+  );
 }
 
 /** GET /v1/pricing-insights?currency=&kind=&price= (GAME-008) */
 export async function fetchPricingInsight(
   currency: string,
   price: number,
-  kind?: PackageKind,
+  kind?: PackageKind
 ): Promise<PricingInsight> {
   if (USE_MOCK) return buildPricingInsight(currency, price);
+
   const query = `currency=${encodeURIComponent(currency)}&price=${price}${kind ? `&kind=${kind}` : ''}`;
-  const res = await apiFetch<{ data: PricingInsight }>(`/v1/pricing-insights?${query}`);
+
+  const res = await apiFetch<{ data: PricingInsight }>(
+    `/v1/pricing-insights?${query}`
+  );
+
   return res.data;
 }

@@ -1,11 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Button, Card, Tag, Avatar, SectionTitle } from '../../../components/ui';
+
+import {
+  Avatar,
+  Button,
+  Card,
+  SectionTitle,
+  Tag,
+} from '../../../components/ui';
 import theme from '../../../theme';
+
 const { colors, typography, spacing } = theme;
-import { useOnboardingStore } from '../../../store/onboardingStore';
+
 import { useShallow } from 'zustand/react/shallow';
+
+import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
@@ -21,6 +31,7 @@ function availabilityText(
 
 export function PreviewProfileScreen() {
   const { navigation, isClient } = useOnboardingScreen('PreviewProfile');
+
   const s = useOnboardingStore(
     useShallow((st) => ({
       name: st.name,
@@ -44,8 +55,16 @@ export function PreviewProfileScreen() {
   );
 
   const displayName = s.name.trim() || (isClient ? 'Client' : 'Trainer');
-  const displayLocation = s.locations.length ? s.locations.join(', ') : 'Not set';
-  const displayAvailability = availabilityText(s.workDays, s.workTimeStart, s.workTimeEnd);
+
+  const displayLocation = s.locations.length
+    ? s.locations.join(', ')
+    : 'Not set';
+
+  const displayAvailability = availabilityText(
+    s.workDays,
+    s.workTimeStart,
+    s.workTimeEnd
+  );
 
   return (
     <OnboardingLayout
@@ -57,9 +76,13 @@ export function PreviewProfileScreen() {
         <Avatar name={displayName} uri={s.profilePhotoUri} size={80} />
         <Text style={styles.profileName}>{displayName}</Text>
         {isClient
-          ? s.selfLevel !== '' && <Text style={styles.profileTitle}>{s.selfLevel}</Text>
+          ? s.selfLevel !== '' && (
+              <Text style={styles.profileTitle}>{s.selfLevel}</Text>
+            )
           : s.trainingTypes.length > 0 && (
-              <Text style={styles.profileTitle}>{s.trainingTypes.slice(0, 3).join(' & ')} Coach</Text>
+              <Text style={styles.profileTitle}>
+                {s.trainingTypes.slice(0, 3).join(' & ')} Coach
+              </Text>
             )}
       </View>
 
@@ -70,7 +93,9 @@ export function PreviewProfileScreen() {
               <Ionicons name="time" size={20} color={colors.textSecondary} />
               <View>
                 <Text style={styles.infoLabel}>Training for</Text>
-                <Text style={styles.infoValue}>{s.experienceYears || 'Not set'}</Text>
+                <Text style={styles.infoValue}>
+                  {s.experienceYears || 'Not set'}
+                </Text>
               </View>
             </Card>
             <Card style={styles.infoCard}>
@@ -82,20 +107,28 @@ export function PreviewProfileScreen() {
             </Card>
           </View>
 
-          <SectionTitle style={styles.sectionTitleSpacing}>Injuries & limitations</SectionTitle>
+          <SectionTitle style={styles.sectionTitleSpacing}>
+            Injuries & limitations
+          </SectionTitle>
           <Card style={styles.card}>
             <Ionicons name="medkit" size={20} color={colors.textSecondary} />
             <View style={styles.cardBody}>
-              <Text style={styles.infoValue}>{s.hasInjuries ? 'Yes' : 'None'}</Text>
+              <Text style={styles.infoValue}>
+                {s.hasInjuries ? 'Yes' : 'None'}
+              </Text>
               {s.hasInjuries && s.injuriesNote.trim() !== '' && (
-                <Text style={[styles.infoLabel, styles.metaSpaced]}>{s.injuriesNote.trim()}</Text>
+                <Text style={[styles.infoLabel, styles.metaSpaced]}>
+                  {s.injuriesNote.trim()}
+                </Text>
               )}
             </View>
           </Card>
 
           {s.trainingTypes.length > 0 && (
             <>
-              <SectionTitle style={styles.sectionTitleSpacing}>Interested in</SectionTitle>
+              <SectionTitle style={styles.sectionTitleSpacing}>
+                Interested in
+              </SectionTitle>
               <View style={styles.tagsRow}>
                 {s.trainingTypes.map((t) => (
                   <Tag key={t} label={t} variant="default" />
@@ -104,7 +137,9 @@ export function PreviewProfileScreen() {
             </>
           )}
 
-          <SectionTitle style={styles.sectionTitleSpacing}>Preferred location</SectionTitle>
+          <SectionTitle style={styles.sectionTitleSpacing}>
+            Preferred location
+          </SectionTitle>
           <Card style={styles.card}>
             <Ionicons name="location" size={20} color={colors.textSecondary} />
             <View style={styles.cardBody}>
@@ -112,7 +147,9 @@ export function PreviewProfileScreen() {
             </View>
           </Card>
 
-          <SectionTitle style={styles.sectionTitleSpacing}>Availability</SectionTitle>
+          <SectionTitle style={styles.sectionTitleSpacing}>
+            Availability
+          </SectionTitle>
           <Card style={[styles.card, styles.availabilityCard]}>
             <Ionicons name="calendar" size={20} color={colors.text} />
             <View style={styles.cardBody}>
@@ -120,13 +157,17 @@ export function PreviewProfileScreen() {
             </View>
           </Card>
 
-          <SectionTitle style={styles.sectionTitleSpacing}>Trainer preferences</SectionTitle>
+          <SectionTitle style={styles.sectionTitleSpacing}>
+            Trainer preferences
+          </SectionTitle>
           <View style={styles.infoRow}>
             <Card style={styles.infoCard}>
               <Ionicons name="person" size={20} color={colors.textSecondary} />
               <View>
                 <Text style={styles.infoLabel}>Gender</Text>
-                <Text style={styles.infoValue}>{s.preferredTrainerGender || 'Any'}</Text>
+                <Text style={styles.infoValue}>
+                  {s.preferredTrainerGender || 'Any'}
+                </Text>
               </View>
             </Card>
             <Card style={styles.infoCard}>
@@ -134,7 +175,9 @@ export function PreviewProfileScreen() {
               <View>
                 <Text style={styles.infoLabel}>Format</Text>
                 <Text style={styles.infoValue}>
-                  {s.preferredFormat.length ? s.preferredFormat.join(', ') : 'Any'}
+                  {s.preferredFormat.length
+                    ? s.preferredFormat.join(', ')
+                    : 'Any'}
                 </Text>
               </View>
             </Card>
@@ -144,52 +187,78 @@ export function PreviewProfileScreen() {
         <>
           <View style={styles.infoRow}>
             <Card style={styles.infoCard}>
-              <Ionicons name="location" size={20} color={colors.textSecondary} />
+              <Ionicons
+                name="location"
+                size={20}
+                color={colors.textSecondary}
+              />
               <View>
                 <Text style={styles.infoLabel}>Location</Text>
                 <Text style={styles.infoValue}>{displayLocation}</Text>
               </View>
             </Card>
             <Card style={styles.infoCard}>
-              <Ionicons name="briefcase" size={20} color={colors.textSecondary} />
+              <Ionicons
+                name="briefcase"
+                size={20}
+                color={colors.textSecondary}
+              />
               <View>
                 <Text style={styles.infoLabel}>Experience</Text>
-                <Text style={styles.infoValue}>{s.experienceYears || 'Not set'}</Text>
+                <Text style={styles.infoValue}>
+                  {s.experienceYears || 'Not set'}
+                </Text>
               </View>
             </Card>
           </View>
 
-          <SectionTitle style={styles.sectionTitleSpacing}>Certifications</SectionTitle>
+          <SectionTitle style={styles.sectionTitleSpacing}>
+            Certifications
+          </SectionTitle>
           <Card style={styles.card}>
             <Ionicons name="ribbon" size={20} color={colors.textSecondary} />
             <View style={styles.cardBody}>
               <Text style={styles.infoLabel}>Plans to add certifications</Text>
-              <Text style={styles.infoValue}>{s.hasCertifications ? 'Yes' : 'No'}</Text>
-              <Text style={[styles.infoLabel, styles.metaSpaced]}>Uploaded</Text>
+              <Text style={styles.infoValue}>
+                {s.hasCertifications ? 'Yes' : 'No'}
+              </Text>
+              <Text style={[styles.infoLabel, styles.metaSpaced]}>
+                Uploaded
+              </Text>
               <Text style={styles.infoValue}>
                 {s.certifications.length === 0
                   ? 'None'
                   : `${s.certifications.length} file${s.certifications.length > 1 ? 's' : ''}`}
               </Text>
               {s.certifications.length > 0 && (
-                <Text style={styles.certNames}>{s.certifications.map((c) => c.name).join(', ')}</Text>
+                <Text style={styles.certNames}>
+                  {s.certifications.map((c) => c.name).join(', ')}
+                </Text>
               )}
             </View>
           </Card>
 
-          <SectionTitle style={styles.sectionTitleSpacing}>Availability</SectionTitle>
+          <SectionTitle style={styles.sectionTitleSpacing}>
+            Availability
+          </SectionTitle>
           <Card style={[styles.card, styles.availabilityCard]}>
             <Ionicons name="time" size={20} color={colors.text} />
             <View style={styles.cardBody}>
               <Text style={styles.availabilityText}>{displayAvailability}</Text>
-              <Text style={[styles.infoLabel, styles.metaSpaced]}>Same slots every week</Text>
-              <Text style={styles.infoValue}>{s.sameSlotsEveryWeek ? 'Yes' : 'No'}</Text>
+              <Text style={[styles.infoLabel, styles.metaSpaced]}>
+                Same slots every week
+              </Text>
+              <Text style={styles.infoValue}>
+                {s.sameSlotsEveryWeek ? 'Yes' : 'No'}
+              </Text>
             </View>
           </Card>
 
           {s.trainingTypes.length > 0 && (
             <>
-              <SectionTitle style={styles.sectionTitleSpacing}>Training Types</SectionTitle>
+              <SectionTitle style={styles.sectionTitleSpacing}>
+                Training Types
+              </SectionTitle>
               <View style={styles.tagsRow}>
                 {s.trainingTypes.map((t) => (
                   <Tag key={t} label={t} variant="default" />
@@ -200,7 +269,9 @@ export function PreviewProfileScreen() {
 
           {s.clientTypes.length > 0 && (
             <>
-              <SectionTitle style={styles.sectionTitleSpacing}>Clients</SectionTitle>
+              <SectionTitle style={styles.sectionTitleSpacing}>
+                Clients
+              </SectionTitle>
               <View style={styles.tagsRow}>
                 {s.clientTypes.map((c) => (
                   <Tag key={c} label={c} variant="default" />
@@ -216,7 +287,11 @@ export function PreviewProfileScreen() {
         onPress={() => navigation.navigate('YoureAllSet')}
         style={styles.publishBtn}
       />
-      <Button title="Edit Info" onPress={() => navigation.goBack()} variant="outline" />
+      <Button
+        title="Edit Info"
+        onPress={() => navigation.goBack()}
+        variant="outline"
+      />
     </OnboardingLayout>
   );
 }

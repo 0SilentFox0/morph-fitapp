@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+
 import { TrainerPreferencesScreen } from '../../../../screens/onboarding/steps/TrainerPreferencesScreen';
 import { useAppStore } from '../../../../store/appStore';
 import { useOnboardingStore } from '../../../../store/onboardingStore';
 
 const mockNavigate = jest.fn();
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate, goBack: jest.fn() }),
 }));
@@ -37,7 +39,10 @@ describe('TrainerPreferencesScreen', () => {
 
     await press('Online');
     await press('In-person');
-    expect(useOnboardingStore.getState().preferredFormat).toEqual(['Online', 'In-person']);
+    expect(useOnboardingStore.getState().preferredFormat).toEqual([
+      'Online',
+      'In-person',
+    ]);
   });
 
   it('advances to ProfilePhoto on Next', async () => {

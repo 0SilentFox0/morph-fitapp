@@ -1,20 +1,34 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import { useAuthStore } from '../../store/authStore';
+import React, { useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+
 import { ApiError } from '../../services/api/client';
+import { useAuthStore } from '../../store/authStore';
 import theme from '../../theme';
+
 const { colors, spacing } = theme;
 
 export function LoginScreen() {
   const login = useAuthStore((s) => s.login);
+
   const [email, setEmail] = useState('');
+
   const [password, setPassword] = useState('');
+
   const [error, setError] = useState<string | null>(null);
+
   const [submitting, setSubmitting] = useState(false);
 
   // Refs mirror state so onSubmit always reads the latest values regardless of
   // when React schedules the re-render after fireEvent.changeText in tests.
   const emailRef = useRef('');
+
   const passwordRef = useRef('');
 
   const handleEmailChange = (value: string) => {
@@ -33,7 +47,11 @@ export function LoginScreen() {
     try {
       await login(emailRef.current.trim(), passwordRef.current);
     } catch (e) {
-      const message = e instanceof ApiError ? e.message : 'Unable to sign in. Please try again.';
+      const message =
+        e instanceof ApiError
+          ? e.message
+          : 'Unable to sign in. Please try again.';
+
       setError(message);
     } finally {
       setSubmitting(false);
@@ -79,15 +97,29 @@ export function LoginScreen() {
         onPress={onSubmit}
         disabled={submitting}
       >
-        {submitting ? <ActivityIndicator color={colors.text} /> : <Text style={styles.buttonText}>Sign in</Text>}
+        {submitting ? (
+          <ActivityIndicator color={colors.text} />
+        ) : (
+          <Text style={styles.buttonText}>Sign in</Text>
+        )}
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: spacing.lg, gap: spacing.md },
-  title: { color: colors.text, fontSize: 28, fontWeight: '700', marginBottom: spacing.md },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  title: {
+    color: colors.text,
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: spacing.md,
+  },
   input: {
     backgroundColor: colors.inputBg,
     color: colors.text,

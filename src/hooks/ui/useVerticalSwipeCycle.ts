@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { PanResponder } from 'react-native';
 
 const DEFAULT_THRESHOLD = 60;
+
 const MOVE_ACTIVATION = 20;
 
 /**
@@ -13,12 +14,16 @@ export function cycleOnSwipe<T>(
   states: readonly T[],
   current: T,
   dy: number,
-  threshold: number,
+  threshold: number
 ): T | null {
   const i = states.indexOf(current);
+
   if (i < 0) return null;
+
   if (dy > threshold && i < states.length - 1) return states[i + 1]!;
+
   if (dy < -threshold && i > 0) return states[i - 1]!;
+
   return null;
 }
 
@@ -30,7 +35,7 @@ export function useVerticalSwipeCycle<T>(
   states: readonly T[],
   current: T,
   onChange: (next: T) => void,
-  threshold = DEFAULT_THRESHOLD,
+  threshold = DEFAULT_THRESHOLD
 ) {
   const responder = useMemo(
     () =>
@@ -39,10 +44,12 @@ export function useVerticalSwipeCycle<T>(
         onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > MOVE_ACTIVATION,
         onPanResponderRelease: (_, g) => {
           const next = cycleOnSwipe(states, current, g.dy, threshold);
+
           if (next !== null) onChange(next);
         },
       }),
-    [states, current, onChange, threshold],
+    [states, current, onChange, threshold]
   );
+
   return responder.panHandlers;
 }

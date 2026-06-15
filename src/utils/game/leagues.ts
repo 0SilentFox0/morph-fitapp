@@ -1,5 +1,7 @@
 import theme from '../../theme';
+
 const { colors } = theme;
+
 import type { Ionicons } from '@expo/vector-icons';
 
 /**
@@ -34,28 +36,79 @@ export interface LeagueTier {
 }
 
 export const LEAGUE_TIERS: readonly LeagueTier[] = [
-  { key: 'wooden', name: 'Wooden', ordinal: 1, minPercentile: 0.0, maxPercentile: 0.4, icon: 'leaf', color: colors.neutral6 },
-  { key: 'bronze', name: 'Bronze', ordinal: 2, minPercentile: 0.4, maxPercentile: 0.65, icon: 'medal', color: colors.primary7 },
-  { key: 'silver', name: 'Silver', ordinal: 3, minPercentile: 0.65, maxPercentile: 0.82, icon: 'medal', color: colors.neutral8 },
-  { key: 'gold', name: 'Gold', ordinal: 4, minPercentile: 0.82, maxPercentile: 0.93, icon: 'trophy', color: colors.warning7 },
-  { key: 'diamond', name: 'Diamond', ordinal: 5, minPercentile: 0.93, maxPercentile: 0.99, icon: 'diamond', color: colors.blue9 },
-  { key: 'platinum', name: 'Platinum', ordinal: 6, minPercentile: 0.99, maxPercentile: 1.0, icon: 'sparkles', color: colors.primary9 },
+  {
+    key: 'wooden',
+    name: 'Wooden',
+    ordinal: 1,
+    minPercentile: 0.0,
+    maxPercentile: 0.4,
+    icon: 'leaf',
+    color: colors.neutral6,
+  },
+  {
+    key: 'bronze',
+    name: 'Bronze',
+    ordinal: 2,
+    minPercentile: 0.4,
+    maxPercentile: 0.65,
+    icon: 'medal',
+    color: colors.primary7,
+  },
+  {
+    key: 'silver',
+    name: 'Silver',
+    ordinal: 3,
+    minPercentile: 0.65,
+    maxPercentile: 0.82,
+    icon: 'medal',
+    color: colors.neutral8,
+  },
+  {
+    key: 'gold',
+    name: 'Gold',
+    ordinal: 4,
+    minPercentile: 0.82,
+    maxPercentile: 0.93,
+    icon: 'trophy',
+    color: colors.warning7,
+  },
+  {
+    key: 'diamond',
+    name: 'Diamond',
+    ordinal: 5,
+    minPercentile: 0.93,
+    maxPercentile: 0.99,
+    icon: 'diamond',
+    color: colors.blue9,
+  },
+  {
+    key: 'platinum',
+    name: 'Platinum',
+    ordinal: 6,
+    minPercentile: 0.99,
+    maxPercentile: 1.0,
+    icon: 'sparkles',
+    color: colors.primary9,
+  },
 ] as const;
 
 const byKey: Record<LeagueTierKey, LeagueTier> = LEAGUE_TIERS.reduce(
   (acc, t) => {
     acc[t.key] = t;
+
     return acc;
   },
-  {} as Record<LeagueTierKey, LeagueTier>,
+  {} as Record<LeagueTierKey, LeagueTier>
 );
 
 /** The tier whose band contains `percentile` (clamped to 0..1). */
 export function resolveTier(percentile: number): LeagueTier {
   const p = Math.min(Math.max(percentile, 0), 1);
+
   for (const tier of LEAGUE_TIERS) {
     if (p >= tier.minPercentile && p < tier.maxPercentile) return tier;
   }
+
   // p === 1 lands here (platinum's max is exclusive in the loop).
   return LEAGUE_TIERS[LEAGUE_TIERS.length - 1]!;
 }
@@ -75,8 +128,15 @@ export function nextTier(tier: LeagueTier): LeagueTier | null {
  */
 export function tierProgress(percentile: number): number {
   const tier = resolveTier(percentile);
+
   const span = tier.maxPercentile - tier.minPercentile;
+
   if (span <= 0) return 1;
-  const p = Math.min(Math.max(percentile, tier.minPercentile), tier.maxPercentile);
+
+  const p = Math.min(
+    Math.max(percentile, tier.minPercentile),
+    tier.maxPercentile
+  );
+
   return (p - tier.minPercentile) / span;
 }

@@ -1,26 +1,39 @@
 import React from 'react';
-import { numericDate, formatKg } from '../../../utils';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LineChart } from 'react-native-chart-kit';
-import { Ionicons } from '@expo/vector-icons';
-import type { ProgressStackParamList } from '../../../navigation/types';
+
 import { ScreenHeader } from '../../../components/layout';
-import { SectionTitle, HorizontalSwipe } from '../../../components/ui';
-import { ProgressQuickLinks } from './components/ProgressQuickLinks';
-import { BodyMapCard } from './components/BodyMapCard';
+import { HorizontalSwipe, SectionTitle } from '../../../components/ui';
+import type { ProgressStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+import { formatKg, numericDate } from '../../../utils';
 import { overallVolumeSeries } from '../../../utils/progress/exerciseProgress';
 import { useClientTabSwipe } from '../useClientTabSwipe';
-import theme from '../../../theme';
+import { BodyMapCard } from './components/BodyMapCard';
+import { ProgressQuickLinks } from './components/ProgressQuickLinks';
+
 const { colors, createChartConfig, radius, typography, spacing } = theme;
-import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
+
+import { MUSCLE_LABELS } from '../../../constants/muscles';
 import { exerciseMuscleMap } from '../../../mocks';
+import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import type { Timeframe } from '../../../utils/progress/muscleStats';
 import { computeProgressOverview } from '../../../utils/progress/progress';
-import { MUSCLE_LABELS } from '../../../constants/muscles';
 
-type Nav = NativeStackNavigationProp<ProgressStackParamList, 'ProgressOverview'>;
+type Nav = NativeStackNavigationProp<
+  ProgressStackParamList,
+  'ProgressOverview'
+>;
 
 const TIMEFRAMES: { key: Timeframe; label: string }[] = [
   { key: 'session', label: 'Last session' },
@@ -28,27 +41,41 @@ const TIMEFRAMES: { key: Timeframe; label: string }[] = [
   { key: 'all', label: 'All time' },
 ];
 
-
 const chartConfig = createChartConfig();
-
 
 export function ProgressOverviewScreen() {
   const navigation = useNavigation<Nav>();
-  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+
+  const getCurrentUserHistory = useTrainingHistoryStore(
+    (s) => s.getCurrentUserHistory
+  );
 
   const [timeframe, setTimeframe] = React.useState<Timeframe>('all');
+
   const [view, setView] = React.useState<'front' | 'back'>('front');
+
   const tabSwipe = useClientTabSwipe('ProgressTab');
 
   const fullHistory = getCurrentUserHistory();
 
   // Overall dynamics is always all-time (independent of the timeframe pills).
-  const overallSeries = React.useMemo(() => overallVolumeSeries(fullHistory), [fullHistory]);
-  const chartWidth = Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
+  const overallSeries = React.useMemo(
+    () => overallVolumeSeries(fullHistory),
+    [fullHistory]
+  );
+
+  const chartWidth =
+    Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
 
   const { intensities, totals, topMuscles } = React.useMemo(
-    () => computeProgressOverview(fullHistory, exerciseMuscleMap, timeframe, new Date()),
-    [fullHistory, timeframe],
+    () =>
+      computeProgressOverview(
+        fullHistory,
+        exerciseMuscleMap,
+        timeframe,
+        new Date()
+      ),
+    [fullHistory, timeframe]
   );
 
   return (
@@ -73,14 +100,23 @@ export function ProgressOverviewScreen() {
         <View style={styles.timeframeRow}>
           {TIMEFRAMES.map((tf) => {
             const active = tf.key === timeframe;
+
             return (
               <TouchableOpacity
                 key={tf.key}
                 onPress={() => setTimeframe(tf.key)}
-                style={[styles.timeframeBtn, active && styles.timeframeBtnActive]}
+                style={[
+                  styles.timeframeBtn,
+                  active && styles.timeframeBtnActive,
+                ]}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.timeframeText, active && styles.timeframeTextActive]}>
+                <Text
+                  style={[
+                    styles.timeframeText,
+                    active && styles.timeframeTextActive,
+                  ]}
+                >
                   {tf.label}
                 </Text>
               </TouchableOpacity>
@@ -100,7 +136,9 @@ export function ProgressOverviewScreen() {
           intensities={intensities}
           view={view}
           onViewChange={setView}
-          onMusclePress={(muscle) => navigation.navigate('MuscleDetail', { muscle })}
+          onMusclePress={(muscle) =>
+            navigation.navigate('MuscleDetail', { muscle })
+          }
         />
 
         {/* Overall progress dynamics (all-time volume per session) */}
@@ -129,7 +167,9 @@ export function ProgressOverviewScreen() {
         {/* Muscles worked */}
         <SectionTitle>Muscles worked</SectionTitle>
         {topMuscles.length === 0 ? (
-          <Text style={styles.empty}>No training logged for this period yet.</Text>
+          <Text style={styles.empty}>
+            No training logged for this period yet.
+          </Text>
         ) : (
           <View style={styles.muscleList}>
             {topMuscles.map(({ group, stat }) => (
@@ -137,13 +177,21 @@ export function ProgressOverviewScreen() {
                 key={group}
                 style={styles.muscleRow}
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('MuscleDetail', { muscle: group })}
+                onPress={() =>
+                  navigation.navigate('MuscleDetail', { muscle: group })
+                }
               >
                 <Text style={styles.muscleName}>{MUSCLE_LABELS[group]}</Text>
                 <View style={styles.muscleMeta}>
-                  <Text style={styles.muscleStat}>{formatKg(stat.totalWeight)}</Text>
+                  <Text style={styles.muscleStat}>
+                    {formatKg(stat.totalWeight)}
+                  </Text>
                   <Text style={styles.muscleSub}>{stat.exerciseCount} ex</Text>
-                  <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={colors.textMuted}
+                  />
                 </View>
               </TouchableOpacity>
             ))}
@@ -169,7 +217,11 @@ function StatTile({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.lg },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.lg,
+  },
   timeframeRow: { flexDirection: 'row', gap: spacing.xs },
   timeframeBtn: {
     flex: 1,
@@ -179,7 +231,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.neutral5,
   },
-  timeframeBtnActive: { backgroundColor: colors.neutral3, borderColor: colors.text },
+  timeframeBtnActive: {
+    backgroundColor: colors.neutral3,
+    borderColor: colors.text,
+  },
   timeframeText: { fontSize: typography.sizes.sm, color: colors.textSecondary },
   timeframeTextActive: { color: colors.text },
   statsRow: { flexDirection: 'row', gap: spacing.sm },
@@ -191,9 +246,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-  statValue: { fontSize: typography.sizes.xl, fontWeight: typography.weights.bold, color: colors.text },
+  statValue: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  chartCard: { backgroundColor: colors.neutral1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.xs },
+  chartCard: {
+    backgroundColor: colors.neutral1,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
   chartCaption: { fontSize: typography.sizes.sm, color: colors.textSecondary },
   chart: { borderRadius: radius.sm },
   empty: { color: colors.textSecondary, fontSize: typography.sizes.sm },
@@ -209,6 +273,10 @@ const styles = StyleSheet.create({
   },
   muscleName: { fontSize: typography.sizes.base, color: colors.text },
   muscleMeta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  muscleStat: { fontSize: typography.sizes.sm, color: colors.text, fontWeight: typography.weights.semibold },
+  muscleStat: {
+    fontSize: typography.sizes.sm,
+    color: colors.text,
+    fontWeight: typography.weights.semibold,
+  },
   muscleSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
 });

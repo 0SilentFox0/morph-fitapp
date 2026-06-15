@@ -1,11 +1,16 @@
 import { z } from 'zod';
 
 const uuid = z.string();
+
 const dt = z.string();
+
 // The backend sends optional collections as `null` (not `[]`) and may omit them
 // entirely, so coerce both null and undefined to an empty array before validating.
 const arr = <T extends z.ZodTypeAny = z.ZodString>(inner?: T) =>
-  z.preprocess((v) => (v == null ? [] : v), z.array((inner ?? z.string()) as T));
+  z.preprocess(
+    (v) => (v == null ? [] : v),
+    z.array((inner ?? z.string()) as T)
+  );
 
 export const TokenResponseSchema = z.object({
   access_token: z.string(),
@@ -33,7 +38,9 @@ export const UserSchema = z.object({
   work_schedule_end: z.string().nullish(),
   work_schedule_days: arr(),
   goals: arr(),
-  fitness_level: z.enum(['beginner', 'intermediate', 'advanced', 'elite']).nullish(),
+  fitness_level: z
+    .enum(['beginner', 'intermediate', 'advanced', 'elite'])
+    .nullish(),
   onboarding_completed_at: dt.nullish(),
   created_at: dt,
 });
@@ -157,7 +164,13 @@ export const SessionSchema = z.object({
   type: z.string().nullish(),
   start_at: dt.nullish(),
   end_at: dt.nullish(),
-  status: z.enum(['planned', 'in_progress', 'completed', 'canceled', 'no_show']),
+  status: z.enum([
+    'planned',
+    'in_progress',
+    'completed',
+    'canceled',
+    'no_show',
+  ]),
   status_changed_at: dt.nullish(),
   cancellation_reason: z.string().nullish(),
   notes: z.string().nullish(),
@@ -223,7 +236,16 @@ export const WorkoutLogSchema = z.object({
 export const BodyMeasurementSchema = z.object({
   id: uuid,
   client_id: uuid,
-  metric_type: z.enum(['weight', 'height', 'body_fat_percent', 'chest', 'waist', 'hips', 'biceps', 'thigh']),
+  metric_type: z.enum([
+    'weight',
+    'height',
+    'body_fat_percent',
+    'chest',
+    'waist',
+    'hips',
+    'biceps',
+    'thigh',
+  ]),
   value: z.number(),
   unit: z.string(),
   measured_at: dt.nullish(),

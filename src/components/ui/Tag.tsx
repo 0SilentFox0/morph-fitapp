@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 interface TagProps {
@@ -12,7 +14,9 @@ interface TagProps {
 export function Tag({ label, variant = 'default', style }: TagProps) {
   return (
     <View style={[styles.tag, variant === 'accent' && styles.tagAccent, style]}>
-      <Text style={[styles.text, variant === 'accent' && styles.textAccent]}>{label}</Text>
+      <Text style={[styles.text, variant === 'accent' && styles.textAccent]}>
+        {label}
+      </Text>
     </View>
   );
 }

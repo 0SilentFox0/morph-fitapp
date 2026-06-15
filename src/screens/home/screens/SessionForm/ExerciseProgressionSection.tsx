@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { applyProgression, PROGRESSION_STEPS } from '../../../../utils';
-import type { TrainingProgram, ExerciseSet } from '../../../../types';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../../../../theme';
+import type { ExerciseSet, TrainingProgram } from '../../../../types';
+import { applyProgression, PROGRESSION_STEPS } from '../../../../utils';
+
 const { colors, radius, typography, spacing } = theme;
+
 import { useExerciseProgression } from './useExerciseProgression';
 
 interface ExerciseProgressionSectionProps {
@@ -27,7 +30,7 @@ export function ExerciseProgressionSection({
   const { exercises, bases, pct, setExercisePct } = useExerciseProgression(
     program,
     clientName,
-    onChange,
+    onChange
   );
 
   if (exercises.length === 0) return null;
@@ -37,17 +40,22 @@ export function ExerciseProgressionSection({
       <Text style={styles.sectionLabel}>Progression</Text>
       {exercises.map((ex) => {
         const base = bases[ex.id] ?? ex.sets;
+
         const p = pct[ex.id] ?? { weightPct: 0, repsPct: 0 };
+
         const baseTop = base[0];
+
         const afterTop = baseTop
           ? applyProgression([baseTop], p.weightPct, p.repsPct)[0]
           : undefined;
+
         return (
           <View key={ex.id} style={styles.card}>
             <Text style={styles.exName}>{ex.name}</Text>
             {baseTop && afterTop && (
               <Text style={styles.preview}>
-                prev {baseTop.weight}×{baseTop.reps} → {afterTop.weight} kg × {afterTop.reps}
+                prev {baseTop.weight}×{baseTop.reps} → {afterTop.weight} kg ×{' '}
+                {afterTop.reps}
               </Text>
             )}
             <ChipRow
@@ -81,6 +89,7 @@ function ChipRow({
       <Text style={styles.chipLabel}>{label}</Text>
       {PROGRESSION_STEPS.map((step) => {
         const active = value === step;
+
         return (
           <TouchableOpacity
             key={step}

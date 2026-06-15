@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Card } from '../../../../components/ui';
 import theme from '../../../../theme';
+
 const { colors, typography, spacing, radius } = theme;
 
 export interface StatCardsRowProps {
@@ -13,7 +15,11 @@ export interface StatCardsRowProps {
 export function StatCardsRow({ onRevenuePress }: StatCardsRowProps) {
   return (
     <View style={styles.cardsRow}>
-      <TouchableOpacity style={{ flex: 1 }} activeOpacity={0.8} onPress={onRevenuePress}>
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        activeOpacity={0.8}
+        onPress={onRevenuePress}
+      >
         <Card style={styles.statCard}>
           <View style={styles.statCardTop}>
             <View style={styles.statCardLabel}>
@@ -31,7 +37,9 @@ export function StatCardsRow({ onRevenuePress }: StatCardsRowProps) {
         <View style={styles.statCardTop}>
           <View style={styles.statCardLabel}>
             <Ionicons name="eye" size={16} color={colors.text} />
-            <Text style={[styles.statLabel, styles.statLabelMuted]}>Profile view</Text>
+            <Text style={[styles.statLabel, styles.statLabelMuted]}>
+              Profile view
+            </Text>
           </View>
           <View style={styles.arrowBtn}>
             <Ionicons name="arrow-forward" size={16} color={colors.neutral7} />

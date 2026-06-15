@@ -1,16 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
-import type { StatsStackParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
 import { SearchInput } from '../../components/ui';
-import { TransactionCard } from './Analytics/TransactionCard';
+import type { StatsStackParamList } from '../../navigation/types';
 import theme from '../../theme';
+import { TransactionCard } from './Analytics/TransactionCard';
+
 const { colors, radius, typography, spacing } = theme;
-import { exportTransactions, searchItems } from '../../utils';
+
 import { mockTransactions } from '../../mocks';
+import { exportTransactions, searchItems } from '../../utils';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'Transactions'>;
 
@@ -18,15 +27,20 @@ const FILTERS = ['All', 'Earnings', 'Subscriptions'] as const;
 
 export function TransactionsScreen() {
   const navigation = useNavigation<Nav>();
+
   const [activeFilter, setActiveFilter] = React.useState(0);
+
   const [search, setSearch] = React.useState('');
 
   const transactions = React.useMemo(() => {
     const byFilter = mockTransactions.filter((t) => {
       if (activeFilter === 1) return t.type === 'Training';
+
       if (activeFilter === 2) return t.type === 'Subscription';
+
       return true;
     });
+
     return searchItems(search, byFilter, (t) => [t.clientName]);
   }, [activeFilter, search]);
 
@@ -37,7 +51,9 @@ export function TransactionsScreen() {
         transparent
         rightElement={
           <View style={styles.headerRight}>
-            <TouchableOpacity onPress={() => navigation.navigate('AddTransaction')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('AddTransaction')}
+            >
               <Ionicons name="pencil" size={22} color={colors.text} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => exportTransactions(transactions)}>
@@ -52,9 +68,17 @@ export function TransactionsScreen() {
           <TouchableOpacity
             key={f}
             onPress={() => setActiveFilter(i)}
-            style={[styles.filterBtn, i === activeFilter && styles.filterBtnActive]}
+            style={[
+              styles.filterBtn,
+              i === activeFilter && styles.filterBtnActive,
+            ]}
           >
-            <Text style={[styles.filterText, i === activeFilter && styles.filterTextActive]}>
+            <Text
+              style={[
+                styles.filterText,
+                i === activeFilter && styles.filterTextActive,
+              ]}
+            >
               {f}
             </Text>
           </TouchableOpacity>

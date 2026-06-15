@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
 import { AsyncBoundary } from '../../components/ui/AsyncBoundary';
 
 const Child = () => <Text testID="child">content</Text>;
@@ -10,7 +11,7 @@ describe('AsyncBoundary', () => {
     await render(
       <AsyncBoundary status="loading">
         <Child />
-      </AsyncBoundary>,
+      </AsyncBoundary>
     );
     expect(screen.getByTestId('async-loading')).toBeTruthy();
     expect(screen.queryByTestId('child')).toBeNull();
@@ -18,10 +19,11 @@ describe('AsyncBoundary', () => {
 
   it('shows the error state with a working retry button', async () => {
     const onRetry = jest.fn();
+
     await render(
       <AsyncBoundary status="error" error={new Error('boom')} onRetry={onRetry}>
         <Child />
-      </AsyncBoundary>,
+      </AsyncBoundary>
     );
     expect(screen.getByTestId('async-error')).toBeTruthy();
     fireEvent.press(screen.getByTestId('async-retry'));
@@ -32,7 +34,7 @@ describe('AsyncBoundary', () => {
     await render(
       <AsyncBoundary status="success" isEmpty emptyLabel="Nothing here">
         <Child />
-      </AsyncBoundary>,
+      </AsyncBoundary>
     );
     expect(screen.getByTestId('async-empty')).toBeTruthy();
     expect(screen.getByText('Nothing here')).toBeTruthy();
@@ -43,7 +45,7 @@ describe('AsyncBoundary', () => {
     await render(
       <AsyncBoundary status="success">
         <Child />
-      </AsyncBoundary>,
+      </AsyncBoundary>
     );
     expect(screen.getByTestId('child')).toBeTruthy();
   });

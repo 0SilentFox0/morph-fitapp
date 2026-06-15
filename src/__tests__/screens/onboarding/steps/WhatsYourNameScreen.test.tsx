@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
 import { WhatsYourNameScreen } from '../../../../screens/onboarding/steps/WhatsYourNameScreen';
 import { useAppStore } from '../../../../store/appStore';
 import { useOnboardingStore } from '../../../../store/onboardingStore';
 
 const mockNavigate = jest.fn();
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate, goBack: jest.fn() }),
 }));
@@ -34,7 +36,9 @@ describe('WhatsYourNameScreen', () => {
 
   it('keeps Next disabled and does not advance for an empty name', async () => {
     await render(<WhatsYourNameScreen />);
-    expect(screen.getByLabelText('Next step').props.accessibilityState.disabled).toBe(true);
+    expect(
+      screen.getByLabelText('Next step').props.accessibilityState.disabled
+    ).toBe(true);
     fireEvent.press(screen.getByLabelText('Next step'));
     expect(mockNavigate).not.toHaveBeenCalled();
   });
@@ -42,6 +46,8 @@ describe('WhatsYourNameScreen', () => {
   it('shows the client subtitle for the client role', async () => {
     useAppStore.getState().setUserRole('client');
     await render(<WhatsYourNameScreen />);
-    expect(screen.getByText('Let trainers know how to address you')).toBeTruthy();
+    expect(
+      screen.getByText('Let trainers know how to address you')
+    ).toBeTruthy();
   });
 });

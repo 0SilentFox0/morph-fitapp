@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
-import { useDisclosure, type Disclosure } from '../ui/useDisclosure';
+
+import { type Disclosure, useDisclosure } from '../ui/useDisclosure';
 
 export interface DateTimePicker extends Disclosure {
   /**
@@ -15,15 +16,21 @@ export interface DateTimePicker extends Disclosure {
  * time field. Wraps useDisclosure and folds in the repeated
  * "close on Android, forward the value" onChange logic.
  */
-export function useDateTimePicker(onChange: (value: Date) => void): DateTimePicker {
+export function useDateTimePicker(
+  onChange: (value: Date) => void
+): DateTimePicker {
   const disclosure = useDisclosure();
+
   const { close } = disclosure;
+
   const handleChange = useCallback(
     (_event: unknown, selected?: Date) => {
       if (Platform.OS === 'android') close();
+
       if (selected) onChange(selected);
     },
-    [close, onChange],
+    [close, onChange]
   );
+
   return { ...disclosure, handleChange };
 }

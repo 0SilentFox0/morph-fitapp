@@ -1,4 +1,4 @@
-import { logger, setLogSink, type LogEvent } from '../../services/logger';
+import { type LogEvent, logger, setLogSink } from '../../services/logger';
 
 afterEach(() => {
   setLogSink(null);
@@ -8,9 +8,11 @@ afterEach(() => {
 describe('logger', () => {
   it('forwards error events to the registered sink with level and error', () => {
     const events: LogEvent[] = [];
+
     setLogSink((e) => events.push(e));
 
     const err = new Error('boom');
+
     logger.error('request failed', err, { path: '/me' });
 
     expect(events).toHaveLength(1);
@@ -24,6 +26,7 @@ describe('logger', () => {
 
   it('forwards info/warn events with their level and context', () => {
     const events: LogEvent[] = [];
+
     setLogSink((e) => events.push(e));
 
     logger.info('started', { mode: 'cold' });
@@ -36,7 +39,9 @@ describe('logger', () => {
 
   it('falls back to console when no sink is registered', () => {
     setLogSink(null);
+
     const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     logger.error('no sink');
     expect(spy).toHaveBeenCalled();
   });

@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
+
 import type { Exercise } from '../../../../services/exerciseApi';
 
 export interface ExerciseGridItemProps {
@@ -13,7 +16,12 @@ export interface ExerciseGridItemProps {
 }
 
 /** Single selectable exercise card in the gallery grid. */
-function ExerciseGridItemBase({ item, isSelected, isExisting, onPress }: ExerciseGridItemProps) {
+function ExerciseGridItemBase({
+  item,
+  isSelected,
+  isExisting,
+  onPress,
+}: ExerciseGridItemProps) {
   return (
     <TouchableOpacity
       style={[styles.gridItem, isExisting && styles.gridItemExisting]}
@@ -22,14 +30,24 @@ function ExerciseGridItemBase({ item, isSelected, isExisting, onPress }: Exercis
     >
       <View style={styles.gridThumb}>
         {item.imageUrl ? (
-          <Image source={{ uri: item.imageUrl }} style={styles.gridImage} resizeMode="cover" />
+          <Image
+            source={{ uri: item.imageUrl }}
+            style={styles.gridImage}
+            resizeMode="cover"
+          />
         ) : (
           <View style={styles.gridPlaceholder}>
-            <Ionicons name="barbell-outline" size={28} color={colors.neutral5} />
+            <Ionicons
+              name="barbell-outline"
+              size={28}
+              color={colors.neutral5}
+            />
           </View>
         )}
         {isSelected && (
-          <View style={[styles.checkbox, isExisting && styles.checkboxExisting]}>
+          <View
+            style={[styles.checkbox, isExisting && styles.checkboxExisting]}
+          >
             <Ionicons name="checkmark" size={14} color={colors.white} />
           </View>
         )}

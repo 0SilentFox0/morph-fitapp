@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import theme from '../../../../theme';
+
 const { colors, typography, spacing } = theme;
 
 export interface MonthSelectorProps {
@@ -13,8 +15,11 @@ export interface MonthSelectorProps {
 export function MonthSelector({ dateKey, onPrev, onNext }: MonthSelectorProps) {
   const label = React.useMemo(
     () =>
-      new Date(dateKey).toLocaleString('default', { month: 'long', year: 'numeric' }),
-    [dateKey],
+      new Date(dateKey).toLocaleString('default', {
+        month: 'long',
+        year: 'numeric',
+      }),
+    [dateKey]
   );
 
   return (

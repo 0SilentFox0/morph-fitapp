@@ -1,8 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from './Avatar';
+
 import theme from '../../theme';
+import { Avatar } from './Avatar';
+
 const { colors, radius, typography } = theme;
 
 /**
@@ -33,7 +41,11 @@ export function ParticipantChip({
         {name}
       </Text>
       {onRemove ? (
-        <TouchableOpacity onPress={onRemove} hitSlop={8} style={styles.removeBtn}>
+        <TouchableOpacity
+          onPress={onRemove}
+          hitSlop={8}
+          style={styles.removeBtn}
+        >
           <Ionicons name="close" size={16} color={colors.neutral9} />
         </TouchableOpacity>
       ) : null}
@@ -44,7 +56,11 @@ export function ParticipantChip({
 
   if (onPress) {
     return (
-      <TouchableOpacity style={[wrapperStyle, style]} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[wrapperStyle, style]}
+        onPress={onPress}
+        activeOpacity={0.8}
+      >
         {content}
       </TouchableOpacity>
     );

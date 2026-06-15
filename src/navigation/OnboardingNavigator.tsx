@@ -1,26 +1,28 @@
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from './types';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import theme from '../theme';
+import type { OnboardingStackParamList } from './types';
+
 const { colors } = theme;
-import { useOnboardingStore } from '../store/onboardingStore';
 
 import {
   ChooseRoleScreen,
+  ClientTypesScreen,
+  ExperienceScreen,
+  PreviewProfileScreen,
+  ProfilePhotoScreen,
+  TrainerPreferencesScreen,
+  TrainingTypesScreen,
   WelcomeScreen,
   WhatsYourNameScreen,
-  ExperienceScreen,
-  TrainingTypesScreen,
-  ClientTypesScreen,
   WhereTrainScreen,
   WorkScheduleScreen,
-  TrainerPreferencesScreen,
-  ProfilePhotoScreen,
-  PreviewProfileScreen,
   YoureAllSetScreen,
 } from '../screens/onboarding';
+import { useOnboardingStore } from '../store/onboardingStore';
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
@@ -40,7 +42,9 @@ const RESUMABLE_ROUTES: readonly (keyof OnboardingStackParamList)[] = [
 ];
 
 function ResumeEffect() {
-  const navigation = useNavigation<NativeStackNavigationProp<OnboardingStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<OnboardingStackParamList>>();
+
   const currentRoute = useOnboardingStore((s) => s.currentRoute);
 
   React.useEffect(() => {
@@ -79,6 +83,7 @@ export function OnboardingNavigator() {
           focus: (e) => {
             // e.target is in the form "RouteName-key"; strip the key suffix.
             const name = e.target?.split('-')[0];
+
             if (name) setCurrentRoute(name);
           },
         }}
@@ -91,7 +96,10 @@ export function OnboardingNavigator() {
         <Stack.Screen name="ClientTypes" component={ClientTypesScreen} />
         <Stack.Screen name="WhereTrain" component={WhereTrainScreen} />
         <Stack.Screen name="WorkSchedule" component={WorkScheduleScreen} />
-        <Stack.Screen name="TrainerPreferences" component={TrainerPreferencesScreen} />
+        <Stack.Screen
+          name="TrainerPreferences"
+          component={TrainerPreferencesScreen}
+        />
         <Stack.Screen name="ProfilePhoto" component={ProfilePhotoScreen} />
         <Stack.Screen name="PreviewProfile" component={PreviewProfileScreen} />
         <Stack.Screen name="YoureAllSet" component={YoureAllSetScreen} />

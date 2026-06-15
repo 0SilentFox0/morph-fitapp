@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import theme from '../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 interface SetSelectorProps {
@@ -16,18 +18,29 @@ interface SetSelectorProps {
  * sets than `maxVisible`, the middle collapses behind an ellipsis pill that
  * expands on tap. The active set is always visible.
  */
-export function SetSelector({ count, value, onChange, maxVisible = 6 }: SetSelectorProps) {
+export function SetSelector({
+  count,
+  value,
+  onChange,
+  maxVisible = 6,
+}: SetSelectorProps) {
   const [expanded, setExpanded] = React.useState(false);
+
   const indices = Array.from({ length: count }, (_, i) => i);
 
   const collapse = !expanded && count > maxVisible + 1;
+
   let visible: number[];
+
   if (!collapse) {
     visible = indices;
   } else {
     const head = indices.slice(0, maxVisible);
+
     const last = count - 1;
+
     visible = head.includes(last) ? head : [...head, last];
+
     // ensure the active set is reachable without expanding
     if (!visible.includes(value)) visible = [...head, value, last];
   }
@@ -35,12 +48,22 @@ export function SetSelector({ count, value, onChange, maxVisible = 6 }: SetSelec
   return (
     <View style={styles.row}>
       {visible.map((i, pos) => {
-        const showEllipsis = collapse && pos === maxVisible - 1 && i !== count - 2;
+        const showEllipsis =
+          collapse && pos === maxVisible - 1 && i !== count - 2;
+
         return (
           <React.Fragment key={i}>
-            <Pill label={String(i + 1)} active={i === value} onPress={() => onChange(i)} />
+            <Pill
+              label={String(i + 1)}
+              active={i === value}
+              onPress={() => onChange(i)}
+            />
             {showEllipsis && (
-              <Pill label="..." active={false} onPress={() => setExpanded(true)} />
+              <Pill
+                label="..."
+                active={false}
+                onPress={() => setExpanded(true)}
+              />
             )}
           </React.Fragment>
         );
@@ -64,7 +87,12 @@ function Pill({
       activeOpacity={0.8}
       style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
     >
-      <Text style={[styles.pillText, active ? styles.pillTextActive : styles.pillTextInactive]}>
+      <Text
+        style={[
+          styles.pillText,
+          active ? styles.pillTextActive : styles.pillTextInactive,
+        ]}
+      >
         {label}
       </Text>
     </TouchableOpacity>

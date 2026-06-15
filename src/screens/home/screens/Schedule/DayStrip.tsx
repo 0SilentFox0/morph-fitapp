@@ -1,9 +1,12 @@
 import React from 'react';
-import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+
 import theme from '../../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 const DAY_CELL_WIDTH = 48;
+
 const DAY_CELL_HEIGHT = 56;
 
 export interface Day {
@@ -27,14 +30,19 @@ export function DayStrip({ days, selectedIndex, onSelect }: DayStripProps) {
     >
       {days.map((day, i) => {
         const selected = i === selectedIndex;
+
         return (
           <TouchableOpacity
             key={day.dateKey}
             onPress={() => onSelect(i)}
             style={[styles.chip, selected && styles.chipSelected]}
           >
-            <Text style={[styles.label, selected && styles.labelSelected]}>{day.label}</Text>
-            <Text style={[styles.date, selected && styles.dateSelected]}>{day.date}</Text>
+            <Text style={[styles.label, selected && styles.labelSelected]}>
+              {day.label}
+            </Text>
+            <Text style={[styles.date, selected && styles.dateSelected]}>
+              {day.date}
+            </Text>
           </TouchableOpacity>
         );
       })}

@@ -1,7 +1,15 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import { Overlay } from '../../../../components/ui';
 import { TRAINING_TYPES } from '../../../../constants';
 import theme from '../../../../theme';
+
 const { colors, radius, typography, spacing } = theme;
 
 export interface TagPickerModalProps {
@@ -13,7 +21,12 @@ export interface TagPickerModalProps {
 }
 
 /** Modal list for picking a program's training-type tag. */
-export function TagPickerModal({ visible, value, onClose, onSelect }: TagPickerModalProps) {
+export function TagPickerModal({
+  visible,
+  value,
+  onClose,
+  onSelect,
+}: TagPickerModalProps) {
   return (
     <Overlay visible={visible} onClose={onClose}>
       <View style={styles.modalContent}>
@@ -22,11 +35,17 @@ export function TagPickerModal({ visible, value, onClose, onSelect }: TagPickerM
           keyExtractor={(item) => item}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.modalOption, value === item && styles.modalOptionActive]}
+              style={[
+                styles.modalOption,
+                value === item && styles.modalOptionActive,
+              ]}
               onPress={() => onSelect(item)}
             >
               <Text
-                style={[styles.modalOptionText, value === item && styles.modalOptionTextActive]}
+                style={[
+                  styles.modalOptionText,
+                  value === item && styles.modalOptionTextActive,
+                ]}
               >
                 {item}
               </Text>
