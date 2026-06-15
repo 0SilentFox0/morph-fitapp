@@ -12,6 +12,7 @@ import {
   RequestSubmittedScreen,
   ScheduleScreen,
   SessionFormScreen,
+  SettingsScreen,
   TrainingLibraryScreen,
 } from '../screens/home';
 import type { HomeStackParamList } from './types';
@@ -35,6 +36,7 @@ export function HomeStackNavigator() {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Schedule" component={ScheduleScreen} />
       <Stack.Screen name="SessionForm" component={SessionFormScreen} />
       <Stack.Screen

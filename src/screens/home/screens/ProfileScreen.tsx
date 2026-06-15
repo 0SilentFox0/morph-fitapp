@@ -201,6 +201,13 @@ export function ProfileScreen() {
           ))}
         </View>
 
+        <Button
+          title="Settings"
+          variant="outline"
+          onPress={() => navigation.navigate('Settings')}
+          style={styles.settingsBtn}
+        />
+
         {__DEV__ && (
           <>
             <Button
@@ -292,5 +299,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
+  settingsBtn: { marginTop: spacing.lg },
   devResetBtn: { marginTop: spacing.md },
 });

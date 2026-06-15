@@ -20,6 +20,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (input: authApi.RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   loadSession: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -72,6 +73,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await authApi.logout();
     } finally {
+      set({ status: 'unauthenticated', user: null });
+    }
+  },
+
+  deleteAccount: async () => {
+    try {
+      await authApi.deleteAccount();
+    } finally {
+      // Always drop the local session, even if the request fails — the user
+      // asked to leave; clear token so they land back on login.
+      await tokenStore.clear();
       set({ status: 'unauthenticated', user: null });
     }
   },

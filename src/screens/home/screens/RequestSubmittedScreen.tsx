@@ -1,7 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Button } from '../../../components/ui';
@@ -11,9 +15,16 @@ import theme from '../../../theme';
 const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'RequestSubmitted'>;
+type Route = RouteProp<HomeStackParamList, 'RequestSubmitted'>;
 
 export function RequestSubmittedScreen() {
   const navigation = useNavigation<Nav>();
+
+  const route = useRoute<Route>();
+
+  // Who has to approve, in whatever context this modal is shown (a trainer sees
+  // the client's name; a client sees the trainer's). Neutral fallback when unknown.
+  const approver = route.params?.counterpartName?.trim() || 'the other person';
 
   return (
     <View style={styles.overlay}>
@@ -29,18 +40,13 @@ export function RequestSubmittedScreen() {
         </View>
         <Text style={styles.title}>Request submitted</Text>
         <Text style={styles.message}>
-          Session time will change after Darrell Steward approves it. In the
-          other case, the session will be canceled in 8 hr.
+          The session time is confirmed once {approver} approves it. Otherwise it
+          will be canceled in 8 hr.
         </Text>
         <Button
-          title="Write to the client"
+          title="Done"
           onPress={() => navigation.goBack()}
           style={styles.primaryBtn}
-        />
-        <Button
-          title="Cancel"
-          onPress={() => navigation.goBack()}
-          variant="outline"
         />
       </View>
     </View>

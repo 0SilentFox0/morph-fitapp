@@ -59,7 +59,9 @@ export function SessionFormScreen() {
     participantsValue,
     selectedProgram,
     showProgression,
-  } = useSessionForm(session, () => navigation.navigate('RequestSubmitted'));
+  } = useSessionForm(session, (counterpartName) =>
+    navigation.navigate('RequestSubmitted', { counterpartName })
+  );
 
   return (
     <View style={styles.container}>

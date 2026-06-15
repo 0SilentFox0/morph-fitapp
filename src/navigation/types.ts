@@ -34,9 +34,10 @@ export type HomeStackParamList = {
   Home: undefined;
   Profile: undefined;
   EditProfile: undefined;
+  Settings: undefined;
   Schedule: undefined;
   SessionForm: { session?: Session } | undefined;
-  RequestSubmitted: undefined;
+  RequestSubmitted: { counterpartName?: string } | undefined;
   TrainingLibrary: undefined;
   AddToLibraryForm:
     | { program?: TrainingProgram; selectedExercises?: ProgramExercise[] }
@@ -112,7 +113,7 @@ export type ClientHomeStackParamList = {
   ClientHome: undefined;
   ClientProfile: undefined;
   BookSession: { trainerId?: string } | undefined;
-  RequestSubmitted: undefined;
+  RequestSubmitted: { counterpartName?: string } | undefined;
 };
 
 export type TrainersStackParamList = {

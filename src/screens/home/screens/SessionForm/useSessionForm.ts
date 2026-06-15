@@ -24,7 +24,7 @@ import { buildParticipants, formatDate, formatTime } from '../../../../utils';
  */
 export function useSessionForm(
   session: Session | undefined,
-  onComplete: () => void
+  onComplete: (counterpartName?: string) => void
 ) {
   const addSession = useSessionsStore((s) => s.addSession);
 
@@ -115,7 +115,7 @@ export function useSessionForm(
         addSession({ ...common, status: 'pending' });
       }
 
-      onComplete();
+      onComplete(data.participants[0]);
     } catch (e) {
       setError(
         e instanceof Error ? e.message : 'Could not save the session'

@@ -9,4 +9,5 @@ export { ProfileScreen } from './screens/ProfileScreen';
 export { RequestSubmittedScreen } from './screens/RequestSubmittedScreen';
 export { ScheduleScreen } from './screens/ScheduleScreen';
 export { SessionFormScreen } from './screens/SessionFormScreen';
+export { SettingsScreen } from './screens/SettingsScreen';
 export { TrainingLibraryScreen } from './screens/TrainingLibraryScreen';
