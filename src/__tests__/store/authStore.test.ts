@@ -109,6 +109,40 @@ describe('authStore', () => {
     expect(useAuthStore.getState().user?.name).toBe('Jane');
   });
 
+  it('marks isOnboarded when the backend reports onboarding completed', async () => {
+    await tokenStore.setTokens({
+      access_token: 'a',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+    useAppStore.setState({ isOnboarded: false });
+    jest.spyOn(usersApi, 'getMe').mockResolvedValue({
+      data: { ...user, onboarding_completed_at: '2026-01-01T00:00:00Z' },
+    } as never);
+    await act(async () => {
+      await useAuthStore.getState().loadSession();
+    });
+    expect(useAppStore.getState().isOnboarded).toBe(true);
+  });
+
+  it('does not reset local isOnboarded when backend onboarding is null (flow not yet persisted)', async () => {
+    await tokenStore.setTokens({
+      access_token: 'a',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+    useAppStore.setState({ isOnboarded: true });
+    jest
+      .spyOn(usersApi, 'getMe')
+      .mockResolvedValue({ data: { ...user, onboarding_completed_at: null } } as never);
+    await act(async () => {
+      await useAuthStore.getState().loadSession();
+    });
+    expect(useAppStore.getState().isOnboarded).toBe(true);
+  });
+
   it('loadSession clears token on a 401', async () => {
     await tokenStore.setTokens({
       access_token: 'a',

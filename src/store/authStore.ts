@@ -24,9 +24,20 @@ interface AuthState {
   refreshProfile: () => Promise<void>;
 }
 
-/** Mirror the authenticated user's role into appStore so navigation reacts. */
-function syncRole(user: User): void {
+/**
+ * Mirror the authenticated user into appStore so navigation reacts. Onboarding
+ * is backend-authoritative once completed: if the server reports
+ * `onboarding_completed_at`, mark the user onboarded so returning users skip the
+ * flow. We do NOT force it back to false when null, because completion is not
+ * yet persisted to the backend (the `/me/onboarding/complete` endpoint isn't
+ * deployed) — that would re-onboard users who finished locally.
+ */
+function syncUser(user: User): void {
   useAppStore.setState({ userRole: user.role, userName: user.name });
+
+  if (user.onboarding_completed_at) {
+    useAppStore.setState({ isOnboarded: true });
+  }
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -38,7 +49,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const { data } = await usersApi.getMe();
 
-    syncRole(data);
+    syncUser(data);
     set({ status: 'authenticated', user: data });
   },
 
@@ -47,15 +58,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const { data } = await usersApi.getMe();
 
-    syncRole(data);
+    syncUser(data);
     set({ status: 'authenticated', user: data });
   },
 
-  // NOTE (follow-up): we intentionally do NOT call useAppStore.reset() here yet.
-  // Onboarding completion is still local-only (mock), not backend-persisted, so
-  // resetting isOnboarded would force completed users to re-onboard on every login.
-  // Multi-user-same-device cleanup belongs with backend-driven onboarding
-  // (user.onboarding_completed_at), which is a deferred task.
+  // NOTE (follow-up): we still do NOT call useAppStore.reset() here. loadSession
+  // now derives isOnboarded from the backend's onboarding_completed_at, but only
+  // when it is set true — completion isn't persisted to the backend yet (the
+  // /me/onboarding/complete endpoint isn't deployed). Until it is, resetting on
+  // logout would force locally-onboarded users to re-onboard. Enable the reset
+  // once completion writes onboarding_completed_at server-side.
   logout: async () => {
     try {
       await authApi.logout();
@@ -78,7 +90,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       const { data } = await usersApi.getMe();
 
-      syncRole(data);
+      syncUser(data);
       set({ status: 'authenticated', user: data });
     } catch (err) {
       // Only a definitive 401 means the token is invalid — clear it and send the
@@ -96,7 +108,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   refreshProfile: async () => {
     const { data } = await usersApi.getMe();
 
-    syncRole(data);
+    syncUser(data);
     set({ user: data });
   },
 }));
