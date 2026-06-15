@@ -50,6 +50,21 @@ describe('useTrainingHistoryStore', () => {
     expect(history.every((h) => h.clientName === CURRENT_USER_NAME)).toBe(true);
   });
 
+  it('addCompletedTraining appends a training so getLastSets returns its sets', () => {
+    const before = useTrainingHistoryStore.getState().history.length;
+    useTrainingHistoryStore.getState().addCompletedTraining({
+      id: 'ct-new',
+      clientName: 'You',
+      programId: 'custom',
+      date: 'Today',
+      exercises: [{ exerciseId: 9999, sets: [{ weight: 77, reps: 5 }] }],
+    });
+    expect(useTrainingHistoryStore.getState().history.length).toBe(before + 1);
+    expect(useTrainingHistoryStore.getState().getLastSets('You', 9999)).toEqual([
+      { weight: 77, reps: 5 },
+    ]);
+  });
+
   it('seeds history for every demo client so the progress chart always has data', () => {
     const { getClientHistory } = useTrainingHistoryStore.getState();
     const names = Array.from(

@@ -8,9 +8,9 @@ import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
 import { FiltersScreen } from '../screens/clients/FiltersScreen';
 import { ClientProfileScreen } from '../screens/clients/ClientProfileScreen';
 import { ProgramDetailScreen } from '../screens/clients/ProgramDetailScreen';
-import { ExerciseDetailScreen } from '../screens/clients/ExerciseDetailScreen';
+import { ExerciseDetailScreen } from '../screens/training/ExerciseDetailScreen';
 import { ClientsProfileExtendedScreen } from '../screens/clients/ClientsProfileExtendedScreen';
-import { TrainingSummaryScreen } from '../screens/clients/TrainingSummaryScreen';
+import { TrainingSummaryScreen } from '../screens/training/TrainingSummaryScreen';
 
 const Stack = createNativeStackNavigator<ClientsStackParamList>();
 

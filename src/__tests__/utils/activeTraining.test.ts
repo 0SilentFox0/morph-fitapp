@@ -1,5 +1,5 @@
-import { deriveActiveGroup, seedActiveClient } from '../../utils/activeTraining';
-import type { Session, TrainingProgram } from '../../types';
+import { deriveActiveGroup, seedParticipant, seedCustomParticipant } from '../../utils/activeTraining';
+import type { Session, TrainingProgram, ProgramExercise } from '../../types';
 
 const programs: TrainingProgram[] = [
   {
@@ -51,48 +51,68 @@ describe('deriveActiveGroup', () => {
       session({ id: 'c', time: '2:00pm', participants: [{ id: 'c3', name: 'Cara' }], programId: 'p2' }),
     ];
     const group = deriveActiveGroup(sessions, programs);
-    expect(group.map((c) => c.clientId)).toEqual(['c2', 'c3']);
+    expect(group.map((c) => c.participantId)).toEqual(['c2', 'c3']);
   });
 
-  it('assigns each client its session program, falling back to a program with exercises', () => {
+  it('assigns each participant its session program, falling back to one with exercises', () => {
     const sessions: Session[] = [
       session({ id: 'a', participants: [{ id: 'c1', name: 'Alice' }], programId: 'p2' }),
       session({ id: 'b', participants: [{ id: 'c2', name: 'Bob' }], programId: 'p3' }),
     ];
     const group = deriveActiveGroup(sessions, programs);
     expect(group[0]!.programId).toBe('p2');
-    // p3 has no exercises -> falls back to a program that does
     expect(['p1', 'p2']).toContain(group[1]!.programId);
   });
 });
 
-describe('seedActiveClient', () => {
+describe('seedParticipant', () => {
+  it('copies the program exercises onto the participant', () => {
+    const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!);
+    expect(p.exercises).toHaveLength(1);
+    expect(p.programId).toBe('p1');
+  });
+
   it('clones each exercise set into the editable setLog', () => {
-    const client = seedActiveClient({ id: 'c1', name: 'Alice' }, programs[0]!);
-    expect(client.setLog[1]).toEqual([{ weight: 40, reps: 10 }]);
-    // mutating the seed must not affect the source program
-    client.setLog[1]![0]!.weight = 99;
+    const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!);
+    expect(p.setLog[1]).toEqual([{ weight: 40, reps: 10 }]);
+    p.setLog[1]![0]!.weight = 99;
     expect(programs[0]!.exercises![0]!.sets[0]!.weight).toBe(40);
   });
 
   it('seeds prevSets from the lookup and defaults setLog to previous values', () => {
     const lookup = (_name: string, exerciseId: number) =>
       exerciseId === 1 ? [{ weight: 35, reps: 12 }] : null;
-    const client = seedActiveClient({ id: 'c1', name: 'Alice' }, programs[0]!, {
-      lookupPrevSets: lookup,
-    });
-    expect(client.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
-    // no planned sets -> setLog defaults to the previous training values
-    expect(client.setLog[1]).toEqual([{ weight: 35, reps: 12 }]);
+    const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!, { lookupPrevSets: lookup });
+    expect(p.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
+    expect(p.setLog[1]).toEqual([{ weight: 35, reps: 12 }]);
   });
 
   it('prefers planned sets over previous and template for setLog', () => {
     const lookup = () => [{ weight: 35, reps: 12 }];
-    const client = seedActiveClient({ id: 'c1', name: 'Alice' }, programs[0]!, {
+    const p = seedParticipant({ id: 'c1', name: 'Alice' }, programs[0]!, {
       plannedSets: { 1: [{ weight: 50, reps: 9 }] },
       lookupPrevSets: lookup,
     });
-    expect(client.setLog[1]).toEqual([{ weight: 50, reps: 9 }]);
-    expect(client.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
+    expect(p.setLog[1]).toEqual([{ weight: 50, reps: 9 }]);
+    expect(p.prevSets[1]).toEqual([{ weight: 35, reps: 12 }]);
+  });
+});
+
+describe('seedCustomParticipant', () => {
+  const customExercises: ProgramExercise[] = [
+    { id: 7, name: 'Custom', category: 'C', imageUrl: null, sets: [{ weight: 20, reps: 15 }] },
+  ];
+
+  it('builds an ad-hoc participant with programId null and the given exercises', () => {
+    const p = seedCustomParticipant({ id: 'me', name: 'You' }, customExercises);
+    expect(p.programId).toBeNull();
+    expect(p.exercises).toHaveLength(1);
+    expect(p.setLog[7]).toEqual([{ weight: 20, reps: 15 }]);
+  });
+
+  it('does not mutate the source exercises', () => {
+    const p = seedCustomParticipant({ id: 'me', name: 'You' }, customExercises);
+    p.setLog[7]![0]!.weight = 99;
+    expect(customExercises[0]!.sets[0]!.weight).toBe(20);
   });
 });

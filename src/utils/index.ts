@@ -7,6 +7,7 @@ export * from './progress';
 export * from './error';
 export * from './transactions';
 export * from './activeTraining';
+export * from './exerciseCatalog';
 export * from './time';
 export * from './progression';
 export * from './muscleStats';

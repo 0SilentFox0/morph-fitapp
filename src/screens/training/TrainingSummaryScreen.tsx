@@ -2,10 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { getChartWidth } from '../../utils/layout';
 import { LineChart } from 'react-native-chart-kit';
-import { useRoute, type RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation, type RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import type { ClientsStackParamList } from '../../navigation/types';
+import type { LiveTrainingParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Card, SectionTitle } from '../../components/ui';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
@@ -18,7 +19,8 @@ import { radius } from '../../theme';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 
-type Route = RouteProp<ClientsStackParamList, 'TrainingSummary'>;
+type Route = RouteProp<LiveTrainingParamList, 'TrainingSummary'>;
+type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'TrainingSummary'>;
 
 const TABS = ['Summary', 'Exercises'];
 const TIMEFRAME = ['Week', 'Month', 'Custom'];
@@ -54,20 +56,26 @@ function durationLabel(exercises: ProgramExercise[]): string {
 
 export function TrainingSummaryScreen() {
   const route = useRoute<Route>();
+  const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
-  const clientId = route.params?.clientId;
+  const participantId = route.params?.participantId;
   const [activeTab, setActiveTab] = React.useState(0);
   const [timeframe, setTimeframe] = React.useState(0);
 
-  const client = useActiveTrainingStore(
-    (s) => s.clients.find((c) => c.clientId === clientId) ?? s.clients[0] ?? null,
+  const participant = useActiveTrainingStore(
+    (s) => s.participants.find((c) => c.participantId === participantId) ?? s.participants[0] ?? null,
   );
+  const addCompletedTraining = useTrainingHistoryStore((s) => s.addCompletedTraining);
+  const endTraining = useActiveTrainingStore((s) => s.endTraining);
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
-  const program =
-    mockTrainingPrograms.find((p) => p.id === client?.programId) ?? mockTrainingPrograms[0]!;
-  const exercises = program.exercises ?? [];
+  // label-only: exercises come from participant.exercises, this is just for the type tag
+  const program = participant?.programId
+    ? mockTrainingPrograms.find((p) => p.id === participant.programId)
+    : undefined;
+  const exercises = participant?.exercises ?? [];
+  const typeLabel = program?.tag ?? 'Custom';
 
-  const history = client ? getClientHistory(client.name) : [];
+  const history = participant ? getClientHistory(participant.name) : [];
   const chartData =
     history.length > 0
       ? {
@@ -77,7 +85,7 @@ export function TrainingSummaryScreen() {
       : null;
 
   const rows = exercises.map((ex) => {
-    const sets = client?.setLog[ex.id] ?? ex.sets;
+    const sets = participant?.setLog[ex.id] ?? ex.sets;
     const top = topSet(sets);
     return {
       id: ex.id,
@@ -88,12 +96,37 @@ export function TrainingSummaryScreen() {
     };
   });
 
+  const doneRef = React.useRef(false);
+  const handleDone = () => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    if (participant) {
+      addCompletedTraining({
+        id: `ct-${participant.participantId}-${Date.now()}`,
+        clientName: participant.name,
+        programId: participant.programId ?? 'custom',
+        date: 'Today',
+        exercises: participant.exercises.map((ex) => ({
+          exerciseId: ex.id,
+          sets: (participant.setLog[ex.id] ?? ex.sets).map((s) => ({ ...s })),
+        })),
+      });
+    }
+    endTraining();
+    navigation.popToTop();
+  };
+
   return (
     <View style={styles.container}>
       <ScreenHeader
         title="Training Summary"
         rightElement={
           <View style={styles.headerRight}>
+            <TouchableOpacity onPress={handleDone} hitSlop={8}>
+              <Text style={{ color: colors.accent, fontWeight: typography.weights.semibold, fontSize: typography.sizes.base }}>
+                Done
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity>
               <Ionicons name="pencil" size={24} color={colors.text} />
             </TouchableOpacity>
@@ -116,7 +149,7 @@ export function TrainingSummaryScreen() {
           </Card>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Type</Text>
-            <Text style={styles.summaryValue}>{program.tag}</Text>
+            <Text style={styles.summaryValue}>{typeLabel}</Text>
           </Card>
         </View>
 

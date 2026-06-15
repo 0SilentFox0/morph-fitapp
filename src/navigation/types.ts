@@ -2,6 +2,10 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Session, TrainingProgram, ProgramExercise } from '../types';
 import type { MuscleGroup } from '../constants/muscles';
 
+export type AuthStackParamList = {
+  Login: undefined;
+};
+
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
   Welcome: undefined;
@@ -43,14 +47,21 @@ export type HomeStackParamList = {
   CardioClassForm: { program?: TrainingProgram } | undefined;
 };
 
-export type ClientsStackParamList = {
+/**
+ * Live-training routes shared by the trainer Clients stack and the client Train
+ * stack — both mount the same ExerciseDetail/TrainingSummary screens.
+ */
+export type LiveTrainingParamList = {
+  ExerciseDetail: { participantId: string; programId: string | null; exerciseIndex: number };
+  TrainingSummary: { participantId?: string };
+};
+
+export type ClientsStackParamList = LiveTrainingParamList & {
   ClientsList: undefined;
   Filters: undefined;
   ClientProfile: { clientId?: string } | undefined;
   ProgramDetail: { programId: string };
-  ExerciseDetail: { clientId: string; programId: string; exerciseIndex: number };
   ClientsProfileExtended: { clientId?: string } | undefined;
-  TrainingSummary: { clientId?: string } | undefined;
 };
 
 export type StatsStackParamList = {
@@ -72,9 +83,18 @@ export type ChatStackParamList = {
 export type ClientTabParamList = {
   ClientHomeTab: undefined;
   TrainersTab: undefined;
-  ClientAddTab: undefined;
+  TrainTab: undefined;
   ChatTab: undefined;
   ProgressTab: undefined;
+};
+
+export type TrainStackParamList = LiveTrainingParamList & {
+  TrainHome: undefined;
+  WorkoutBuilder: undefined;
+  WorkoutOverview:
+    | { source: 'program'; programId: string }
+    | { source: 'assigned'; sessionId: string }
+    | { source: 'custom'; exercises: ProgramExercise[] };
 };
 
 export type ClientHomeStackParamList = {

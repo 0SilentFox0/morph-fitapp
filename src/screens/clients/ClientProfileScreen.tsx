@@ -27,14 +27,14 @@ export function ClientProfileScreen() {
   const route = useRoute<Route>();
   const requestedClientId = route.params?.clientId;
 
-  const clients = useActiveTrainingStore((s) => s.clients);
-  const activeClientId = useActiveTrainingStore((s) => s.activeClientId);
-  const setActiveClient = useActiveTrainingStore((s) => s.setActiveClient);
+  const participants = useActiveTrainingStore((s) => s.participants);
+  const activeParticipantId = useActiveTrainingStore((s) => s.activeParticipantId);
+  const setActiveParticipant = useActiveTrainingStore((s) => s.setActiveParticipant);
   const startTraining = useActiveTrainingStore((s) => s.startTraining);
 
   // Seed the active training group from today's overlapping sessions on first entry.
   React.useEffect(() => {
-    if (useActiveTrainingStore.getState().clients.length === 0) {
+    if (useActiveTrainingStore.getState().participants.length === 0) {
       const group = deriveActiveGroup(
         useSessionsStore.getState().sessions,
         mockTrainingPrograms,
@@ -42,19 +42,19 @@ export function ClientProfileScreen() {
       );
       if (group.length > 0) startTraining(group, requestedClientId);
     } else if (requestedClientId) {
-      setActiveClient(requestedClientId);
+      setActiveParticipant(requestedClientId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const activeClient = clients.find((c) => c.clientId === activeClientId) ?? clients[0] ?? null;
+  const activeClient = participants.find((c) => c.participantId === activeParticipantId) ?? participants[0] ?? null;
 
   const [selectedProgramId, setSelectedProgramId] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (activeClient) setSelectedProgramId(activeClient.programId);
     // reset to the client's assigned program when the active client changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeClient?.clientId]);
+  }, [activeClient?.participantId]);
 
   if (!activeClient) {
     return (
@@ -70,8 +70,8 @@ export function ClientProfileScreen() {
   const selectedProgram =
     PROGRAMS.find((p) => p.id === (selectedProgramId ?? activeClient.programId)) ?? PROGRAMS[0]!;
 
-  const switcherClients: SwitcherClient[] = clients.map((c) => ({
-    id: c.clientId,
+  const switcherClients: SwitcherClient[] = participants.map((c) => ({
+    id: c.participantId,
     name: c.name,
     avatar: c.avatar,
     badge: c.rest.running ? formatClock(c.rest.remainingSec) : undefined,
@@ -90,7 +90,7 @@ export function ClientProfileScreen() {
         title=""
         rightElement={
           <View style={styles.headerRight}>
-            <TouchableOpacity onPress={() => navigation.navigate('ClientsProfileExtended', { clientId: activeClient.clientId })}>
+            <TouchableOpacity onPress={() => navigation.navigate('ClientsProfileExtended', { clientId: activeClient.participantId })}>
               <Ionicons name="person-outline" size={22} color={colors.text} />
             </TouchableOpacity>
             <TouchableOpacity>
@@ -102,8 +102,8 @@ export function ClientProfileScreen() {
 
       <ClientSwitcherStrip
         clients={switcherClients}
-        activeId={activeClientId}
-        onSelect={setActiveClient}
+        activeId={activeParticipantId}
+        onSelect={setActiveParticipant}
         activeSubtitle={subtitle}
       />
 
@@ -144,7 +144,7 @@ export function ClientProfileScreen() {
           program={selectedProgram}
           onSelectExercise={(index) =>
             navigation.navigate('ExerciseDetail', {
-              clientId: activeClient.clientId,
+              participantId: activeClient.participantId,
               programId: selectedProgram.id,
               exerciseIndex: index,
             })

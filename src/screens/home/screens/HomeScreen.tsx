@@ -69,12 +69,12 @@ export function HomeScreen() {
         useTrainingHistoryStore.getState().getLastSets,
       );
       if (group.length === 0) return;
-      startTraining(group, group[0]!.clientId);
+      startTraining(group, group[0]!.participantId);
       navigation
         .getParent()
         ?.navigate('ClientsTab', {
           screen: 'ClientProfile',
-          params: { clientId: group[0]!.clientId },
+          params: { clientId: group[0]!.participantId },
         });
     },
     [navigation, programs, startTraining]

@@ -18,7 +18,7 @@ export function ProgramDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const program = mockTrainingPrograms.find((p) => p.id === route.params?.programId);
-  const activeClientId = useActiveTrainingStore((s) => s.activeClientId);
+  const activeParticipantId = useActiveTrainingStore((s) => s.activeParticipantId);
 
   if (!program) {
     return (
@@ -42,9 +42,9 @@ export function ProgramDetailScreen() {
         <ProgramExerciseList
           program={program}
           onSelectExercise={(index) => {
-            if (!activeClientId) return;
+            if (!activeParticipantId) return;
             navigation.navigate('ExerciseDetail', {
-              clientId: activeClientId,
+              participantId: activeParticipantId,
               programId: program.id,
               exerciseIndex: index,
             });

@@ -74,6 +74,23 @@ export function ChatTabIcon({ color, focused }: { color: string; focused?: boole
   );
 }
 
+export function TrainTabIcon({ color, focused }: { color: string; focused: boolean }) {
+  const strokeColor = focused ? ACTIVE_FILL : color;
+  return (
+    <View style={{ width: SIZE, height: SIZE }}>
+      <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
+        <Path
+          d="M6.667 12v8M9.333 9.333v13.334M22.667 12v8M25.333 9.333v13.334M9.333 16h13.334"
+          stroke={strokeColor}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </Svg>
+    </View>
+  );
+}
+
 export function StatsTabIcon({ color, focused }: { color: string; focused: boolean }) {
   if (focused) {
     // Active state uses the design's solid bar-chart silhouette. Its source
