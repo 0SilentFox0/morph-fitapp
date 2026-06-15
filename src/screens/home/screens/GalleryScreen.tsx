@@ -13,13 +13,13 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
-import { Button } from '../../../components/ui';
+import { Button, AsyncBoundary } from '../../../components/ui';
+import type { AsyncStatus } from '../../../hooks/data/useAsyncResource';
 import { CategoryFilterBar } from './Gallery/CategoryFilterBar';
 import { ExerciseGridItem } from './Gallery/ExerciseGridItem';
 import { useExerciseSelection } from './Gallery/useExerciseSelection';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useExerciseStore } from '../../../store/exerciseStore';
@@ -134,37 +134,12 @@ export function GalleryScreen() {
   const renderFooter = () =>
     loadingMore ? <ActivityIndicator color={colors.accent} style={styles.loadingMore} /> : null;
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ScreenHeader
-          title="Gallery"
-          rightElement={
-            <TouchableOpacity>
-              <Ionicons name="add" size={24} color={colors.text} />
-            </TouchableOpacity>
-          }
-        />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.accent} />
-          <Text style={styles.loadingText}>Loading exercises...</Text>
-        </View>
-      </View>
-    );
-  }
-
-  if (error && exercises.length === 0) {
-    return (
-      <View style={styles.container}>
-        <ScreenHeader title="Gallery" />
-        <View style={styles.centered}>
-          <Ionicons name="cloud-offline-outline" size={48} color={colors.textMuted} />
-          <Text style={styles.errorText}>Failed to load exercises</Text>
-          <Button title="Retry" onPress={loadExercises} style={styles.retryBtn} />
-        </View>
-      </View>
-    );
-  }
+  // Initial load only: errors/spinners during pagination are handled in-list.
+  const status: AsyncStatus = loading
+    ? 'loading'
+    : error && exercises.length === 0
+      ? 'error'
+      : 'success';
 
   return (
     <View style={styles.container}>
@@ -176,35 +151,45 @@ export function GalleryScreen() {
           </TouchableOpacity>
         }
       />
-      <FlatList
-        data={displayExercises}
-        keyExtractor={(item) => String(item.id)}
-        numColumns={2}
-        columnWrapperStyle={styles.gridRow}
-        renderItem={renderExercise}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        initialNumToRender={12}
-        maxToRenderPerBatch={10}
-        windowSize={5}
-        removeClippedSubviews
-        ListEmptyComponent={
-          <View style={styles.centered}>
-            <Text style={styles.emptyText}>No exercises found</Text>
-          </View>
-        }
-      />
-      <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) + 80 }]}>
-        <Button
-          title="Save"
-          onPress={handleContinue}
-          disabled={selected.size === 0 && draftExercises.length === 0}
+      <AsyncBoundary
+        status={status}
+        error={error}
+        onRetry={loadExercises}
+        errorTitle="Failed to load exercises"
+      >
+        {/* Empty handled in-list so the search/filter header stays visible. */}
+        <FlatList
+          data={displayExercises}
+          keyExtractor={(item) => String(item.id)}
+          numColumns={2}
+          columnWrapperStyle={styles.gridRow}
+          renderItem={renderExercise}
+          ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          initialNumToRender={12}
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          removeClippedSubviews
+          ListEmptyComponent={
+            <View style={styles.centered}>
+              <Text style={styles.emptyText}>No exercises found</Text>
+            </View>
+          }
         />
-      </View>
+      </AsyncBoundary>
+      {status === 'success' && (
+        <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) + 80 }]}>
+          <Button
+            title="Save"
+            onPress={handleContinue}
+            disabled={selected.size === 0 && draftExercises.length === 0}
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -244,20 +229,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing['2xl'],
     gap: spacing.md,
   },
-  loadingText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-  },
-  errorText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textMuted,
-  },
   emptyText: {
     fontSize: typography.sizes.sm,
     color: colors.textMuted,
-  },
-  retryBtn: {
-    marginTop: spacing.md,
-    minWidth: 120,
   },
 });

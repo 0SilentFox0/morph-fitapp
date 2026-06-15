@@ -6,31 +6,23 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { radius } from '../../../theme';
+import theme from '../../../theme';
+const { radius, colors, typography, spacing } = theme;
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller } from 'react-hook-form';
 import { FormInput, DropdownSelect, Button } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useSessionsStore } from '../../../store/sessionsStore';
-import { useProgramsStore } from '../../../store/programsStore';
 import { TRAINING_TYPES } from '../../../constants';
-import { formatDate, formatTime } from '../../../utils';
-import { useDisclosure } from '../../../hooks/useDisclosure';
-import { sessionSchema, type SessionFormValues } from '../../../schemas/session';
 import { TypePickerModal } from './SessionForm/TypePickerModal';
 import { ProgramPickerModal } from './SessionForm/ProgramPickerModal';
 import { ParticipantsSection } from './SessionForm/ParticipantsSection';
 import { DateTimePickerSection } from './SessionForm/DateTimePickerSection';
 import { ExerciseProgressionSection } from './SessionForm/ExerciseProgressionSection';
-import type { ExerciseSet } from '../../../types';
-import { programMeta, buildParticipants } from '../../../utils';
+import { useSessionForm } from './SessionForm/useSessionForm';
+import { programMeta } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'SessionForm'>;
 type SessionFormRoute = RouteProp<HomeStackParamList, 'SessionForm'>;
@@ -41,73 +33,24 @@ export function SessionFormScreen() {
   const insets = useSafeAreaInsets();
   const session = route.params?.session;
 
-  const addSession = useSessionsStore((s) => s.addSession);
-  const updateSession = useSessionsStore((s) => s.updateSession);
-  const programs = useProgramsStore((s) => s.programs);
-
   const {
     control,
-    handleSubmit,
+    errors,
     setValue,
-    watch,
-    formState: { errors },
-  } = useForm<SessionFormValues>({
-    resolver: zodResolver(sessionSchema),
-    defaultValues: {
-      title: session?.title ?? '',
-      programId: session?.programId ?? '',
-      date: new Date(),
-      time: new Date(),
-      type: session?.type ?? 'Cardio',
-      participants: session?.participants?.map((p) => p.name) ?? [],
-    },
-    mode: 'onBlur',
-  });
-
-  const typePicker = useDisclosure();
-  const programPicker = useDisclosure();
-  const [plannedSets, setPlannedSets] = React.useState<Record<number, ExerciseSet[]>>({});
-
-  const titleValue = watch('title');
-  const dateValue = watch('date');
-  const timeValue = watch('time');
-  const typeValue = watch('type');
-  const programIdValue = watch('programId');
-  const participantsValue = watch('participants');
-  const selectedProgram = programs.find((p) => p.id === programIdValue);
-  // Progression pre-fill is per-client, so it only applies to Personal (1-participant) sessions.
-  const isPersonal = participantsValue.length === 1;
-  const showProgression = isPersonal && (selectedProgram?.exercises?.length ?? 0) > 0;
-
-  const onSubmit = (data: SessionFormValues) => {
-    const trimmedTitle = data.title.trim();
-    const builtParticipants = buildParticipants(data.participants, session?.participants);
-
-    if (session) {
-      updateSession(session.id, {
-        title: trimmedTitle,
-        type: data.type,
-        date: formatDate(data.date),
-        time: formatTime(data.time),
-        participants: builtParticipants,
-        programId: data.programId,
-        plannedSets: showProgression ? plannedSets : undefined,
-      });
-    } else {
-      addSession({
-        title: trimmedTitle,
-        type: data.type,
-        date: formatDate(data.date),
-        time: formatTime(data.time),
-        status: 'pending',
-        participants: builtParticipants,
-        programId: data.programId,
-        plannedSets: showProgression ? plannedSets : undefined,
-      });
-    }
-
-    navigation.navigate('RequestSubmitted');
-  };
+    programs,
+    submit,
+    typePicker,
+    programPicker,
+    setPlannedSets,
+    titleValue,
+    dateValue,
+    timeValue,
+    typeValue,
+    programIdValue,
+    participantsValue,
+    selectedProgram,
+    showProgression,
+  } = useSessionForm(session, () => navigation.navigate('RequestSubmitted'));
 
   return (
     <View style={styles.container}>
@@ -116,7 +59,7 @@ export function SessionFormScreen() {
           <Ionicons name="chevron-back" size={20} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{titleValue || 'New Session'}</Text>
-        <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.headerBtn}>
+        <TouchableOpacity onPress={submit} style={styles.headerBtn}>
           <Ionicons name="save-outline" size={20} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -200,7 +143,7 @@ export function SessionFormScreen() {
 
         <Button
           title="Apply"
-          onPress={handleSubmit(onSubmit)}
+          onPress={submit}
           style={styles.applyButton}
         />
       </ScrollView>

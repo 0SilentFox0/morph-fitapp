@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTrainingHistoryStore } from '../../../../store/trainingHistoryStore';
 import { applyProgression, PROGRESSION_STEPS } from '../../../../utils';
 import type { TrainingProgram, ExerciseSet } from '../../../../types';
-import { colors } from '../../../../theme/colors';
-import { radius } from '../../../../theme';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+const { colors, radius, typography, spacing } = theme;
+import { useExerciseProgression } from './useExerciseProgression';
 
 interface ExerciseProgressionSectionProps {
   program: TrainingProgram;
@@ -15,8 +13,6 @@ interface ExerciseProgressionSectionProps {
   /** Emits the resolved target sets per exercise id whenever inputs change. */
   onChange: (plannedSets: Record<number, ExerciseSet[]>) => void;
 }
-
-type PctState = Record<number, { weightPct: number; repsPct: number }>;
 
 /**
  * Per-exercise progression for session creation: pre-fills each exercise from
@@ -28,40 +24,11 @@ export function ExerciseProgressionSection({
   clientName,
   onChange,
 }: ExerciseProgressionSectionProps) {
-  const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
-  const exercises = program.exercises ?? [];
-
-  // Base = previous training values, else the program template.
-  const bases = React.useMemo(() => {
-    const map: Record<number, ExerciseSet[]> = {};
-    for (const ex of program.exercises ?? []) {
-      map[ex.id] = getLastSets(clientName, ex.id) ?? ex.sets;
-    }
-    return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [program.id, clientName]);
-
-  const [pct, setPct] = React.useState<PctState>({});
-
-  React.useEffect(() => {
-    setPct({});
-  }, [program.id, clientName]);
-
-  React.useEffect(() => {
-    const planned: Record<number, ExerciseSet[]> = {};
-    for (const ex of program.exercises ?? []) {
-      const p = pct[ex.id] ?? { weightPct: 0, repsPct: 0 };
-      planned[ex.id] = applyProgression(bases[ex.id] ?? ex.sets, p.weightPct, p.repsPct);
-    }
-    onChange(planned);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bases, pct]);
-
-  const setExercisePct = (id: number, key: 'weightPct' | 'repsPct', value: number) =>
-    setPct((prev) => ({
-      ...prev,
-      [id]: { weightPct: 0, repsPct: 0, ...prev[id], [key]: value },
-    }));
+  const { exercises, bases, pct, setExercisePct } = useExerciseProgression(
+    program,
+    clientName,
+    onChange,
+  );
 
   if (exercises.length === 0) return null;
 

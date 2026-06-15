@@ -5,16 +5,16 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { StatsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
-import { SearchInput } from '../../components/ui';
+import { SearchInput, AsyncBoundary } from '../../components/ui';
 import { AnalyticsChartCard } from './Analytics/AnalyticsChartCard';
 import { TransactionCard } from './Analytics/TransactionCard';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, typography, spacing } = theme;
 import { exportTransactions, searchItems, getChartWidth } from '../../utils';
-import { mockTransactions, mockAnalyticsData } from '../../mocks';
+import { useAsyncResource } from '../../hooks/data/useAsyncResource';
+import { loadBusinessAnalytics } from '../../services/analyticsService';
 import { useGamificationStore } from '../../store/gamificationStore';
-import { LEAGUE_TIERS } from '../../utils/leagues';
+import { LEAGUE_TIERS } from '../../utils/game/leagues';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'BusinessAnalytics'>;
 
@@ -33,31 +33,34 @@ export function BusinessAnalyticsScreen() {
     : null;
 
   const chartWidth = React.useMemo(() => getChartWidth(20), []);
-  const incomeData = React.useMemo(() => mockAnalyticsData.incomeOverTime, []);
+
+  const { data, status, error, refetch } = useAsyncResource(() => loadBusinessAnalytics());
+
   const sourceData = React.useMemo(
     () => ({
       labels: ['Subscriptions', 'Trainings'],
       datasets: [
         {
           data: [
-            mockAnalyticsData.revenueBySource.subscriptions,
-            mockAnalyticsData.revenueBySource.trainings,
+            data?.revenueBySource.subscriptions ?? 0,
+            data?.revenueBySource.trainings ?? 0,
           ],
         },
       ],
     }),
-    []
+    [data],
   );
 
   const preview = React.useMemo(
-    () => searchItems(search, mockTransactions, (t) => [t.clientName]).slice(0, 5),
-    [search],
+    () => searchItems(search, data?.transactions ?? [], (t) => [t.clientName]).slice(0, 5),
+    [search, data],
   );
 
   return (
     <View style={styles.container}>
       <ScreenHeader title="Business Analytics" transparent />
 
+      <AsyncBoundary status={status} error={error} onRetry={refetch} errorTitle="Couldn't load analytics">
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -66,15 +69,15 @@ export function BusinessAnalyticsScreen() {
         <View style={styles.earningsRow}>
           <View style={styles.earningsCard}>
             <Text style={styles.earningsLabel}>Total Month</Text>
-            <Text style={styles.earningsValue}>${mockAnalyticsData.totalEarningsPerMonth}</Text>
+            <Text style={styles.earningsValue}>${data?.totals.month ?? 0}</Text>
           </View>
           <View style={styles.earningsCard}>
             <Text style={styles.earningsLabel}>Subscriptions</Text>
-            <Text style={styles.earningsValue}>${mockAnalyticsData.fromSubscriptions}</Text>
+            <Text style={styles.earningsValue}>${data?.totals.subscriptions ?? 0}</Text>
           </View>
           <View style={styles.earningsCard}>
             <Text style={styles.earningsLabel}>Trainings</Text>
-            <Text style={styles.earningsValue}>${mockAnalyticsData.fromTrainings}</Text>
+            <Text style={styles.earningsValue}>${data?.totals.trainings ?? 0}</Text>
           </View>
         </View>
 
@@ -99,7 +102,7 @@ export function BusinessAnalyticsScreen() {
         )}
 
         <AnalyticsChartCard
-          incomeData={incomeData}
+          incomeData={data?.incomeData ?? { labels: [], datasets: [{ data: [] }] }}
           sourceData={sourceData}
           chartWidth={chartWidth}
         />
@@ -123,7 +126,7 @@ export function BusinessAnalyticsScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   hitSlop={ICON_HIT_SLOP}
-                  onPress={() => exportTransactions(mockTransactions)}
+                  onPress={() => exportTransactions(data?.transactions ?? [])}
                 >
                   <Ionicons name="download" size={18} color={colors.text} />
                 </TouchableOpacity>
@@ -145,6 +148,7 @@ export function BusinessAnalyticsScreen() {
           </View>
         </View>
       </ScrollView>
+      </AsyncBoundary>
     </View>
   );
 }

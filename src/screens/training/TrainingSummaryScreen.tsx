@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { getChartWidth } from '../../utils/layout';
+import { getChartWidth } from '../../utils/common/layout';
 import { LineChart } from 'react-native-chart-kit';
 import { useRoute, useNavigation, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,15 +9,14 @@ import { Ionicons } from '@expo/vector-icons';
 import type { LiveTrainingParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Card, SectionTitle } from '../../components/ui';
+import { ExercisesTable } from './components/ExercisesTable';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { trainingMetric } from '../../utils';
+import { topSet, totalDurationLabel } from '../../utils/training/trainingSummary';
 import { mockTrainingPrograms } from '../../mocks';
-import type { ExerciseSet, ProgramExercise } from '../../types';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 
 type Route = RouteProp<LiveTrainingParamList, 'TrainingSummary'>;
 type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'TrainingSummary'>;
@@ -27,32 +26,7 @@ const TIMEFRAME = ['Week', 'Month', 'Custom'];
 
 const CHART_WIDTH = getChartWidth(20);
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
-
-/** Picks the heaviest logged set as the representative row for an exercise. */
-function topSet(sets: ExerciseSet[]): ExerciseSet | undefined {
-  return sets.reduce<ExerciseSet | undefined>(
-    (best, s) => (!best || s.weight > best.weight ? s : best),
-    undefined,
-  );
-}
-
-function durationLabel(exercises: ProgramExercise[]): string {
-  const minutes = exercises.reduce((sum, ex) => {
-    const m = ex.durationLabel?.match(/(\d+)\s*m/);
-    return sum + (m ? Number(m[1]) : 0);
-  }, 0);
-  return minutes > 0 ? `${minutes}m` : '—';
-}
+const chartConfig = createChartConfig();
 
 export function TrainingSummaryScreen() {
   const route = useRoute<Route>();
@@ -145,7 +119,7 @@ export function TrainingSummaryScreen() {
         <View style={styles.summaryRow}>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Duration</Text>
-            <Text style={styles.summaryValue}>{durationLabel(exercises)}</Text>
+            <Text style={styles.summaryValue}>{totalDurationLabel(exercises)}</Text>
           </Card>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Type</Text>
@@ -184,22 +158,7 @@ export function TrainingSummaryScreen() {
         )}
 
         <SectionTitle>Exercises</SectionTitle>
-        <View style={styles.table}>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Name</Text>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Weight</Text>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Sets</Text>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Reps</Text>
-          </View>
-          {rows.map((r, i) => (
-            <View key={r.id} style={[styles.tableRow, i % 2 === 0 && styles.tableRowHighlight]}>
-              <Text style={styles.tableCell}>{r.name}</Text>
-              <Text style={styles.tableCell}>{r.weight}</Text>
-              <Text style={styles.tableCell}>{r.sets}</Text>
-              <Text style={styles.tableCell}>{r.reps}</Text>
-            </View>
-          ))}
-        </View>
+        <ExercisesTable rows={rows} />
 
         <SectionTitle>Trainer Notes</SectionTitle>
         <Card style={styles.notesCard}>
@@ -292,27 +251,6 @@ const styles = StyleSheet.create({
   },
   chart: {
     borderRadius: radius.sm,
-  },
-  table: {
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    marginBottom: spacing.lg,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    padding: spacing.md,
-  },
-  tableRowHighlight: {
-    backgroundColor: colors.primary2,
-  },
-  tableCell: {
-    flex: 1,
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-  },
-  tableHeader: {
-    fontWeight: typography.weights.semibold,
   },
   notesCard: {
     marginBottom: spacing.lg,
