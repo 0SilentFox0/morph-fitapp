@@ -39,6 +39,13 @@ export function HomeScreen() {
 
   const programs = useProgramsStore((s) => s.programs);
 
+  const loadPrograms = useProgramsStore((s) => s.loadPrograms);
+
+  // Populate the programs carousel (store starts empty; no-ops if already loaded).
+  React.useEffect(() => {
+    loadPrograms();
+  }, [loadPrograms]);
+
   const sessions = useSessionsStore((s) => s.sessions);
 
   const [refreshing, setRefreshing] = React.useState(false);

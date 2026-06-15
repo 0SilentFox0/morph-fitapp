@@ -32,6 +32,13 @@ export function useSessionForm(
 
   const programs = useProgramsStore((s) => s.programs);
 
+  const loadPrograms = useProgramsStore((s) => s.loadPrograms);
+
+  // The store starts empty; make sure the program picker has data (idempotent).
+  React.useEffect(() => {
+    loadPrograms();
+  }, [loadPrograms]);
+
   const {
     control,
     handleSubmit,

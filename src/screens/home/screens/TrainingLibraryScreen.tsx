@@ -13,7 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { ScreenHeader } from '../../../components/layout';
-import { Card, EmptyState, SearchInput } from '../../../components/ui';
+import { AsyncBoundary, Card, EmptyState, SearchInput } from '../../../components/ui';
+import { useAsyncResource } from '../../../hooks/data/useAsyncResource';
 import type { HomeStackParamList } from '../../../navigation/types';
 import theme from '../../../theme';
 
@@ -21,21 +22,28 @@ const { colors, radius, typography, spacing } = theme;
 
 import { useProgramsStore } from '../../../store/programsStore';
 import type { TrainingProgram } from '../../../types';
+import { searchItems } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'TrainingLibrary'>;
 
 export function TrainingLibraryScreen() {
   const navigation = useNavigation<Nav>();
 
-  const searchPrograms = useProgramsStore((s) => s.searchPrograms);
+  const loadPrograms = useProgramsStore((s) => s.loadPrograms);
+
+  // Subscribe to the program list so the screen re-renders after a load /
+  // local create / delete; the searched view is derived below.
+  const programs = useProgramsStore((s) => s.programs);
 
   const deleteProgram = useProgramsStore((s) => s.deleteProgram);
 
   const [search, setSearch] = React.useState('');
 
+  const { status, error, refetch } = useAsyncResource(() => loadPrograms());
+
   const filteredPrograms = React.useMemo(
-    () => searchPrograms(search),
-    [search, searchPrograms]
+    () => searchItems(search, programs, (p) => [p.name, p.tag]),
+    [search, programs]
   );
 
   const handleEdit = (p: TrainingProgram) => {
@@ -83,27 +91,35 @@ export function TrainingLibraryScreen() {
         />
       </View>
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <AsyncBoundary
+        status={status}
+        error={error}
+        onRetry={refetch}
+        errorTitle="Couldn't load programs"
       >
-        {filteredPrograms.length === 0 ? (
-          <EmptyState
-            icon="folder-open-outline"
-            title="No programs yet"
-            subtitle={
-              search
-                ? 'No programs match your search.'
-                : 'Add your first program to get started.'
-            }
-            actionLabel={search ? undefined : 'Add program'}
-            onAction={
-              search ? undefined : () => navigation.navigate('AddToLibraryForm')
-            }
-          />
-        ) : (
-          filteredPrograms.map((p) => (
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {filteredPrograms.length === 0 ? (
+            <EmptyState
+              icon="folder-open-outline"
+              title="No programs yet"
+              subtitle={
+                search
+                  ? 'No programs match your search.'
+                  : 'Add your first program to get started.'
+              }
+              actionLabel={search ? undefined : 'Add program'}
+              onAction={
+                search
+                  ? undefined
+                  : () => navigation.navigate('AddToLibraryForm')
+              }
+            />
+          ) : (
+            filteredPrograms.map((p) => (
             <Card key={p.id} style={styles.programCard}>
               <View style={styles.thumbWrap}>
                 {p.thumbnail ? (
@@ -176,9 +192,10 @@ export function TrainingLibraryScreen() {
                 </View>
               </View>
             </Card>
-          ))
-        )}
-      </ScrollView>
+            ))
+          )}
+        </ScrollView>
+      </AsyncBoundary>
     </View>
   );
 }

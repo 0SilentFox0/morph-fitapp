@@ -189,6 +189,43 @@ The frontend (`authStore.ts:65`) explicitly notes `/me/onboarding/complete` is *
 
 ---
 
+## P1.1 — Stores load from the API (remove seed for new accounts)
+
+Migrating the in-memory seeded stores to async API loads (empty start → real,
+possibly-empty list). First store done: **programs**.
+
+### Programs — DONE (`GET /v1/programs`)  ⚠️ field gaps
+`programsRepository.loadPrograms` → `programsApi.listPrograms` → `apiProgramToUi`; the
+store starts empty and loads once (guarded), Home carousel + SessionForm picker + Library
+all trigger it. Library shows loading/error/empty via `AsyncBoundary`.
+
+**Backend field gaps** (frontend derives/omits for now — add these to make the library faithful):
+- **No `tag`/category** on `Program` — frontend derives a tag from `difficulty`
+  (`beginner`/`intermediate`/`advanced`). Add a real category/tag field if programs should
+  be grouped by training type.
+- **No cover image** — `ProgramInput` accepts `cover_file_id`, but `ProgramSchema` returns no
+  resolved `thumbnail`/`cover_url`. Add a resolved cover URL to the response.
+- **No `price`** — the card shows a price ("$5/month"); there is no price field. Add one if
+  programs are monetized, else the UI drops it.
+- Full exercise mapping (API count-based `sets` vs UI set arrays + catalog join) is deferred;
+  the list only needs `exercises.length`.
+
+### Remaining stores — NOT migrated yet (blocked / larger refactor)
+- **sessions** — needs a UI date-model rework: the UI `Session` uses `'Today'`/`'Tomorrow'`
+  display strings and a 3-value status (`pending|completed|canceled`), while the API uses ISO
+  `start_at`/`end_at` and `planned|in_progress|completed|canceled|no_show`. Migrating requires
+  adapting both. (Trainer `GET /sessions` exists; client-as-participant listing does not — see below.)
+- **trainers** — **no backend endpoint exists** for a trainer catalog or discovery; the
+  `Trainer` model is frontend-only. Blocked on **B2** (`GET /v1/trainers`, `TrainerPublic`).
+- **measurements / training history / client sessions** — these are **client-facing** screens, but
+  the APIs are **trainer-centric** (`/clients/{clientId}/measurements`, `/sessions` by trainer).
+  There are **no client-self endpoints**. **Backend gap:** add self-scoped endpoints —
+  `GET /v1/me/measurements`, `POST /v1/me/measurements`, `GET /v1/me/workout-logs` (training
+  history), `GET /v1/me/sessions` (sessions where I'm a participant). Until these exist, client
+  progress/measurements stay on mock.
+
+---
+
 ## Cross-cutting (applies to every P0 slice)
 
 - **Idempotency:** every `POST`/`PATCH` carries `Idempotency-Key`; a retried mutation (e.g. after

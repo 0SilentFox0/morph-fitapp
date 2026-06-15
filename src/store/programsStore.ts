@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { loadPrograms as loadProgramsFromApi } from '../services/repositories/programsRepository';
 import type { ProgramExercise, TrainingProgram } from '../types';
 import { searchItems } from '../utils/common/search';
 import { removeById, updateById } from './collection';
@@ -13,6 +14,14 @@ export interface DraftProgramData {
 
 interface ProgramsState {
   programs: TrainingProgram[];
+  /** True once the API list has been pulled at least once this session. */
+  loaded: boolean;
+  /**
+   * Load the trainer's programs from the API into the store. No-ops after the
+   * first successful load (so locally created/edited programs aren't wiped on
+   * re-entry) unless `force` is passed.
+   */
+  loadPrograms: (force?: boolean) => Promise<TrainingProgram[]>;
   addProgram: (program: Omit<TrainingProgram, 'id'>) => TrainingProgram;
   addProgramFromDraft: (draft: DraftProgramData) => TrainingProgram;
   updateProgram: (id: string, updates: Partial<TrainingProgram>) => void;
@@ -30,63 +39,23 @@ const TRAINING_IMAGES = [
   'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=400&fit=crop',
 ];
 
-const initialPrograms: TrainingProgram[] = [
-  {
-    id: '1',
-    name: 'HIIT Power',
-    tag: 'HIIT',
-    videoCount: 10,
-    views: 24,
-    likes: 340,
-    thumbnail: TRAINING_IMAGES[0],
-    price: '$5/month',
-  },
-  {
-    id: '2',
-    name: 'Cardio Burn',
-    tag: 'Cardio',
-    videoCount: 8,
-    views: 18,
-    likes: 210,
-    thumbnail: TRAINING_IMAGES[1],
-    price: '$5/month',
-  },
-  {
-    id: '3',
-    name: 'Strength Builder',
-    tag: 'Strength',
-    videoCount: 12,
-    views: 45,
-    likes: 520,
-    thumbnail: TRAINING_IMAGES[2],
-    price: '$5/month',
-  },
-  {
-    id: '4',
-    name: 'Yoga Flow',
-    tag: 'Yoga',
-    videoCount: 15,
-    views: 62,
-    likes: 380,
-    thumbnail: TRAINING_IMAGES[3],
-    price: '$5/month',
-  },
-  {
-    id: '5',
-    name: 'Core Crush',
-    tag: 'HIIT',
-    videoCount: 6,
-    views: 31,
-    likes: 195,
-    thumbnail: TRAINING_IMAGES[4],
-    price: '$5/month',
-  },
-];
-
-let nextId = 6;
+let nextId = 1;
 
 export const useProgramsStore = create<ProgramsState>((set, get) => ({
-  programs: initialPrograms,
+  // Starts empty: a new trainer has no seeded programs. loadPrograms() pulls
+  // their real library from the API (or the mock fallback while not deployed).
+  programs: [],
+  loaded: false,
+
+  loadPrograms: async (force = false) => {
+    if (get().loaded && !force) return get().programs;
+
+    const programs = await loadProgramsFromApi();
+
+    set({ programs, loaded: true });
+
+    return programs;
+  },
 
   addProgram: (program) => {
     const id = String(nextId++);
