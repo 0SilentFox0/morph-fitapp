@@ -24,6 +24,8 @@ export { ChoiceCard } from './ChoiceCard';
 export type { ChoiceCardProps, ChoiceCardVariant } from './ChoiceCard';
 export { EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState';
+export { AsyncBoundary } from './AsyncBoundary';
+export type { AsyncBoundaryProps } from './AsyncBoundary';
 export { SectionTitle } from './SectionTitle';
 export type { SectionTitleProps } from './SectionTitle';
 export { Overlay } from './Overlay';

@@ -21,6 +21,12 @@ describe('RootNavigator gate', () => {
     expect(() => render(<RootNavigator />)).not.toThrow();
   });
 
+  it('renders the connection-error retry screen when offline', async () => {
+    useAuthStore.setState({ status: 'offline', user: null });
+    await render(<RootNavigator />);
+    expect(screen.getByTestId('connection-error')).toBeTruthy();
+  });
+
   it('renders without crashing when authenticated and onboarded', () => {
     useAuthStore.setState({ status: 'authenticated', user: null });
     useAppStore.setState({ isOnboarded: true, userRole: 'trainer' });

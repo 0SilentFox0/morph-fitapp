@@ -4,8 +4,8 @@ const uuid = z.string();
 const dt = z.string();
 // The backend sends optional collections as `null` (not `[]`) and may omit them
 // entirely, so coerce both null and undefined to an empty array before validating.
-const arr = (inner: z.ZodTypeAny = z.string()) =>
-  z.preprocess((v) => (v == null ? [] : v), z.array(inner));
+const arr = <T extends z.ZodTypeAny = z.ZodString>(inner?: T) =>
+  z.preprocess((v) => (v == null ? [] : v), z.array((inner ?? z.string()) as T));
 
 export const TokenResponseSchema = z.object({
   access_token: z.string(),
@@ -242,14 +242,6 @@ export const PersonalRecordSchema = z.object({
   created_at: dt.nullish(),
 });
 
-export const ConversationSchema = z.object({
-  id: uuid,
-  last_message_at: dt.nullish(),
-  participants: arr(z.unknown()),
-  last_message: z.unknown().nullish(),
-  unread_count: z.number().default(0),
-});
-
 export const MessageSchema = z.object({
   id: uuid,
   conversation_id: uuid,
@@ -258,6 +250,19 @@ export const MessageSchema = z.object({
   media_file_ids: arr(),
   sent_at: dt.nullish(),
   deleted_at: dt.nullish(),
+});
+
+export const ConversationParticipantSchema = z.object({
+  user_id: uuid,
+  last_read_at: dt.nullish(),
+});
+
+export const ConversationSchema = z.object({
+  id: uuid,
+  last_message_at: dt.nullish(),
+  participants: arr(ConversationParticipantSchema),
+  last_message: MessageSchema.nullish(),
+  unread_count: z.number().default(0),
 });
 
 export const TransactionSchema = z.object({

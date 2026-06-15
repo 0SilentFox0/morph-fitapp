@@ -6,7 +6,9 @@ import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
 import { ClientTabNavigator } from './ClientTabNavigator';
 import { AuthNavigator } from './AuthNavigator';
-import { colors } from '../theme/colors';
+import { ConnectionErrorScreen } from '../screens/ConnectionErrorScreen';
+import theme from '../theme';
+const { colors } = theme;
 
 export function RootNavigator() {
   const status = useAuthStore((state) => state.status);
@@ -19,6 +21,12 @@ export function RootNavigator() {
         <ActivityIndicator color={colors.accent} />
       </View>
     );
+  }
+
+  // A stored session that couldn't be verified due to a network/server error —
+  // offer a retry instead of bouncing the user to login (the token is intact).
+  if (status === 'offline') {
+    return <ConnectionErrorScreen />;
   }
 
   if (status === 'unauthenticated') {

@@ -6,8 +6,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { useAuthStore } from './src/store/authStore';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { OfflineBanner } from './src/components/layout';
 import { ThemeProvider } from './src/theme/ThemeContext';
 import { colors } from './src/theme/colors';
+// Importing the store registers the API client's connectivity bridge.
+import './src/store/connectivityStore';
 
 const AppTheme = {
   ...DefaultTheme,
@@ -37,6 +40,7 @@ export default function App() {
               <StatusBar style="light" />
               <RootNavigator />
             </NavigationContainer>
+            <OfflineBanner />
           </ErrorBoundary>
         </View>
       </SafeAreaProvider>

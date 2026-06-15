@@ -1,5 +1,6 @@
 import type { OnboardingState } from '../store/onboardingStore';
 import type { UserRole } from '../store/appStore';
+import { logger } from './logger';
 
 /**
  * Consolidated profiles the backend receives at the end of onboarding. These
@@ -104,7 +105,7 @@ export async function submitOnboardingProfile(
   }
 
   if (__DEV__) {
-    console.log('[onboardingApi] (mock) submitting profile:', JSON.stringify(profile, null, 2));
+    logger.debug('onboardingApi: (mock) submitting profile', { profile });
   }
 
   return {

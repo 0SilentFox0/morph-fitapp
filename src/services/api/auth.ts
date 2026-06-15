@@ -41,7 +41,8 @@ export async function register(input: RegisterInput): Promise<TokenResponse> {
 
 export async function logout(): Promise<void> {
   try {
-    await api.post('/auth/logout');
+    // skipRefresh: an expired token shouldn't trigger a refresh cascade on the way out.
+    await api.post('/auth/logout', { skipRefresh: true });
   } finally {
     await tokenStore.clear();
   }
@@ -49,7 +50,7 @@ export async function logout(): Promise<void> {
 
 export async function logoutAll(): Promise<void> {
   try {
-    await api.post('/auth/logout-all');
+    await api.post('/auth/logout-all', { skipRefresh: true });
   } finally {
     await tokenStore.clear();
   }

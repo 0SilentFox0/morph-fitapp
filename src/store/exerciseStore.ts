@@ -6,7 +6,8 @@ import {
   type ExerciseCategory,
 } from '../services/exerciseApi';
 import { toErrorMessage } from '../utils';
-import { searchItems } from '../utils/search';
+import { searchItems } from '../utils/common/search';
+import { logger } from '../services/logger';
 
 interface ExerciseState {
   exercises: Exercise[];
@@ -64,7 +65,7 @@ export const useExerciseStore = create<ExerciseState>((set, get) => ({
         loadingMore: false,
       }));
     } catch (e) {
-      console.warn('[exerciseStore] loadMore failed:', toErrorMessage(e));
+      logger.warn('exerciseStore.loadMore failed', { error: toErrorMessage(e) });
       set({ loadingMore: false });
     }
   },
@@ -74,7 +75,7 @@ export const useExerciseStore = create<ExerciseState>((set, get) => ({
       const categories = await fetchCategories();
       set({ categories });
     } catch (e) {
-      console.warn('[exerciseStore] loadCategories failed:', toErrorMessage(e));
+      logger.warn('exerciseStore.loadCategories failed', { error: toErrorMessage(e) });
     }
   },
 

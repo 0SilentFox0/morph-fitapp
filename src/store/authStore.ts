@@ -6,7 +6,12 @@ import * as authApi from '../services/api/auth';
 import * as usersApi from '../services/api/users';
 import type { User } from '../schemas/api/models';
 
-export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
+export type AuthStatus =
+  | 'loading'
+  | 'authenticated'
+  | 'unauthenticated'
+  /** A token exists but the backend was unreachable on cold start — show a retry screen, not login. */
+  | 'offline';
 
 interface AuthState {
   status: AuthStatus;
@@ -66,12 +71,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       syncRole(data);
       set({ status: 'authenticated', user: data });
     } catch (err) {
-      // Only a definitive 401 means the token is invalid — clear it. Transient
-      // failures (network/timeout/5xx) must NOT destroy a possibly-valid session.
+      // Only a definitive 401 means the token is invalid — clear it and send the
+      // user to login. Transient failures (network/timeout/5xx) must NOT destroy a
+      // possibly-valid session: keep the token and surface a retryable offline state.
       if (err instanceof ApiError && err.status === 401) {
         await tokenStore.clear();
+        set({ status: 'unauthenticated', user: null });
+      } else {
+        set({ status: 'offline', user: null });
       }
-      set({ status: 'unauthenticated', user: null });
     }
   },
 

@@ -1,6 +1,6 @@
 import { apiFetch } from './apiClient';
-import type { LeagueTierKey } from '../utils/leagues';
-import { LEAGUE_TIERS } from '../utils/leagues';
+import type { LeagueTierKey } from '../utils/game/leagues';
+import { LEAGUE_TIERS } from '../utils/game/leagues';
 import {
   CANONICAL_EXERCISES,
   buildMyGamification,

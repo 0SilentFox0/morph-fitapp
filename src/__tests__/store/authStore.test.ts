@@ -43,14 +43,35 @@ describe('authStore', () => {
     expect(useAuthStore.getState().user).toBeNull();
   });
 
-  it('loadSession stays out of loading and preserves token on a transient (non-401) error', async () => {
+  it('loadSession becomes offline (not unauthenticated) and preserves token on a transient error', async () => {
     await tokenStore.setTokens({ access_token: 'a', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
     jest.spyOn(usersApi, 'getMe').mockRejectedValue(new Error('network down'));
     await act(async () => {
       await useAuthStore.getState().loadSession();
     });
-    expect(useAuthStore.getState().status).toBe('unauthenticated');
+    expect(useAuthStore.getState().status).toBe('offline');
     expect(await tokenStore.getAccessToken()).toBe('a'); // token preserved
+  });
+
+  it('a transient 5xx is treated as offline (token preserved)', async () => {
+    await tokenStore.setTokens({ access_token: 'a', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    jest.spyOn(usersApi, 'getMe').mockRejectedValue(new ApiError(503, 'Service Unavailable'));
+    await act(async () => {
+      await useAuthStore.getState().loadSession();
+    });
+    expect(useAuthStore.getState().status).toBe('offline');
+    expect(await tokenStore.getAccessToken()).toBe('a');
+  });
+
+  it('retrying loadSession from offline reaches authenticated when the server recovers', async () => {
+    await tokenStore.setTokens({ access_token: 'a', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    useAuthStore.setState({ status: 'offline', user: null });
+    jest.spyOn(usersApi, 'getMe').mockResolvedValue({ data: user } as never);
+    await act(async () => {
+      await useAuthStore.getState().loadSession();
+    });
+    expect(useAuthStore.getState().status).toBe('authenticated');
+    expect(useAuthStore.getState().user?.name).toBe('Jane');
   });
 
   it('loadSession clears token on a 401', async () => {

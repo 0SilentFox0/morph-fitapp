@@ -89,6 +89,18 @@ describe('api client', () => {
     expect(await tokenStore.getAccessToken()).toBe('old'); // token preserved
   });
 
+  it('does NOT attempt a refresh on 401 when skipRefresh is set', async () => {
+    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    const onUnauth = jest.fn();
+    setUnauthorizedHandler(onUnauth);
+    const fetchSpy = jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(okJson({ message: 'Unauthenticated' }, 401));
+    await expect(request('POST', '/auth/logout', { skipRefresh: true })).rejects.toBeInstanceOf(ApiError);
+    expect(fetchSpy).toHaveBeenCalledTimes(1); // logout only — no refresh round-trip
+    expect(await tokenStore.getAccessToken()).toBeNull(); // token still cleared
+  });
+
   it('treats a malformed refresh response as a failed refresh (clears tokens)', async () => {
     await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
     const onUnauth = jest.fn();

@@ -3,6 +3,7 @@ import { tokenStore } from './tokenStore';
 import type { z } from 'zod';
 import { dataEnvelope } from '../../schemas/api/envelope';
 import { TokenResponseSchema } from '../../schemas/api/models';
+import { logger } from '../logger';
 
 const refreshEnvelope = dataEnvelope(TokenResponseSchema);
 
@@ -28,12 +29,28 @@ export interface RequestOptions<T> {
   schema?: z.ZodType<T>;
   /** Attach the bearer token. Default true; set false for public auth endpoints. */
   auth?: boolean;
+  /**
+   * Skip the automatic refresh-and-retry on 401. Used by logout: an expired
+   * token shouldn't trigger a spurious refresh cascade just to end the session.
+   */
+  skipRefresh?: boolean;
 }
 
 /** authStore registers a handler so a failed refresh can force a logout. */
 let onUnauthorized: (() => void) | null = null;
 export function setUnauthorizedHandler(fn: (() => void) | null): void {
   onUnauthorized = fn;
+}
+
+/**
+ * connectivityStore registers a reporter so the UI can react to reachability.
+ * Reachability is derived from request outcomes: any HTTP response (even a 5xx)
+ * means the server is reachable; a thrown fetch (network down / timeout) means
+ * it is not. This keeps the client dependency-free (no NetInfo native module).
+ */
+let connectivityReporter: ((online: boolean) => void) | null = null;
+export function setConnectivityReporter(fn: ((online: boolean) => void) | null): void {
+  connectivityReporter = fn;
 }
 
 function buildUrl(path: string, query?: Query): string {
@@ -46,26 +63,43 @@ function buildUrl(path: string, query?: Query): string {
   return qs ? `${API_BASE_URL}${path}?${qs}` : `${API_BASE_URL}${path}`;
 }
 
+/**
+ * Per-request key so a mutation that is transparently retried (e.g. after a
+ * token refresh) is recognised by the backend as the same operation rather than
+ * being applied twice.
+ */
+function newIdempotencyKey(): string {
+  const g = globalThis as { crypto?: { randomUUID?: () => string } };
+  if (g.crypto?.randomUUID) return g.crypto.randomUUID();
+  return `idem-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 async function rawRequest(
   method: HttpMethod,
   path: string,
-  opts: { body?: unknown; query?: Query; auth: boolean },
+  opts: { body?: unknown; query?: Query; auth: boolean; idempotencyKey?: string },
 ): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
   try {
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+    if (opts.idempotencyKey) headers['Idempotency-Key'] = opts.idempotencyKey;
     if (opts.auth) {
       const token = await tokenStore.getAccessToken();
       if (token) headers.Authorization = `Bearer ${token}`;
     }
-    return await fetch(buildUrl(path, opts.query), {
+    const res = await fetch(buildUrl(path, opts.query), {
       method,
       headers,
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
       signal: controller.signal,
     });
+    connectivityReporter?.(true); // any HTTP response ⇒ server reachable
+    return res;
+  } catch (err) {
+    connectivityReporter?.(false); // fetch threw ⇒ network down / timeout
+    throw err;
   } finally {
     clearTimeout(timeoutId);
   }
@@ -110,6 +144,19 @@ async function ensureRefreshed(): Promise<boolean> {
   return refreshPromise;
 }
 
+/** Tear down the session after a definitive 401: clear tokens and notify the app. */
+async function forceLogout(): Promise<void> {
+  await tokenStore.clear();
+  onUnauthorized?.();
+}
+
+/** Log a failed request without leaking the body or bearer token. */
+function logHttpFailure(method: HttpMethod, path: string, status: number): void {
+  const context = { status, method, path };
+  if (status >= 500) logger.error('API request failed', undefined, context);
+  else logger.warn('API request failed', context);
+}
+
 /** Make a typed request against the backend. */
 export async function request<T = unknown>(
   method: HttpMethod,
@@ -117,26 +164,25 @@ export async function request<T = unknown>(
   opts: RequestOptions<T> = {},
 ): Promise<T> {
   const auth = opts.auth !== false;
-  let res = await rawRequest(method, path, { body: opts.body, query: opts.query, auth });
+  // Generated once and reused on retry so the backend can dedupe the mutation.
+  const idempotencyKey =
+    method === 'POST' || method === 'PATCH' ? newIdempotencyKey() : undefined;
+  let res = await rawRequest(method, path, { body: opts.body, query: opts.query, auth, idempotencyKey });
 
-  if (res.status === 401 && auth) {
+  if (res.status === 401 && auth && !opts.skipRefresh) {
     // ensureRefreshed() may throw on transient errors (network failure, timeout).
     // Only clear tokens / notify on a definitive refresh failure (returns false).
     const refreshed = await ensureRefreshed();
     if (refreshed) {
-      res = await rawRequest(method, path, { body: opts.body, query: opts.query, auth });
-    } else {
-      await tokenStore.clear();
-      onUnauthorized?.();
-      throw await toApiError(res);
+      res = await rawRequest(method, path, { body: opts.body, query: opts.query, auth, idempotencyKey });
     }
   }
 
   if (!res.ok) {
     if (res.status === 401 && auth) {
-      await tokenStore.clear();
-      onUnauthorized?.();
+      await forceLogout();
     }
+    logHttpFailure(method, path, res.status);
     throw await toApiError(res);
   }
 
