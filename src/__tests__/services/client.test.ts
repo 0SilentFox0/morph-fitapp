@@ -76,6 +76,19 @@ describe('api client', () => {
     expect(await tokenStore.getAccessToken()).toBe('old'); // tokens preserved
   });
 
+  it('does NOT clear tokens when the refresh endpoint returns 5xx (transient)', async () => {
+    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    const onUnauth = jest.fn();
+    setUnauthorizedHandler(onUnauth);
+    jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValueOnce(okJson({ message: 'Unauthenticated' }, 401)) // original request
+      .mockResolvedValueOnce(okJson({ message: 'Service Unavailable' }, 503)); // refresh 5xx
+    await expect(request('GET', '/me')).rejects.toBeInstanceOf(ApiError);
+    expect(onUnauth).not.toHaveBeenCalled();
+    expect(await tokenStore.getAccessToken()).toBe('old'); // token preserved
+  });
+
   it('treats a malformed refresh response as a failed refresh (clears tokens)', async () => {
     await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
     const onUnauth = jest.fn();

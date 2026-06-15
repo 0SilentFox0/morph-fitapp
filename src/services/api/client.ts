@@ -92,10 +92,14 @@ async function ensureRefreshed(): Promise<boolean> {
       const refresh_token = await tokenStore.getRefreshToken();
       if (!refresh_token) return false;
       const res = await rawRequest('POST', '/auth/refresh', { body: { refresh_token }, auth: false });
-      if (!res.ok) return false; // refresh token definitively rejected
+      if (res.status === 401 || res.status === 403) return false; // refresh token definitively rejected
+      if (!res.ok) {
+        // Transient failure (5xx / unexpected) — do NOT treat as logout; let it propagate.
+        throw new ApiError(res.status, 'Token refresh failed; please retry.');
+      }
       const json = await res.json();
       const parsed = refreshEnvelope.safeParse(json);
-      if (!parsed.success) return false; // unexpected shape — treat as failed refresh
+      if (!parsed.success) return false; // unexpected 2xx shape — failed refresh
       await tokenStore.setTokens(parsed.data.data);
       return true;
     })();
