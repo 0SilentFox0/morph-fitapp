@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 const uuid = z.string();
 const dt = z.string();
-const arr = (inner: z.ZodTypeAny = z.string()) => z.array(inner).default([]);
+// The backend sends optional collections as `null` (not `[]`) and may omit them
+// entirely, so coerce both null and undefined to an empty array before validating.
+const arr = (inner: z.ZodTypeAny = z.string()) =>
+  z.preprocess((v) => (v == null ? [] : v), z.array(inner));
 
 export const TokenResponseSchema = z.object({
   access_token: z.string(),
@@ -129,7 +132,7 @@ export const ProgramSchema = z.object({
   likes_count: z.number().default(0),
   archived_at: dt.nullish(),
   created_at: dt.nullish(),
-  exercises: z.array(ProgramExerciseSchema).default([]),
+  exercises: arr(ProgramExerciseSchema),
 });
 
 export const ClientProgramSchema = z.object({
@@ -164,7 +167,7 @@ export const SessionSchema = z.object({
   google_event_id: z.string().nullish(),
   created_at: dt.nullish(),
   updated_at: dt.nullish(),
-  participants: z.array(SessionParticipantSchema).default([]),
+  participants: arr(SessionParticipantSchema),
 });
 
 export const ExerciseSchema = z.object({
@@ -202,7 +205,7 @@ export const WorkoutLogExerciseSchema = z.object({
   planned_sets: z.number().nullish(),
   planned_reps: z.number().nullish(),
   planned_weight_kg: z.number().nullish(),
-  sets: z.array(WorkoutLogSetSchema).default([]),
+  sets: arr(WorkoutLogSetSchema),
 });
 
 export const WorkoutLogSchema = z.object({
@@ -214,7 +217,7 @@ export const WorkoutLogSchema = z.object({
   finished_by_user_id: uuid.nullish(),
   last_version: z.number().nullish(),
   created_at: dt.nullish(),
-  exercises: z.array(WorkoutLogExerciseSchema).default([]),
+  exercises: arr(WorkoutLogExerciseSchema),
 });
 
 export const BodyMeasurementSchema = z.object({
@@ -242,7 +245,7 @@ export const PersonalRecordSchema = z.object({
 export const ConversationSchema = z.object({
   id: uuid,
   last_message_at: dt.nullish(),
-  participants: z.array(z.unknown()).default([]),
+  participants: arr(z.unknown()),
   last_message: z.unknown().nullish(),
   unread_count: z.number().default(0),
 });

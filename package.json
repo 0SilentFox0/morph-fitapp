@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:integration": "RUN_INTEGRATION=1 jest --config jest.integration.config.js",
     "format": "prettier --write \"**/*.{ts,tsx,js,json}\""
   },
   "dependencies": {
