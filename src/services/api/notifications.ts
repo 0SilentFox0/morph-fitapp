@@ -4,7 +4,8 @@ import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
 import { NotificationSchema } from '../../schemas/api/models';
 import { z } from 'zod';
 
-const UnreadCountSchema = z.object({ count: z.number() });
+// The backend returns `{ data: { unread_count: number } }`.
+const UnreadCountSchema = z.object({ unread_count: z.number() });
 
 export interface DeviceTokenInput {
   token: string;

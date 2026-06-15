@@ -1,7 +1,7 @@
 import { api } from './client';
 import type { Query } from './client';
 import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
-import { ProgramSchema } from '../../schemas/api/models';
+import { ProgramSchema, ClientProgramSchema } from '../../schemas/api/models';
 
 export interface ProgramExerciseInput {
   exercise_id: string;
@@ -36,11 +36,11 @@ export const updateProgram = (id: string, body: Partial<ProgramInput>) =>
 
 export const archiveProgram = (id: string) => api.post(`/programs/${id}/archive`);
 
-// Body shape per the live OpenAPI spec: { client_id: string }. NOTE: the internal
-// backend feature doc (docs/backend/features/programs.md) shows a plural { client_ids: [] };
-// if the running backend rejects this, switch to client_ids. Following the documented API.
+// Body is { client_id: string } — confirmed against the live backend (the plural
+// { client_ids: [] } from the internal doc returns 422). Returns the created
+// ClientProgram assignment.
 export const assignProgram = (id: string, client_id: string) =>
-  api.post(`/programs/${id}/assign`, { body: { client_id } });
+  api.post(`/programs/${id}/assign`, { body: { client_id }, schema: dataEnvelope(ClientProgramSchema) });
 
 export const replaceProgramExercises = (id: string, exercises: ProgramExerciseInput[]) =>
   api.put(`/programs/${id}/exercises`, { body: { exercises }, schema: dataEnvelope(ProgramSchema) });
