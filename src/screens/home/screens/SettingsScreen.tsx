@@ -4,7 +4,8 @@ import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { ScreenHeader } from '../../../components/layout';
-import { Button } from '../../../components/ui';
+import { Button, Segmented } from '../../../components/ui';
+import { useAppStore } from '../../../store/appStore';
 import { useAuthStore } from '../../../store/authStore';
 import theme from '../../../theme';
 import { toErrorMessage } from '../../../utils/format/error';
@@ -19,6 +20,10 @@ export function SettingsScreen() {
   const logout = useAuthStore((s) => s.logout);
 
   const deleteAccount = useAuthStore((s) => s.deleteAccount);
+
+  const units = useAppStore((s) => s.units);
+
+  const setUnits = useAppStore((s) => s.setUnits);
 
   const [busy, setBusy] = React.useState(false);
 
@@ -72,7 +77,14 @@ export function SettingsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionLabel}>Account</Text>
+        <Text style={styles.sectionLabel}>Units</Text>
+        <Segmented
+          options={[{ label: 'kg' }, { label: 'lb' }]}
+          value={units === 'imperial' ? 1 : 0}
+          onChange={(i) => setUnits(i === 1 ? 'imperial' : 'metric')}
+        />
+
+        <Text style={[styles.sectionLabel, styles.sectionGap]}>Account</Text>
 
         <Button
           title="Log out"
@@ -108,6 +120,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
+  sectionGap: { marginTop: spacing.xl },
   btn: { marginBottom: spacing.md },
   deleteBtn: { marginBottom: spacing.md, borderColor: colors.Error },
   deleteText: { color: colors.Error },

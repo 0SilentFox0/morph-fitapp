@@ -8,6 +8,7 @@ import {
   EditProfileScreen,
   GalleryScreen,
   HomeScreen,
+  NotificationsScreen,
   ProfileScreen,
   RequestSubmittedScreen,
   ScheduleScreen,
@@ -37,6 +38,7 @@ export function HomeStackNavigator() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="Schedule" component={ScheduleScreen} />
       <Stack.Screen name="SessionForm" component={SessionFormScreen} />
       <Stack.Screen

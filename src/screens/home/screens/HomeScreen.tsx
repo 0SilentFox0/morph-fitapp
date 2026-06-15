@@ -20,6 +20,7 @@ import { TrainingProgramsRow } from './Home/TrainingProgramsRow';
 
 const { colors, typography, spacing } = theme;
 
+import { loadUnreadCount } from '../../../services/repositories/notificationsRepository';
 import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
 import { useAppStore } from '../../../store/appStore';
 import { useProgramsStore } from '../../../store/programsStore';
@@ -56,6 +57,15 @@ export function HomeScreen() {
     void loadSessions().catch(() => {});
   }, [loadSessions]);
 
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  // Real unread-notifications badge for the bell.
+  React.useEffect(() => {
+    void loadUnreadCount()
+      .then(setUnreadCount)
+      .catch(() => {});
+  }, []);
+
   const [refreshing, setRefreshing] = React.useState(false);
 
   const refreshTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(
@@ -71,11 +81,6 @@ export function HomeScreen() {
 
   const upcomingSessions = React.useMemo(
     () => sessions.filter((s) => s.status !== 'canceled'),
-    [sessions]
-  );
-
-  const todayCount = React.useMemo(
-    () => sessions.filter((s) => s.date === 'Today').length,
     [sessions]
   );
 
@@ -120,8 +125,9 @@ export function HomeScreen() {
       <HomeHeader
         userName={userName}
         points={points}
-        showNotifDot={todayCount > 0}
+        showNotifDot={unreadCount > 0}
         onProfilePress={() => navigation.navigate('Profile')}
+        onNotificationsPress={() => navigation.navigate('Notifications')}
       />
 
       <ScrollView

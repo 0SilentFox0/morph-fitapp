@@ -5,6 +5,7 @@ export { ChatPlaceholderScreen } from './screens/ChatPlaceholderScreen';
 export { EditProfileScreen } from './screens/EditProfileScreen';
 export { GalleryScreen } from './screens/GalleryScreen';
 export { HomeScreen } from './screens/HomeScreen';
+export { NotificationsScreen } from './screens/NotificationsScreen';
 export { ProfileScreen } from './screens/ProfileScreen';
 export { RequestSubmittedScreen } from './screens/RequestSubmittedScreen';
 export { ScheduleScreen } from './screens/ScheduleScreen';

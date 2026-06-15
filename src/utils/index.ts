@@ -5,6 +5,7 @@ export * from './format/date';
 export * from './format/error';
 export * from './format/format';
 export * from './format/time';
+export * from './format/units';
 export * from './game/achievements';
 export * from './progress/chartData';
 export * from './progress/exerciseProgress';

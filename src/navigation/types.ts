@@ -35,6 +35,7 @@ export type HomeStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   Settings: undefined;
+  Notifications: undefined;
   Schedule: undefined;
   SessionForm: { session?: Session } | undefined;
   RequestSubmitted: { counterpartName?: string } | undefined;

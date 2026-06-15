@@ -14,6 +14,28 @@
 
 ---
 
+## 🔴 CRITICAL NOW — do these first
+
+The frontend has stopped faking success: every write now hits the API and shows a real error on
+failure, and several screens now consume live endpoints. These are the blocking items, in order:
+
+1. **Verify the P0 write endpoints actually work** (⚠️ across P0.1–P0.7). The app no longer writes
+   to a local store — `createTransaction`, `create/updateSession`, `createClient`/`updateClient`,
+   `updateMe` (profile + onboarding publish), and the workout `logSet`/`finishWorkout` pipeline must
+   accept the documented payloads and return the documented schemas. **A broken/changed endpoint is
+   now a user-facing error**, not a silent no-op. Confirm each against the sections below.
+2. **Notifications feed** (B4) — the in-app notifications screen is now LIVE on the frontend and calls
+   `GET /notifications`, `GET /notifications/unread-count`, `POST /notifications/{id}/read`,
+   `POST /notifications/read-all`. These exact paths/shapes must be deployed (the home bell + unread
+   dot read the count). This is the most immediate new dependency.
+3. **`POST /me/onboarding/complete`** (B8) — small, but it unblocks backend-authoritative onboarding
+   and re-enabling the logout reset (currently disabled). Return `onboarding_completed_at` from `GET /me`.
+
+Everything else (B1/B2/B5/B6/B7 + the client-self endpoints) is needed to unblock the P3 UI flips, but
+the three above gate what is already shipped on the frontend.
+
+---
+
 ## P0.1 — Create Transaction (`POST /v1/transactions`)  ⚠️ verify
 
 Wired in `src/services/repositories/transactionsRepository.ts` → `transactionsApi.createTransaction`.
@@ -233,6 +255,19 @@ so the existing schedule queries keep working.
   `GET /v1/me/measurements`, `POST /v1/me/measurements`, `GET /v1/me/workout-logs` (training
   history), `GET /v1/me/sessions` (sessions where I'm a participant). Until these exist, client
   progress/measurements stay on mock.
+
+---
+
+## Frontend polish shipped now (no backend dependency, FYI)
+
+- **In-app notifications feed** (trainer) — live against `GET /notifications` etc. (see CRITICAL #2).
+- **Dead buttons** wired/removed: ClientProfile → chat thread; the fake pencil/ellipsis on Training
+  Summary removed.
+- **kg/lb units** — trainer Settings toggle; weights are still **stored in kg**, converted only for
+  entry (live SetEditor) and display (Training Summary). Client-side units + a client Settings screen
+  remain a follow-up (the toggle currently lives in the trainer stack).
+- Remaining minor frontend follow-ups (no backend): client-side notifications entry (reuse the screen),
+  custom rest-timer duration UI, voice messages / media attachments (need recording + B7 upload).
 
 ---
 

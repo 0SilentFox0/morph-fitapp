@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import {
   type RouteProp,
   useNavigation,
@@ -21,9 +20,10 @@ import { Card, SectionTitle } from '../../components/ui';
 import { mockTrainingPrograms } from '../../mocks';
 import type { LiveTrainingParamList } from '../../navigation/types';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useAppStore } from '../../store/appStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import theme from '../../theme';
-import { trainingMetric } from '../../utils';
+import { formatWeight, trainingMetric } from '../../utils';
 import { getChartWidth } from '../../utils/common/layout';
 import {
   topSet,
@@ -74,6 +74,8 @@ export function TrainingSummaryScreen() {
     (s) => s.finishServerWorkout
   );
 
+  const units = useAppStore((s) => s.units);
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
 
   // label-only: exercises come from participant.exercises, this is just for the type tag
@@ -103,7 +105,7 @@ export function TrainingSummaryScreen() {
     return {
       id: ex.id,
       name: ex.name,
-      weight: top ? `${top.weight}kg` : '—',
+      weight: top ? formatWeight(top.weight, units) : '—',
       sets: sets.length,
       reps: top ? top.reps : 0,
     };
@@ -158,16 +160,6 @@ export function TrainingSummaryScreen() {
               >
                 Done
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Ionicons name="pencil" size={24} color={colors.text} />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Ionicons
-                name="ellipsis-vertical"
-                size={24}
-                color={colors.text}
-              />
             </TouchableOpacity>
           </View>
         }

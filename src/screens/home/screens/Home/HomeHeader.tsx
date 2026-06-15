@@ -13,6 +13,7 @@ export interface HomeHeaderProps {
   points: number;
   showNotifDot: boolean;
   onProfilePress: () => void;
+  onNotificationsPress?: () => void;
 }
 
 /** Home dashboard top bar: profile shortcut, points pill, notifications. */
@@ -21,6 +22,7 @@ export function HomeHeader({
   points,
   showNotifDot,
   onProfilePress,
+  onNotificationsPress,
 }: HomeHeaderProps) {
   const insets = useSafeAreaInsets();
 
@@ -58,6 +60,7 @@ export function HomeHeader({
           style={styles.notifBtn}
           accessibilityRole="button"
           accessibilityLabel="Notifications"
+          onPress={onNotificationsPress}
         >
           <Ionicons name="notifications" size={24} color={colors.text} />
           {showNotifDot && <View style={styles.notifDot} />}
