@@ -1,8 +1,16 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle,
+} from 'react-native';
+
+import theme from '../../theme';
+
+const { colors, radius, typography } = theme;
 
 /**
  * Form input per Figma Session form (Input / Basic): height 40, bg #141414,

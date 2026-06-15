@@ -1,17 +1,18 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
+  View,
   ViewStyle,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+
+import theme from '../../theme';
+
+const { colors, typography, spacing } = theme;
 
 interface ScreenHeaderProps {
   title: string;
@@ -31,6 +32,7 @@ export function ScreenHeader({
   transparent,
 }: ScreenHeaderProps) {
   const navigation = useNavigation();
+
   const insets = useSafeAreaInsets();
 
   const handleBack = () => {
@@ -49,7 +51,14 @@ export function ScreenHeader({
   };
 
   return (
-    <View style={[styles.header, safePadding, transparent && styles.headerTransparent, style]}>
+    <View
+      style={[
+        styles.header,
+        safePadding,
+        transparent && styles.headerTransparent,
+        style,
+      ]}
+    >
       <View style={styles.left}>
         {showBack && (
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { searchItems } from '../utils/search';
+
+import { searchItems } from '../utils/common/search';
 
 /** Avatar tint pairs (background + foreground) for initials placeholders, per Figma. */
 export type AvatarTint = 'primary' | 'blue' | 'success';
@@ -68,7 +69,10 @@ interface ChatState {
   conversations: Conversation[];
   messagesByConversation: Record<string, ChatMessage[]>;
   addConversation: (participant: ChatParticipant) => Conversation;
-  getOrCreateConversation: (participantId: string, participant: ChatParticipant) => Conversation;
+  getOrCreateConversation: (
+    participantId: string,
+    participant: ChatParticipant
+  ) => Conversation;
   sendMessage: (conversationId: string, text: string) => ChatMessage;
   markAsRead: (conversationId: string) => void;
   searchConversations: (query: string) => Conversation[];
@@ -76,6 +80,7 @@ interface ChatState {
 }
 
 let nextConvId = 100;
+
 let nextMsgId = 1;
 
 // --- Mock conversations (Chat list) -------------------------------------------------
@@ -86,15 +91,84 @@ const listParticipants: {
   fromMe: boolean;
   status: MessageStatus;
 }[] = [
-  { participant: { id: '1', name: 'Jacob Jones', avatar: 'https://i.pravatar.cc/150?img=12' }, unread: 2, fromMe: false, status: 'delivered' },
-  { participant: { id: '2', name: 'Dianne Russell', avatar: 'https://i.pravatar.cc/150?img=5' }, unread: 3, fromMe: false, status: 'delivered' },
-  { participant: { id: '3', name: 'Brooklyn Simmons', tint: 'primary' }, unread: 0, fromMe: true, status: 'read' },
-  { participant: { id: '4', name: 'Jerome Bell', avatar: 'https://i.pravatar.cc/150?img=33' }, unread: 0, fromMe: true, status: 'sent' },
-  { participant: { id: '5', name: 'Cameron Williamson', tint: 'blue' }, unread: 0, fromMe: true, status: 'read' },
-  { participant: { id: '6', name: 'Ronald Richards', avatar: 'https://i.pravatar.cc/150?img=52' }, unread: 0, fromMe: true, status: 'read' },
-  { participant: { id: '7', name: 'Brooklyn Simmons', avatar: 'https://i.pravatar.cc/150?img=47' }, unread: 0, fromMe: true, status: 'read' },
-  { participant: { id: '8', name: 'Eleanor Pena', tint: 'success' }, unread: 0, fromMe: true, status: 'sent' },
-  { participant: { id: '9', name: 'Savannah Nguyen', avatar: 'https://i.pravatar.cc/150?img=15' }, unread: 0, fromMe: true, status: 'read' },
+  {
+    participant: {
+      id: '1',
+      name: 'Jacob Jones',
+      avatar: 'https://i.pravatar.cc/150?img=12',
+    },
+    unread: 2,
+    fromMe: false,
+    status: 'delivered',
+  },
+  {
+    participant: {
+      id: '2',
+      name: 'Dianne Russell',
+      avatar: 'https://i.pravatar.cc/150?img=5',
+    },
+    unread: 3,
+    fromMe: false,
+    status: 'delivered',
+  },
+  {
+    participant: { id: '3', name: 'Brooklyn Simmons', tint: 'primary' },
+    unread: 0,
+    fromMe: true,
+    status: 'read',
+  },
+  {
+    participant: {
+      id: '4',
+      name: 'Jerome Bell',
+      avatar: 'https://i.pravatar.cc/150?img=33',
+    },
+    unread: 0,
+    fromMe: true,
+    status: 'sent',
+  },
+  {
+    participant: { id: '5', name: 'Cameron Williamson', tint: 'blue' },
+    unread: 0,
+    fromMe: true,
+    status: 'read',
+  },
+  {
+    participant: {
+      id: '6',
+      name: 'Ronald Richards',
+      avatar: 'https://i.pravatar.cc/150?img=52',
+    },
+    unread: 0,
+    fromMe: true,
+    status: 'read',
+  },
+  {
+    participant: {
+      id: '7',
+      name: 'Brooklyn Simmons',
+      avatar: 'https://i.pravatar.cc/150?img=47',
+    },
+    unread: 0,
+    fromMe: true,
+    status: 'read',
+  },
+  {
+    participant: { id: '8', name: 'Eleanor Pena', tint: 'success' },
+    unread: 0,
+    fromMe: true,
+    status: 'sent',
+  },
+  {
+    participant: {
+      id: '9',
+      name: 'Savannah Nguyen',
+      avatar: 'https://i.pravatar.cc/150?img=15',
+    },
+    unread: 0,
+    fromMe: true,
+    status: 'read',
+  },
 ];
 
 const initialConversations: Conversation[] = listParticipants.map((row, i) => ({
@@ -110,18 +184,50 @@ const initialConversations: Conversation[] = listParticipants.map((row, i) => ({
 // --- Mock thread (Morning Warriors group) -------------------------------------------
 // Mirrors Figma node 2006:10366 — bubbles, a session card and a timer card.
 const morningWarriorsMessages: ChatMessage[] = [
-  { kind: 'text', id: 'mw1', text: 'Good morning !', sentAt: '2025-03-16T08:00:00Z', isFromMe: true, status: 'read' },
+  {
+    kind: 'text',
+    id: 'mw1',
+    text: 'Good morning !',
+    sentAt: '2025-03-16T08:00:00Z',
+    isFromMe: true,
+    status: 'read',
+  },
   {
     kind: 'session',
     id: 'mw2',
     sentAt: '2025-03-16T08:05:00Z',
     isFromMe: false,
     status: 'read',
-    session: { title: 'Single Training', date: 'Mar 16, 2026', time: '6:00 AM', participants: 8 },
+    session: {
+      title: 'Single Training',
+      date: 'Mar 16, 2026',
+      time: '6:00 AM',
+      participants: 8,
+    },
   },
-  { kind: 'sessionStarted', id: 'mw3', sentAt: '2025-03-16T09:00:00Z', isFromMe: false, status: 'read' },
-  { kind: 'text', id: 'mw4', text: 'See you all tomorrow at 6AM', sentAt: '2025-03-16T09:15:00Z', isFromMe: true, status: 'read' },
-  { kind: 'text', id: 'mw5', text: 'Thanks for the workout plan!', sentAt: '2025-03-16T09:20:00Z', isFromMe: false, status: 'read' },
+  {
+    kind: 'sessionStarted',
+    id: 'mw3',
+    sentAt: '2025-03-16T09:00:00Z',
+    isFromMe: false,
+    status: 'read',
+  },
+  {
+    kind: 'text',
+    id: 'mw4',
+    text: 'See you all tomorrow at 6AM',
+    sentAt: '2025-03-16T09:15:00Z',
+    isFromMe: true,
+    status: 'read',
+  },
+  {
+    kind: 'text',
+    id: 'mw5',
+    text: 'Thanks for the workout plan!',
+    sentAt: '2025-03-16T09:20:00Z',
+    isFromMe: false,
+    status: 'read',
+  },
 ];
 
 const initialMessages: Record<string, ChatMessage[]> = {
@@ -145,6 +251,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   addConversation: (participant) => {
     const id = `c${nextConvId++}`;
+
     const conv: Conversation = {
       id,
       participant,
@@ -154,16 +261,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
       lastMessageFromMe: false,
       unreadCount: 0,
     };
+
     set((s) => ({
       conversations: [conv, ...s.conversations],
       messagesByConversation: { ...s.messagesByConversation, [id]: [] },
     }));
+
     return conv;
   },
 
   getOrCreateConversation: (participantId, participant) => {
-    const existing = get().conversations.find((c) => c.participant.id === participantId);
+    const existing = get().conversations.find(
+      (c) => c.participant.id === participantId
+    );
+
     if (existing) return existing;
+
     return get().addConversation(participant);
   },
 
@@ -176,9 +289,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       isFromMe: true,
       status: 'sent',
     };
+
     set((s) => {
-      const messages = [...(s.messagesByConversation[conversationId] ?? []), msg];
+      const messages = [
+        ...(s.messagesByConversation[conversationId] ?? []),
+        msg,
+      ];
+
       const conv = s.conversations.find((c) => c.id === conversationId);
+
       const updated = conv
         ? s.conversations.map((c) =>
             c.id === conversationId
@@ -193,11 +312,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
               : c
           )
         : s.conversations;
+
       return {
-        messagesByConversation: { ...s.messagesByConversation, [conversationId]: messages },
+        messagesByConversation: {
+          ...s.messagesByConversation,
+          [conversationId]: messages,
+        },
         conversations: updated,
       };
     });
+
     return msg;
   },
 
@@ -212,5 +336,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   searchConversations: (query) =>
     searchItems(query, get().conversations, (c) => [c.participant.name]),
 
-  getUnreadCount: () => get().conversations.reduce((acc, c) => acc + c.unreadCount, 0),
+  getUnreadCount: () =>
+    get().conversations.reduce((acc, c) => acc + c.unreadCount, 0),
 }));

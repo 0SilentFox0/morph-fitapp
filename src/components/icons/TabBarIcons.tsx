@@ -1,7 +1,10 @@
 import React from 'react';
+import Svg, { G, Path } from 'react-native-svg';
 import { View } from 'react-native';
-import Svg, { Path, G } from 'react-native-svg';
-import { colors } from '../../theme/colors';
+
+import theme from '../../theme';
+
+const { colors } = theme;
 
 const SIZE = 32;
 
@@ -9,8 +12,15 @@ const SIZE = 32;
 // rather than the inactive grey outline. All active icons share one accent fill.
 const ACTIVE_FILL = colors.primary9;
 
-export function HomeTabIcon({ color, focused }: { color: string; focused: boolean }) {
+export function HomeTabIcon({
+  color,
+  focused,
+}: {
+  color: string;
+  focused: boolean;
+}) {
   const fillColor = focused ? ACTIVE_FILL : color;
+
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
@@ -26,9 +36,17 @@ export function HomeTabIcon({ color, focused }: { color: string; focused: boolea
   );
 }
 
-export function ProfileTabIcon({ color, focused }: { color: string; focused: boolean }) {
+export function ProfileTabIcon({
+  color,
+  focused,
+}: {
+  color: string;
+  focused: boolean;
+}) {
   const fillColor = focused ? ACTIVE_FILL : 'none';
+
   const strokeColor = focused ? ACTIVE_FILL : color;
+
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
@@ -55,9 +73,17 @@ export function ProfileTabIcon({ color, focused }: { color: string; focused: boo
   );
 }
 
-export function ChatTabIcon({ color, focused }: { color: string; focused?: boolean }) {
+export function ChatTabIcon({
+  color,
+  focused,
+}: {
+  color: string;
+  focused?: boolean;
+}) {
   const fillColor = focused ? ACTIVE_FILL : 'none';
+
   const strokeColor = focused ? ACTIVE_FILL : color;
+
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
@@ -74,8 +100,15 @@ export function ChatTabIcon({ color, focused }: { color: string; focused?: boole
   );
 }
 
-export function TrainTabIcon({ color, focused }: { color: string; focused: boolean }) {
+export function TrainTabIcon({
+  color,
+  focused,
+}: {
+  color: string;
+  focused: boolean;
+}) {
   const strokeColor = focused ? ACTIVE_FILL : color;
+
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">
@@ -91,7 +124,13 @@ export function TrainTabIcon({ color, focused }: { color: string; focused: boole
   );
 }
 
-export function StatsTabIcon({ color, focused }: { color: string; focused: boolean }) {
+export function StatsTabIcon({
+  color,
+  focused,
+}: {
+  color: string;
+  focused: boolean;
+}) {
   if (focused) {
     // Active state uses the design's solid bar-chart silhouette. Its source
     // viewBox (20.75 x 19.4167) is mapped onto the inactive glyph's bounding box
@@ -113,6 +152,7 @@ export function StatsTabIcon({ color, focused }: { color: string; focused: boole
       </View>
     );
   }
+
   return (
     <View style={{ width: SIZE, height: SIZE }}>
       <Svg width={SIZE} height={SIZE} viewBox="0 0 32 32" fill="none">

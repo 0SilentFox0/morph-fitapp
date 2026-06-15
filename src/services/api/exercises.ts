@@ -1,7 +1,7 @@
-import { api } from './client';
-import type { Query } from './client';
 import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
 import { ExerciseSchema } from '../../schemas/api/models';
+import type { Query } from './client';
+import { api } from './client';
 
 export interface ExerciseInput {
   name: string;
@@ -23,5 +23,7 @@ export const createExercise = (body: ExerciseInput) =>
 export const updateExercise = (id: string, body: Partial<ExerciseInput>) =>
   api.put(`/exercises/${id}`, { body, schema: dataEnvelope(ExerciseSchema) });
 
-export const archiveExercise = (id: string) => api.post(`/exercises/${id}/archive`);
-export const restoreExercise = (id: string) => api.post(`/exercises/${id}/restore`);
+export const archiveExercise = (id: string) =>
+  api.post(`/exercises/${id}/archive`);
+export const restoreExercise = (id: string) =>
+  api.post(`/exercises/${id}/restore`);

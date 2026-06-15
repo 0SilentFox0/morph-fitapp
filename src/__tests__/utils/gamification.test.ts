@@ -1,20 +1,21 @@
 import type { CompletedTraining } from '../../types';
 import {
   activeWeeks,
-  daysSinceLast,
-  computeConsistency,
   computeComposite,
+  computeConsistency,
   computeTrainerComposite,
-  softCap,
+  daysSinceLast,
   percentileOf,
   pointsFor,
-} from '../../utils/gamification';
+  softCap,
+} from '../../utils/game/gamification';
 
 const NOW = new Date('2026-06-13T12:00:00Z');
 
 /** A training `weeksAgo` before NOW (one logged set). */
 function training(weeksAgo: number, id = `t${weeksAgo}`): CompletedTraining {
   const d = new Date(NOW.getTime() - weeksAgo * 7 * 24 * 60 * 60 * 1000);
+
   return {
     id,
     clientName: 'You',
@@ -47,30 +48,38 @@ describe('activeWeeks / daysSinceLast', () => {
 describe('computeConsistency', () => {
   it('rewards long-term regular training over a single recent session', () => {
     const veteran = computeConsistency(steady(104), 2000, NOW).normalized; // ~2 years
+
     const rookie = computeConsistency(steady(1), 20, NOW).normalized; // 1 week
+
     expect(veteran).toBeGreaterThan(rookie);
   });
 
   it('decays toward zero as inactivity grows', () => {
     const recent = computeConsistency(steady(12), 240, NOW).raw;
+
     // Same 12-week block but the last session was ~6 weeks (2·tau) ago.
     const stale = computeConsistency(
       Array.from({ length: 12 }, (_, i) => training(i + 6, `g${i}`)),
       240,
-      NOW,
+      NOW
     ).raw;
+
     expect(stale).toBeLessThan(recent);
     expect(stale).toBeGreaterThan(0);
   });
 
   it('produces a normalized score within [0,1)', () => {
     const { normalized } = computeConsistency(steady(52), 1000, NOW);
+
     expect(normalized).toBeGreaterThan(0);
     expect(normalized).toBeLessThan(1);
   });
 
   it('is zero with no history', () => {
-    expect(computeConsistency([], 0, NOW)).toMatchObject({ raw: 0, normalized: 0 });
+    expect(computeConsistency([], 0, NOW)).toMatchObject({
+      raw: 0,
+      normalized: 0,
+    });
   });
 });
 
@@ -112,7 +121,9 @@ describe('softCap', () => {
 describe('computeTrainerComposite', () => {
   it('grows with trainings, clients and client records, and stays in 0..1', () => {
     const small = computeTrainerComposite(2, 1, 1);
+
     const big = computeTrainerComposite(50, 20, 40);
+
     expect(big).toBeGreaterThan(small);
     expect(big).toBeLessThanOrEqual(1);
     expect(small).toBeGreaterThan(0);

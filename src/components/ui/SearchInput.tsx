@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, TextInput, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+
+import theme from '../../theme';
+
+const { colors, radius, typography } = theme;
 
 /**
  * Search input per Figma 1-11042: height 40, bg #141414, border #434343,
@@ -31,7 +32,12 @@ export function SearchInput({
         value={value}
         onChangeText={onChangeText}
       />
-      <Ionicons name="search" size={24} color={colors.neutral9} style={styles.icon} />
+      <Ionicons
+        name="search"
+        size={24}
+        color={colors.neutral9}
+        style={styles.icon}
+      />
     </View>
   );
 }

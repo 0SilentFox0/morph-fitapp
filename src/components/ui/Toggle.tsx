@@ -1,7 +1,10 @@
 import React from 'react';
-import { TouchableOpacity, View, StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
+
+import theme from '../../theme';
+
+const { colors } = theme;
 
 interface ToggleProps {
   value: boolean;
@@ -23,7 +26,12 @@ export function Toggle({ value, onValueChange, disabled }: ToggleProps) {
       style={[styles.track, value ? styles.trackOn : styles.trackOff]}
     >
       {value && (
-        <Ionicons name="checkmark" size={10} color={colors.white} style={styles.iconLeft} />
+        <Ionicons
+          name="checkmark"
+          size={10}
+          color={colors.white}
+          style={styles.iconLeft}
+        />
       )}
       <View style={[styles.handle, value ? styles.handleOn : styles.handleOff]}>
         {!value && <Ionicons name="close" size={10} color={colors.neutral7} />}
@@ -33,7 +41,9 @@ export function Toggle({ value, onValueChange, disabled }: ToggleProps) {
 }
 
 const TRACK_W = 48;
+
 const TRACK_H = 22;
+
 const HANDLE = 18;
 
 const styles = StyleSheet.create({

@@ -1,38 +1,56 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+
+import theme from '../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
+import { SET_NOTE_CYCLE, SET_NOTES } from '../../constants';
 import { useDraftProgramStore } from '../../store/draftProgramStore';
-import type { ProgramExercise, ExerciseSet } from '../../types';
-import { SET_NOTES, SET_NOTE_CYCLE } from '../../constants';
-import { radius } from '../../theme';
+import type { ExerciseSet, ProgramExercise } from '../../types';
 
 export interface ExerciseCardProps {
   exercise: ProgramExercise;
 }
 
-export const ExerciseCard = React.memo(function ExerciseCard({ exercise }: ExerciseCardProps) {
+export const ExerciseCard = React.memo(function ExerciseCard({
+  exercise,
+}: ExerciseCardProps) {
   const removeExercise = useDraftProgramStore((s) => s.removeExercise);
+
   const addSet = useDraftProgramStore((s) => s.addSet);
+
   const removeSet = useDraftProgramStore((s) => s.removeSet);
+
   const updateSet = useDraftProgramStore((s) => s.updateSet);
 
   const handleWeightChange = (setIdx: number, text: string) => {
     const num = parseInt(text, 10);
+
     updateSet(exercise.id, setIdx, { weight: isNaN(num) ? 0 : num });
   };
 
   const handleRepsChange = (setIdx: number, text: string) => {
     const num = parseInt(text, 10);
+
     updateSet(exercise.id, setIdx, { reps: isNaN(num) ? 0 : num });
   };
 
   const cycleNote = (setIdx: number) => {
     const current = exercise.sets[setIdx]?.note ?? 'regular';
+
     const currentIdx = SET_NOTE_CYCLE.indexOf(current);
+
     const next = SET_NOTE_CYCLE[(currentIdx + 1) % SET_NOTE_CYCLE.length];
+
     updateSet(exercise.id, setIdx, { note: next });
   };
 
@@ -41,10 +59,18 @@ export const ExerciseCard = React.memo(function ExerciseCard({ exercise }: Exerc
       <View style={styles.cardHeader}>
         <View style={styles.headerLeft}>
           {exercise.imageUrl ? (
-            <Image source={{ uri: exercise.imageUrl }} style={styles.thumb} resizeMode="cover" />
+            <Image
+              source={{ uri: exercise.imageUrl }}
+              style={styles.thumb}
+              resizeMode="cover"
+            />
           ) : (
             <View style={[styles.thumb, styles.thumbEmpty]}>
-              <Ionicons name="barbell-outline" size={16} color={colors.neutral5} />
+              <Ionicons
+                name="barbell-outline"
+                size={16}
+                color={colors.neutral5}
+              />
             </View>
           )}
           <View style={styles.headerText}>
@@ -95,12 +121,15 @@ export const ExerciseCard = React.memo(function ExerciseCard({ exercise }: Exerc
               style={styles.noteBtn}
               onPress={() => cycleNote(idx)}
               onLongPress={() =>
-                exercise.sets.length > 1 ? removeSet(exercise.id, idx) : undefined
+                exercise.sets.length > 1
+                  ? removeSet(exercise.id, idx)
+                  : undefined
               }
             >
               <Ionicons
                 name={
-                  (SET_NOTES.find((n) => n.key === (set.note ?? 'regular'))?.icon ??
+                  (SET_NOTES.find((n) => n.key === (set.note ?? 'regular'))
+                    ?.icon ??
                     'checkmark-circle-outline') as keyof typeof Ionicons.glyphMap
                 }
                 size={16}
@@ -111,7 +140,10 @@ export const ExerciseCard = React.memo(function ExerciseCard({ exercise }: Exerc
         </View>
       ))}
 
-      <TouchableOpacity style={styles.addSetBtn} onPress={() => addSet(exercise.id)}>
+      <TouchableOpacity
+        style={styles.addSetBtn}
+        onPress={() => addSet(exercise.id)}
+      >
         <Ionicons name="add" size={16} color={colors.accent} />
         <Text style={styles.addSetText}>Add set</Text>
       </TouchableOpacity>

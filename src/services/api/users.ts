@@ -1,6 +1,6 @@
-import { api } from './client';
 import { dataEnvelope } from '../../schemas/api/envelope';
-import { UserSchema, UserPublicSchema } from '../../schemas/api/models';
+import { UserPublicSchema, UserSchema } from '../../schemas/api/models';
+import { api } from './client';
 
 export interface UpdateProfileInput {
   name?: string;
@@ -22,12 +22,17 @@ export const updateMe = (body: UpdateProfileInput) =>
   api.put('/me', { body, schema: dataEnvelope(UserSchema) });
 
 export const updateAvatar = (media_file_id: string) =>
-  api.put('/me/avatar', { body: { media_file_id }, schema: dataEnvelope(UserSchema) });
+  api.put('/me/avatar', {
+    body: { media_file_id },
+    schema: dataEnvelope(UserSchema),
+  });
 
 export const getOnboarding = () => api.get('/me/onboarding');
 
-export const updateOnboardingStep = (step: string, data: Record<string, unknown>) =>
-  api.put(`/me/onboarding/${step}`, { body: { data } });
+export const updateOnboardingStep = (
+  step: string,
+  data: Record<string, unknown>
+) => api.put(`/me/onboarding/${step}`, { body: { data } });
 
 export const updateSettings = (body: {
   timezone?: string;

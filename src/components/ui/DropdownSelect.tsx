@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+
+import theme from '../../theme';
+
+const { colors, radius, typography } = theme;
 
 /**
  * Dropdown trigger per Figma (Dropdown / Trigger / Button Basic):
@@ -23,6 +24,7 @@ export function DropdownSelect({
   style,
 }: DropdownSelectProps) {
   const label = value || placeholder;
+
   const isPlaceholder = !value;
 
   return (
@@ -31,7 +33,10 @@ export function DropdownSelect({
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Text style={[styles.text, isPlaceholder && styles.placeholder]} numberOfLines={1}>
+      <Text
+        style={[styles.text, isPlaceholder && styles.placeholder]}
+        numberOfLines={1}
+      >
         {label}
       </Text>
       <Ionicons name="chevron-down" size={12} color={colors.neutral9} />

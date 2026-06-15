@@ -1,27 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useOnboardingStore } from '../../../store/onboardingStore';
+import * as DocumentPicker from 'expo-document-picker';
+
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
 import { useShallow } from 'zustand/react/shallow';
+
+import { logger } from '../../../services/logger';
+import { useOnboardingStore } from '../../../store/onboardingStore';
 import { Checkbox } from './Checkbox';
 
 /** Trainer experience step: "I have certifications" + certificate uploads. */
 export function CertificationUpload() {
-  const { hasCertifications, certifications, setField, addCertification, removeCertification } =
-    useOnboardingStore(
-      useShallow((s) => ({
-        hasCertifications: s.hasCertifications,
-        certifications: s.certifications,
-        setField: s.setField,
-        addCertification: s.addCertification,
-        removeCertification: s.removeCertification,
-      }))
-    );
+  const {
+    hasCertifications,
+    certifications,
+    setField,
+    addCertification,
+    removeCertification,
+  } = useOnboardingStore(
+    useShallow((s) => ({
+      hasCertifications: s.hasCertifications,
+      certifications: s.certifications,
+      setField: s.setField,
+      addCertification: s.addCertification,
+      removeCertification: s.removeCertification,
+    }))
+  );
 
   const handleUpload = async () => {
     try {
@@ -30,13 +38,19 @@ export function CertificationUpload() {
         copyToCacheDirectory: true,
         multiple: true,
       });
+
       if (result.canceled || !result.assets?.length) return;
+
       const existing = new Set(certifications.map((c) => c.uri));
+
       result.assets.forEach((asset) => {
-        if (!existing.has(asset.uri)) addCertification({ name: asset.name, uri: asset.uri });
+        if (!existing.has(asset.uri))
+          addCertification({ name: asset.name, uri: asset.uri });
       });
     } catch (e) {
-      console.warn('[CertificationUpload] DocumentPicker failed:', e);
+      logger.warn('CertificationUpload: DocumentPicker failed', {
+        error: String(e),
+      });
       Alert.alert('Error', 'Could not pick document. Please try again.');
     }
   };
@@ -49,10 +63,20 @@ export function CertificationUpload() {
         label="I have certifications"
       />
 
-      <TouchableOpacity style={styles.uploadBtn} onPress={handleUpload} activeOpacity={0.8}>
-        <Ionicons name="cloud-upload-outline" size={16} color={colors.neutral9} />
+      <TouchableOpacity
+        style={styles.uploadBtn}
+        onPress={handleUpload}
+        activeOpacity={0.8}
+      >
+        <Ionicons
+          name="cloud-upload-outline"
+          size={16}
+          color={colors.neutral9}
+        />
         <Text style={styles.uploadText}>
-          {certifications.length ? 'Add another certificate' : 'Upload certificate'}
+          {certifications.length
+            ? 'Add another certificate'
+            : 'Upload certificate'}
         </Text>
       </TouchableOpacity>
 

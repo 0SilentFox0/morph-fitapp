@@ -1,34 +1,51 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import {
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScheduleCard, SectionTitle } from '../../../components/ui';
-import { TrainingProgramsRow } from './Home/TrainingProgramsRow';
+import type { HomeStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
 import { HomeHeader } from './Home/HomeHeader';
 import { StatCardsRow } from './Home/StatCardsRow';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import { TrainingProgramsRow } from './Home/TrainingProgramsRow';
+
+const { colors, typography, spacing } = theme;
+
+import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
 import { useAppStore } from '../../../store/appStore';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
-import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
-import { deriveGroupFromSession } from '../../../utils';
 import type { Session } from '../../../types';
+import { deriveGroupFromSession } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 
 export function HomeScreen() {
   const navigation = useNavigation<Nav>();
+
   const userName = useAppStore((s) => s.userName);
+
   const points = useAppStore((s) => s.points);
+
   const programs = useProgramsStore((s) => s.programs);
+
   const sessions = useSessionsStore((s) => s.sessions);
+
   const [refreshing, setRefreshing] = React.useState(false);
-  const refreshTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refreshTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   React.useEffect(
     () => () => {
@@ -56,26 +73,29 @@ export function HomeScreen() {
     (session: Session) => navigation.navigate('SessionForm', { session }),
     [navigation]
   );
+
   const handleSessionOptions = React.useCallback(
     (_session: Session) => navigation.navigate('Schedule'),
     [navigation]
   );
+
   const startTraining = useActiveTrainingStore((s) => s.startTraining);
+
   const handleSessionStart = React.useCallback(
     (session: Session) => {
       const group = deriveGroupFromSession(
         session,
         programs,
-        useTrainingHistoryStore.getState().getLastSets,
+        useTrainingHistoryStore.getState().getLastSets
       );
+
       if (group.length === 0) return;
+
       startTraining(group, group[0]!.participantId);
-      navigation
-        .getParent()
-        ?.navigate('ClientsTab', {
-          screen: 'ClientProfile',
-          params: { clientId: group[0]!.participantId },
-        });
+      navigation.getParent()?.navigate('ClientsTab', {
+        screen: 'ClientProfile',
+        params: { clientId: group[0]!.participantId },
+      });
     },
     [navigation, programs, startTraining]
   );
@@ -104,7 +124,9 @@ export function HomeScreen() {
       >
         <StatCardsRow
           onRevenuePress={() =>
-            navigation.getParent()?.navigate('StatsTab', { screen: 'BusinessAnalytics' })
+            navigation
+              .getParent()
+              ?.navigate('StatsTab', { screen: 'BusinessAnalytics' })
           }
         />
 
@@ -118,9 +140,13 @@ export function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.scheduleTitleRow}>
-              <SectionTitle style={styles.sectionTitleSpacing}>Schedule</SectionTitle>
+              <SectionTitle style={styles.sectionTitleSpacing}>
+                Schedule
+              </SectionTitle>
               <View style={styles.scheduleBadge}>
-                <Text style={styles.scheduleBadgeText}>{upcomingSessions.length}</Text>
+                <Text style={styles.scheduleBadgeText}>
+                  {upcomingSessions.length}
+                </Text>
               </View>
             </View>
             <TouchableOpacity onPress={() => navigation.navigate('Schedule')}>
@@ -145,7 +171,11 @@ export function HomeScreen() {
               onPress={() => navigation.navigate('SessionForm', {})}
               activeOpacity={0.8}
             >
-              <Ionicons name="calendar-outline" size={32} color={colors.textMuted} />
+              <Ionicons
+                name="calendar-outline"
+                size={32}
+                color={colors.textMuted}
+              />
               <Text style={styles.emptyText}>No upcoming sessions</Text>
               <Text style={styles.emptyHint}>Tap to create one</Text>
             </TouchableOpacity>

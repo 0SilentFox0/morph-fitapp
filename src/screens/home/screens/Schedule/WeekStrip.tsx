@@ -1,8 +1,10 @@
 import React from 'react';
-import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors } from '../../../../theme/colors';
-import { radius } from '../../../../theme';
-import { spacing } from '../../../../theme/spacing';
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+
+import theme from '../../../../theme';
+
+const { colors, radius, spacing } = theme;
+
 import type { ScheduleDay } from './scheduleUtils';
 
 export interface WeekStripProps {
@@ -15,7 +17,13 @@ export interface WeekStripProps {
 }
 
 /** Horizontal week selector shown in the schedule's "week" view mode. */
-export function WeekStrip({ weekDays, baseIndex, onSelect, getCount, cellWidth }: WeekStripProps) {
+export function WeekStrip({
+  weekDays,
+  baseIndex,
+  onSelect,
+  getCount,
+  cellWidth,
+}: WeekStripProps) {
   return (
     <ScrollView
       horizontal
@@ -24,6 +32,7 @@ export function WeekStrip({ weekDays, baseIndex, onSelect, getCount, cellWidth }
     >
       {weekDays.map((day, i) => {
         const selected = baseIndex + i === baseIndex;
+
         return (
           <TouchableOpacity
             key={day.dateKey}
@@ -31,7 +40,11 @@ export function WeekStrip({ weekDays, baseIndex, onSelect, getCount, cellWidth }
             style={[styles.weekDayCell, { width: cellWidth }]}
           >
             <Text style={styles.weekDayLabel}>{day.label}</Text>
-            <Text style={[styles.weekDayDate, selected && styles.dayDateSelected]}>{day.date}</Text>
+            <Text
+              style={[styles.weekDayDate, selected && styles.dayDateSelected]}
+            >
+              {day.date}
+            </Text>
             <Text style={styles.weekDayCount}>{getCount(day.dateKey)}</Text>
           </TouchableOpacity>
         );

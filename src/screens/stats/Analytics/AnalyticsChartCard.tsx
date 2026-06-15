@@ -1,27 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { LineChart, BarChart } from 'react-native-chart-kit';
+import { BarChart, LineChart } from 'react-native-chart-kit';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useDateRangePicker } from '../../../hooks/useDateRangePicker';
+
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing, createChartConfig } = theme;
+
+import { useIncomeTimeframes } from './useIncomeTimeframes';
 
 const CHART_TABS = ['Income Over Time', 'By Source'];
-const DAY_MS = 24 * 60 * 60 * 1000;
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
+const chartConfig = createChartConfig();
 
 // chart-kit treats `paddingRight` as the LEFT gutter (y-axis labels live here and
 // the plot starts at this x). The 64px default pushes the whole graph far to the
@@ -30,9 +27,6 @@ const chartConfig = {
 const CHART_LEFT_GUTTER = 28;
 
 type LineData = React.ComponentProps<typeof LineChart>['data'];
-
-const shortDate = (d: Date) =>
-  d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
 export interface AnalyticsChartCardProps {
   incomeData: LineData;
@@ -47,58 +41,8 @@ export function AnalyticsChartCard({
   chartWidth,
 }: AnalyticsChartCardProps) {
   const [chartTab, setChartTab] = React.useState(0);
-  const picker = useDateRangePicker();
 
-  // Week stays as provided; Month / Custom are derived so the selector visibly
-  // re-renders the chart instead of being a dead toggle.
-  const monthIncome = React.useMemo<LineData>(() => {
-    const week = incomeData.datasets[0]?.data ?? [];
-    const total = week.reduce((sum, n) => sum + n, 0);
-    return {
-      labels: ['W1', 'W2', 'W3', 'W4'],
-      datasets: [
-        {
-          data: [
-            Math.round(total * 0.9),
-            Math.round(total * 0.75),
-            Math.round(total * 1.05),
-            Math.round(total * 0.85),
-          ],
-        },
-      ],
-    };
-  }, [incomeData]);
-
-  const customIncome = React.useMemo<LineData>(() => {
-    const range = picker.customRange;
-    if (!range) return incomeData;
-    const pattern = incomeData.datasets[0]?.data ?? [100];
-    const days = Math.max(1, Math.round((range.end.getTime() - range.start.getTime()) / DAY_MS) + 1);
-    const count = Math.min(days, 7);
-    const step = days / count;
-    const data: number[] = [];
-    const labels: string[] = [];
-    for (let i = 0; i < count; i++) {
-      const dayIndex = Math.floor(i * step);
-      const d = new Date(range.start.getTime() + dayIndex * DAY_MS);
-      data.push(pattern[dayIndex % pattern.length] ?? 0);
-      labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
-    }
-    return { labels, datasets: [{ data }] };
-  }, [picker.customRange, incomeData]);
-
-  const timeframes = [
-    { key: 'week', label: 'Week', data: incomeData },
-    { key: 'month', label: 'Month', data: monthIncome },
-    {
-      key: 'custom',
-      label: picker.customRange
-        ? `${shortDate(picker.customRange.start)} – ${shortDate(picker.customRange.end)}`
-        : 'Custom',
-      data: customIncome,
-    },
-  ];
-  const activeIncome = timeframes[picker.timeframe]?.data ?? incomeData;
+  const { picker, timeframes, activeIncome } = useIncomeTimeframes(incomeData);
 
   return (
     <View style={styles.chartCard}>
@@ -112,7 +56,12 @@ export function AnalyticsChartCard({
             style={[styles.chartTab, i === chartTab && styles.chartTabActive]}
             activeOpacity={0.8}
           >
-            <Text style={[styles.chartTabText, i === chartTab && styles.chartTabTextActive]}>
+            <Text
+              style={[
+                styles.chartTabText,
+                i === chartTab && styles.chartTabTextActive,
+              ]}
+            >
               {t}
             </Text>
           </TouchableOpacity>
@@ -122,7 +71,9 @@ export function AnalyticsChartCard({
       <View style={styles.timeframeRow}>
         {timeframes.map((tf, i) => {
           const active = i === picker.timeframe;
+
           const showReset = tf.key === 'custom' && picker.customRange;
+
           return (
             <TouchableOpacity
               key={tf.key}
@@ -132,7 +83,10 @@ export function AnalyticsChartCard({
             >
               <Text
                 numberOfLines={1}
-                style={[styles.timeframeText, active && styles.timeframeTextActive]}
+                style={[
+                  styles.timeframeText,
+                  active && styles.timeframeTextActive,
+                ]}
               >
                 {tf.label}
               </Text>
@@ -158,7 +112,9 @@ export function AnalyticsChartCard({
       {picker.picking && (
         <View style={styles.picker}>
           <Text style={styles.pickerLabel}>
-            {picker.picking === 'start' ? 'Select start date' : 'Select end date'}
+            {picker.picking === 'start'
+              ? 'Select start date'
+              : 'Select end date'}
           </Text>
           <DateTimePicker
             value={picker.draft}
@@ -169,11 +125,19 @@ export function AnalyticsChartCard({
           />
           {Platform.OS === 'ios' && (
             <View style={styles.pickerActions}>
-              <TouchableOpacity style={styles.pickerBtn} onPress={picker.cancel}>
+              <TouchableOpacity
+                style={styles.pickerBtn}
+                onPress={picker.cancel}
+              >
                 <Text style={styles.pickerCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.pickerBtn} onPress={() => picker.commit(picker.draft)}>
-                <Text style={styles.pickerDoneText}>{picker.picking === 'start' ? 'Next' : 'Done'}</Text>
+              <TouchableOpacity
+                style={styles.pickerBtn}
+                onPress={() => picker.commit(picker.draft)}
+              >
+                <Text style={styles.pickerDoneText}>
+                  {picker.picking === 'start' ? 'Next' : 'Done'}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -207,11 +171,15 @@ export function AnalyticsChartCard({
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.accent }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: colors.accent }]}
+          />
           <Text style={styles.legendText}>Subscription</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.primary7 }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: colors.primary7 }]}
+          />
           <Text style={styles.legendText}>Training</Text>
         </View>
       </View>

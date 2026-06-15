@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { Overlay } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
 
 export interface TypePickerModalProps {
   visible: boolean;
@@ -26,6 +26,7 @@ export function TypePickerModal({
       <View style={styles.box}>
         {options.map((opt) => {
           const active = value === opt;
+
           return (
             <TouchableOpacity
               key={opt}
@@ -35,7 +36,11 @@ export function TypePickerModal({
                 onClose();
               }}
             >
-              <Text style={[styles.optionText, active && styles.optionTextActive]}>{opt}</Text>
+              <Text
+                style={[styles.optionText, active && styles.optionTextActive]}
+              >
+                {opt}
+              </Text>
             </TouchableOpacity>
           );
         })}

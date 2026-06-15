@@ -1,7 +1,10 @@
-import { computeProgressOverview, rankMuscles } from '../../utils/progress';
-import { computeMuscleStats } from '../../utils/muscleStats';
 import type { MuscleGroup } from '../../constants/muscles';
 import type { CompletedTraining } from '../../types';
+import { computeMuscleStats } from '../../utils/progress/muscleStats';
+import {
+  computeProgressOverview,
+  rankMuscles,
+} from '../../utils/progress/progress';
 
 const lookup: Record<number, MuscleGroup[]> = {
   101: ['chest', 'triceps'],
@@ -28,10 +31,12 @@ const history: CompletedTraining[] = [
 describe('rankMuscles', () => {
   it('ranks worked muscles by tonnage and excludes untouched ones', () => {
     const stats = computeMuscleStats(history, lookup);
+
     const ranked = rankMuscles(stats);
+
     expect(ranked[0]?.group).toBe('quads'); // 1000 > 500
     expect(ranked.map((r) => r.group)).toEqual(
-      expect.arrayContaining(['quads', 'glutes', 'chest', 'triceps']),
+      expect.arrayContaining(['quads', 'glutes', 'chest', 'triceps'])
     );
     expect(ranked.every((r) => r.stat.exerciseCount > 0)).toBe(true);
   });
@@ -40,7 +45,9 @@ describe('rankMuscles', () => {
 describe('computeProgressOverview', () => {
   it('returns intensities, totals and ranked top muscles for all-time', () => {
     const now = new Date(2026, 0, 10);
+
     const overview = computeProgressOverview(history, lookup, 'all', now);
+
     expect(overview.topMuscles[0]?.group).toBe('quads');
     expect(overview.totals.tonnage).toBeGreaterThan(0);
     expect(Object.keys(overview.intensities).length).toBeGreaterThan(0);

@@ -1,9 +1,16 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+
+import theme from '../../theme';
+
+const { colors, radius, typography } = theme;
 
 /**
  * Time picker input per Figma Session form: bg #141414, border #434343,
@@ -36,17 +43,27 @@ export function TimePickerInput({
         onChangeText={onChangeText}
         editable={editable}
       />
-      <Ionicons name="time-outline" size={18} color={colors.neutral9} style={styles.icon} />
+      <Ionicons
+        name="time-outline"
+        size={18}
+        color={colors.neutral9}
+        style={styles.icon}
+      />
     </>
   );
 
   if (onPress) {
     return (
-      <TouchableOpacity style={[styles.wrapper, style]} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[styles.wrapper, style]}
+        onPress={onPress}
+        activeOpacity={0.8}
+      >
         {content}
       </TouchableOpacity>
     );
   }
+
   return <View style={[styles.wrapper, style]}>{content}</View>;
 }
 

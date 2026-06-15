@@ -1,17 +1,20 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { TrainersStackParamList } from '../types';
+
 import { ScreenBackground } from '../../components/layout';
-import { TrainersListScreen } from '../../screens/client/trainers/TrainersListScreen';
 import { TrainerFiltersScreen } from '../../screens/client/trainers/TrainerFiltersScreen';
 import { TrainerProfileScreen } from '../../screens/client/trainers/TrainerProfileScreen';
+import { TrainersListScreen } from '../../screens/client/trainers/TrainersListScreen';
+import type { TrainersStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<TrainersStackParamList>();
 
 export function TrainersStackNavigator() {
   return (
     <Stack.Navigator
-      screenLayout={({ children }) => <ScreenBackground>{children}</ScreenBackground>}
+      screenLayout={({ children }) => (
+        <ScreenBackground>{children}</ScreenBackground>
+      )}
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',

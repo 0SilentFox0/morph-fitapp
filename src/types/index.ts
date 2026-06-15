@@ -3,23 +3,27 @@
  * Mock data and data-access live in src/mocks (and, later, src/services).
  */
 
-export type { SessionStatus, Session } from './session';
 export type {
-  SetNote,
-  ExerciseSet,
-  ProgramExercise,
-  TrainingProgram,
-  ExerciseInfo,
-  LoggedExercise,
-  CompletedTraining,
-} from './training';
-export type { Client } from './client';
-export type { ConnectionStatus, Trainer } from './trainer';
-export type { TransactionStatus, TransactionType, Transaction } from './transaction';
-export type {
+  AnalyticsData,
   ChartDataPoint,
   IncomeOverTimeData,
   RevenueBySourceData,
-  AnalyticsData,
 } from './analytics';
+export type { Client } from './client';
 export type { MeasurementEntry } from './measurement';
+export type { Session, SessionStatus } from './session';
+export type { ConnectionStatus, Trainer } from './trainer';
+export type {
+  CompletedTraining,
+  ExerciseInfo,
+  ExerciseSet,
+  LoggedExercise,
+  ProgramExercise,
+  SetNote,
+  TrainingProgram,
+} from './training';
+export type {
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from './transaction';

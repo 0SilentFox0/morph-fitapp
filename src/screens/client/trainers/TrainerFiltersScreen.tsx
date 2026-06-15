@@ -1,25 +1,37 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { TrainersStackParamList } from '../../../navigation/types';
+
 import { ScreenHeader } from '../../../components/layout';
 import { Button, SectionTitle, Toggle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useTrainersStore } from '../../../store/trainersStore';
+import type { TrainersStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
 import { trainerSpecialties } from '../../../mocks';
+import { useTrainersStore } from '../../../store/trainersStore';
 
 type Nav = NativeStackNavigationProp<TrainersStackParamList, 'TrainerFilters'>;
 
 export function TrainerFiltersScreen() {
   const navigation = useNavigation<Nav>();
+
   const filterSpecialty = useTrainersStore((s) => s.filterSpecialty);
+
   const onlineOnly = useTrainersStore((s) => s.onlineOnly);
+
   const setFilterSpecialty = useTrainersStore((s) => s.setFilterSpecialty);
+
   const setOnlineOnly = useTrainersStore((s) => s.setOnlineOnly);
+
   const clearFilters = useTrainersStore((s) => s.clearFilters);
 
   return (
@@ -50,21 +62,40 @@ export function TrainerFiltersScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title="Clear" variant="outline" onPress={clearFilters} style={styles.footerBtn} />
-        <Button title="Show results" onPress={() => navigation.goBack()} style={styles.footerBtn} />
+        <Button
+          title="Clear"
+          variant="outline"
+          onPress={clearFilters}
+          style={styles.footerBtn}
+        />
+        <Button
+          title="Show results"
+          onPress={() => navigation.goBack()}
+          style={styles.footerBtn}
+        />
       </View>
     </View>
   );
 }
 
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+function Chip({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[styles.chip, active && styles.chipActive]}
       activeOpacity={0.8}
     >
-      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+      <Text style={[styles.chipText, active && styles.chipTextActive]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -83,7 +114,10 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: colors.accent, borderColor: colors.accent },
   chipText: { fontSize: typography.sizes.sm, color: colors.textSecondary },
-  chipTextActive: { color: colors.white, fontWeight: typography.weights.semibold },
+  chipTextActive: {
+    color: colors.white,
+    fontWeight: typography.weights.semibold,
+  },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',

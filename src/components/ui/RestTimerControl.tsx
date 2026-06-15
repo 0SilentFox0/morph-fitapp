@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+
+import theme from '../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
 import type { RestState } from '../../store/activeTrainingStore';
 
 interface RestTimerControlProps {
@@ -21,7 +22,9 @@ interface RestTimerControlProps {
 
 function formatTime(totalSec: number): string {
   const m = Math.floor(totalSec / 60);
+
   const s = totalSec % 60;
+
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
@@ -56,11 +59,19 @@ export function RestTimerControl({
       </TouchableOpacity>
 
       {rest.running ? (
-        <TouchableOpacity onPress={onStop} style={styles.timerRing} activeOpacity={0.8}>
+        <TouchableOpacity
+          onPress={onStop}
+          style={styles.timerRing}
+          activeOpacity={0.8}
+        >
           <Text style={styles.timerText}>{formatTime(rest.remainingSec)}</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity onPress={onStart} style={styles.playCircle} activeOpacity={0.8}>
+        <TouchableOpacity
+          onPress={onStart}
+          style={styles.playCircle}
+          activeOpacity={0.8}
+        >
           <Ionicons name="play" size={40} color={colors.white} />
         </TouchableOpacity>
       )}

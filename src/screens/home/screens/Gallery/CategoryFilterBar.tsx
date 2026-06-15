@@ -1,10 +1,17 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import { SearchInput } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
 import type { ExerciseCategory } from '../../../../services/exerciseApi';
 
 export interface CategoryFilterBarProps {
@@ -41,10 +48,16 @@ export function CategoryFilterBar({
           contentContainerStyle={styles.categoryRow}
           renderItem={({ item: cat }) => {
             const active =
-              cat.id === 0 ? selectedCategory === null : selectedCategory === cat.id;
+              cat.id === 0
+                ? selectedCategory === null
+                : selectedCategory === cat.id;
+
             return (
               <TouchableOpacity
-                style={[styles.categoryChip, active && styles.categoryChipActive]}
+                style={[
+                  styles.categoryChip,
+                  active && styles.categoryChipActive,
+                ]}
                 onPress={() => onCategoryChange(cat.id === 0 ? null : cat.id)}
               >
                 <Text

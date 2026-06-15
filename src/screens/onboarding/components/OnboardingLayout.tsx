@@ -1,14 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import { FitnessLogo } from '../../../components/icons/FitnessLogo';
 import { ProgressIndicator } from '../../../components/layout';
 import { HorizontalSwipe } from '../../../components/ui';
-import { FitnessLogo } from '../../../components/icons/FitnessLogo';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
 
 const DEFAULT_TOTAL_STEPS = 7;
 
@@ -48,6 +55,7 @@ export function OnboardingLayout({
 
   const handleNext = () => {
     if (nextDisabled || !onNext) return;
+
     onNext();
   };
 
@@ -86,7 +94,12 @@ export function OnboardingLayout({
       </ScrollView>
 
       {showFooter && (onNext || onBack || onSkip) && (
-        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: Math.max(insets.bottom, spacing.lg) },
+          ]}
+        >
           <View style={styles.footerSlot}>
             {onBack && (
               <TouchableOpacity

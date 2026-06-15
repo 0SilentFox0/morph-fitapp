@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
+
 import { ExperienceScreen } from '../../../../screens/onboarding/steps/ExperienceScreen';
 import { useAppStore } from '../../../../store/appStore';
 import { useOnboardingStore } from '../../../../store/onboardingStore';
@@ -19,7 +20,9 @@ describe('ExperienceScreen', () => {
     await render(<ExperienceScreen />);
 
     expect(screen.getByText('How long have you been training?')).toBeTruthy();
-    expect(screen.getByText('I have injuries or health limitations')).toBeTruthy();
+    expect(
+      screen.getByText('I have injuries or health limitations')
+    ).toBeTruthy();
     expect(screen.queryByText('I have certifications')).toBeNull();
   });
 
@@ -29,6 +32,8 @@ describe('ExperienceScreen', () => {
 
     expect(screen.getByText('Tell us about your experience')).toBeTruthy();
     expect(screen.getByText('I have certifications')).toBeTruthy();
-    expect(screen.queryByText('I have injuries or health limitations')).toBeNull();
+    expect(
+      screen.queryByText('I have injuries or health limitations')
+    ).toBeNull();
   });
 });

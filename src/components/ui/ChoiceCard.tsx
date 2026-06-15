@@ -1,10 +1,10 @@
 import React from 'react';
-import { Pressable, View, Text, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
-import { radius } from '../../theme';
+
+import theme from '../../theme';
+
+const { colors, typography, spacing, radius } = theme;
 
 export type ChoiceCardVariant = 'card' | 'chip';
 
@@ -30,6 +30,7 @@ export const ChoiceCard = React.memo(function ChoiceCard({
   accessibilityLabel,
 }: ChoiceCardProps) {
   const isChip = variant === 'chip';
+
   return (
     <Pressable
       testID={testID}
@@ -44,7 +45,11 @@ export const ChoiceCard = React.memo(function ChoiceCard({
     >
       {icon ? (
         <View
-          style={[styles.iconBox, isChip && styles.iconBoxChip, selected && styles.iconBoxSelected]}
+          style={[
+            styles.iconBox,
+            isChip && styles.iconBoxChip,
+            selected && styles.iconBoxSelected,
+          ]}
         >
           <Ionicons name={icon} size={isChip ? 14 : 24} color={colors.text} />
         </View>
@@ -53,7 +58,8 @@ export const ChoiceCard = React.memo(function ChoiceCard({
         <Text
           style={[
             isChip ? styles.chipText : styles.cardTitle,
-            selected && (isChip ? styles.chipTextSelected : styles.cardTitleSelected),
+            selected &&
+              (isChip ? styles.chipTextSelected : styles.cardTitleSelected),
           ]}
         >
           {title}

@@ -1,16 +1,16 @@
 import React from 'react';
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
   ActivityIndicator,
-  ViewStyle,
+  StyleSheet,
+  Text,
   TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+
+import theme from '../../theme';
+
+const { colors, radius, typography, spacing } = theme;
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
@@ -34,11 +34,17 @@ export function Button({
   textStyle,
 }: ButtonProps) {
   const variantStyles = getVariantStyles(variant);
+
   const isDisabled = disabled || loading;
 
   return (
     <TouchableOpacity
-      style={[styles.base, variantStyles.container, isDisabled && styles.disabled, style]}
+      style={[
+        styles.base,
+        variantStyles.container,
+        isDisabled && styles.disabled,
+        style,
+      ]}
       onPress={onPress}
       disabled={isDisabled}
       activeOpacity={0.8}
@@ -50,7 +56,12 @@ export function Button({
         />
       ) : (
         <Text
-          style={[styles.text, variantStyles.text, isDisabled && styles.disabledText, textStyle]}
+          style={[
+            styles.text,
+            variantStyles.text,
+            isDisabled && styles.disabledText,
+            textStyle,
+          ]}
         >
           {title}
         </Text>

@@ -1,21 +1,31 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { getFocusedRouteNameFromRoute, type RouteProp } from '@react-navigation/native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { MainTabParamList } from './types';
-import { colors } from '../theme/colors';
-import { radius } from '../theme';
-import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon } from '../components/icons/TabBarIcons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  getFocusedRouteNameFromRoute,
+  type RouteProp,
+} from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
 
-import { HomeStackNavigator } from './HomeStackNavigator';
-import { ClientsStackNavigator } from './ClientsStackNavigator';
-import { ChatStackNavigator } from './ChatStackNavigator';
+import theme from '../theme';
+import type { MainTabParamList } from './types';
+
+const { colors, radius } = theme;
+
+import {
+  ChatTabIcon,
+  HomeTabIcon,
+  ProfileTabIcon,
+  StatsTabIcon,
+} from '../components/icons/TabBarIcons';
 import { AddPlaceholderScreen } from '../screens/home';
-import { StatsStackNavigator } from './StatsStackNavigator';
 import { useChatStore } from '../store/chatStore';
+import { ChatStackNavigator } from './ChatStackNavigator';
+import { ClientsStackNavigator } from './ClientsStackNavigator';
+import { HomeStackNavigator } from './HomeStackNavigator';
+import { StatsStackNavigator } from './StatsStackNavigator';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -26,7 +36,9 @@ function TabBarBackground() {
         intensity={80}
         tint="dark"
         style={StyleSheet.absoluteFill}
-        {...(Platform.OS === 'android' && { experimentalBlurMethod: 'dimezisBlurView' as const })}
+        {...(Platform.OS === 'android' && {
+          experimentalBlurMethod: 'dimezisBlurView' as const,
+        })}
       />
       <View style={[StyleSheet.absoluteFill, styles.tabBarOverlay]} />
     </View>
@@ -47,7 +59,13 @@ function AddButton({ onPress }: { onPress: () => void }) {
 
 const TAB_BAR_BASE_HEIGHT = 60;
 
-function ChatTabIconWithBadge({ color, focused }: { color: string; focused: boolean }) {
+function ChatTabIconWithBadge({
+  color,
+  focused,
+}: {
+  color: string;
+  focused: boolean;
+}) {
   const unreadCount = useChatStore((s) => s.getUnreadCount());
 
   return (
@@ -69,7 +87,9 @@ const CLIENTS_FULLSCREEN_ROUTES = ['ExerciseDetail', 'TrainingSummary'];
 
 export function MainTabNavigator() {
   const insets = useSafeAreaInsets();
+
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
+
   const baseTabBarStyle = [
     styles.tabBar,
     { height: tabBarHeight, paddingBottom: insets.bottom },
@@ -104,7 +124,11 @@ export function MainTabNavigator() {
         name="ClientsTab"
         component={ClientsStackNavigator}
         options={({ route }) => {
-          const focused = getFocusedRouteNameFromRoute(route as RouteProp<MainTabParamList>) ?? '';
+          const focused =
+            getFocusedRouteNameFromRoute(
+              route as RouteProp<MainTabParamList>
+            ) ?? '';
+
           return {
             tabBarLabel: 'Clients',
             tabBarIcon: ({ focused: tabFocused, color }) => (
@@ -123,8 +147,13 @@ export function MainTabNavigator() {
           // BottomTab → Stack screen nav: TS can't infer the nested param shape from
           // useNavigation here, so we cast the target. `as never` is the React Navigation
           // community-recommended escape for nested-navigator typing.
-          const nav = navigation as unknown as { navigate: (n: string, p: object) => void };
-          const goToSessionForm = () => nav.navigate('HomeTab', { screen: 'SessionForm' });
+          const nav = navigation as unknown as {
+            navigate: (n: string, p: object) => void;
+          };
+
+          const goToSessionForm = () =>
+            nav.navigate('HomeTab', { screen: 'SessionForm' });
+
           return {
             tabBarLabel: () => null,
             tabBarIcon: () => <AddButton onPress={goToSessionForm} />,
@@ -144,7 +173,11 @@ export function MainTabNavigator() {
         name="ChatTab"
         component={ChatStackNavigator}
         options={({ route }) => {
-          const focused = getFocusedRouteNameFromRoute(route as RouteProp<MainTabParamList>) ?? '';
+          const focused =
+            getFocusedRouteNameFromRoute(
+              route as RouteProp<MainTabParamList>
+            ) ?? '';
+
           return {
             tabBarLabel: 'Chat',
             tabBarIcon: ({ focused: tabFocused, color }) => (
@@ -191,7 +224,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   tabBarOverlay: {
-    backgroundColor: Platform.OS === 'ios' ? 'rgba(29,29,29,0.35)' : 'rgba(29,29,29,0.92)',
+    backgroundColor:
+      Platform.OS === 'ios' ? 'rgba(29,29,29,0.35)' : 'rgba(29,29,29,0.92)',
   },
   tabBarLabel: {
     fontSize: 12,

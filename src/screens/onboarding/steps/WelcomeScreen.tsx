@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { Button } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+
+const { colors, radius, spacing } = theme;
+
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
@@ -26,7 +28,12 @@ export function WelcomeScreen() {
         <View style={StyleSheet.absoluteFill}>
           <View style={styles.baseFill} />
           <LinearGradient
-            colors={['transparent', 'transparent', 'rgba(49,13,0,0.6)', 'rgba(174,69,31,0.45)']}
+            colors={[
+              'transparent',
+              'transparent',
+              'rgba(49,13,0,0.6)',
+              'rgba(174,69,31,0.45)',
+            ]}
             locations={[0, 0.4, 0.75, 1]}
             style={StyleSheet.absoluteFill}
           />

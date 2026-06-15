@@ -2,6 +2,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
+
 import { FadeInUp } from '../../components/ui/FadeInUp';
 
 describe('FadeInUp', () => {
@@ -9,7 +10,7 @@ describe('FadeInUp', () => {
     await render(
       <FadeInUp>
         <Text>hello</Text>
-      </FadeInUp>,
+      </FadeInUp>
     );
     expect(screen.getByText('hello')).toBeTruthy();
   });

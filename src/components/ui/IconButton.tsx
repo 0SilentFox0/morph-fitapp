@@ -1,8 +1,10 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
+
+import theme from '../../theme';
+
+const { colors, radius } = theme;
 
 interface IconButtonProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -11,14 +13,23 @@ interface IconButtonProps {
   style?: ViewStyle;
 }
 
-export function IconButton({ icon, onPress, variant = 'secondary', style }: IconButtonProps) {
+export function IconButton({
+  icon,
+  onPress,
+  variant = 'secondary',
+  style,
+}: IconButtonProps) {
   return (
     <TouchableOpacity
       style={[styles.button, variant === 'primary' && styles.primary, style]}
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Ionicons name={icon} size={24} color={variant === 'primary' ? colors.white : colors.text} />
+      <Ionicons
+        name={icon}
+        size={24}
+        color={variant === 'primary' ? colors.white : colors.text}
+      />
     </TouchableOpacity>
   );
 }

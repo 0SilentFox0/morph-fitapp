@@ -32,7 +32,13 @@ describe('useOnboardingStore', () => {
     });
 
     it('toggleWorkDay starts from the Mon–Fri default', () => {
-      expect(get().workDays).toEqual(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+      expect(get().workDays).toEqual([
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+      ]);
       get().toggleWorkDay('Saturday');
       expect(get().workDays).toContain('Saturday');
       get().toggleWorkDay('Monday');
@@ -54,7 +60,9 @@ describe('useOnboardingStore', () => {
       get().addCertification({ name: 'b.pdf', uri: 'file://b' });
       expect(get().certifications).toHaveLength(2);
       get().removeCertification('file://a');
-      expect(get().certifications).toEqual([{ name: 'b.pdf', uri: 'file://b' }]);
+      expect(get().certifications).toEqual([
+        { name: 'b.pdf', uri: 'file://b' },
+      ]);
     });
   });
 

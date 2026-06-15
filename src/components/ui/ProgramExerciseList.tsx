@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import theme from '../../theme';
 import { Card } from './Card';
 import { Tag } from './Tag';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+
+const { colors, radius, typography, spacing } = theme;
+
 import type { TrainingProgram } from '../../types';
 
 interface ProgramExerciseListProps {
@@ -18,10 +19,13 @@ interface ProgramExerciseListProps {
 /** Sums "5m"-style exercise duration labels into a program-level "Nm" chip. */
 function totalDurationLabel(program: TrainingProgram): string | null {
   const exercises = program.exercises ?? [];
+
   const minutes = exercises.reduce((sum, ex) => {
     const m = ex.durationLabel?.match(/(\d+)\s*m/);
+
     return sum + (m ? Number(m[1]) : 0);
   }, 0);
+
   return minutes > 0 ? `${minutes}m` : null;
 }
 
@@ -37,6 +41,7 @@ export function ProgramExerciseList({
   onEditProgram,
 }: ProgramExerciseListProps) {
   const exercises = program.exercises ?? [];
+
   const duration = totalDurationLabel(program);
 
   return (
@@ -50,7 +55,9 @@ export function ProgramExerciseList({
         )}
       </View>
 
-      {!!program.description && <Text style={styles.desc}>{program.description}</Text>}
+      {!!program.description && (
+        <Text style={styles.desc}>{program.description}</Text>
+      )}
 
       <View style={styles.tagsRow}>
         {!!duration && <Tag label={duration} variant="default" />}
@@ -73,7 +80,11 @@ export function ProgramExerciseList({
             <Text style={styles.exName}>{ex.name}</Text>
             {!!ex.durationLabel && (
               <View style={styles.durationRow}>
-                <Ionicons name="time-outline" size={14} color={colors.textMuted} />
+                <Ionicons
+                  name="time-outline"
+                  size={14}
+                  color={colors.textMuted}
+                />
                 <Text style={styles.duration}>{ex.durationLabel}</Text>
               </View>
             )}

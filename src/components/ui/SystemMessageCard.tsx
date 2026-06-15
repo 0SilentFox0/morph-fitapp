@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import { StyleSheet, Text, View } from 'react-native';
+
+import theme from '../../theme';
+
+const { colors, typography, spacing } = theme;
+
 import { formatRelativeTime } from '../../utils';
 
 interface SystemMessageCardProps {
@@ -15,7 +17,11 @@ interface SystemMessageCardProps {
  * Centered system note (e.g. "Session started" / "Timer running") per Figma
  * node 2006:10417. primary-2 (#310A00) surface, white title, primary-9 detail.
  */
-export function SystemMessageCard({ title, subtitle, sentAt }: SystemMessageCardProps) {
+export function SystemMessageCard({
+  title,
+  subtitle,
+  sentAt,
+}: SystemMessageCardProps) {
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>

@@ -1,9 +1,18 @@
-import { request, ApiError, setUnauthorizedHandler } from '../../services/api/client';
-import { tokenStore } from '../../services/api/tokenStore';
 import { z } from 'zod';
 
+import {
+  ApiError,
+  request,
+  setUnauthorizedHandler,
+} from '../../services/api/client';
+import { tokenStore } from '../../services/api/tokenStore';
+
 const okJson = (body: unknown, status = 200) =>
-  ({ ok: status >= 200 && status < 300, status, json: async () => body } as Response);
+  ({
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => body,
+  }) as Response;
 
 beforeEach(async () => {
   await tokenStore.clear();
@@ -13,46 +22,96 @@ beforeEach(async () => {
 
 describe('api client', () => {
   it('sends the bearer token and returns parsed JSON', async () => {
-    await tokenStore.setTokens({ access_token: 'tok', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
-    const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue(okJson({ data: { id: '1' } }));
-    const res = await request('GET', '/me', { schema: z.object({ data: z.object({ id: z.string() }) }) });
+    await tokenStore.setTokens({
+      access_token: 'tok',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
+    const fetchSpy = jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(okJson({ data: { id: '1' } }));
+
+    const res = await request('GET', '/me', {
+      schema: z.object({ data: z.object({ id: z.string() }) }),
+    });
+
     expect(res).toEqual({ data: { id: '1' } });
-    const headers = (fetchSpy.mock.calls[0]![1] as RequestInit).headers as Record<string, string>;
+
+    const headers = (fetchSpy.mock.calls[0]![1] as RequestInit)
+      .headers as Record<string, string>;
+
     expect(headers.Authorization).toBe('Bearer tok');
   });
 
   it('appends query params, skipping null/undefined', async () => {
-    const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue(okJson({ data: [] }));
-    await request('GET', '/clients', { query: { status: 'active', q: undefined, per_page: 20 } });
-    expect(fetchSpy.mock.calls[0]![0]).toContain('/clients?status=active&per_page=20');
+    const fetchSpy = jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(okJson({ data: [] }));
+
+    await request('GET', '/clients', {
+      query: { status: 'active', q: undefined, per_page: 20 },
+    });
+    expect(fetchSpy.mock.calls[0]![0]).toContain(
+      '/clients?status=active&per_page=20'
+    );
   });
 
   it('throws ApiError with fieldErrors on 422', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(
-      okJson({ message: 'Invalid', errors: { email: ['required'] } }, 422),
-    );
-    await expect(request('POST', '/clients', { body: {} })).rejects.toMatchObject({
+    jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(
+        okJson({ message: 'Invalid', errors: { email: ['required'] } }, 422)
+      );
+    await expect(
+      request('POST', '/clients', { body: {} })
+    ).rejects.toMatchObject({
       status: 422,
       fieldErrors: { email: ['required'] },
     });
   });
 
   it('refreshes once on 401 then retries the original request', async () => {
-    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    await tokenStore.setTokens({
+      access_token: 'old',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
     const fetchSpy = jest
       .spyOn(global, 'fetch')
       .mockResolvedValueOnce(okJson({ message: 'Unauthenticated' }, 401)) // original
-      .mockResolvedValueOnce(okJson({ data: { access_token: 'new', refresh_token: 'r2', expires_at: 'x', token_type: 'Bearer' } })) // refresh
+      .mockResolvedValueOnce(
+        okJson({
+          data: {
+            access_token: 'new',
+            refresh_token: 'r2',
+            expires_at: 'x',
+            token_type: 'Bearer',
+          },
+        })
+      ) // refresh
       .mockResolvedValueOnce(okJson({ data: { id: '1' } })); // retry
+
     const res = await request('GET', '/me');
+
     expect(res).toEqual({ data: { id: '1' } });
     expect(fetchSpy).toHaveBeenCalledTimes(3);
     expect(await tokenStore.getAccessToken()).toBe('new');
   });
 
   it('clears tokens and notifies when refresh fails', async () => {
-    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    await tokenStore.setTokens({
+      access_token: 'old',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
     const onUnauth = jest.fn();
+
     setUnauthorizedHandler(onUnauth);
     jest
       .spyOn(global, 'fetch')
@@ -64,8 +123,15 @@ describe('api client', () => {
   });
 
   it('does NOT clear tokens when the refresh request throws a network error', async () => {
-    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    await tokenStore.setTokens({
+      access_token: 'old',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
     const onUnauth = jest.fn();
+
     setUnauthorizedHandler(onUnauth);
     jest
       .spyOn(global, 'fetch')
@@ -77,8 +143,15 @@ describe('api client', () => {
   });
 
   it('does NOT clear tokens when the refresh endpoint returns 5xx (transient)', async () => {
-    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+    await tokenStore.setTokens({
+      access_token: 'old',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
     const onUnauth = jest.fn();
+
     setUnauthorizedHandler(onUnauth);
     jest
       .spyOn(global, 'fetch')
@@ -89,9 +162,39 @@ describe('api client', () => {
     expect(await tokenStore.getAccessToken()).toBe('old'); // token preserved
   });
 
-  it('treats a malformed refresh response as a failed refresh (clears tokens)', async () => {
-    await tokenStore.setTokens({ access_token: 'old', refresh_token: 'r', expires_at: 'x', token_type: 'Bearer' });
+  it('does NOT attempt a refresh on 401 when skipRefresh is set', async () => {
+    await tokenStore.setTokens({
+      access_token: 'old',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
     const onUnauth = jest.fn();
+
+    setUnauthorizedHandler(onUnauth);
+
+    const fetchSpy = jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(okJson({ message: 'Unauthenticated' }, 401));
+
+    await expect(
+      request('POST', '/auth/logout', { skipRefresh: true })
+    ).rejects.toBeInstanceOf(ApiError);
+    expect(fetchSpy).toHaveBeenCalledTimes(1); // logout only — no refresh round-trip
+    expect(await tokenStore.getAccessToken()).toBeNull(); // token still cleared
+  });
+
+  it('treats a malformed refresh response as a failed refresh (clears tokens)', async () => {
+    await tokenStore.setTokens({
+      access_token: 'old',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+
+    const onUnauth = jest.fn();
+
     setUnauthorizedHandler(onUnauth);
     jest
       .spyOn(global, 'fetch')

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Text, StyleSheet, StyleProp, TextStyle } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native';
+
+import theme from '../../theme';
+
+const { colors, typography, spacing } = theme;
 
 export interface SectionTitleProps {
   children: React.ReactNode;

@@ -5,15 +5,15 @@
 
 import type { MuscleGroup } from '../constants/muscles';
 import type {
-  Session,
-  TrainingProgram,
-  ExerciseInfo,
+  AnalyticsData,
   Client,
   CompletedTraining,
-  Transaction,
-  AnalyticsData,
+  ExerciseInfo,
   MeasurementEntry,
+  Session,
   Trainer,
+  TrainingProgram,
+  Transaction,
 } from '../types';
 
 // ─── Training placeholder images (fitness/workout themed) ───────────────────
@@ -128,7 +128,8 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 340,
     thumbnail: TRAINING_IMAGES[0],
     price: '$5/month',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
     exercises: [
       {
         id: 101,
@@ -187,7 +188,8 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 210,
     thumbnail: TRAINING_IMAGES[1],
     price: '$5/month',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
     exercises: [
       {
         id: 201,
@@ -224,7 +226,8 @@ export const mockTrainingPrograms: TrainingProgram[] = [
     likes: 520,
     thumbnail: TRAINING_IMAGES[2],
     price: '$5/month',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
     exercises: [
       {
         id: 301,
@@ -290,6 +293,7 @@ export const exerciseCatalog: Record<number, ExerciseInfo> =
         };
       }
     }
+
     return acc;
   }, {});
 
@@ -297,11 +301,12 @@ export const exerciseCatalog: Record<number, ExerciseInfo> =
  * exercise id → muscle groups, derived from the program definitions above.
  * Source of truth for the per-muscle progress stats (see utils/muscleStats.ts).
  */
-export const exerciseMuscleMap: Record<number, MuscleGroup[]> = Object.fromEntries(
-  Object.values(exerciseCatalog)
-    .filter((e) => e.muscles.length > 0)
-    .map((e) => [e.id, e.muscles]),
-);
+export const exerciseMuscleMap: Record<number, MuscleGroup[]> =
+  Object.fromEntries(
+    Object.values(exerciseCatalog)
+      .filter((e) => e.muscles.length > 0)
+      .map((e) => [e.id, e.muscles])
+  );
 
 export const mockClients: Client[] = [
   {
@@ -369,8 +374,21 @@ const curatedTrainingHistory: CompletedTraining[] = [
     programId: '3',
     date: 'Nov 22',
     exercises: [
-      { exerciseId: 301, sets: [{ weight: 45, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
-      { exerciseId: 302, sets: [{ weight: 60, reps: 8 }, { weight: 70, reps: 6 }] },
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 45, reps: 12 },
+          { weight: 55, reps: 10 },
+          { weight: 60, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 60, reps: 8 },
+          { weight: 70, reps: 6 },
+        ],
+      },
     ],
   },
   {
@@ -379,8 +397,21 @@ const curatedTrainingHistory: CompletedTraining[] = [
     programId: '3',
     date: 'Nov 29',
     exercises: [
-      { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
-      { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 50, reps: 12 },
+          { weight: 60, reps: 10 },
+          { weight: 70, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 70, reps: 8 },
+          { weight: 80, reps: 6 },
+        ],
+      },
     ],
   },
   {
@@ -442,6 +473,7 @@ const curatedTrainingHistory: CompletedTraining[] = [
  */
 function seedClientHistory(clientName: string): CompletedTraining[] {
   const slug = clientName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
   return [
     {
       id: `th-${slug}-1`,
@@ -449,8 +481,21 @@ function seedClientHistory(clientName: string): CompletedTraining[] {
       programId: '3',
       date: 'Nov 22',
       exercises: [
-        { exerciseId: 301, sets: [{ weight: 45, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
-        { exerciseId: 302, sets: [{ weight: 60, reps: 8 }, { weight: 70, reps: 6 }] },
+        {
+          exerciseId: 301,
+          sets: [
+            { weight: 45, reps: 12 },
+            { weight: 55, reps: 10 },
+            { weight: 60, reps: 8 },
+          ],
+        },
+        {
+          exerciseId: 302,
+          sets: [
+            { weight: 60, reps: 8 },
+            { weight: 70, reps: 6 },
+          ],
+        },
       ],
     },
     {
@@ -459,8 +504,21 @@ function seedClientHistory(clientName: string): CompletedTraining[] {
       programId: '3',
       date: 'Nov 29',
       exercises: [
-        { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
-        { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+        {
+          exerciseId: 301,
+          sets: [
+            { weight: 50, reps: 12 },
+            { weight: 60, reps: 10 },
+            { weight: 70, reps: 8 },
+          ],
+        },
+        {
+          exerciseId: 302,
+          sets: [
+            { weight: 70, reps: 8 },
+            { weight: 80, reps: 6 },
+          ],
+        },
       ],
     },
     {
@@ -469,8 +527,21 @@ function seedClientHistory(clientName: string): CompletedTraining[] {
       programId: '3',
       date: 'Dec 6',
       exercises: [
-        { exerciseId: 301, sets: [{ weight: 55, reps: 12 }, { weight: 65, reps: 10 }, { weight: 75, reps: 8 }] },
-        { exerciseId: 302, sets: [{ weight: 75, reps: 8 }, { weight: 85, reps: 6 }] },
+        {
+          exerciseId: 301,
+          sets: [
+            { weight: 55, reps: 12 },
+            { weight: 65, reps: 10 },
+            { weight: 75, reps: 8 },
+          ],
+        },
+        {
+          exerciseId: 302,
+          sets: [
+            { weight: 75, reps: 8 },
+            { weight: 85, reps: 6 },
+          ],
+        },
       ],
     },
   ];
@@ -495,8 +566,21 @@ const currentUserHistory: CompletedTraining[] = [
     programId: '3',
     date: '2026-06-01T18:00:00Z',
     exercises: [
-      { exerciseId: 301, sets: [{ weight: 50, reps: 12 }, { weight: 60, reps: 10 }, { weight: 70, reps: 8 }] },
-      { exerciseId: 302, sets: [{ weight: 70, reps: 8 }, { weight: 80, reps: 6 }] },
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 50, reps: 12 },
+          { weight: 60, reps: 10 },
+          { weight: 70, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 70, reps: 8 },
+          { weight: 80, reps: 6 },
+        ],
+      },
     ],
   },
   {
@@ -505,9 +589,28 @@ const currentUserHistory: CompletedTraining[] = [
     programId: '1',
     date: '2026-06-03T18:00:00Z',
     exercises: [
-      { exerciseId: 101, sets: [{ weight: 45, reps: 12 }, { weight: 50, reps: 10 }, { weight: 55, reps: 8 }] },
-      { exerciseId: 102, sets: [{ weight: 20, reps: 14 }, { weight: 22, reps: 12 }] },
-      { exerciseId: 103, sets: [{ weight: 0, reps: 40 }, { weight: 0, reps: 35 }] },
+      {
+        exerciseId: 101,
+        sets: [
+          { weight: 45, reps: 12 },
+          { weight: 50, reps: 10 },
+          { weight: 55, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 102,
+        sets: [
+          { weight: 20, reps: 14 },
+          { weight: 22, reps: 12 },
+        ],
+      },
+      {
+        exerciseId: 103,
+        sets: [
+          { weight: 0, reps: 40 },
+          { weight: 0, reps: 35 },
+        ],
+      },
     ],
   },
   {
@@ -517,7 +620,13 @@ const currentUserHistory: CompletedTraining[] = [
     date: '2026-06-06T08:00:00Z',
     exercises: [
       { exerciseId: 201, sets: [{ weight: 0, reps: 25 }] },
-      { exerciseId: 202, sets: [{ weight: 0, reps: 18 }, { weight: 0, reps: 16 }] },
+      {
+        exerciseId: 202,
+        sets: [
+          { weight: 0, reps: 18 },
+          { weight: 0, reps: 16 },
+        ],
+      },
     ],
   },
   {
@@ -526,8 +635,22 @@ const currentUserHistory: CompletedTraining[] = [
     programId: '3',
     date: '2026-06-08T18:00:00Z',
     exercises: [
-      { exerciseId: 301, sets: [{ weight: 55, reps: 12 }, { weight: 65, reps: 10 }, { weight: 75, reps: 8 }] },
-      { exerciseId: 302, sets: [{ weight: 75, reps: 8 }, { weight: 85, reps: 6 }, { weight: 95, reps: 4 }] },
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 55, reps: 12 },
+          { weight: 65, reps: 10 },
+          { weight: 75, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 75, reps: 8 },
+          { weight: 85, reps: 6 },
+          { weight: 95, reps: 4 },
+        ],
+      },
     ],
   },
   {
@@ -536,8 +659,21 @@ const currentUserHistory: CompletedTraining[] = [
     programId: '1',
     date: '2026-06-10T18:00:00Z',
     exercises: [
-      { exerciseId: 101, sets: [{ weight: 50, reps: 12 }, { weight: 55, reps: 10 }, { weight: 60, reps: 8 }] },
-      { exerciseId: 102, sets: [{ weight: 22, reps: 14 }, { weight: 24, reps: 12 }] },
+      {
+        exerciseId: 101,
+        sets: [
+          { weight: 50, reps: 12 },
+          { weight: 55, reps: 10 },
+          { weight: 60, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 102,
+        sets: [
+          { weight: 22, reps: 14 },
+          { weight: 24, reps: 12 },
+        ],
+      },
     ],
   },
   {
@@ -546,13 +682,29 @@ const currentUserHistory: CompletedTraining[] = [
     programId: '3',
     date: '2026-06-12T18:00:00Z',
     exercises: [
-      { exerciseId: 301, sets: [{ weight: 60, reps: 12 }, { weight: 70, reps: 10 }, { weight: 80, reps: 8 }] },
-      { exerciseId: 302, sets: [{ weight: 80, reps: 8 }, { weight: 90, reps: 6 }, { weight: 100, reps: 4 }] },
+      {
+        exerciseId: 301,
+        sets: [
+          { weight: 60, reps: 12 },
+          { weight: 70, reps: 10 },
+          { weight: 80, reps: 8 },
+        ],
+      },
+      {
+        exerciseId: 302,
+        sets: [
+          { weight: 80, reps: 8 },
+          { weight: 90, reps: 6 },
+          { weight: 100, reps: 4 },
+        ],
+      },
     ],
   },
 ];
 
-const curatedHistoryNames = new Set(curatedTrainingHistory.map((t) => t.clientName));
+const curatedHistoryNames = new Set(
+  curatedTrainingHistory.map((t) => t.clientName)
+);
 
 /**
  * Past trainings keyed by client display name. The headline demo clients keep
@@ -567,7 +719,7 @@ export const mockTrainingHistory: CompletedTraining[] = [
     new Set([
       ...mockClients.map((c) => c.name),
       ...mockSessions.flatMap((s) => s.participants.map((p) => p.name)),
-    ]),
+    ])
   )
     .filter((name) => !curatedHistoryNames.has(name))
     .flatMap(seedClientHistory),
@@ -638,11 +790,46 @@ export const mockAnalyticsData: AnalyticsData = {
 
 /** Seed bodyweight/measurement history for the current client, oldest → newest. */
 export const mockMeasurements: MeasurementEntry[] = [
-  { id: 'm1', date: '2026-05-16T08:00:00Z', weightKg: 82.4, chestCm: 102, waistCm: 88, armCm: 36 },
-  { id: 'm2', date: '2026-05-23T08:00:00Z', weightKg: 81.8, chestCm: 102, waistCm: 87, armCm: 36 },
-  { id: 'm3', date: '2026-05-30T08:00:00Z', weightKg: 81.1, chestCm: 103, waistCm: 86, armCm: 37 },
-  { id: 'm4', date: '2026-06-06T08:00:00Z', weightKg: 80.5, chestCm: 103, waistCm: 85, armCm: 37 },
-  { id: 'm5', date: '2026-06-12T08:00:00Z', weightKg: 79.9, chestCm: 104, waistCm: 84, armCm: 38 },
+  {
+    id: 'm1',
+    date: '2026-05-16T08:00:00Z',
+    weightKg: 82.4,
+    chestCm: 102,
+    waistCm: 88,
+    armCm: 36,
+  },
+  {
+    id: 'm2',
+    date: '2026-05-23T08:00:00Z',
+    weightKg: 81.8,
+    chestCm: 102,
+    waistCm: 87,
+    armCm: 36,
+  },
+  {
+    id: 'm3',
+    date: '2026-05-30T08:00:00Z',
+    weightKg: 81.1,
+    chestCm: 103,
+    waistCm: 86,
+    armCm: 37,
+  },
+  {
+    id: 'm4',
+    date: '2026-06-06T08:00:00Z',
+    weightKg: 80.5,
+    chestCm: 103,
+    waistCm: 85,
+    armCm: 37,
+  },
+  {
+    id: 'm5',
+    date: '2026-06-12T08:00:00Z',
+    weightKg: 79.9,
+    chestCm: 104,
+    waistCm: 84,
+    armCm: 38,
+  },
 ];
 
 // ─── Trainers (client-side discovery) ───────────────────────────────────────
@@ -742,5 +929,5 @@ export const mockTrainers: Trainer[] = [
 
 /** Distinct specialties across all trainers, for the filter screen. */
 export const trainerSpecialties: string[] = Array.from(
-  new Set(mockTrainers.flatMap((t) => t.specialties)),
+  new Set(mockTrainers.flatMap((t) => t.specialties))
 ).sort();

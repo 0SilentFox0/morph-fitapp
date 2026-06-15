@@ -1,9 +1,9 @@
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+
 import { Toggle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
 
 export interface SetEditorProps {
   weight: number;

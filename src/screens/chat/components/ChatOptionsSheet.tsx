@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Overlay } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
 
 /** Actions surfaced by the thread "more" menu, per Figma node 2006:10537. */
 export type ChatOptionAction =
@@ -24,7 +24,11 @@ interface ChatOptionsSheetProps {
 }
 
 // A divider sits between "Cancel session" and "View client profile".
-const OPTIONS: { action: ChatOptionAction; label: string; dividerBefore?: boolean }[] = [
+const OPTIONS: {
+  action: ChatOptionAction;
+  label: string;
+  dividerBefore?: boolean;
+}[] = [
   { action: 'reschedule', label: 'Reschedule session' },
   { action: 'cancel', label: 'Cancel session' },
   { action: 'viewClient', label: 'View client profile', dividerBefore: true },
@@ -37,12 +41,20 @@ const OPTIONS: { action: ChatOptionAction; label: string; dividerBefore?: boolea
  * Drag handle + "Title" header with a close button, then a list of 48px-tall
  * action rows. Matches Figma node 2006:10537.
  */
-export function ChatOptionsSheet({ visible, title, onClose, onSelect }: ChatOptionsSheetProps) {
+export function ChatOptionsSheet({
+  visible,
+  title,
+  onClose,
+  onSelect,
+}: ChatOptionsSheetProps) {
   const insets = useSafeAreaInsets();
 
   return (
     <Overlay visible={visible} onClose={onClose} justify="flex-end">
-      <TouchableOpacity activeOpacity={1} style={[styles.sheet, { paddingBottom: insets.bottom + spacing.md }]}>
+      <TouchableOpacity
+        activeOpacity={1}
+        style={[styles.sheet, { paddingBottom: insets.bottom + spacing.md }]}
+      >
         <View style={styles.handle} />
 
         <View style={styles.header}>

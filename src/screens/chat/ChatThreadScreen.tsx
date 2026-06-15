@@ -1,51 +1,71 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ChatStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { MessageBubble, SessionMessageCard, SystemMessageCard } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import type { ChatStackParamList } from '../../navigation/types';
+import theme from '../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
+import { useDisclosure } from '../../hooks/ui/useDisclosure';
 import { useChatStore } from '../../store/chatStore';
-import { ChatOptionsSheet, ChatAttachmentSheet, type ChatOptionAction } from './components';
-import { useDisclosure } from '../../hooks/useDisclosure';
+import {
+  ChatAttachmentSheet,
+  type ChatOptionAction,
+  ChatOptionsSheet,
+  MessageInputBar,
+  MessageList,
+} from './components';
 
 type Route = RouteProp<ChatStackParamList, 'ChatThread'>;
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatThread'>;
 
 export function ChatThreadScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
+
   const { conversationId } = route.params;
 
-  const conversation = useChatStore((s) => s.conversations.find((c) => c.id === conversationId));
+  const conversation = useChatStore((s) =>
+    s.conversations.find((c) => c.id === conversationId)
+  );
+
   // Default outside the selector: returning a fresh `[]` from the selector makes
   // zustand see a new reference every render (Object.is) and loops forever for
   // conversations with no seeded messages.
-  const messages = useChatStore((s) => s.messagesByConversation[conversationId]) ?? [];
+  const messages =
+    useChatStore((s) => s.messagesByConversation[conversationId]) ?? [];
+
   const sendMessage = useChatStore((s) => s.sendMessage);
+
   const markAsRead = useChatStore((s) => s.markAsRead);
 
   const [input, setInput] = React.useState('');
+
   const optionsSheet = useDisclosure();
+
   const attachSheet = useDisclosure();
+
   const scrollRef = React.useRef<ScrollView>(null);
-  const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   const title = conversation?.participant.name ?? 'Chat';
 
@@ -69,7 +89,9 @@ export function ChatThreadScreen() {
 
   const handleSend = () => {
     const text = input.trim();
+
     if (!text) return;
+
     sendMessage(conversationId, text);
     setInput('');
     scrollToEndSoon();
@@ -129,8 +151,6 @@ export function ChatThreadScreen() {
     }
   };
 
-  const hasInput = input.trim().length > 0;
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -138,7 +158,12 @@ export function ChatThreadScreen() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       {/* Header: back, left-aligned title, more menu (Figma node 2006:10369) */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md) }]}>
+      <View
+        style={[
+          styles.header,
+          { paddingTop: Math.max(insets.top, spacing.md) },
+        ]}
+      >
         <TouchableOpacity
           style={styles.headerBtn}
           onPress={() => navigation.goBack()}
@@ -164,42 +189,14 @@ export function ChatThreadScreen() {
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+          onContentSizeChange={() =>
+            scrollRef.current?.scrollToEnd({ animated: false })
+          }
         >
-          {messages.map((msg) => {
-            switch (msg.kind) {
-              case 'text':
-                return (
-                  <MessageBubble
-                    key={msg.id}
-                    text={msg.text}
-                    sentAt={msg.sentAt}
-                    isFromMe={msg.isFromMe}
-                  />
-                );
-              case 'session':
-                return (
-                  <SessionMessageCard
-                    key={msg.id}
-                    title={msg.session.title}
-                    date={msg.session.date}
-                    time={msg.session.time}
-                    participants={msg.session.participants}
-                    sentAt={msg.sentAt}
-                    onStart={handleStartSession}
-                  />
-                );
-              case 'sessionStarted':
-                return (
-                  <SystemMessageCard
-                    key={msg.id}
-                    title="Session started"
-                    subtitle="Timer running"
-                    sentAt={msg.sentAt}
-                  />
-                );
-            }
-          })}
+          <MessageList
+            messages={messages}
+            onStartSession={handleStartSession}
+          />
         </ScrollView>
       ) : (
         <View style={styles.center}>
@@ -208,39 +205,13 @@ export function ChatThreadScreen() {
       )}
 
       {/* Message bar: attach, text input, mic/send (Figma node 2006:10439) */}
-      <View style={[styles.inputRow, { paddingBottom: spacing.md + insets.bottom }]}>
-        <TouchableOpacity
-          style={styles.iconBox}
-          onPress={attachSheet.open}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="link-outline" size={24} color={colors.neutral8} />
-        </TouchableOpacity>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Type a message..."
-          placeholderTextColor={colors.neutral5}
-          value={input}
-          onChangeText={setInput}
-          multiline
-          maxLength={1000}
-          onSubmitEditing={handleSend}
-        />
-
-        <TouchableOpacity
-          style={styles.iconBox}
-          onPress={hasInput ? handleSend : undefined}
-          disabled={!hasInput}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={hasInput ? 'send' : 'mic-outline'}
-            size={20}
-            color={hasInput ? colors.accent : colors.neutral8}
-          />
-        </TouchableOpacity>
-      </View>
+      <MessageInputBar
+        value={input}
+        onChangeText={setInput}
+        onSend={handleSend}
+        onAttach={attachSheet.open}
+        bottomInset={insets.bottom}
+      />
 
       <ChatOptionsSheet
         visible={optionsSheet.visible}
@@ -297,36 +268,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md - 3,
-  },
-  iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.sm,
-    backgroundColor: colors.neutral1,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    flex: 1,
-    minHeight: 40,
-    maxHeight: 100,
-    backgroundColor: colors.neutral1,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: typography.sizes.sm,
-    lineHeight: 22,
-    color: colors.text,
   },
 });

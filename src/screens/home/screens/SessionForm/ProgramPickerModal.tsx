@@ -1,12 +1,19 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Overlay } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
 import type { TrainingProgram } from '../../../../types';
-import { radius } from '../../../../theme';
 import { programMeta } from '../../../../utils';
 
 export interface ProgramPickerModalProps {
@@ -16,7 +23,6 @@ export interface ProgramPickerModalProps {
   value: string | undefined;
   onChange: (programId: string) => void;
 }
-
 
 export function ProgramPickerModal({
   visible,
@@ -38,6 +44,7 @@ export function ProgramPickerModal({
           {programs.length > 0 ? (
             programs.map((p) => {
               const active = value === p.id;
+
               return (
                 <TouchableOpacity
                   key={p.id}
@@ -51,18 +58,31 @@ export function ProgramPickerModal({
                       color={active ? colors.accent : colors.neutral8}
                     />
                     <View style={styles.optionInfo}>
-                      <Text style={[styles.optionText, active && styles.optionTextActive]}>
+                      <Text
+                        style={[
+                          styles.optionText,
+                          active && styles.optionTextActive,
+                        ]}
+                      >
                         {p.name}
                       </Text>
                       <Text style={styles.optionMeta}>{programMeta(p)}</Text>
                     </View>
                   </View>
-                  {active ? <Ionicons name="checkmark" size={18} color={colors.accent} /> : null}
+                  {active ? (
+                    <Ionicons
+                      name="checkmark"
+                      size={18}
+                      color={colors.accent}
+                    />
+                  ) : null}
                 </TouchableOpacity>
               );
             })
           ) : (
-            <Text style={styles.empty}>No programs yet. Create one in Training Library.</Text>
+            <Text style={styles.empty}>
+              No programs yet. Create one in Training Library.
+            </Text>
           )}
         </ScrollView>
       </View>

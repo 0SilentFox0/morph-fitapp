@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { zustandStorage } from '../services/storage';
 
 export type UserRole = 'client' | 'trainer';
@@ -30,9 +31,10 @@ export const useAppStore = create<AppState>()(
       setOnboarded: (value) => set({ isOnboarded: value }),
       setUserRole: (role) => set({ userRole: role }),
       setUserName: (name) => set({ userName: name }),
-      addPoints: (amount) => set((state) => ({ points: state.points + amount })),
+      addPoints: (amount) =>
+        set((state) => ({ points: state.points + amount })),
       reset: () => set(initialState),
     }),
-    { name: 'app-storage', storage: zustandStorage },
-  ),
+    { name: 'app-storage', storage: zustandStorage }
+  )
 );

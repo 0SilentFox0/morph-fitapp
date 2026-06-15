@@ -1,11 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { radius } from '../../theme';
 
-export type StatusBadgeColor = 'success' | 'warning' | 'error' | 'accent' | 'neutral';
+import theme from '../../theme';
+
+const { colors, typography, radius } = theme;
+
+export type StatusBadgeColor =
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'accent'
+  | 'neutral';
 
 export interface StatusBadgeProps {
   icon?: keyof typeof Ionicons.glyphMap;
@@ -27,6 +33,7 @@ export const StatusBadge = React.memo(function StatusBadge({
   color = 'neutral',
 }: StatusBadgeProps) {
   const fg = colorMap[color];
+
   return (
     <View style={styles.badge}>
       {icon ? (

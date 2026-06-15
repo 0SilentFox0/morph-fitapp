@@ -1,97 +1,47 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   Image,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
-  useRoute,
-  useNavigation,
   type RouteProp,
+  useNavigation,
+  useRoute,
 } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import type { LiveTrainingParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
 import {
-  SetSelector,
-  RestTimerControl,
   ClientSwitcherStrip,
-  type SwitcherClient,
+  RestTimerControl,
+  SetSelector,
 } from '../../components/ui';
+import type { LiveTrainingParamList } from '../../navigation/types';
+import theme from '../../theme';
 import { SetEditor } from './ExerciseDetail/SetEditor';
-import { useActiveTrainingStore } from '../../store/activeTrainingStore';
-import { mockTrainingPrograms } from '../../mocks';
-import { formatClock } from '../../utils';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import { useActiveExercise } from './ExerciseDetail/useActiveExercise';
+
+const { colors, radius, typography, spacing } = theme;
 
 type Route = RouteProp<LiveTrainingParamList, 'ExerciseDetail'>;
 type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'ExerciseDetail'>;
 
-/** Default rest length seeded into the timer; long_rest sets get more. */
-const REST_SECONDS: Record<string, number> = { short_rest: 45, long_rest: 120 };
-
 export function ExerciseDetailScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
-  // Params are optional at runtime: the screen can also be reached with an
-  // already-active training (e.g. via the client switcher) and no params.
-  const {
-    participantId: routeParticipantId,
-    programId: routeProgramId,
-    exerciseIndex: routeExerciseIndex,
-  } = route.params ?? {};
 
-  // The screen follows the *active* participant, so switching avatars instantly
-  // shows that participant's current exercise and live timer.
-  const participants = useActiveTrainingStore((s) => s.participants);
-  const activeParticipantId = useActiveTrainingStore((s) => s.activeParticipantId);
-  const setActiveParticipant = useActiveTrainingStore((s) => s.setActiveParticipant);
-  const openExercise = useActiveTrainingStore((s) => s.openExercise);
-  const setSetIndex = useActiveTrainingStore((s) => s.setSetIndex);
-  const setExerciseIndex = useActiveTrainingStore((s) => s.setExerciseIndex);
-  const ensureSetLog = useActiveTrainingStore((s) => s.ensureSetLog);
-  const updateSet = useActiveTrainingStore((s) => s.updateSet);
-  const toggleRepToFailure = useActiveTrainingStore((s) => s.toggleRepToFailure);
-  const startRest = useActiveTrainingStore((s) => s.startRest);
-  const stopRest = useActiveTrainingStore((s) => s.stopRest);
+  const vm = useActiveExercise(route.params ?? {});
 
-  // Apply the tapped selection once on entry; from then on the store is the
-  // source of truth, so switching participants preserves each one's progress.
-  React.useEffect(() => {
-    if (routeParticipantId && routeExerciseIndex != null) {
-      const openedProgram = routeProgramId
-        ? mockTrainingPrograms.find((p) => p.id === routeProgramId)
-        : undefined;
-      openExercise(routeParticipantId, routeProgramId ?? null, routeExerciseIndex, openedProgram?.exercises);
-      setActiveParticipant(routeParticipantId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const participant =
-    participants.find((c) => c.participantId === activeParticipantId) ?? participants[0] ?? null;
-  const exercises = participant?.exercises ?? [];
-
-  // Seed an editable set log whenever the open exercise changes.
-  const currentParticipantId = participant?.participantId;
-  const currentExerciseIndex = participant?.exerciseIndex;
-  React.useEffect(() => {
-    if (!currentParticipantId || currentExerciseIndex == null) return;
-    const ex = exercises[Math.min(currentExerciseIndex, exercises.length - 1)];
-    if (ex) ensureSetLog(currentParticipantId, ex.id, ex.sets);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentParticipantId, currentExerciseIndex, exercises.length]);
-
-  if (!participant || exercises.length === 0) {
+  if (!vm) {
     return (
       <View style={styles.container}>
         <ScreenHeader title="Exercise" />
@@ -102,24 +52,16 @@ export function ExerciseDetailScreen() {
     );
   }
 
-  const exerciseIndex = Math.min(participant.exerciseIndex, exercises.length - 1);
-  const exercise = exercises[exerciseIndex]!;
-  const sets = participant.setLog[exercise.id] ?? exercise.sets;
-  const setIndex = Math.min(participant.setIndex, sets.length - 1);
-  const currentSet = sets[setIndex]!;
-  const prevSet = participant.prevSets?.[exercise.id]?.[setIndex];
-
-  const handleStartRest = () => {
-    const seconds = (currentSet.note && REST_SECONDS[currentSet.note]) || 60;
-    startRest(participant.participantId, seconds);
-  };
-
-  const switcherClients: SwitcherClient[] = participants.map((c) => ({
-    id: c.participantId,
-    name: c.name,
-    avatar: c.avatar,
-    badge: c.rest.running ? formatClock(c.rest.remainingSec) : undefined,
-  }));
+  const {
+    participant,
+    exercise,
+    exercises,
+    exerciseIndex,
+    sets,
+    setIndex,
+    currentSet,
+    prevSet,
+  } = vm;
 
   return (
     <View style={styles.container}>
@@ -127,7 +69,11 @@ export function ExerciseDetailScreen() {
         title="Exercise"
         rightElement={
           <TouchableOpacity
-            onPress={() => navigation.navigate('TrainingSummary', { participantId: participant.participantId })}
+            onPress={() =>
+              navigation.navigate('TrainingSummary', {
+                participantId: participant.participantId,
+              })
+            }
             hitSlop={8}
           >
             <Text style={styles.finish}>Finish</Text>
@@ -135,11 +81,11 @@ export function ExerciseDetailScreen() {
         }
       />
 
-      {participants.length > 1 && (
+      {vm.participants.length > 1 && (
         <ClientSwitcherStrip
-          clients={switcherClients}
-          activeId={activeParticipantId}
-          onSelect={setActiveParticipant}
+          clients={vm.switcherClients}
+          activeId={vm.activeParticipantId}
+          onSelect={vm.setActiveParticipant}
         />
       )}
 
@@ -154,7 +100,10 @@ export function ExerciseDetailScreen() {
       >
         <View style={styles.video}>
           {exercise.imageUrl && (
-            <Image source={{ uri: exercise.imageUrl }} style={styles.videoImage} />
+            <Image
+              source={{ uri: exercise.imageUrl }}
+              style={styles.videoImage}
+            />
           )}
           <View style={styles.playOverlay}>
             <Ionicons name="play" size={28} color={colors.white} />
@@ -168,7 +117,7 @@ export function ExerciseDetailScreen() {
         <SetSelector
           count={sets.length}
           value={setIndex}
-          onChange={(i) => setSetIndex(participant.participantId, i)}
+          onChange={vm.onSetChange}
         />
 
         {prevSet && (
@@ -185,9 +134,9 @@ export function ExerciseDetailScreen() {
           weight={currentSet.weight}
           reps={currentSet.reps}
           toFailure={currentSet.note === 'failure'}
-          onWeightChange={(weight) => updateSet(participant.participantId, exercise.id, setIndex, { weight })}
-          onRepsChange={(reps) => updateSet(participant.participantId, exercise.id, setIndex, { reps })}
-          onToggleFailure={() => toggleRepToFailure(participant.participantId, exercise.id, setIndex)}
+          onWeightChange={vm.onWeightChange}
+          onRepsChange={vm.onRepsChange}
+          onToggleFailure={vm.onToggleFailure}
         />
 
         <Text style={[styles.label, styles.labelSpaced]}>Trainer Notes</Text>
@@ -199,11 +148,11 @@ export function ExerciseDetailScreen() {
 
         <View style={styles.controls}>
           <RestTimerControl
-            rest={participant.rest}
-            onStart={handleStartRest}
-            onStop={() => stopRest(participant.participantId)}
-            onPrev={() => setExerciseIndex(participant.participantId, exerciseIndex - 1)}
-            onNext={() => setExerciseIndex(participant.participantId, exerciseIndex + 1)}
+            rest={vm.rest}
+            onStart={vm.onStartRest}
+            onStop={vm.onStopRest}
+            onPrev={vm.onPrev}
+            onNext={vm.onNext}
             prevDisabled={exerciseIndex === 0}
             nextDisabled={exerciseIndex === exercises.length - 1}
           />

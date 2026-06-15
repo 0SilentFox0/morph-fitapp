@@ -1,7 +1,10 @@
-import { request, api } from './client';
-import { tokenStore } from './tokenStore';
 import { dataEnvelope } from '../../schemas/api/envelope';
-import { TokenResponseSchema, type TokenResponse } from '../../schemas/api/models';
+import {
+  type TokenResponse,
+  TokenResponseSchema,
+} from '../../schemas/api/models';
+import { api, request } from './client';
+import { tokenStore } from './tokenStore';
 
 const tokenEnvelope = dataEnvelope(TokenResponseSchema);
 
@@ -25,7 +28,9 @@ export async function login(input: LoginInput): Promise<TokenResponse> {
     auth: false,
     schema: tokenEnvelope,
   });
+
   await tokenStore.setTokens(data);
+
   return data;
 }
 
@@ -35,13 +40,16 @@ export async function register(input: RegisterInput): Promise<TokenResponse> {
     auth: false,
     schema: tokenEnvelope,
   });
+
   await tokenStore.setTokens(data);
+
   return data;
 }
 
 export async function logout(): Promise<void> {
   try {
-    await api.post('/auth/logout');
+    // skipRefresh: an expired token shouldn't trigger a refresh cascade on the way out.
+    await api.post('/auth/logout', { skipRefresh: true });
   } finally {
     await tokenStore.clear();
   }
@@ -49,7 +57,7 @@ export async function logout(): Promise<void> {
 
 export async function logoutAll(): Promise<void> {
   try {
-    await api.post('/auth/logout-all');
+    await api.post('/auth/logout-all', { skipRefresh: true });
   } finally {
     await tokenStore.clear();
   }
@@ -58,8 +66,11 @@ export async function logoutAll(): Promise<void> {
 export const forgotPassword = (email: string) =>
   api.post('/auth/forgot-password', { body: { email }, auth: false });
 
-export const resetPassword = (body: { token: string; password: string; password_confirmation: string }) =>
-  api.post('/auth/reset-password', { body, auth: false });
+export const resetPassword = (body: {
+  token: string;
+  password: string;
+  password_confirmation: string;
+}) => api.post('/auth/reset-password', { body, auth: false });
 
 export const verifyEmail = (token: string) =>
   api.post('/auth/verify-email', { body: { token }, auth: false });

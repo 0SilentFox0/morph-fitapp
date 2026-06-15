@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { zustandStorage } from '../services/storage';
+
 import { getSeedMeasurements } from '../services/repositories';
+import { zustandStorage } from '../services/storage';
 import type { MeasurementEntry } from '../types';
 
 export type { MeasurementEntry };
@@ -33,7 +34,9 @@ export const useMeasurementsStore = create<MeasurementsState>()(
 
       addEntry: (entry) =>
         set((state) => ({
-          entries: [...state.entries, { ...entry, id: `m-${Date.now()}` }].sort(byDateAsc),
+          entries: [...state.entries, { ...entry, id: `m-${Date.now()}` }].sort(
+            byDateAsc
+          ),
         })),
 
       getSeries: (field) =>
@@ -43,9 +46,10 @@ export const useMeasurementsStore = create<MeasurementsState>()(
 
       latest: () => {
         const { entries } = get();
+
         return entries.length ? entries[entries.length - 1]! : null;
       },
     }),
-    { name: 'measurements-storage', storage: zustandStorage },
-  ),
+    { name: 'measurements-storage', storage: zustandStorage }
+  )
 );

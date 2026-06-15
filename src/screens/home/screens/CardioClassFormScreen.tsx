@@ -1,28 +1,47 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Input, Button, Avatar, SectionTitle, PricingInsightHint } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useSessionsStore } from '../../../store/sessionsStore';
+import {
+  Avatar,
+  Button,
+  Input,
+  PricingInsightHint,
+  SectionTitle,
+} from '../../../components/ui';
+import type { HomeStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
 import { mockClients } from '../../../mocks';
-import { cardioClassSchema, type CardioClassFormValues } from '../../../schemas/cardio-class';
+import {
+  type CardioClassFormValues,
+  cardioClassSchema,
+} from '../../../schemas/cardio-class';
+import { useSessionsStore } from '../../../store/sessionsStore';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'CardioClassForm'>;
 type Route = RouteProp<HomeStackParamList, 'CardioClassForm'>;
 
 export function CardioClassFormScreen() {
   const navigation = useNavigation<Nav>();
+
   const route = useRoute<Route>();
+
   const program = route.params?.program;
+
   const addSession = useSessionsStore((s) => s.addSession);
 
   const {
@@ -48,7 +67,10 @@ export function CardioClassFormScreen() {
   const clientIds = watch('clientIds');
 
   const toggleClient = (id: string) => {
-    const next = clientIds.includes(id) ? clientIds.filter((c) => c !== id) : [...clientIds, id];
+    const next = clientIds.includes(id)
+      ? clientIds.filter((c) => c !== id)
+      : [...clientIds, id];
+
     setValue('clientIds', next, { shouldValidate: false, shouldDirty: true });
   };
 
@@ -75,7 +97,10 @@ export function CardioClassFormScreen() {
       <ScreenHeader
         title={titleValue || 'Cardio Class'}
         rightElement={
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Share">
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Share"
+          >
             <Ionicons name="share-outline" size={24} color={colors.text} />
           </TouchableOpacity>
         }
@@ -101,7 +126,9 @@ export function CardioClassFormScreen() {
             />
           )}
         />
-        {errors.title ? <Text style={styles.errorText}>{errors.title.message}</Text> : null}
+        {errors.title ? (
+          <Text style={styles.errorText}>{errors.title.message}</Text>
+        ) : null}
 
         <Controller
           control={control}
@@ -139,10 +166,14 @@ export function CardioClassFormScreen() {
         >
           <Ionicons name="camera" size={40} color={colors.textMuted} />
           <Text style={styles.uploadText}>Tap to upload photo</Text>
-          <Text style={styles.uploadHint}>Recommended size: square, min 500x500px</Text>
+          <Text style={styles.uploadHint}>
+            Recommended size: square, min 500x500px
+          </Text>
         </TouchableOpacity>
 
-        <SectionTitle style={styles.sectionTitleSpacing}>Date and time</SectionTitle>
+        <SectionTitle style={styles.sectionTitleSpacing}>
+          Date and time
+        </SectionTitle>
         <Controller
           control={control}
           name="date"
@@ -151,7 +182,9 @@ export function CardioClassFormScreen() {
               placeholder="Date (e.g. 04/10/2026)"
               value={value ?? ''}
               onChangeText={onChange}
-              rightIcon={<Ionicons name="calendar" size={20} color={colors.textMuted} />}
+              rightIcon={
+                <Ionicons name="calendar" size={20} color={colors.textMuted} />
+              }
               accessibilityLabel="Date"
             />
           )}
@@ -164,7 +197,9 @@ export function CardioClassFormScreen() {
               placeholder="Time (e.g. 14:00)"
               value={value ?? ''}
               onChangeText={onChange}
-              rightIcon={<Ionicons name="time" size={20} color={colors.textMuted} />}
+              rightIcon={
+                <Ionicons name="time" size={20} color={colors.textMuted} />
+              }
               accessibilityLabel="Time"
             />
           )}
@@ -178,6 +213,7 @@ export function CardioClassFormScreen() {
         >
           {mockClients.map((client) => {
             const isSelected = clientIds.includes(client.id);
+
             return (
               <TouchableOpacity
                 key={client.id}
@@ -187,7 +223,12 @@ export function CardioClassFormScreen() {
                 accessibilityState={{ checked: isSelected }}
                 accessibilityLabel={client.name}
               >
-                <View style={[styles.clientAvatarWrap, isSelected && styles.clientAvatarSelected]}>
+                <View
+                  style={[
+                    styles.clientAvatarWrap,
+                    isSelected && styles.clientAvatarSelected,
+                  ]}
+                >
                   <Avatar name={client.name} size={48} />
                 </View>
                 <Text style={styles.clientName} numberOfLines={1}>
@@ -198,7 +239,9 @@ export function CardioClassFormScreen() {
           })}
         </ScrollView>
 
-        <SectionTitle style={styles.sectionTitleSpacing}>Price per class</SectionTitle>
+        <SectionTitle style={styles.sectionTitleSpacing}>
+          Price per class
+        </SectionTitle>
         <Controller
           control={control}
           name="price"
@@ -212,13 +255,22 @@ export function CardioClassFormScreen() {
             />
           )}
         />
-        {errors.price ? <Text style={styles.errorText}>{errors.price.message}</Text> : null}
+        {errors.price ? (
+          <Text style={styles.errorText}>{errors.price.message}</Text>
+        ) : null}
 
         <View style={styles.insightSpacing}>
-          <PricingInsightHint price={parseInt(watch('price') || '0', 10)} currency="USD" />
+          <PricingInsightHint
+            price={parseInt(watch('price') || '0', 10)}
+            currency="USD"
+          />
         </View>
 
-        <Button title="Apply" onPress={handleSubmit(onSubmit)} style={styles.button} />
+        <Button
+          title="Apply"
+          onPress={handleSubmit(onSubmit)}
+          style={styles.button}
+        />
       </ScrollView>
     </View>
   );
@@ -227,7 +279,10 @@ export function CardioClassFormScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+  },
   sectionTitleSpacing: {
     marginTop: spacing.sm,
   },
@@ -241,11 +296,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
-  uploadText: { fontSize: typography.sizes.sm, color: colors.textMuted, marginTop: spacing.sm },
-  uploadHint: { fontSize: typography.sizes.xs, color: colors.textMuted, marginTop: spacing.xs },
-  clientsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
+  uploadText: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+  },
+  uploadHint: {
+    fontSize: typography.sizes.xs,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+  },
+  clientsRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
   clientItem: { alignItems: 'center' },
-  clientAvatarWrap: { borderRadius: radius['2xl'], borderWidth: 2, borderColor: 'transparent' },
+  clientAvatarWrap: {
+    borderRadius: radius['2xl'],
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
   clientAvatarSelected: { borderColor: colors.accent },
   clientName: {
     fontSize: typography.sizes.xs,
@@ -254,5 +325,9 @@ const styles = StyleSheet.create({
     maxWidth: 60,
   },
   button: { marginTop: spacing.lg },
-  errorText: { fontSize: typography.sizes.xs, color: colors.Error, marginTop: spacing.xs },
+  errorText: {
+    fontSize: typography.sizes.xs,
+    color: colors.Error,
+    marginTop: spacing.xs,
+  },
 });

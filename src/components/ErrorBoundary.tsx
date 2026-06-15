@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
-import { radius } from '../theme';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import theme from '../theme';
+
+const { colors, spacing, radius } = theme;
+
+import { logger } from '../services/logger';
 
 interface Props {
   children: React.ReactNode;
@@ -20,8 +23,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    // Hook a crash-reporting service here in production
-    console.error('[ErrorBoundary]', error, info.componentStack);
+    // Goes to the registered crash reporter (Sentry, …) via the logger sink.
+    logger.error('Uncaught React render error', error, {
+      componentStack: info.componentStack,
+    });
   }
 
   reset = () => this.setState({ error: null });
@@ -38,6 +43,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
         </View>
       );
     }
+
     return this.props.children;
   }
 }

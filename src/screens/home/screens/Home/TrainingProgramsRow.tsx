@@ -1,12 +1,20 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { SectionTitle } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
 import type { TrainingProgram } from '../../../../types';
 
 export interface TrainingProgramsRowProps {
@@ -25,7 +33,9 @@ export function TrainingProgramsRow({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <SectionTitle style={styles.sectionTitleSpacing}>Training Templates</SectionTitle>
+        <SectionTitle style={styles.sectionTitleSpacing}>
+          Training Templates
+        </SectionTitle>
         <TouchableOpacity onPress={onSeeAll}>
           <Text style={styles.seeAll}>See all</Text>
         </TouchableOpacity>
@@ -45,7 +55,11 @@ export function TrainingProgramsRow({
             >
               <View style={styles.thumb}>
                 {p.thumbnail ? (
-                  <Image source={{ uri: p.thumbnail }} style={styles.image} resizeMode="cover" />
+                  <Image
+                    source={{ uri: p.thumbnail }}
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
                 ) : null}
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.8)']}
@@ -70,8 +84,16 @@ export function TrainingProgramsRow({
           ))}
         </ScrollView>
       ) : (
-        <TouchableOpacity style={styles.empty} onPress={onEmptyPress} activeOpacity={0.8}>
-          <Ionicons name="add-circle-outline" size={32} color={colors.textMuted} />
+        <TouchableOpacity
+          style={styles.empty}
+          onPress={onEmptyPress}
+          activeOpacity={0.8}
+        >
+          <Ionicons
+            name="add-circle-outline"
+            size={32}
+            color={colors.textMuted}
+          />
           <Text style={styles.emptyText}>Add your first training program</Text>
         </TouchableOpacity>
       )}

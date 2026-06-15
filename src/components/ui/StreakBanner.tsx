@@ -1,11 +1,11 @@
 // src/components/ui/StreakBanner.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+
+import theme from '../../theme';
+
+const { colors, spacing, radius, typography } = theme;
 
 interface StreakBannerProps {
   streak: number;
@@ -15,12 +15,24 @@ interface StreakBannerProps {
 }
 
 /** Motivation banner: current week-streak + weekly session progress. */
-export function StreakBanner({ streak, sessionsThisWeek, weeklyTarget = 3, onPress }: StreakBannerProps) {
-  const pct = weeklyTarget > 0 ? Math.min(1, sessionsThisWeek / weeklyTarget) : 0;
+export function StreakBanner({
+  streak,
+  sessionsThisWeek,
+  weeklyTarget = 3,
+  onPress,
+}: StreakBannerProps) {
+  const pct =
+    weeklyTarget > 0 ? Math.min(1, sessionsThisWeek / weeklyTarget) : 0;
+
   const hasStreak = streak > 0;
 
   return (
-    <TouchableOpacity style={styles.banner} activeOpacity={0.85} onPress={onPress} testID="streak-banner">
+    <TouchableOpacity
+      style={styles.banner}
+      activeOpacity={0.85}
+      onPress={onPress}
+      testID="streak-banner"
+    >
       <View style={styles.flame}>
         <Ionicons name="flame" size={22} color={colors.accent} />
       </View>
@@ -58,8 +70,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   body: { flex: 1, gap: 4 },
-  title: { fontSize: typography.sizes.base, color: colors.text, fontWeight: typography.weights.semibold },
+  title: {
+    fontSize: typography.sizes.base,
+    color: colors.text,
+    fontWeight: typography.weights.semibold,
+  },
   sub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  track: { height: 6, borderRadius: radius.pill, backgroundColor: colors.neutral3, overflow: 'hidden', marginTop: 2 },
-  fill: { height: 6, borderRadius: radius.pill, backgroundColor: colors.accent },
+  track: {
+    height: 6,
+    borderRadius: radius.pill,
+    backgroundColor: colors.neutral3,
+    overflow: 'hidden',
+    marginTop: 2,
+  },
+  fill: {
+    height: 6,
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
+  },
 });

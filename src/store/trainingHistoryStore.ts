@@ -1,5 +1,9 @@
 import { create } from 'zustand';
-import { getSeedTrainingHistory, getCurrentUserName } from '../services/repositories';
+
+import {
+  getCurrentUserName,
+  getSeedTrainingHistory,
+} from '../services/repositories';
 import type { CompletedTraining, ExerciseSet } from '../types';
 
 export type { CompletedTraining };
@@ -20,29 +24,38 @@ interface TrainingHistoryState {
   addCompletedTraining: (training: CompletedTraining) => void;
 }
 
-export const useTrainingHistoryStore = create<TrainingHistoryState>((set, get) => ({
-  history: getSeedTrainingHistory(),
+export const useTrainingHistoryStore = create<TrainingHistoryState>(
+  (set, get) => ({
+    history: getSeedTrainingHistory(),
 
-  getClientHistory: (clientName) => {
-    const key = normalizeName(clientName);
-    return get().history.filter((h) => normalizeName(h.clientName) === key);
-  },
+    getClientHistory: (clientName) => {
+      const key = normalizeName(clientName);
 
-  getCurrentUserHistory: () => get().getClientHistory(getCurrentUserName()),
+      return get().history.filter((h) => normalizeName(h.clientName) === key);
+    },
 
-  getLastSets: (clientName, exerciseId) => {
-    const key = normalizeName(clientName);
-    const matches = get().history.filter(
-      (h) =>
-        normalizeName(h.clientName) === key &&
-        h.exercises.some((e) => e.exerciseId === exerciseId),
-    );
-    if (matches.length === 0) return null;
-    // Seed order is chronological, so the last match is the most recent.
-    const newest = matches[matches.length - 1]!;
-    return newest.exercises.find((e) => e.exerciseId === exerciseId)?.sets ?? null;
-  },
+    getCurrentUserHistory: () => get().getClientHistory(getCurrentUserName()),
 
-  addCompletedTraining: (training) =>
-    set((state) => ({ history: [...state.history, training] })),
-}));
+    getLastSets: (clientName, exerciseId) => {
+      const key = normalizeName(clientName);
+
+      const matches = get().history.filter(
+        (h) =>
+          normalizeName(h.clientName) === key &&
+          h.exercises.some((e) => e.exerciseId === exerciseId)
+      );
+
+      if (matches.length === 0) return null;
+
+      // Seed order is chronological, so the last match is the most recent.
+      const newest = matches[matches.length - 1]!;
+
+      return (
+        newest.exercises.find((e) => e.exerciseId === exerciseId)?.sets ?? null
+      );
+    },
+
+    addCompletedTraining: (training) =>
+      set((state) => ({ history: [...state.history, training] })),
+  })
+);

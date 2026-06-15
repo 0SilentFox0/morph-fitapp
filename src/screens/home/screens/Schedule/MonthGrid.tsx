@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors } from '../../../../theme/colors';
-import { radius } from '../../../../theme';
-import { spacing } from '../../../../theme/spacing';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import theme from '../../../../theme';
+
+const { colors, radius, spacing } = theme;
+
 import { DAY_LABELS, getBusyPercent } from './scheduleUtils';
 
 export interface MonthCell {
@@ -19,7 +21,12 @@ export interface MonthGridProps {
 }
 
 /** Month calendar with per-day busyness fill, shown in the "month" view mode. */
-export function MonthGrid({ monthDays, cellSize, getCount, onSelectDate }: MonthGridProps) {
+export function MonthGrid({
+  monthDays,
+  cellSize,
+  getCount,
+  onSelectDate,
+}: MonthGridProps) {
   return (
     <View style={styles.monthGrid}>
       {DAY_LABELS.map((l) => (
@@ -36,7 +43,9 @@ export function MonthGrid({ monthDays, cellSize, getCount, onSelectDate }: Month
             />
           );
         }
+
         const pct = getBusyPercent(getCount(cell.dateKey));
+
         return (
           <TouchableOpacity
             key={cell.dateKey}

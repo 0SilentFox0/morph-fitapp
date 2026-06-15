@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
+
 import type { ThemeColors } from './themes';
 import { darkTheme } from './themes';
 
@@ -26,6 +27,7 @@ export function ThemeProvider({
   initialName = 'dark',
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<ThemeColors>(initial);
+
   const [themeName, setThemeName] = useState(initialName);
 
   const value = useMemo<ThemeContextValue>(
@@ -37,7 +39,7 @@ export function ThemeProvider({
         setThemeState(next);
       },
     }),
-    [theme, themeName],
+    [theme, themeName]
   );
 
   return (

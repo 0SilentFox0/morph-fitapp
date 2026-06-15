@@ -10,10 +10,7 @@ import { z } from 'zod';
  *   });
  */
 export const sessionSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(2, 'Title must be at least 2 characters'),
+  title: z.string().trim().min(2, 'Title must be at least 2 characters'),
   programId: z.string().min(1, 'Please select a training program'),
   date: z.date(),
   time: z.date(),

@@ -1,20 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { StatsStackParamList } from '../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../components/layout';
-import { SearchInput } from '../../components/ui';
+import { AsyncBoundary, SearchInput } from '../../components/ui';
+import type { StatsStackParamList } from '../../navigation/types';
+import theme from '../../theme';
 import { AnalyticsChartCard } from './Analytics/AnalyticsChartCard';
 import { TransactionCard } from './Analytics/TransactionCard';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
-import { exportTransactions, searchItems, getChartWidth } from '../../utils';
-import { mockTransactions, mockAnalyticsData } from '../../mocks';
+
+const { colors, typography, spacing } = theme;
+
+import { useAsyncResource } from '../../hooks/data/useAsyncResource';
+import { loadBusinessAnalytics } from '../../services/analyticsService';
 import { useGamificationStore } from '../../store/gamificationStore';
-import { LEAGUE_TIERS } from '../../utils/leagues';
+import { exportTransactions, getChartWidth, searchItems } from '../../utils';
+import { LEAGUE_TIERS } from '../../utils/game/leagues';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'BusinessAnalytics'>;
 
@@ -22,129 +31,170 @@ const ICON_HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
 export function BusinessAnalyticsScreen() {
   const navigation = useNavigation<Nav>();
+
   const [search, setSearch] = React.useState('');
+
   const trainerOverview = useGamificationStore((s) => s.trainerOverview);
+
   const loadTrainer = useGamificationStore((s) => s.loadTrainer);
+
   React.useEffect(() => {
     loadTrainer();
   }, [loadTrainer]);
+
   const leagueTier = trainerOverview
     ? LEAGUE_TIERS.find((t) => t.key === trainerOverview.league.key)
     : null;
 
   const chartWidth = React.useMemo(() => getChartWidth(20), []);
-  const incomeData = React.useMemo(() => mockAnalyticsData.incomeOverTime, []);
+
+  const { data, status, error, refetch } = useAsyncResource(() =>
+    loadBusinessAnalytics()
+  );
+
   const sourceData = React.useMemo(
     () => ({
       labels: ['Subscriptions', 'Trainings'],
       datasets: [
         {
           data: [
-            mockAnalyticsData.revenueBySource.subscriptions,
-            mockAnalyticsData.revenueBySource.trainings,
+            data?.revenueBySource.subscriptions ?? 0,
+            data?.revenueBySource.trainings ?? 0,
           ],
         },
       ],
     }),
-    []
+    [data]
   );
 
   const preview = React.useMemo(
-    () => searchItems(search, mockTransactions, (t) => [t.clientName]).slice(0, 5),
-    [search],
+    () =>
+      searchItems(search, data?.transactions ?? [], (t) => [
+        t.clientName,
+      ]).slice(0, 5),
+    [search, data]
   );
 
   return (
     <View style={styles.container}>
       <ScreenHeader title="Business Analytics" transparent />
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <AsyncBoundary
+        status={status}
+        error={error}
+        onRetry={refetch}
+        errorTitle="Couldn't load analytics"
       >
-        <View style={styles.earningsRow}>
-          <View style={styles.earningsCard}>
-            <Text style={styles.earningsLabel}>Total Month</Text>
-            <Text style={styles.earningsValue}>${mockAnalyticsData.totalEarningsPerMonth}</Text>
-          </View>
-          <View style={styles.earningsCard}>
-            <Text style={styles.earningsLabel}>Subscriptions</Text>
-            <Text style={styles.earningsValue}>${mockAnalyticsData.fromSubscriptions}</Text>
-          </View>
-          <View style={styles.earningsCard}>
-            <Text style={styles.earningsLabel}>Trainings</Text>
-            <Text style={styles.earningsValue}>${mockAnalyticsData.fromTrainings}</Text>
-          </View>
-        </View>
-
-        {leagueTier && trainerOverview && (
-          <TouchableOpacity
-            style={styles.leagueBanner}
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate('TrainerLeague')}
-          >
-            <View style={[styles.leagueIcon, { borderColor: leagueTier.color }]}>
-              <Ionicons name={leagueTier.icon} size={22} color={leagueTier.color} />
-            </View>
-            <View style={styles.leagueText}>
-              <Text style={styles.leagueName}>{leagueTier.name} league</Text>
-              <Text style={styles.leagueSub}>
-                Top {Math.max(1, Math.round((1 - trainerOverview.percentile) * 100))}% · rank #
-                {trainerOverview.rank}
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.earningsRow}>
+            <View style={styles.earningsCard}>
+              <Text style={styles.earningsLabel}>Total Month</Text>
+              <Text style={styles.earningsValue}>
+                ${data?.totals.month ?? 0}
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.accent} />
-          </TouchableOpacity>
-        )}
-
-        <AnalyticsChartCard
-          incomeData={incomeData}
-          sourceData={sourceData}
-          chartWidth={chartWidth}
-        />
-
-        <View style={styles.transactionsCard}>
-          <View style={styles.transactionsTop}>
-            <View style={styles.transactionsHeader}>
-              <Text style={styles.transactionsTitle}>Transactions</Text>
-              <View style={styles.transactionsActions}>
-                <TouchableOpacity
-                  hitSlop={ICON_HIT_SLOP}
-                  onPress={() => navigation.navigate('Transactions')}
-                >
-                  <Ionicons name="filter" size={18} color={colors.text} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  hitSlop={ICON_HIT_SLOP}
-                  onPress={() => navigation.navigate('AddTransaction')}
-                >
-                  <Ionicons name="pencil" size={18} color={colors.text} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  hitSlop={ICON_HIT_SLOP}
-                  onPress={() => exportTransactions(mockTransactions)}
-                >
-                  <Ionicons name="download" size={18} color={colors.text} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  hitSlop={ICON_HIT_SLOP}
-                  onPress={() => navigation.navigate('Transactions')}
-                >
-                  <Text style={styles.seeAll}>See all</Text>
-                </TouchableOpacity>
-              </View>
+            <View style={styles.earningsCard}>
+              <Text style={styles.earningsLabel}>Subscriptions</Text>
+              <Text style={styles.earningsValue}>
+                ${data?.totals.subscriptions ?? 0}
+              </Text>
             </View>
-            <SearchInput value={search} onChangeText={setSearch} />
+            <View style={styles.earningsCard}>
+              <Text style={styles.earningsLabel}>Trainings</Text>
+              <Text style={styles.earningsValue}>
+                ${data?.totals.trainings ?? 0}
+              </Text>
+            </View>
           </View>
 
-          <View style={styles.transactionsList}>
-            {preview.map((t) => (
-              <TransactionCard key={t.id} transaction={t} />
-            ))}
+          {leagueTier && trainerOverview && (
+            <TouchableOpacity
+              style={styles.leagueBanner}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate('TrainerLeague')}
+            >
+              <View
+                style={[styles.leagueIcon, { borderColor: leagueTier.color }]}
+              >
+                <Ionicons
+                  name={leagueTier.icon}
+                  size={22}
+                  color={leagueTier.color}
+                />
+              </View>
+              <View style={styles.leagueText}>
+                <Text style={styles.leagueName}>{leagueTier.name} league</Text>
+                <Text style={styles.leagueSub}>
+                  Top{' '}
+                  {Math.max(
+                    1,
+                    Math.round((1 - trainerOverview.percentile) * 100)
+                  )}
+                  % · rank #{trainerOverview.rank}
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.accent}
+              />
+            </TouchableOpacity>
+          )}
+
+          <AnalyticsChartCard
+            incomeData={
+              data?.incomeData ?? { labels: [], datasets: [{ data: [] }] }
+            }
+            sourceData={sourceData}
+            chartWidth={chartWidth}
+          />
+
+          <View style={styles.transactionsCard}>
+            <View style={styles.transactionsTop}>
+              <View style={styles.transactionsHeader}>
+                <Text style={styles.transactionsTitle}>Transactions</Text>
+                <View style={styles.transactionsActions}>
+                  <TouchableOpacity
+                    hitSlop={ICON_HIT_SLOP}
+                    onPress={() => navigation.navigate('Transactions')}
+                  >
+                    <Ionicons name="filter" size={18} color={colors.text} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={ICON_HIT_SLOP}
+                    onPress={() => navigation.navigate('AddTransaction')}
+                  >
+                    <Ionicons name="pencil" size={18} color={colors.text} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={ICON_HIT_SLOP}
+                    onPress={() => exportTransactions(data?.transactions ?? [])}
+                  >
+                    <Ionicons name="download" size={18} color={colors.text} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={ICON_HIT_SLOP}
+                    onPress={() => navigation.navigate('Transactions')}
+                  >
+                    <Text style={styles.seeAll}>See all</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <SearchInput value={search} onChangeText={setSearch} />
+            </View>
+
+            <View style={styles.transactionsList}>
+              {preview.map((t) => (
+                <TransactionCard key={t.id} transaction={t} />
+              ))}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </AsyncBoundary>
     </View>
   );
 }
@@ -183,7 +233,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral1,
   },
   leagueText: { flex: 1 },
-  leagueName: { fontSize: typography.sizes.base, fontWeight: typography.weights.bold, color: colors.text },
+  leagueName: {
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   leagueSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   earningsCard: {
     flex: 1,

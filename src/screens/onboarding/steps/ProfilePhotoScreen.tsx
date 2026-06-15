@@ -1,31 +1,43 @@
 import React from 'react';
-import { Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import * as ImagePicker from 'expo-image-picker';
+
+import theme from '../../../theme';
+
+const { colors, typography, spacing } = theme;
+
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function ProfilePhotoScreen() {
-  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('ProfilePhoto');
+  const { navigation, isClient, step, totalSteps } =
+    useOnboardingScreen('ProfilePhoto');
+
   const profilePhotoUri = useOnboardingStore((s) => s.profilePhotoUri);
+
   const setField = useOnboardingStore((s) => s.setField);
 
   const handlePickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (!permission.granted) {
-      Alert.alert('Permission needed', 'Please allow access to your photo library in Settings.');
+      Alert.alert(
+        'Permission needed',
+        'Please allow access to your photo library in Settings.'
+      );
+
       return;
     }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
     });
+
     if (!result.canceled && result.assets?.[0]) {
       setField('profilePhotoUri', result.assets[0].uri);
     }
@@ -40,7 +52,11 @@ export function ProfilePhotoScreen() {
       step={step}
       totalSteps={totalSteps}
       title="Add a profile photo"
-      subtitle={isClient ? 'Trainers will see this on your profile' : 'Clients will see this on your profile'}
+      subtitle={
+        isClient
+          ? 'Trainers will see this on your profile'
+          : 'Clients will see this on your profile'
+      }
       centerContent
       onNext={() => navigation.navigate('PreviewProfile')}
       onBack={() => navigation.goBack()}
@@ -62,7 +78,11 @@ export function ProfilePhotoScreen() {
         )}
       </TouchableOpacity>
       {profilePhotoUri && (
-        <TouchableOpacity onPress={handleRemove} style={styles.removeBtn} accessibilityLabel="Remove photo">
+        <TouchableOpacity
+          onPress={handleRemove}
+          style={styles.removeBtn}
+          accessibilityLabel="Remove photo"
+        >
           <Ionicons name="trash-outline" size={18} color={colors.Error} />
           <Text style={styles.removeText}>Remove photo</Text>
         </TouchableOpacity>
@@ -73,10 +93,28 @@ export function ProfilePhotoScreen() {
 }
 
 const styles = StyleSheet.create({
-  uploadCircle: { width: 200, height: 200, borderRadius: 100, backgroundColor: colors.neutral2, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm, overflow: 'hidden' },
+  uploadCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: colors.neutral2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+    overflow: 'hidden',
+  },
   photo: { width: 200, height: 200, borderRadius: 100 },
-  uploadText: { fontSize: typography.sizes.sm, color: colors.textMuted, marginTop: spacing.sm },
-  removeBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginBottom: spacing.sm },
+  uploadText: {
+    fontSize: typography.sizes.sm,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+  },
+  removeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
+  },
   removeText: { fontSize: typography.sizes.sm, color: colors.Error },
   hint: { fontSize: typography.sizes.xs, color: colors.textMuted },
 });

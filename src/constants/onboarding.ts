@@ -5,7 +5,10 @@ import { TRAINING_TYPES } from './training';
  * and append "Other" so the onboarding chip grid stays in sync with the rest
  * of the app instead of re-declaring the list.
  */
-export const ONBOARDING_TRAINING_TYPES: readonly string[] = [...TRAINING_TYPES, 'Other'];
+export const ONBOARDING_TRAINING_TYPES: readonly string[] = [
+  ...TRAINING_TYPES,
+  'Other',
+];
 
 export const CLIENT_TYPES: readonly string[] = [
   'Beginners',
@@ -36,6 +39,10 @@ export const CLIENT_LEVELS: readonly string[] = [
   'Professional',
 ];
 
-export const TRAINER_GENDER_PREFS: readonly string[] = ['Any', 'Female', 'Male'];
+export const TRAINER_GENDER_PREFS: readonly string[] = [
+  'Any',
+  'Female',
+  'Male',
+];
 
 export const TRAINING_FORMATS: readonly string[] = ['Online', 'In-person'];

@@ -1,6 +1,9 @@
 import React from 'react';
-import { Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import { Modal, StyleSheet, TouchableOpacity } from 'react-native';
+
+import theme from '../../theme';
+
+const { colors } = theme;
 
 export interface OverlayProps {
   visible: boolean;
@@ -16,9 +19,19 @@ export interface OverlayProps {
  * pattern and standardizes the previously inconsistent backdrop opacities
  * onto the `colors.overlay` token. Tapping the scrim calls `onClose`.
  */
-export function Overlay({ visible, onClose, children, justify = 'center' }: OverlayProps) {
+export function Overlay({
+  visible,
+  onClose,
+  children,
+  justify = 'center',
+}: OverlayProps) {
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <TouchableOpacity
         style={[styles.scrim, { justifyContent: justify }]}
         activeOpacity={1}

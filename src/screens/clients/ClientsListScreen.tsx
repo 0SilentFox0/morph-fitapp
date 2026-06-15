@@ -1,27 +1,41 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { AsyncBoundary, Avatar, Card, Tag } from '../../components/ui';
 import type { ClientsStackParamList } from '../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
-import { Card, Tag, Avatar } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
-import { mockClients } from '../../mocks';
+import theme from '../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
+import { useAsyncResource } from '../../hooks/data/useAsyncResource';
+import { loadClients } from '../../services/clientsService';
+import { searchItems } from '../../utils';
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsList'>;
 
 export function ClientsListScreen() {
   const navigation = useNavigation<Nav>();
+
+  const [search, setSearch] = React.useState('');
+
+  const { data, status, error, refetch } = useAsyncResource(() =>
+    loadClients()
+  );
+
+  const clients = React.useMemo(
+    () => searchItems(search, data ?? [], (c) => [c.name, c.tag]),
+    [search, data]
+  );
 
   return (
     <View style={styles.container}>
@@ -37,6 +51,8 @@ export function ClientsListScreen() {
           style={styles.search}
           placeholder="Search"
           placeholderTextColor={colors.textMuted}
+          value={search}
+          onChangeText={setSearch}
         />
         <Ionicons
           name="search"
@@ -46,29 +62,49 @@ export function ClientsListScreen() {
         />
       </View>
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <AsyncBoundary
+        status={status}
+        error={error}
+        onRetry={refetch}
+        errorTitle="Couldn't load clients"
+        isEmpty={clients.length === 0}
+        emptyLabel={search ? 'No clients match your search' : 'No clients yet'}
+        emptyIcon="people-outline"
       >
-        {mockClients.map((client) => (
-          <Card
-            key={client.id}
-            style={styles.clientCard}
-            onPress={() => navigation.navigate('ClientsProfileExtended', { clientId: client.id })}
-          >
-            <Avatar name={client.name} size={48} />
-            <View style={styles.clientInfo}>
-              <Text style={styles.clientName}>{client.name}</Text>
-              <View style={styles.clientMeta}>
-                <Ionicons name="information-circle" size={16} color={colors.textMuted} />
-                <Text style={styles.clientDate}>{client.lastSession}</Text>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {clients.map((client) => (
+            <Card
+              key={client.id}
+              style={styles.clientCard}
+              onPress={() =>
+                navigation.navigate('ClientsProfileExtended', {
+                  clientId: client.id,
+                })
+              }
+            >
+              <Avatar name={client.name} size={48} />
+              <View style={styles.clientInfo}>
+                <Text style={styles.clientName}>{client.name}</Text>
+                {client.lastSession ? (
+                  <View style={styles.clientMeta}>
+                    <Ionicons
+                      name="information-circle"
+                      size={16}
+                      color={colors.textMuted}
+                    />
+                    <Text style={styles.clientDate}>{client.lastSession}</Text>
+                  </View>
+                ) : null}
               </View>
-            </View>
-            <Tag label={client.tag} variant="accent" />
-          </Card>
-        ))}
-      </ScrollView>
+              <Tag label={client.tag} variant="accent" />
+            </Card>
+          ))}
+        </ScrollView>
+      </AsyncBoundary>
     </View>
   );
 }

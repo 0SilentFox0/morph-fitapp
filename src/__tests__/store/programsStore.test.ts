@@ -9,6 +9,7 @@ beforeEach(() => {
 describe('useProgramsStore', () => {
   it('addProgram prepends a new program with an id and returns it', () => {
     const before = useProgramsStore.getState().programs.length;
+
     const created = useProgramsStore.getState().addProgram({
       name: 'New One',
       tag: 'HIIT',
@@ -18,6 +19,7 @@ describe('useProgramsStore', () => {
     });
 
     const programs = useProgramsStore.getState().programs;
+
     expect(programs).toHaveLength(before + 1);
     expect(programs[0]!.id).toBe(created.id);
     expect(typeof created.id).toBe('string');
@@ -56,7 +58,9 @@ describe('useProgramsStore', () => {
     });
 
     useProgramsStore.getState().updateProgram(created.id, { name: 'Updated' });
-    expect(useProgramsStore.getState().getProgram(created.id)!.name).toBe('Updated');
+    expect(useProgramsStore.getState().getProgram(created.id)!.name).toBe(
+      'Updated'
+    );
 
     useProgramsStore.getState().deleteProgram(created.id);
     expect(useProgramsStore.getState().getProgram(created.id)).toBeUndefined();
@@ -65,8 +69,22 @@ describe('useProgramsStore', () => {
   it('searchPrograms matches name or tag; empty query returns all', () => {
     useProgramsStore.setState({
       programs: [
-        { id: '1', name: 'HIIT Power', tag: 'HIIT', videoCount: 1, views: 0, likes: 0 },
-        { id: '2', name: 'Yoga Flow', tag: 'Yoga', videoCount: 1, views: 0, likes: 0 },
+        {
+          id: '1',
+          name: 'HIIT Power',
+          tag: 'HIIT',
+          videoCount: 1,
+          views: 0,
+          likes: 0,
+        },
+        {
+          id: '2',
+          name: 'Yoga Flow',
+          tag: 'Yoga',
+          videoCount: 1,
+          views: 0,
+          likes: 0,
+        },
       ],
     });
 

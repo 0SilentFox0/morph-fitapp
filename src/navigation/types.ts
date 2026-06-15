@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { Session, TrainingProgram, ProgramExercise } from '../types';
+
 import type { MuscleGroup } from '../constants/muscles';
+import type { ProgramExercise, Session, TrainingProgram } from '../types';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -36,14 +37,18 @@ export type HomeStackParamList = {
   SessionForm: { session?: Session } | undefined;
   RequestSubmitted: undefined;
   TrainingLibrary: undefined;
-  AddToLibraryForm: { program?: TrainingProgram; selectedExercises?: ProgramExercise[] } | undefined;
-  Gallery: {
-    program?: TrainingProgram;
-    draftTitle?: string;
-    draftTag?: string;
-    draftDescription?: string;
-    existingExercises?: ProgramExercise[];
-  } | undefined;
+  AddToLibraryForm:
+    | { program?: TrainingProgram; selectedExercises?: ProgramExercise[] }
+    | undefined;
+  Gallery:
+    | {
+        program?: TrainingProgram;
+        draftTitle?: string;
+        draftTag?: string;
+        draftDescription?: string;
+        existingExercises?: ProgramExercise[];
+      }
+    | undefined;
   CardioClassForm: { program?: TrainingProgram } | undefined;
 };
 
@@ -52,7 +57,11 @@ export type HomeStackParamList = {
  * stack — both mount the same ExerciseDetail/TrainingSummary screens.
  */
 export type LiveTrainingParamList = {
-  ExerciseDetail: { participantId: string; programId: string | null; exerciseIndex: number };
+  ExerciseDetail: {
+    participantId: string;
+    programId: string | null;
+    exerciseIndex: number;
+  };
   TrainingSummary: { participantId?: string };
 };
 

@@ -1,7 +1,7 @@
-import { api } from './client';
-import type { Query } from './client';
 import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
-import { ProgramSchema, ClientProgramSchema } from '../../schemas/api/models';
+import { ClientProgramSchema, ProgramSchema } from '../../schemas/api/models';
+import type { Query } from './client';
+import { api } from './client';
 
 export interface ProgramExerciseInput {
   exercise_id: string;
@@ -34,18 +34,29 @@ export const createProgram = (body: ProgramInput) =>
 export const updateProgram = (id: string, body: Partial<ProgramInput>) =>
   api.put(`/programs/${id}`, { body, schema: dataEnvelope(ProgramSchema) });
 
-export const archiveProgram = (id: string) => api.post(`/programs/${id}/archive`);
+export const archiveProgram = (id: string) =>
+  api.post(`/programs/${id}/archive`);
 
 // Body is { client_id: string } — confirmed against the live backend (the plural
 // { client_ids: [] } from the internal doc returns 422). Returns the created
 // ClientProgram assignment.
 export const assignProgram = (id: string, client_id: string) =>
-  api.post(`/programs/${id}/assign`, { body: { client_id }, schema: dataEnvelope(ClientProgramSchema) });
+  api.post(`/programs/${id}/assign`, {
+    body: { client_id },
+    schema: dataEnvelope(ClientProgramSchema),
+  });
 
-export const replaceProgramExercises = (id: string, exercises: ProgramExerciseInput[]) =>
-  api.put(`/programs/${id}/exercises`, { body: { exercises }, schema: dataEnvelope(ProgramSchema) });
+export const replaceProgramExercises = (
+  id: string,
+  exercises: ProgramExerciseInput[]
+) =>
+  api.put(`/programs/${id}/exercises`, {
+    body: { exercises },
+    schema: dataEnvelope(ProgramSchema),
+  });
 
-export const toggleProgramLike = (id: string) => api.post(`/programs/${id}/like`);
+export const toggleProgramLike = (id: string) =>
+  api.post(`/programs/${id}/like`);
 
 export const removeClientProgram = (clientProgram: string) =>
   api.delete(`/client-programs/${clientProgram}`);

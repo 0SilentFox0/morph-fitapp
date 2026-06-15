@@ -1,25 +1,39 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LineChart } from 'react-native-chart-kit';
-import { Ionicons } from '@expo/vector-icons';
-import type { ProgressStackParamList } from '../../../navigation/types';
-import { ScreenHeader } from '../../../components/layout';
-import { BodyMap, SectionTitle, HorizontalSwipe } from '../../../components/ui';
-import { overallVolumeSeries } from '../../../utils/exerciseProgress';
-import { useClientTabSwipe } from '../useClientTabSwipe';
-import { colors, heatColors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
-import { exerciseMuscleMap } from '../../../mocks';
-import type { Timeframe } from '../../../utils/muscleStats';
-import { computeProgressOverview } from '../../../utils/progress';
-import { MUSCLE_LABELS } from '../../../constants/muscles';
 
-type Nav = NativeStackNavigationProp<ProgressStackParamList, 'ProgressOverview'>;
+import { ScreenHeader } from '../../../components/layout';
+import { HorizontalSwipe, SectionTitle } from '../../../components/ui';
+import type { ProgressStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+import { formatKg, numericDate } from '../../../utils';
+import { overallVolumeSeries } from '../../../utils/progress/exerciseProgress';
+import { useClientTabSwipe } from '../useClientTabSwipe';
+import { BodyMapCard } from './components/BodyMapCard';
+import { ProgressQuickLinks } from './components/ProgressQuickLinks';
+
+const { colors, createChartConfig, radius, typography, spacing } = theme;
+
+import { MUSCLE_LABELS } from '../../../constants/muscles';
+import { exerciseMuscleMap } from '../../../mocks';
+import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
+import type { Timeframe } from '../../../utils/progress/muscleStats';
+import { computeProgressOverview } from '../../../utils/progress/progress';
+
+type Nav = NativeStackNavigationProp<
+  ProgressStackParamList,
+  'ProgressOverview'
+>;
 
 const TIMEFRAMES: { key: Timeframe; label: string }[] = [
   { key: 'session', label: 'Last session' },
@@ -27,56 +41,41 @@ const TIMEFRAMES: { key: Timeframe; label: string }[] = [
   { key: 'all', label: 'All time' },
 ];
 
-const formatKg = (n: number) =>
-  n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`;
-
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
-
-const shortLabel = (date: string) => {
-  const d = new Date(date);
-  return Number.isNaN(d.getTime()) ? date : `${d.getMonth() + 1}/${d.getDate()}`;
-};
-
-const QUICK_LINKS: {
-  label: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  route: keyof ProgressStackParamList;
-}[] = [
-  { label: 'My league', icon: 'ribbon-outline', route: 'League' },
-  { label: 'Leaderboards', icon: 'podium-outline', route: 'Leaderboard' },
-  { label: 'Exercise progress', icon: 'barbell-outline', route: 'ExerciseProgress' },
-  { label: 'Training history', icon: 'time-outline', route: 'TrainingHistory' },
-  { label: 'Personal records', icon: 'trophy-outline', route: 'PersonalRecords' },
-  { label: 'Measurements', icon: 'analytics-outline', route: 'Measurements' },
-  { label: 'Achievements', icon: 'medal-outline', route: 'Achievements' },
-];
+const chartConfig = createChartConfig();
 
 export function ProgressOverviewScreen() {
   const navigation = useNavigation<Nav>();
-  const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);
+
+  const getCurrentUserHistory = useTrainingHistoryStore(
+    (s) => s.getCurrentUserHistory
+  );
 
   const [timeframe, setTimeframe] = React.useState<Timeframe>('all');
+
   const [view, setView] = React.useState<'front' | 'back'>('front');
+
   const tabSwipe = useClientTabSwipe('ProgressTab');
 
   const fullHistory = getCurrentUserHistory();
 
   // Overall dynamics is always all-time (independent of the timeframe pills).
-  const overallSeries = React.useMemo(() => overallVolumeSeries(fullHistory), [fullHistory]);
-  const chartWidth = Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
+  const overallSeries = React.useMemo(
+    () => overallVolumeSeries(fullHistory),
+    [fullHistory]
+  );
+
+  const chartWidth =
+    Dimensions.get('window').width - spacing.lg * 2 - spacing.md * 2;
 
   const { intensities, totals, topMuscles } = React.useMemo(
-    () => computeProgressOverview(fullHistory, exerciseMuscleMap, timeframe, new Date()),
-    [fullHistory, timeframe],
+    () =>
+      computeProgressOverview(
+        fullHistory,
+        exerciseMuscleMap,
+        timeframe,
+        new Date()
+      ),
+    [fullHistory, timeframe]
   );
 
   return (
@@ -101,14 +100,23 @@ export function ProgressOverviewScreen() {
         <View style={styles.timeframeRow}>
           {TIMEFRAMES.map((tf) => {
             const active = tf.key === timeframe;
+
             return (
               <TouchableOpacity
                 key={tf.key}
                 onPress={() => setTimeframe(tf.key)}
-                style={[styles.timeframeBtn, active && styles.timeframeBtnActive]}
+                style={[
+                  styles.timeframeBtn,
+                  active && styles.timeframeBtnActive,
+                ]}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.timeframeText, active && styles.timeframeTextActive]}>
+                <Text
+                  style={[
+                    styles.timeframeText,
+                    active && styles.timeframeTextActive,
+                  ]}
+                >
                   {tf.label}
                 </Text>
               </TouchableOpacity>
@@ -124,42 +132,14 @@ export function ProgressOverviewScreen() {
         </View>
 
         {/* Body map card */}
-        <View style={styles.mapCard}>
-          <View style={styles.faceToggle}>
-            {(['front', 'back'] as const).map((f) => {
-              const active = f === view;
-              return (
-                <TouchableOpacity
-                  key={f}
-                  onPress={() => setView(f)}
-                  style={[styles.faceBtn, active && styles.faceBtnActive]}
-                  activeOpacity={0.8}
-                >
-                  <Text style={[styles.faceText, active && styles.faceTextActive]}>
-                    {f === 'front' ? 'Front' : 'Back'}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          <BodyMap
-            intensities={intensities}
-            view={view}
-            onMusclePress={(muscle) => navigation.navigate('MuscleDetail', { muscle })}
-          />
-
-          {/* Heat legend */}
-          <View style={styles.legend}>
-            <Text style={styles.legendLabel}>Less</Text>
-            <View style={styles.legendBar}>
-              {heatColors.map((c) => (
-                <View key={c} style={[styles.legendSwatch, { backgroundColor: c }]} />
-              ))}
-            </View>
-            <Text style={styles.legendLabel}>More</Text>
-          </View>
-        </View>
+        <BodyMapCard
+          intensities={intensities}
+          view={view}
+          onViewChange={setView}
+          onMusclePress={(muscle) =>
+            navigation.navigate('MuscleDetail', { muscle })
+          }
+        />
 
         {/* Overall progress dynamics (all-time volume per session) */}
         {overallSeries.length >= 2 && (
@@ -169,7 +149,7 @@ export function ProgressOverviewScreen() {
               <Text style={styles.chartCaption}>Total volume per session</Text>
               <LineChart
                 data={{
-                  labels: overallSeries.map((p) => shortLabel(p.date)),
+                  labels: overallSeries.map((p) => numericDate(p.date)),
                   datasets: [{ data: overallSeries.map((p) => p.value) }],
                 }}
                 width={chartWidth}
@@ -187,7 +167,9 @@ export function ProgressOverviewScreen() {
         {/* Muscles worked */}
         <SectionTitle>Muscles worked</SectionTitle>
         {topMuscles.length === 0 ? (
-          <Text style={styles.empty}>No training logged for this period yet.</Text>
+          <Text style={styles.empty}>
+            No training logged for this period yet.
+          </Text>
         ) : (
           <View style={styles.muscleList}>
             {topMuscles.map(({ group, stat }) => (
@@ -195,13 +177,21 @@ export function ProgressOverviewScreen() {
                 key={group}
                 style={styles.muscleRow}
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('MuscleDetail', { muscle: group })}
+                onPress={() =>
+                  navigation.navigate('MuscleDetail', { muscle: group })
+                }
               >
                 <Text style={styles.muscleName}>{MUSCLE_LABELS[group]}</Text>
                 <View style={styles.muscleMeta}>
-                  <Text style={styles.muscleStat}>{formatKg(stat.totalWeight)}</Text>
+                  <Text style={styles.muscleStat}>
+                    {formatKg(stat.totalWeight)}
+                  </Text>
                   <Text style={styles.muscleSub}>{stat.exerciseCount} ex</Text>
-                  <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={colors.textMuted}
+                  />
                 </View>
               </TouchableOpacity>
             ))}
@@ -209,19 +199,7 @@ export function ProgressOverviewScreen() {
         )}
 
         {/* Quick links */}
-        <View style={styles.linksGrid}>
-          {QUICK_LINKS.map((link) => (
-            <TouchableOpacity
-              key={link.route}
-              style={styles.linkCard}
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate(link.route as never)}
-            >
-              <Ionicons name={link.icon} size={22} color={colors.accent} />
-              <Text style={styles.linkLabel}>{link.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <ProgressQuickLinks />
       </ScrollView>
     </HorizontalSwipe>
   );
@@ -239,7 +217,11 @@ function StatTile({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.lg },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.lg,
+  },
   timeframeRow: { flexDirection: 'row', gap: spacing.xs },
   timeframeBtn: {
     flex: 1,
@@ -249,7 +231,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.neutral5,
   },
-  timeframeBtnActive: { backgroundColor: colors.neutral3, borderColor: colors.text },
+  timeframeBtnActive: {
+    backgroundColor: colors.neutral3,
+    borderColor: colors.text,
+  },
   timeframeText: { fontSize: typography.sizes.sm, color: colors.textSecondary },
   timeframeTextActive: { color: colors.text },
   statsRow: { flexDirection: 'row', gap: spacing.sm },
@@ -261,30 +246,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-  statValue: { fontSize: typography.sizes.xl, fontWeight: typography.weights.bold, color: colors.text },
+  statValue: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+  },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  mapCard: {
+  chartCard: {
     backgroundColor: colors.neutral1,
     borderRadius: radius.lg,
     padding: spacing.md,
-    alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.xs,
   },
-  faceToggle: {
-    flexDirection: 'row',
-    backgroundColor: colors.neutral3,
-    borderRadius: radius.pill,
-    padding: 3,
-  },
-  faceBtn: { paddingHorizontal: spacing.lg, paddingVertical: 6, borderRadius: radius.pill },
-  faceBtnActive: { backgroundColor: colors.accent },
-  faceText: { fontSize: typography.sizes.sm, color: colors.textSecondary },
-  faceTextActive: { color: colors.white, fontWeight: typography.weights.semibold },
-  legend: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  legendLabel: { fontSize: typography.sizes.xs, color: colors.textMuted },
-  legendBar: { flexDirection: 'row', borderRadius: radius.sm, overflow: 'hidden' },
-  legendSwatch: { width: 22, height: 8 },
-  chartCard: { backgroundColor: colors.neutral1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.xs },
   chartCaption: { fontSize: typography.sizes.sm, color: colors.textSecondary },
   chart: { borderRadius: radius.sm },
   empty: { color: colors.textSecondary, fontSize: typography.sizes.sm },
@@ -300,18 +273,10 @@ const styles = StyleSheet.create({
   },
   muscleName: { fontSize: typography.sizes.base, color: colors.text },
   muscleMeta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  muscleStat: { fontSize: typography.sizes.sm, color: colors.text, fontWeight: typography.weights.semibold },
-  muscleSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
-  linksGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  linkCard: {
-    width: '48%',
-    flexGrow: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.cardBg,
-    borderRadius: radius.md,
-    padding: spacing.md,
+  muscleStat: {
+    fontSize: typography.sizes.sm,
+    color: colors.text,
+    fontWeight: typography.weights.semibold,
   },
-  linkLabel: { fontSize: typography.sizes.sm, color: colors.text, flexShrink: 1 },
+  muscleSub: { fontSize: typography.sizes.xs, color: colors.textSecondary },
 });

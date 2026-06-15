@@ -1,10 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import theme from '../../theme';
 import { Avatar } from './Avatar';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+
+const { colors, radius, typography } = theme;
 
 /**
  * Participant chip per Figma (Component 1): avatar + name in pill,
@@ -34,7 +41,11 @@ export function ParticipantChip({
         {name}
       </Text>
       {onRemove ? (
-        <TouchableOpacity onPress={onRemove} hitSlop={8} style={styles.removeBtn}>
+        <TouchableOpacity
+          onPress={onRemove}
+          hitSlop={8}
+          style={styles.removeBtn}
+        >
           <Ionicons name="close" size={16} color={colors.neutral9} />
         </TouchableOpacity>
       ) : null}
@@ -45,7 +56,11 @@ export function ParticipantChip({
 
   if (onPress) {
     return (
-      <TouchableOpacity style={[wrapperStyle, style]} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[wrapperStyle, style]}
+        onPress={onPress}
+        activeOpacity={0.8}
+      >
         {content}
       </TouchableOpacity>
     );

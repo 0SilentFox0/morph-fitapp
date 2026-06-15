@@ -1,31 +1,45 @@
 import React from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Button, Card } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
+import {
+  buildOnboardingProfile,
+  submitOnboardingProfile,
+} from '../../../services/onboardingApi';
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { buildOnboardingProfile, submitOnboardingProfile } from '../../../services/onboardingApi';
-import { toErrorMessage } from '../../../utils/error';
+import { toErrorMessage } from '../../../utils/format/error';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 export function YoureAllSetScreen() {
   const setOnboarded = useAppStore((s) => s.setOnboarded);
+
   const addPoints = useAppStore((s) => s.addPoints);
+
   const role = useAppStore((s) => s.userRole);
+
   const isClient = role === 'client';
+
   const resetOnboarding = useOnboardingStore((s) => s.reset);
+
   const [submitting, setSubmitting] = React.useState(false);
 
   const handleComplete = async () => {
     if (submitting) return;
+
     setSubmitting(true);
     try {
       // Send the consolidated profile to the backend, then clear local state.
-      const profile = buildOnboardingProfile(useOnboardingStore.getState(), role ?? 'trainer');
+      const profile = buildOnboardingProfile(
+        useOnboardingStore.getState(),
+        role ?? 'trainer'
+      );
+
       await submitOnboardingProfile(profile);
       addPoints(20);
       resetOnboarding();
@@ -37,7 +51,11 @@ export function YoureAllSetScreen() {
   };
 
   return (
-    <OnboardingLayout showFooter={false} centerContent scrollContentStyle={styles.centered}>
+    <OnboardingLayout
+      showFooter={false}
+      centerContent
+      scrollContentStyle={styles.centered}
+    >
       <Text style={styles.title}>You're all set!</Text>
       <Text style={styles.subtitle}>
         {isClient
@@ -90,7 +108,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
     textAlign: 'center',
   },
-  achievementCard: { alignItems: 'center', marginBottom: spacing.xl, padding: spacing.xl },
+  achievementCard: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    padding: spacing.xl,
+  },
   achievementIcon: {
     width: 80,
     height: 80,

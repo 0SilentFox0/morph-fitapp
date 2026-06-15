@@ -86,9 +86,10 @@ export const MUSCLE_TO_SLUGS: Record<MuscleGroup, string[]> = {
 
 /** Reverse lookup: body-highlighter slug → our MuscleGroup (for tap handling). */
 export const SLUG_TO_MUSCLE: Record<string, MuscleGroup> = Object.entries(
-  MUSCLE_TO_SLUGS,
+  MUSCLE_TO_SLUGS
 ).reduce<Record<string, MuscleGroup>>((acc, [group, slugs]) => {
   for (const slug of slugs) acc[slug] = group as MuscleGroup;
+
   return acc;
 }, {});
 
@@ -116,5 +117,6 @@ export function normalizeApiMuscle(nameEn: string): MuscleGroup | null {
   for (const [re, group] of API_MUSCLE_KEYWORDS) {
     if (re.test(nameEn)) return group;
   }
+
   return null;
 }

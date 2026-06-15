@@ -1,84 +1,106 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { ClientsStackParamList } from '../../navigation/types';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../components/layout';
-import { Avatar, SectionTitle, Button, Tag } from '../../components/ui';
-import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
-import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
-import { useActiveTrainingStore } from '../../store/activeTrainingStore';
-import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
-import { useSessionsStore } from '../../store/sessionsStore';
-import { useProgramsStore } from '../../store/programsStore';
-import { seedParticipant, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
-import { useDisclosure } from '../../hooks/useDisclosure';
+import { Avatar, Button, SectionTitle } from '../../components/ui';
+import { useDisclosure } from '../../hooks/ui/useDisclosure';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import type { ClientsStackParamList } from '../../navigation/types';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useProgramsStore } from '../../store/programsStore';
+import { useSessionsStore } from '../../store/sessionsStore';
+import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
+import theme from '../../theme';
+import {
+  buildLineChart,
+  getChartWidth,
+  seedParticipant,
+  trainingMetric,
+} from '../../utils';
+import { ProgramPickerModal } from '../home/screens/SessionForm/ProgramPickerModal';
+import { ClientInfoSection } from './ClientProfile/ClientInfoSection';
+import { NextTrainingCard } from './ClientProfile/NextTrainingCard';
+import { TrainingHistoryCard } from './ClientProfile/TrainingHistoryCard';
+
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 
 type Route = RouteProp<ClientsStackParamList, 'ClientsProfileExtended'>;
-type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsProfileExtended'>;
+type Nav = NativeStackNavigationProp<
+  ClientsStackParamList,
+  'ClientsProfileExtended'
+>;
 
 const CHART_WIDTH = getChartWidth(20);
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
+const chartConfig = createChartConfig();
 
 export function ClientsProfileExtendedScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const clientId = route.params?.clientId;
 
-  const fromTraining = useActiveTrainingStore((s) => s.participants.find((c) => c.participantId === clientId));
+  const fromTraining = useActiveTrainingStore((s) =>
+    s.participants.find((c) => c.participantId === clientId)
+  );
+
   const startTraining = useActiveTrainingStore((s) => s.startTraining);
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+
   const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
+
   const sessions = useSessionsStore((s) => s.sessions);
+
   const programs = useProgramsStore((s) => s.programs);
 
   const name =
-    fromTraining?.name ?? mockClients.find((c) => c.id === clientId)?.name ?? 'Brooklyn Simmons';
+    fromTraining?.name ??
+    mockClients.find((c) => c.id === clientId)?.name ??
+    'Brooklyn Simmons';
 
   const programPicker = useDisclosure();
 
   const history = getClientHistory(name);
+
   const nextSession = sessions.find(
-    (s) => s.status === 'pending' && s.participants.some((p) => p.name === name),
+    (s) => s.status === 'pending' && s.participants.some((p) => p.name === name)
   );
 
   const handleStart = (programId: string) => {
     programPicker.close();
+
     const program =
       programs.find((p) => p.id === programId) ??
       mockTrainingPrograms.find((p) => p.id === programId);
+
     if (!program) return;
+
     const participant = seedParticipant(
       { id: clientId ?? name, name, avatar: fromTraining?.avatar },
       program,
-      { lookupPrevSets: getLastSets },
+      { lookupPrevSets: getLastSets }
     );
+
     startTraining([participant], participant.participantId);
-    navigation.navigate('ClientProfile', { clientId: participant.participantId });
+    navigation.navigate('ClientProfile', {
+      clientId: participant.participantId,
+    });
   };
 
   const chartData = buildLineChart(history, (h) => h.date, trainingMetric);
@@ -110,55 +132,20 @@ export function ClientsProfileExtendedScreen() {
           </View>
         </View>
 
-        <Button title="Start training" onPress={programPicker.open} style={styles.startBtn} />
+        <Button
+          title="Start training"
+          onPress={programPicker.open}
+          style={styles.startBtn}
+        />
 
         <View style={styles.sectionHeader}>
-          <SectionTitle style={styles.sectionTitleInline}>Next training</SectionTitle>
+          <SectionTitle style={styles.sectionTitleInline}>
+            Next training
+          </SectionTitle>
         </View>
-        {nextSession ? (
-          <LinearGradient
-            colors={[colors.neutral2, colors.neutral2, 'rgba(140,30,3,0.35)']}
-            locations={[0, 0.55, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.nextCard}
-          >
-            <Text style={styles.nextTitle}>{nextSession.title}</Text>
-            <Tag label={nextSession.type} variant="default" style={styles.nextTag} />
-            <View style={styles.completedRow}>
-              <View style={styles.dateChip}>
-                <Ionicons name="calendar-outline" size={14} color={colors.neutral1} />
-                <Text style={styles.dateChipText}>
-                  {nextSession.date}: {nextSession.time}
-                </Text>
-              </View>
-            </View>
-          </LinearGradient>
-        ) : (
-          <Text style={styles.emptyNote}>No upcoming sessions.</Text>
-        )}
+        <NextTrainingCard session={nextSession} />
 
-        <View style={styles.infoRowFull}>
-          <IconSquare icon="flag" />
-          <Text style={styles.infoLabel}>Target:</Text>
-          <Text style={styles.infoValue}>Fat loss, Endurance</Text>
-        </View>
-        <View style={styles.infoColumns}>
-          <View style={styles.infoCol}>
-            <IconSquare icon="rocket" />
-            <Text style={styles.infoLabel}>Level:</Text>
-            <Text style={styles.infoValue} numberOfLines={1}>
-              Intermediate
-            </Text>
-          </View>
-          <View style={styles.infoCol}>
-            <IconSquare icon="walk" />
-            <Text style={styles.infoLabel}>Type:</Text>
-            <Text style={styles.infoValue} numberOfLines={1}>
-              HIIT, Cardio
-            </Text>
-          </View>
-        </View>
+        <ClientInfoSection />
 
         {chartData && (
           <>
@@ -180,13 +167,15 @@ export function ClientsProfileExtendedScreen() {
         {history.length === 0 ? (
           <Text style={styles.emptyNote}>No completed trainings yet.</Text>
         ) : (
-          [...history].reverse().map((h) => (
-            <TrainingHistoryCard
-              key={h.id}
-              training={h}
-              program={mockTrainingPrograms.find((p) => p.id === h.programId)}
-            />
-          ))
+          [...history]
+            .reverse()
+            .map((h) => (
+              <TrainingHistoryCard
+                key={h.id}
+                training={h}
+                program={mockTrainingPrograms.find((p) => p.id === h.programId)}
+              />
+            ))
         )}
       </ScrollView>
 
@@ -197,14 +186,6 @@ export function ClientsProfileExtendedScreen() {
         value={undefined}
         onChange={handleStart}
       />
-    </View>
-  );
-}
-
-function IconSquare({ icon }: { icon: keyof typeof Ionicons.glyphMap }) {
-  return (
-    <View style={styles.iconSquare}>
-      <Ionicons name={icon} size={16} color={colors.white} />
     </View>
   );
 }
@@ -255,82 +236,10 @@ const styles = StyleSheet.create({
   sectionTitleInline: {
     marginBottom: spacing.md,
   },
-  nextCard: {
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-    overflow: 'hidden',
-  },
-  nextTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
-    color: colors.text,
-  },
-  nextTag: {
-    marginTop: spacing.sm,
-  },
-  completedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  dateChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.neutral9,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-  },
-  dateChipText: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral1,
-  },
   emptyNote: {
     fontSize: typography.sizes.sm,
     color: colors.textMuted,
     marginBottom: spacing.lg,
-  },
-  infoRowFull: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  infoColumns: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  infoCol: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-  },
-  iconSquare: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.sm,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  infoLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
-  },
-  infoValue: {
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-    flexShrink: 1,
   },
   chartCard: {
     backgroundColor: colors.neutral1,

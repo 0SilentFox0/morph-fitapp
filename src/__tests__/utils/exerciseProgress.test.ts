@@ -1,9 +1,9 @@
-import {
-  listExerciseProgress,
-  exerciseSessionSeries,
-  overallVolumeSeries,
-} from '../../utils/exerciseProgress';
 import type { CompletedTraining, ExerciseInfo } from '../../types';
+import {
+  exerciseSessionSeries,
+  listExerciseProgress,
+  overallVolumeSeries,
+} from '../../utils/progress/exerciseProgress';
 
 const catalog: Record<number, ExerciseInfo> = {
   101: { id: 101, name: 'Bench press', category: 'Chest', muscles: ['chest'] },
@@ -12,14 +12,26 @@ const catalog: Record<number, ExerciseInfo> = {
 
 const history: CompletedTraining[] = [
   {
-    id: '1', clientName: 'Me', programId: '1', date: 'Jun 1',
+    id: '1',
+    clientName: 'Me',
+    programId: '1',
+    date: 'Jun 1',
     exercises: [
-      { exerciseId: 101, sets: [{ weight: 50, reps: 10 }, { weight: 60, reps: 8 }] }, // vol 980, top 60
+      {
+        exerciseId: 101,
+        sets: [
+          { weight: 50, reps: 10 },
+          { weight: 60, reps: 8 },
+        ],
+      }, // vol 980, top 60
       { exerciseId: 301, sets: [{ weight: 80, reps: 5 }] }, // vol 400
     ],
   },
   {
-    id: '2', clientName: 'Me', programId: '1', date: 'Jun 8',
+    id: '2',
+    clientName: 'Me',
+    programId: '1',
+    date: 'Jun 8',
     exercises: [
       { exerciseId: 101, sets: [{ weight: 70, reps: 6 }] }, // vol 420, top 70
     ],
@@ -29,7 +41,9 @@ const history: CompletedTraining[] = [
 describe('listExerciseProgress', () => {
   it('summarizes each exercise with sessions, top weight and best 1RM', () => {
     const list = listExerciseProgress(history, catalog);
+
     const bench = list.find((e) => e.exerciseId === 101)!;
+
     expect(bench.name).toBe('Bench press');
     expect(bench.sessions).toBe(2);
     expect(bench.topWeight).toBe(70);
@@ -38,6 +52,7 @@ describe('listExerciseProgress', () => {
 
   it('orders by most recently performed', () => {
     const list = listExerciseProgress(history, catalog);
+
     expect(list[0]?.exerciseId).toBe(101); // performed last on Jun 8
   });
 });
@@ -58,7 +73,9 @@ describe('exerciseSessionSeries', () => {
   });
 
   it('omits sessions without the exercise', () => {
-    expect(exerciseSessionSeries(history, 301, 'volume')).toEqual([{ date: 'Jun 1', value: 400 }]);
+    expect(exerciseSessionSeries(history, 301, 'volume')).toEqual([
+      { date: 'Jun 1', value: 400 },
+    ]);
   });
 });
 

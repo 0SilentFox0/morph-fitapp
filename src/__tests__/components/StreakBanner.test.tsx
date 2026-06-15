@@ -1,6 +1,7 @@
 // src/__tests__/components/StreakBanner.test.tsx
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+
 import { StreakBanner } from '../../components/ui/StreakBanner';
 
 describe('StreakBanner', () => {
@@ -17,7 +18,10 @@ describe('StreakBanner', () => {
 
   it('fires onPress when tapped', async () => {
     const onPress = jest.fn();
-    await render(<StreakBanner streak={1} sessionsThisWeek={1} onPress={onPress} />);
+
+    await render(
+      <StreakBanner streak={1} sessionsThisWeek={1} onPress={onPress} />
+    );
     fireEvent.press(screen.getByTestId('streak-banner'));
     expect(onPress).toHaveBeenCalled();
   });

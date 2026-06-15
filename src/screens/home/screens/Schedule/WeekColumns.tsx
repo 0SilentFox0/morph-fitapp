@@ -1,8 +1,15 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
 import type { Session, SessionStatus } from '../../../../types';
 
 const WEEK_STATUS_BAR: Record<SessionStatus, string> = {
@@ -19,7 +26,11 @@ export interface WeekColumnsProps {
 }
 
 /** Horizontal per-day columns for the schedule's week view. */
-export function WeekColumns({ weekDays, getSessions, onSessionPress }: WeekColumnsProps) {
+export function WeekColumns({
+  weekDays,
+  getSessions,
+  onSessionPress,
+}: WeekColumnsProps) {
   return (
     <ScrollView
       horizontal
@@ -28,6 +39,7 @@ export function WeekColumns({ weekDays, getSessions, onSessionPress }: WeekColum
     >
       {weekDays.map((day) => {
         const sess = getSessions(day.dateKey);
+
         return (
           <View key={day.dateKey} style={styles.weekColumn}>
             <Text style={styles.weekColumnTitle}>
@@ -36,7 +48,9 @@ export function WeekColumns({ weekDays, getSessions, onSessionPress }: WeekColum
             {sess.length === 0 ? (
               <Text style={styles.weekColumnEmpty}>No sessions</Text>
             ) : (
-              sess.map((s) => <WeekMiniCard key={s.id} session={s} onPress={onSessionPress} />)
+              sess.map((s) => (
+                <WeekMiniCard key={s.id} session={s} onPress={onSessionPress} />
+              ))
             )}
           </View>
         );
@@ -46,10 +60,25 @@ export function WeekColumns({ weekDays, getSessions, onSessionPress }: WeekColum
 }
 
 /** Compact session card used inside the week view's per-day columns. */
-function WeekMiniCard({ session, onPress }: { session: Session; onPress: (s: Session) => void }) {
+function WeekMiniCard({
+  session,
+  onPress,
+}: {
+  session: Session;
+  onPress: (s: Session) => void;
+}) {
   return (
-    <TouchableOpacity style={styles.miniCard} activeOpacity={0.8} onPress={() => onPress(session)}>
-      <View style={[styles.miniBar, { backgroundColor: WEEK_STATUS_BAR[session.status] }]} />
+    <TouchableOpacity
+      style={styles.miniCard}
+      activeOpacity={0.8}
+      onPress={() => onPress(session)}
+    >
+      <View
+        style={[
+          styles.miniBar,
+          { backgroundColor: WEEK_STATUS_BAR[session.status] },
+        ]}
+      />
       <View style={styles.miniBody}>
         <Text style={styles.miniTitle} numberOfLines={2}>
           {session.title}

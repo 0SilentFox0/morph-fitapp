@@ -1,11 +1,14 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useOnboardingStore } from '../../../store/onboardingStore';
-import { TRAINER_GENDER_PREFS, TRAINING_FORMATS } from '../../../constants';
+import { StyleSheet, Text } from 'react-native';
+
+import theme from '../../../theme';
+
+const { colors, typography, spacing } = theme;
+
 import { useShallow } from 'zustand/react/shallow';
+
+import { TRAINER_GENDER_PREFS, TRAINING_FORMATS } from '../../../constants';
+import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { OptionGroup } from '../components/OptionGroup';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
@@ -15,16 +18,22 @@ import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
  * choice) and how they want to train (format, multi choice) to sharpen matching.
  */
 export function TrainerPreferencesScreen() {
-  const { navigation, step, totalSteps } = useOnboardingScreen('TrainerPreferences');
-  const { preferredTrainerGender, preferredFormat, setField, togglePreferredFormat } =
-    useOnboardingStore(
-      useShallow((s) => ({
-        preferredTrainerGender: s.preferredTrainerGender,
-        preferredFormat: s.preferredFormat,
-        setField: s.setField,
-        togglePreferredFormat: s.togglePreferredFormat,
-      }))
-    );
+  const { navigation, step, totalSteps } =
+    useOnboardingScreen('TrainerPreferences');
+
+  const {
+    preferredTrainerGender,
+    preferredFormat,
+    setField,
+    togglePreferredFormat,
+  } = useOnboardingStore(
+    useShallow((s) => ({
+      preferredTrainerGender: s.preferredTrainerGender,
+      preferredFormat: s.preferredFormat,
+      setField: s.setField,
+      togglePreferredFormat: s.togglePreferredFormat,
+    }))
+  );
 
   const goNext = () => navigation.navigate('ProfilePhoto');
 
@@ -43,11 +52,16 @@ export function TrainerPreferencesScreen() {
         options={TRAINER_GENDER_PREFS}
         selected={preferredTrainerGender ? [preferredTrainerGender] : []}
         onToggle={(value) =>
-          setField('preferredTrainerGender', preferredTrainerGender === value ? '' : value)
+          setField(
+            'preferredTrainerGender',
+            preferredTrainerGender === value ? '' : value
+          )
         }
       />
 
-      <Text style={[styles.sectionLabel, styles.sectionSpacing]}>Training format</Text>
+      <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
+        Training format
+      </Text>
       <OptionGroup
         options={TRAINING_FORMATS}
         selected={preferredFormat}

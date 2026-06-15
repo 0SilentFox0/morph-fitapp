@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { Button } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import type { HomeStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'RequestSubmitted'>;
 
@@ -18,7 +18,10 @@ export function RequestSubmittedScreen() {
   return (
     <View style={styles.overlay}>
       <View style={styles.modal}>
-        <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.iconCircle}>
@@ -26,15 +29,19 @@ export function RequestSubmittedScreen() {
         </View>
         <Text style={styles.title}>Request submitted</Text>
         <Text style={styles.message}>
-          Session time will change after Darrell Steward approves it. In the other case, the session
-          will be canceled in 8 hr.
+          Session time will change after Darrell Steward approves it. In the
+          other case, the session will be canceled in 8 hr.
         </Text>
         <Button
           title="Write to the client"
           onPress={() => navigation.goBack()}
           style={styles.primaryBtn}
         />
-        <Button title="Cancel" onPress={() => navigation.goBack()} variant="outline" />
+        <Button
+          title="Cancel"
+          onPress={() => navigation.goBack()}
+          variant="outline"
+        />
       </View>
     </View>
   );

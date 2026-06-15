@@ -1,14 +1,14 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { TrainStackParamList } from '../types';
-import { ScreenBackground } from '../../components/layout';
-import { useRestTimer } from '../../hooks/useRestTimer';
 
+import { ScreenBackground } from '../../components/layout';
+import { useRestTimer } from '../../hooks/training/useRestTimer';
 import { TrainHomeScreen } from '../../screens/client/train/TrainHomeScreen';
-import { WorkoutOverviewScreen } from '../../screens/client/train/WorkoutOverviewScreen';
 import { WorkoutBuilderScreen } from '../../screens/client/train/WorkoutBuilderScreen';
+import { WorkoutOverviewScreen } from '../../screens/client/train/WorkoutOverviewScreen';
 import { ExerciseDetailScreen } from '../../screens/training/ExerciseDetailScreen';
 import { TrainingSummaryScreen } from '../../screens/training/TrainingSummaryScreen';
+import type { TrainStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<TrainStackParamList>();
 
@@ -19,7 +19,9 @@ export function TrainStackNavigator() {
 
   return (
     <Stack.Navigator
-      screenLayout={({ children }) => <ScreenBackground>{children}</ScreenBackground>}
+      screenLayout={({ children }) => (
+        <ScreenBackground>{children}</ScreenBackground>
+      )}
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',

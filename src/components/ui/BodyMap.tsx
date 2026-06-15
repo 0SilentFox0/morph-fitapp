@@ -1,19 +1,26 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Body, { type ExtendedBodyPart, type Slug } from 'react-native-body-highlighter';
+import Body, {
+  type ExtendedBodyPart,
+  type Slug,
+} from 'react-native-body-highlighter';
+import { StyleSheet, View } from 'react-native';
+
 import {
-  MUSCLE_TO_SLUGS,
-  SLUG_TO_MUSCLE,
   MUSCLE_GROUPS,
+  MUSCLE_TO_SLUGS,
   type MuscleGroup,
+  SLUG_TO_MUSCLE,
 } from '../../constants/muscles';
-import { colors, heatColors } from '../../theme/colors';
+import theme from '../../theme';
+
+const { colors, heatColors } = theme;
 
 const BANDS = heatColors.length;
 
 /** Quantize a 0..1 intensity into a 1..BANDS color band; 0 means "not worked". */
 function toBand(intensity: number): number {
   if (intensity <= 0) return 0;
+
   return Math.min(BANDS, Math.ceil(intensity * BANDS));
 }
 
@@ -25,27 +32,39 @@ export interface BodyMapProps {
   scale?: number;
 }
 
-export function BodyMap({ intensities, view, onMusclePress, scale = 1 }: BodyMapProps) {
+export function BodyMap({
+  intensities,
+  view,
+  onMusclePress,
+  scale = 1,
+}: BodyMapProps) {
   const data: ExtendedBodyPart[] = React.useMemo(() => {
     const parts: ExtendedBodyPart[] = [];
+
     for (const group of MUSCLE_GROUPS) {
       const band = toBand(intensities[group] ?? 0);
+
       if (band === 0) continue;
+
       for (const slug of MUSCLE_TO_SLUGS[group]) {
         parts.push({ slug: slug as Slug, intensity: band });
       }
     }
+
     return parts;
   }, [intensities]);
 
   const handlePress = React.useCallback(
     (part: ExtendedBodyPart) => {
       const slug = part.slug;
+
       if (!slug || !onMusclePress) return;
+
       const muscle = SLUG_TO_MUSCLE[slug];
+
       if (muscle) onMusclePress(muscle);
     },
-    [onMusclePress],
+    [onMusclePress]
   );
 
   return (

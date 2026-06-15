@@ -1,30 +1,43 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ClientsStackParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
 import { Button, SectionTitle } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import type { ClientsStackParamList } from '../../navigation/types';
+import theme from '../../theme';
+
+const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'Filters'>;
 
 const TRAINING_OPTIONS = ['Personal', 'Group', 'Archived'];
+
 const PAYMENT_OPTIONS = ['Completed', 'Pending', 'Canceled'];
 
 export function FiltersScreen() {
   const navigation = useNavigation<Nav>();
+
   const [training, setTraining] = React.useState('Personal');
-  const [payments, setPayments] = React.useState<Set<string>>(new Set(['Completed']));
+
+  const [payments, setPayments] = React.useState<Set<string>>(
+    new Set(['Completed'])
+  );
 
   const togglePayment = (opt: string) => {
     setPayments((prev) => {
       const next = new Set(prev);
+
       if (next.has(opt)) next.delete(opt);
       else next.add(opt);
+
       return next;
     });
   };
@@ -46,7 +59,12 @@ export function FiltersScreen() {
               onPress={() => setTraining(opt)}
               style={[styles.option, training === opt && styles.optionSelected]}
             >
-              <Text style={[styles.optionText, training === opt && styles.optionTextSelected]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  training === opt && styles.optionTextSelected,
+                ]}
+              >
                 {opt}
               </Text>
             </TouchableOpacity>
@@ -55,15 +73,28 @@ export function FiltersScreen() {
 
         <SectionTitle style={styles.sectionTitleSpacing}>Payments</SectionTitle>
         {PAYMENT_OPTIONS.map((opt) => (
-          <TouchableOpacity key={opt} onPress={() => togglePayment(opt)} style={styles.checkRow}>
-            <View style={[styles.checkbox, payments.has(opt) && styles.checkboxChecked]}>
+          <TouchableOpacity
+            key={opt}
+            onPress={() => togglePayment(opt)}
+            style={styles.checkRow}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                payments.has(opt) && styles.checkboxChecked,
+              ]}
+            >
               {payments.has(opt) && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={styles.checkLabel}>{opt}</Text>
           </TouchableOpacity>
         ))}
 
-        <Button title="Submit" onPress={() => navigation.goBack()} style={styles.button} />
+        <Button
+          title="Submit"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        />
       </ScrollView>
     </View>
   );

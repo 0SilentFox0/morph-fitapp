@@ -1,34 +1,49 @@
 import React from 'react';
-import { View, Text, StyleSheet, Switch } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useOnboardingStore } from '../../../store/onboardingStore';
+import { StyleSheet, Switch, Text, View } from 'react-native';
+
+import theme from '../../../theme';
+
+const { colors, typography, spacing } = theme;
+
 import { useShallow } from 'zustand/react/shallow';
+
+import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
-import { WeekdayPicker } from '../components/WeekdayPicker';
 import { TimeField } from '../components/TimeField';
+import { WeekdayPicker } from '../components/WeekdayPicker';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function WorkScheduleScreen() {
-  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('WorkSchedule');
-  const { workTimeStart, workTimeEnd, sameSlotsEveryWeek, setField } = useOnboardingStore(
-    useShallow((s) => ({
-      workTimeStart: s.workTimeStart,
-      workTimeEnd: s.workTimeEnd,
-      sameSlotsEveryWeek: s.sameSlotsEveryWeek,
-      setField: s.setField,
-    }))
-  );
+  const { navigation, isClient, step, totalSteps } =
+    useOnboardingScreen('WorkSchedule');
 
-  const goNext = () => navigation.navigate(isClient ? 'TrainerPreferences' : 'ProfilePhoto');
+  const { workTimeStart, workTimeEnd, sameSlotsEveryWeek, setField } =
+    useOnboardingStore(
+      useShallow((s) => ({
+        workTimeStart: s.workTimeStart,
+        workTimeEnd: s.workTimeEnd,
+        sameSlotsEveryWeek: s.sameSlotsEveryWeek,
+        setField: s.setField,
+      }))
+    );
+
+  const goNext = () =>
+    navigation.navigate(isClient ? 'TrainerPreferences' : 'ProfilePhoto');
 
   return (
     <OnboardingLayout
       step={step}
       totalSteps={totalSteps}
-      title={isClient ? 'When are you available to train?' : 'What time do you plan to work?'}
-      subtitle={isClient ? 'Select your preferred days and hours' : 'Select your working days and hours'}
+      title={
+        isClient
+          ? 'When are you available to train?'
+          : 'What time do you plan to work?'
+      }
+      subtitle={
+        isClient
+          ? 'Select your preferred days and hours'
+          : 'Select your working days and hours'
+      }
       onNext={goNext}
       onBack={navigation.goBack}
       onSkip={goNext}
@@ -41,7 +56,11 @@ export function WorkScheduleScreen() {
         value={workTimeStart}
         onChange={(t) => setField('workTimeStart', t)}
       />
-      <TimeField label="End time" value={workTimeEnd} onChange={(t) => setField('workTimeEnd', t)} />
+      <TimeField
+        label="End time"
+        value={workTimeEnd}
+        onChange={(t) => setField('workTimeEnd', t)}
+      />
 
       <View style={styles.toggleRow}>
         <Text style={styles.toggleLabel}>Same slots every week</Text>

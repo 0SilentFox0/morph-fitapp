@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import theme from '../../theme';
 import { StatusBadge, type StatusBadgeColor } from './StatusBadge';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+
+const { colors, radius, typography, spacing } = theme;
+
 import type { Session, SessionStatus } from '../../types';
 
 interface ScheduleCardProps {
@@ -41,16 +42,32 @@ function ScheduleCardImpl({
   onStart,
 }: ScheduleCardProps) {
   const isClient = variant === 'client';
+
   const barColor = statusBarColor[session.status];
-  const statusLabel = session.status.charAt(0).toUpperCase() + session.status.slice(1);
+
+  const statusLabel =
+    session.status.charAt(0).toUpperCase() + session.status.slice(1);
+
   const isGroup = session.participants.length !== 1;
-  const nameLabel = isGroup ? 'Group' : session.participants[0]?.name ?? 'Group';
+
+  const nameLabel = isGroup
+    ? 'Group'
+    : (session.participants[0]?.name ?? 'Group');
+
   const handlePress = onPress ? () => onPress(session) : undefined;
-  const handleOptionsPress = onOptionsPress ? () => onOptionsPress(session) : undefined;
+
+  const handleOptionsPress = onOptionsPress
+    ? () => onOptionsPress(session)
+    : undefined;
+
   const canStart = !isClient && !!onStart && session.status === 'pending';
 
   return (
-    <TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.8}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={handlePress}
+      activeOpacity={0.8}
+    >
       <View style={[styles.leftBar, { backgroundColor: barColor }]} />
       <View style={styles.content}>
         <View style={styles.topRow}>
@@ -61,7 +78,11 @@ function ScheduleCardImpl({
               onPress={handleOptionsPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="ellipsis-horizontal" size={20} color={colors.text} />
+              <Ionicons
+                name="ellipsis-horizontal"
+                size={20}
+                color={colors.text}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -80,7 +101,12 @@ function ScheduleCardImpl({
                 </View>
               ) : null
             ) : (
-              <View style={[styles.namePill, isGroup ? styles.namePillGroup : styles.namePillSingle]}>
+              <View
+                style={[
+                  styles.namePill,
+                  isGroup ? styles.namePillGroup : styles.namePillSingle,
+                ]}
+              >
                 <Text style={styles.nameText}>{nameLabel}</Text>
               </View>
             )}

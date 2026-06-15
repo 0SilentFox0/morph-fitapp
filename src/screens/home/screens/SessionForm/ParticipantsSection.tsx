@@ -1,25 +1,37 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Avatar } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
 import { mockClients } from '../../../../mocks';
 import { searchByName } from '../../../../utils';
-import { radius } from '../../../../theme';
 
 export interface ParticipantsSectionProps {
   value: string[];
   onChange: (next: string[]) => void;
 }
 
-export function ParticipantsSection({ value, onChange }: ParticipantsSectionProps) {
+export function ParticipantsSection({
+  value,
+  onChange,
+}: ParticipantsSectionProps) {
   const [search, setSearch] = React.useState('');
+
   const [showResults, setShowResults] = React.useState(false);
 
   const filtered = React.useMemo(() => {
     const available = mockClients.filter((c) => !value.includes(c.name));
+
     return searchByName(search, available);
   }, [search, value]);
 
@@ -27,6 +39,7 @@ export function ParticipantsSection({ value, onChange }: ParticipantsSectionProp
     if (!value.includes(name)) {
       onChange([...value, name]);
     }
+
     setSearch('');
     setShowResults(false);
   };
@@ -47,8 +60,15 @@ export function ParticipantsSection({ value, onChange }: ParticipantsSectionProp
             <View key={name} style={styles.chip}>
               <Avatar name={name} size={22} />
               <Text style={styles.chipText}>{name}</Text>
-              <TouchableOpacity onPress={() => removeParticipant(name)} hitSlop={6}>
-                <Ionicons name="close-circle" size={16} color={colors.neutral6} />
+              <TouchableOpacity
+                onPress={() => removeParticipant(name)}
+                hitSlop={6}
+              >
+                <Ionicons
+                  name="close-circle"
+                  size={16}
+                  color={colors.neutral6}
+                />
               </TouchableOpacity>
             </View>
           ))}
@@ -80,10 +100,16 @@ export function ParticipantsSection({ value, onChange }: ParticipantsSectionProp
               <View style={styles.info}>
                 <Text style={styles.name}>{c.name}</Text>
                 {c.lastSession ? (
-                  <Text style={styles.meta}>{`Last session: ${c.lastSession}`}</Text>
+                  <Text
+                    style={styles.meta}
+                  >{`Last session: ${c.lastSession}`}</Text>
                 ) : null}
               </View>
-              <Ionicons name="add-circle-outline" size={20} color={colors.accent} />
+              <Ionicons
+                name="add-circle-outline"
+                size={20}
+                color={colors.accent}
+              />
             </TouchableOpacity>
           ))}
         </View>

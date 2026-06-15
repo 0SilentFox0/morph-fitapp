@@ -1,7 +1,7 @@
-import { api } from './client';
-import type { Query } from './client';
 import { dataEnvelope, paginatedEnvelope } from '../../schemas/api/envelope';
 import { TransactionSchema, WithdrawalSchema } from '../../schemas/api/models';
+import type { Query } from './client';
+import { api } from './client';
 
 export interface TransactionInput {
   client_id?: string;
@@ -23,7 +23,10 @@ export interface WithdrawalInput {
 }
 
 export const listTransactions = (query?: Query) =>
-  api.get('/transactions', { query, schema: paginatedEnvelope(TransactionSchema) });
+  api.get('/transactions', {
+    query,
+    schema: paginatedEnvelope(TransactionSchema),
+  });
 
 export const getTransaction = (id: string) =>
   api.get(`/transactions/${id}`, { schema: dataEnvelope(TransactionSchema) });
@@ -31,15 +34,26 @@ export const getTransaction = (id: string) =>
 export const createTransaction = (body: TransactionInput) =>
   api.post('/transactions', { body, schema: dataEnvelope(TransactionSchema) });
 
-export const updateTransaction = (id: string, body: Partial<TransactionInput>) =>
-  api.put(`/transactions/${id}`, { body, schema: dataEnvelope(TransactionSchema) });
+export const updateTransaction = (
+  id: string,
+  body: Partial<TransactionInput>
+) =>
+  api.put(`/transactions/${id}`, {
+    body,
+    schema: dataEnvelope(TransactionSchema),
+  });
 
-export const deleteTransaction = (id: string) => api.delete(`/transactions/${id}`);
+export const deleteTransaction = (id: string) =>
+  api.delete(`/transactions/${id}`);
 
 export const listWithdrawals = (query?: Query) =>
-  api.get('/withdrawals', { query, schema: paginatedEnvelope(WithdrawalSchema) });
+  api.get('/withdrawals', {
+    query,
+    schema: paginatedEnvelope(WithdrawalSchema),
+  });
 
 export const createWithdrawal = (body: WithdrawalInput) =>
   api.post('/withdrawals', { body, schema: dataEnvelope(WithdrawalSchema) });
 
-export const deleteWithdrawal = (id: string) => api.delete(`/withdrawals/${id}`);
+export const deleteWithdrawal = (id: string) =>
+  api.delete(`/withdrawals/${id}`);

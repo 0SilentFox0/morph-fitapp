@@ -1,111 +1,65 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { StatsStackParamList } from '../../navigation/types';
+
 import { ScreenHeader } from '../../components/layout';
 import {
-  FormInput,
-  DatePickerInput,
-  TimePickerInput,
-  DropdownSelect,
   Button,
   Card,
+  DatePickerInput,
+  DropdownSelect,
+  FormInput,
+  Segmented,
+  TimePickerInput,
 } from '../../components/ui';
+import type { StatsStackParamList } from '../../navigation/types';
+import theme from '../../theme';
 import { TransactionCard } from './Analytics/TransactionCard';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
-import { formatDate, formatTime } from '../../utils';
-import type { Transaction, TransactionType } from '../../types';
+
+const { colors, radius, typography, spacing } = theme;
+
 import {
-  TRANSACTION_TYPES,
-  TRANSACTION_STATUSES,
   PAYMENT_METHODS,
+  TRANSACTION_STATUSES,
 } from '../../constants/transactions';
-import { useDisclosure } from '../../hooks/useDisclosure';
-import { useDateTimePicker } from '../../hooks/useDateTimePicker';
+import { formatDate, formatTime } from '../../utils';
+import { useTransactionForm } from './useTransactionForm';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
 
-interface SegmentOption {
-  label: string;
-  activeColor?: string;
-}
-
-function Segmented({
-  options,
-  value,
-  onChange,
-}: {
-  options: SegmentOption[];
-  value: number;
-  onChange: (i: number) => void;
-}) {
-  return (
-    <View style={styles.segmented}>
-      {options.map((o, i) => {
-        const active = i === value;
-        return (
-          <TouchableOpacity
-            key={o.label}
-            style={[styles.segment, active && styles.segmentActive]}
-            onPress={() => onChange(i)}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.segmentText,
-                active && { color: o.activeColor ?? colors.text, fontWeight: typography.weights.semibold },
-              ]}
-            >
-              {o.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
 export function AddTransactionScreen() {
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
 
-  const [clientName, setClientName] = React.useState('');
-  const [typeIndex, setTypeIndex] = React.useState(0);
-  const [amount, setAmount] = React.useState('');
-  const [date, setDate] = React.useState(new Date());
-  const [time, setTime] = React.useState(new Date());
-  const [statusIndex, setStatusIndex] = React.useState(0);
-  const [method, setMethod] = React.useState('');
-  const methodMenu = useDisclosure();
-  const datePicker = useDateTimePicker(setDate);
-  const timePicker = useDateTimePicker(setTime);
-
-  const type = TRANSACTION_TYPES[typeIndex] as TransactionType;
-  const status = TRANSACTION_STATUSES[statusIndex];
-
-  const preview: Transaction = {
-    id: 'preview',
-    clientName: clientName || 'Client Name',
-    date: formatDate(date),
-    amount: amount ? (amount.startsWith('$') ? amount : `$${amount}`) : '$40',
-    type,
-    status: status?.value ?? 'completed',
-    ...(typeIndex === 1 ? { sessionsUsed: 0, sessionsTotal: 9 } : {}),
-  };
-
+  const {
+    clientName,
+    setClientName,
+    typeIndex,
+    setTypeIndex,
+    amount,
+    setAmount,
+    date,
+    time,
+    statusIndex,
+    setStatusIndex,
+    method,
+    setMethod,
+    methodMenu,
+    datePicker,
+    timePicker,
+    preview,
+  } = useTransactionForm();
 
   return (
     <View style={styles.container}>
@@ -181,7 +135,10 @@ export function AddTransactionScreen() {
 
         <View style={styles.spacer}>
           <Segmented
-            options={TRANSACTION_STATUSES.map((s) => ({ label: s.label, activeColor: s.color }))}
+            options={TRANSACTION_STATUSES.map((s) => ({
+              label: s.label,
+              activeColor: s.color,
+            }))}
             value={statusIndex}
             onChange={setStatusIndex}
           />
@@ -219,10 +176,16 @@ export function AddTransactionScreen() {
       <View
         style={[
           styles.footer,
-          { paddingBottom: Math.max(insets.bottom, spacing.md) + spacing.tabBarInset },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, spacing.md) + spacing.tabBarInset,
+          },
         ]}
       >
-        <Button title="Save Transaction" onPress={() => navigation.navigate('YouGotPaid')} />
+        <Button
+          title="Save Transaction"
+          onPress={() => navigation.navigate('YouGotPaid')}
+        />
       </View>
     </View>
   );
@@ -249,28 +212,6 @@ const styles = StyleSheet.create({
   },
   timeField: {
     minWidth: 0,
-  },
-  segmented: {
-    flexDirection: 'row',
-    backgroundColor: colors.neutral1,
-    borderWidth: 1,
-    borderColor: colors.neutral5,
-    borderRadius: radius.sm,
-    padding: 2,
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.sm - 2,
-  },
-  segmentActive: {
-    backgroundColor: colors.neutral3,
-  },
-  segmentText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
   },
   picker: {
     backgroundColor: colors.neutral2,

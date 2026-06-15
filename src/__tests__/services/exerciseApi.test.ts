@@ -1,5 +1,5 @@
 import { apiFetch } from '../../services/apiClient';
-import { fetchExercises, fetchCategories } from '../../services/exerciseApi';
+import { fetchCategories, fetchExercises } from '../../services/exerciseApi';
 
 jest.mock('../../services/apiClient');
 
@@ -34,12 +34,15 @@ describe('exerciseApi response validation', () => {
           category: { id: 10, name: 'Legs' },
           images: [],
           muscles: [],
-          translations: [{ language: 2, name: 'Squat', description: '<p>Do it</p>' }],
+          translations: [
+            { language: 2, name: 'Squat', description: '<p>Do it</p>' },
+          ],
         },
       ],
     });
 
     const { exercises, hasMore } = await fetchExercises();
+
     expect(hasMore).toBe(false);
     expect(exercises[0]).toMatchObject({
       id: 7,

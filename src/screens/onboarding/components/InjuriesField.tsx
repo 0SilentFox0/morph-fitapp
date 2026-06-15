@@ -1,7 +1,8 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
+
 import { Input } from '../../../components/ui';
 import { useOnboardingStore } from '../../../store/onboardingStore';
-import { useShallow } from 'zustand/react/shallow';
 import { Checkbox } from './Checkbox';
 
 /** Client experience step: injuries / health-limitations flag + optional note. */

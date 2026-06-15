@@ -1,81 +1,88 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { getChartWidth } from '../../utils/layout';
 import { LineChart } from 'react-native-chart-kit';
-import { useRoute, useNavigation, type RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { LiveTrainingParamList } from '../../navigation/types';
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { ScreenHeader } from '../../components/layout';
 import { Card, SectionTitle } from '../../components/ui';
+import { mockTrainingPrograms } from '../../mocks';
+import type { LiveTrainingParamList } from '../../navigation/types';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
+import theme from '../../theme';
 import { trainingMetric } from '../../utils';
-import { mockTrainingPrograms } from '../../mocks';
-import type { ExerciseSet, ProgramExercise } from '../../types';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import { getChartWidth } from '../../utils/common/layout';
+import {
+  topSet,
+  totalDurationLabel,
+} from '../../utils/training/trainingSummary';
+import { ExercisesTable } from './components/ExercisesTable';
+
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 
 type Route = RouteProp<LiveTrainingParamList, 'TrainingSummary'>;
 type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'TrainingSummary'>;
 
 const TABS = ['Summary', 'Exercises'];
+
 const TIMEFRAME = ['Week', 'Month', 'Custom'];
 
 const CHART_WIDTH = getChartWidth(20);
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
-
-/** Picks the heaviest logged set as the representative row for an exercise. */
-function topSet(sets: ExerciseSet[]): ExerciseSet | undefined {
-  return sets.reduce<ExerciseSet | undefined>(
-    (best, s) => (!best || s.weight > best.weight ? s : best),
-    undefined,
-  );
-}
-
-function durationLabel(exercises: ProgramExercise[]): string {
-  const minutes = exercises.reduce((sum, ex) => {
-    const m = ex.durationLabel?.match(/(\d+)\s*m/);
-    return sum + (m ? Number(m[1]) : 0);
-  }, 0);
-  return minutes > 0 ? `${minutes}m` : '—';
-}
+const chartConfig = createChartConfig();
 
 export function TrainingSummaryScreen() {
   const route = useRoute<Route>();
+
   const navigation = useNavigation<Nav>();
+
   const insets = useSafeAreaInsets();
+
   const participantId = route.params?.participantId;
+
   const [activeTab, setActiveTab] = React.useState(0);
+
   const [timeframe, setTimeframe] = React.useState(0);
 
   const participant = useActiveTrainingStore(
-    (s) => s.participants.find((c) => c.participantId === participantId) ?? s.participants[0] ?? null,
+    (s) =>
+      s.participants.find((c) => c.participantId === participantId) ??
+      s.participants[0] ??
+      null
   );
-  const addCompletedTraining = useTrainingHistoryStore((s) => s.addCompletedTraining);
+
+  const addCompletedTraining = useTrainingHistoryStore(
+    (s) => s.addCompletedTraining
+  );
+
   const endTraining = useActiveTrainingStore((s) => s.endTraining);
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
+
   // label-only: exercises come from participant.exercises, this is just for the type tag
   const program = participant?.programId
     ? mockTrainingPrograms.find((p) => p.id === participant.programId)
     : undefined;
+
   const exercises = participant?.exercises ?? [];
+
   const typeLabel = program?.tag ?? 'Custom';
 
   const history = participant ? getClientHistory(participant.name) : [];
+
   const chartData =
     history.length > 0
       ? {
@@ -86,7 +93,9 @@ export function TrainingSummaryScreen() {
 
   const rows = exercises.map((ex) => {
     const sets = participant?.setLog[ex.id] ?? ex.sets;
+
     const top = topSet(sets);
+
     return {
       id: ex.id,
       name: ex.name,
@@ -97,9 +106,12 @@ export function TrainingSummaryScreen() {
   });
 
   const doneRef = React.useRef(false);
+
   const handleDone = () => {
     if (doneRef.current) return;
+
     doneRef.current = true;
+
     if (participant) {
       addCompletedTraining({
         id: `ct-${participant.participantId}-${Date.now()}`,
@@ -112,6 +124,7 @@ export function TrainingSummaryScreen() {
         })),
       });
     }
+
     endTraining();
     navigation.popToTop();
   };
@@ -123,7 +136,13 @@ export function TrainingSummaryScreen() {
         rightElement={
           <View style={styles.headerRight}>
             <TouchableOpacity onPress={handleDone} hitSlop={8}>
-              <Text style={{ color: colors.accent, fontWeight: typography.weights.semibold, fontSize: typography.sizes.base }}>
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontWeight: typography.weights.semibold,
+                  fontSize: typography.sizes.base,
+                }}
+              >
                 Done
               </Text>
             </TouchableOpacity>
@@ -131,7 +150,11 @@ export function TrainingSummaryScreen() {
               <Ionicons name="pencil" size={24} color={colors.text} />
             </TouchableOpacity>
             <TouchableOpacity>
-              <Ionicons name="ellipsis-vertical" size={24} color={colors.text} />
+              <Ionicons
+                name="ellipsis-vertical"
+                size={24}
+                color={colors.text}
+              />
             </TouchableOpacity>
           </View>
         }
@@ -145,7 +168,9 @@ export function TrainingSummaryScreen() {
         <View style={styles.summaryRow}>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Duration</Text>
-            <Text style={styles.summaryValue}>{durationLabel(exercises)}</Text>
+            <Text style={styles.summaryValue}>
+              {totalDurationLabel(exercises)}
+            </Text>
           </Card>
           <Card style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Type</Text>
@@ -159,9 +184,17 @@ export function TrainingSummaryScreen() {
             <TouchableOpacity
               key={t}
               onPress={() => setTimeframe(i)}
-              style={[styles.timeframeBtn, i === timeframe && styles.timeframeBtnActive]}
+              style={[
+                styles.timeframeBtn,
+                i === timeframe && styles.timeframeBtnActive,
+              ]}
             >
-              <Text style={[styles.timeframeText, i === timeframe && styles.timeframeTextActive]}>
+              <Text
+                style={[
+                  styles.timeframeText,
+                  i === timeframe && styles.timeframeTextActive,
+                ]}
+              >
                 {t}
               </Text>
             </TouchableOpacity>
@@ -184,39 +217,31 @@ export function TrainingSummaryScreen() {
         )}
 
         <SectionTitle>Exercises</SectionTitle>
-        <View style={styles.table}>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Name</Text>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Weight</Text>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Sets</Text>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Reps</Text>
-          </View>
-          {rows.map((r, i) => (
-            <View key={r.id} style={[styles.tableRow, i % 2 === 0 && styles.tableRowHighlight]}>
-              <Text style={styles.tableCell}>{r.name}</Text>
-              <Text style={styles.tableCell}>{r.weight}</Text>
-              <Text style={styles.tableCell}>{r.sets}</Text>
-              <Text style={styles.tableCell}>{r.reps}</Text>
-            </View>
-          ))}
-        </View>
+        <ExercisesTable rows={rows} />
 
         <SectionTitle>Trainer Notes</SectionTitle>
         <Card style={styles.notesCard}>
           <Text style={styles.notesText}>
-            {exercises[0]?.trainerNotes ?? 'No notes recorded for this session.'}
+            {exercises[0]?.trainerNotes ??
+              'No notes recorded for this session.'}
           </Text>
         </Card>
       </ScrollView>
 
-      <View style={[styles.tabBar, { paddingBottom: spacing.md + insets.bottom }]}>
+      <View
+        style={[styles.tabBar, { paddingBottom: spacing.md + insets.bottom }]}
+      >
         {TABS.map((t, i) => (
           <TouchableOpacity
             key={t}
             onPress={() => setActiveTab(i)}
             style={[styles.tab, i === activeTab && styles.tabActive]}
           >
-            <Text style={[styles.tabText, i === activeTab && styles.tabTextActive]}>{t}</Text>
+            <Text
+              style={[styles.tabText, i === activeTab && styles.tabTextActive]}
+            >
+              {t}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -292,27 +317,6 @@ const styles = StyleSheet.create({
   },
   chart: {
     borderRadius: radius.sm,
-  },
-  table: {
-    backgroundColor: colors.neutral2,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    marginBottom: spacing.lg,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    padding: spacing.md,
-  },
-  tableRowHighlight: {
-    backgroundColor: colors.primary2,
-  },
-  tableCell: {
-    flex: 1,
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-  },
-  tableHeader: {
-    fontWeight: typography.weights.semibold,
   },
   notesCard: {
     marginBottom: spacing.lg,

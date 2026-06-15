@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { ExerciseCard } from '../../../../components/ui';
 import { SET_NOTES } from '../../../../constants';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
 import type { ProgramExercise } from '../../../../types';
 
 export interface ExercisesSectionProps {
@@ -18,7 +19,10 @@ export interface ExercisesSectionProps {
  * "Exercises" section of the add-to-library form: the set-type legend, the
  * current exercise list (or an empty prompt), and the "add more" action.
  */
-export function ExercisesSection({ exercises, onBrowse }: ExercisesSectionProps) {
+export function ExercisesSection({
+  exercises,
+  onBrowse,
+}: ExercisesSectionProps) {
   return (
     <>
       <Text style={styles.sectionLabel}>Exercises</Text>
@@ -36,15 +40,23 @@ export function ExercisesSection({ exercises, onBrowse }: ExercisesSectionProps)
             </View>
           ))}
         </View>
-        <Text style={styles.legendHint}>Tap icon to cycle · Long press to remove set</Text>
+        <Text style={styles.legendHint}>
+          Tap icon to cycle · Long press to remove set
+        </Text>
       </View>
 
       {exercises.length > 0 ? (
         exercises.map((ex) => <ExerciseCard key={ex.id} exercise={ex} />)
       ) : (
         <TouchableOpacity style={styles.addExerciseEmpty} onPress={onBrowse}>
-          <Ionicons name="add-circle-outline" size={24} color={colors.textMuted} />
-          <Text style={styles.addExerciseEmptyText}>Tap to browse exercises</Text>
+          <Ionicons
+            name="add-circle-outline"
+            size={24}
+            color={colors.textMuted}
+          />
+          <Text style={styles.addExerciseEmptyText}>
+            Tap to browse exercises
+          </Text>
         </TouchableOpacity>
       )}
 

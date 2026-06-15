@@ -1,6 +1,7 @@
 import { Dimensions } from 'react-native';
-import { getChartWidth } from '../../utils/layout';
+
 import { spacing } from '../../theme/spacing';
+import { getChartWidth } from '../../utils/common/layout';
 
 describe('getChartWidth', () => {
   const spy = jest
@@ -15,6 +16,8 @@ describe('getChartWidth', () => {
 
   it('subtracts an additional inset when given', () => {
     expect(getChartWidth(20)).toBe(400 - spacing.lg * 2 - 20);
-    expect(getChartWidth(spacing.md * 2)).toBe(400 - spacing.lg * 2 - spacing.md * 2);
+    expect(getChartWidth(spacing.md * 2)).toBe(
+      400 - spacing.lg * 2 - spacing.md * 2
+    );
   });
 });

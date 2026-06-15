@@ -1,23 +1,24 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
   Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../../navigation/types';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Card, SearchInput, EmptyState } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import { Card, EmptyState, SearchInput } from '../../../components/ui';
+import type { HomeStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
 import { useProgramsStore } from '../../../store/programsStore';
 import type { TrainingProgram } from '../../../types';
 
@@ -25,14 +26,16 @@ type Nav = NativeStackNavigationProp<HomeStackParamList, 'TrainingLibrary'>;
 
 export function TrainingLibraryScreen() {
   const navigation = useNavigation<Nav>();
+
   const searchPrograms = useProgramsStore((s) => s.searchPrograms);
+
   const deleteProgram = useProgramsStore((s) => s.deleteProgram);
 
   const [search, setSearch] = React.useState('');
 
   const filteredPrograms = React.useMemo(
     () => searchPrograms(search),
-    [search, searchPrograms],
+    [search, searchPrograms]
   );
 
   const handleEdit = (p: TrainingProgram) => {
@@ -49,8 +52,12 @@ export function TrainingLibraryScreen() {
       `Delete "${p.name}"? This cannot be undone.`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => deleteProgram(p.id) },
-      ],
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteProgram(p.id),
+        },
+      ]
     );
   };
 
@@ -59,7 +66,9 @@ export function TrainingLibraryScreen() {
       <ScreenHeader
         title="Training Library"
         rightElement={
-          <TouchableOpacity onPress={() => navigation.navigate('AddToLibraryForm')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('AddToLibraryForm')}
+          >
             <Ionicons name="add" size={24} color={colors.text} />
           </TouchableOpacity>
         }
@@ -89,14 +98,20 @@ export function TrainingLibraryScreen() {
                 : 'Add your first program to get started.'
             }
             actionLabel={search ? undefined : 'Add program'}
-            onAction={search ? undefined : () => navigation.navigate('AddToLibraryForm')}
+            onAction={
+              search ? undefined : () => navigation.navigate('AddToLibraryForm')
+            }
           />
         ) : (
           filteredPrograms.map((p) => (
             <Card key={p.id} style={styles.programCard}>
               <View style={styles.thumbWrap}>
                 {p.thumbnail ? (
-                  <Image source={{ uri: p.thumbnail }} style={styles.thumbImg} resizeMode="cover" />
+                  <Image
+                    source={{ uri: p.thumbnail }}
+                    style={styles.thumbImg}
+                    resizeMode="cover"
+                  />
                 ) : (
                   <View style={styles.thumbPlaceholder} />
                 )}
@@ -106,27 +121,57 @@ export function TrainingLibraryScreen() {
                   {p.name}
                 </Text>
                 <Text style={styles.programMeta}>
-                  {`${p.videoCount} videos`}{p.price ? ` \u00B7 ${p.price}` : ''}
+                  {`${p.videoCount} videos`}
+                  {p.price ? ` \u00B7 ${p.price}` : ''}
                 </Text>
                 <View style={styles.stats}>
                   <View style={styles.statItem}>
-                    <Ionicons name="eye-outline" size={14} color={colors.textMuted} />
+                    <Ionicons
+                      name="eye-outline"
+                      size={14}
+                      color={colors.textMuted}
+                    />
                     <Text style={styles.statText}>{p.views}</Text>
                   </View>
                   <View style={styles.statItem}>
-                    <Ionicons name="heart-outline" size={14} color={colors.textMuted} />
+                    <Ionicons
+                      name="heart-outline"
+                      size={14}
+                      color={colors.textMuted}
+                    />
                     <Text style={styles.statText}>{p.likes}</Text>
                   </View>
                 </View>
                 <View style={styles.actions}>
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleEdit(p)}>
-                    <Ionicons name="create-outline" size={16} color={colors.neutral9} />
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleEdit(p)}
+                  >
+                    <Ionicons
+                      name="create-outline"
+                      size={16}
+                      color={colors.neutral9}
+                    />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleCreateSession(p)}>
-                    <Ionicons name="calendar-outline" size={16} color={colors.neutral9} />
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleCreateSession(p)}
+                  >
+                    <Ionicons
+                      name="calendar-outline"
+                      size={16}
+                      color={colors.neutral9}
+                    />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleDelete(p)}>
-                    <Ionicons name="trash-outline" size={16} color={colors.Error} />
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleDelete(p)}
+                  >
+                    <Ionicons
+                      name="trash-outline"
+                      size={16}
+                      color={colors.Error}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -134,7 +179,6 @@ export function TrainingLibraryScreen() {
           ))
         )}
       </ScrollView>
-
     </View>
   );
 }

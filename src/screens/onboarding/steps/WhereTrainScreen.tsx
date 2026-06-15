@@ -1,12 +1,16 @@
 import React from 'react';
-import { useOnboardingStore } from '../../../store/onboardingStore';
+
 import { TRAINING_LOCATIONS } from '../../../constants';
+import { useOnboardingStore } from '../../../store/onboardingStore';
 import { MultiSelectStep } from '../components/MultiSelectStep';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 export function WhereTrainScreen() {
-  const { navigation, isClient, step, totalSteps } = useOnboardingScreen('WhereTrain');
+  const { navigation, isClient, step, totalSteps } =
+    useOnboardingScreen('WhereTrain');
+
   const locations = useOnboardingStore((s) => s.locations);
+
   const toggleLocation = useOnboardingStore((s) => s.toggleLocation);
 
   const goNext = () => navigation.navigate('WorkSchedule');
@@ -15,7 +19,11 @@ export function WhereTrainScreen() {
     <MultiSelectStep
       step={step}
       totalSteps={totalSteps}
-      title={isClient ? 'Where would you like to train?' : 'Where do you train clients?'}
+      title={
+        isClient
+          ? 'Where would you like to train?'
+          : 'Where do you train clients?'
+      }
       subtitle="Select all that apply"
       options={TRAINING_LOCATIONS}
       selected={locations}

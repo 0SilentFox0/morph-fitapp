@@ -1,5 +1,6 @@
-import type { OnboardingState } from '../store/onboardingStore';
 import type { UserRole } from '../store/appStore';
+import type { OnboardingState } from '../store/onboardingStore';
+import { logger } from './logger';
 
 /**
  * Consolidated profiles the backend receives at the end of onboarding. These
@@ -31,7 +32,12 @@ export interface TrainerProfile {
   trainingTypes: string[];
   clientTypes: string[];
   locations: string[];
-  schedule: { days: string[]; from: string; to: string; sameSlotsEveryWeek: boolean };
+  schedule: {
+    days: string[];
+    from: string;
+    to: string;
+    sameSlotsEveryWeek: boolean;
+  };
   photoUri: string | null;
 }
 
@@ -59,7 +65,11 @@ export function buildOnboardingProfile(
       interests: state.trainingTypes,
       injuries: { has: state.hasInjuries, note: state.injuriesNote.trim() },
       preferredLocations: state.locations,
-      availability: { days: state.workDays, from: state.workTimeStart, to: state.workTimeEnd },
+      availability: {
+        days: state.workDays,
+        from: state.workTimeStart,
+        to: state.workTimeEnd,
+      },
       trainerPreferences: {
         gender: state.preferredTrainerGender || 'Any',
         formats: state.preferredFormat,
@@ -72,7 +82,10 @@ export function buildOnboardingProfile(
     role: 'trainer',
     name: state.name.trim(),
     experience: state.experienceYears,
-    certifications: { has: state.hasCertifications, files: state.certifications },
+    certifications: {
+      has: state.hasCertifications,
+      files: state.certifications,
+    },
     trainingTypes: state.trainingTypes,
     clientTypes: state.clientTypes,
     locations: state.locations,
@@ -86,7 +99,8 @@ export function buildOnboardingProfile(
   };
 }
 
-const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
  * Mock backend submission for a finished onboarding profile. Simulates network
@@ -104,7 +118,7 @@ export async function submitOnboardingProfile(
   }
 
   if (__DEV__) {
-    console.log('[onboardingApi] (mock) submitting profile:', JSON.stringify(profile, null, 2));
+    logger.debug('onboardingApi: (mock) submitting profile', { profile });
   }
 
   return {

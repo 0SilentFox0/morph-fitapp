@@ -1,12 +1,19 @@
-import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+
+import theme from '../../../../theme';
+
+const { colors, typography, spacing, radius } = theme;
+
+import { useDateTimePicker } from '../../../../hooks/datetime/useDateTimePicker';
 import { formatDate, formatTime } from '../../../../utils';
-import { radius } from '../../../../theme';
-import { useDateTimePicker } from '../../../../hooks/useDateTimePicker';
 
 export interface DateTimePickerSectionProps {
   date: Date;
@@ -22,6 +29,7 @@ export function DateTimePickerSection({
   onTimeChange,
 }: DateTimePickerSectionProps) {
   const datePicker = useDateTimePicker(onDateChange);
+
   const timePicker = useDateTimePicker(onTimeChange);
 
   return (

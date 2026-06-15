@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import type { Transaction } from '../../../types';
+
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
 import { TRANSACTION_STATUS_COLORS } from '../../../constants/transactions';
+import type { Transaction } from '../../../types';
 
 export interface TransactionCardProps {
   transaction: Transaction;
@@ -15,9 +16,13 @@ export interface TransactionCardProps {
 /** Single transaction row in the business analytics list (Figma 2006:9948). */
 export function TransactionCard({ transaction: t }: TransactionCardProps) {
   const statusColor = TRANSACTION_STATUS_COLORS[t.status];
+
   const statusLabel = t.status.charAt(0).toUpperCase() + t.status.slice(1);
+
   const showProgress =
-    t.type === 'Subscription' && t.sessionsTotal != null && t.sessionsUsed != null;
+    t.type === 'Subscription' &&
+    t.sessionsTotal != null &&
+    t.sessionsUsed != null;
 
   return (
     <View style={styles.card}>
@@ -27,7 +32,9 @@ export function TransactionCard({ transaction: t }: TransactionCardProps) {
           <Text style={styles.date}>{t.date}</Text>
         </View>
         <View style={styles.right}>
-          <Text style={[styles.amount, { color: statusColor }]}>{t.amount}</Text>
+          <Text style={[styles.amount, { color: statusColor }]}>
+            {t.amount}
+          </Text>
           <Text style={styles.type}>{t.type}</Text>
         </View>
       </View>
@@ -35,7 +42,8 @@ export function TransactionCard({ transaction: t }: TransactionCardProps) {
       {showProgress ? (
         <View style={styles.progressRow}>
           <Text style={styles.progressLabel}>
-            <Text style={styles.progressUsed}>{t.sessionsUsed}</Text>/{t.sessionsTotal}
+            <Text style={styles.progressUsed}>{t.sessionsUsed}</Text>/
+            {t.sessionsTotal}
           </Text>
           <View style={styles.progressTrack}>
             {Array.from({ length: t.sessionsTotal as number }).map((_, i) => (
@@ -43,7 +51,12 @@ export function TransactionCard({ transaction: t }: TransactionCardProps) {
                 key={i}
                 style={[
                   styles.progressDash,
-                  { backgroundColor: i < (t.sessionsUsed as number) ? colors.accent : colors.neutral5 },
+                  {
+                    backgroundColor:
+                      i < (t.sessionsUsed as number)
+                        ? colors.accent
+                        : colors.neutral5,
+                  },
                 ]}
               />
             ))}

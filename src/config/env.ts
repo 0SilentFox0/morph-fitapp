@@ -5,7 +5,8 @@
  * WGER_API_BASE_URL → legacy public exercise catalogue, used by src/services/apiClient.
  */
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://morph-server.desmait.tech/api/v1';
+  process.env.EXPO_PUBLIC_API_BASE_URL ??
+  'https://morph-server.desmait.tech/api/v1';
 
 export const WGER_API_BASE_URL =
   process.env.EXPO_PUBLIC_WGER_API_BASE_URL ?? 'https://wger.de/api/v2';

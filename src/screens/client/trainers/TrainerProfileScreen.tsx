@@ -1,17 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useRoute, type RouteProp } from '@react-navigation/native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { TrainersStackParamList } from '../../../navigation/types';
+import { type RouteProp, useRoute } from '@react-navigation/native';
+
 import { ScreenHeader } from '../../../components/layout';
-import { Button, Avatar, Tag, SectionTitle, EmptyState } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
-import { useTrainersStore } from '../../../store/trainersStore';
+import {
+  Avatar,
+  Button,
+  EmptyState,
+  SectionTitle,
+  Tag,
+} from '../../../components/ui';
+import type { TrainersStackParamList } from '../../../navigation/types';
+import theme from '../../../theme';
+
+const { colors, radius, typography, spacing } = theme;
+
+import { useTabNavigation } from '../../../hooks/ui/useTabNavigation';
 import { useChatStore } from '../../../store/chatStore';
-import { useTabNavigation } from '../../../hooks/useTabNavigation';
+import { useTrainersStore } from '../../../store/trainersStore';
 
 type Route = RouteProp<TrainersStackParamList, 'TrainerProfile'>;
 
@@ -19,11 +26,17 @@ type Route = RouteProp<TrainersStackParamList, 'TrainerProfile'>;
 
 export function TrainerProfileScreen() {
   const route = useRoute<Route>();
+
   const { trainerId } = route.params;
 
   const trainer = useTrainersStore((s) => s.getTrainer(trainerId));
+
   const connect = useTrainersStore((s) => s.connect);
-  const getOrCreateConversation = useChatStore((s) => s.getOrCreateConversation);
+
+  const getOrCreateConversation = useChatStore(
+    (s) => s.getOrCreateConversation
+  );
+
   const tabNav = useTabNavigation();
 
   if (!trainer) {
@@ -43,11 +56,18 @@ export function TrainerProfileScreen() {
       name: trainer.name,
       avatar: trainer.avatar ?? null,
     });
-    tabNav?.navigate('ChatTab', { screen: 'ChatThread', params: { conversationId: conversation.id } });
+
+    tabNav?.navigate('ChatTab', {
+      screen: 'ChatThread',
+      params: { conversationId: conversation.id },
+    });
   };
 
   const handleRequestSession = () => {
-    tabNav?.navigate('ClientHomeTab', { screen: 'BookSession', params: { trainerId: trainer.id } });
+    tabNav?.navigate('ClientHomeTab', {
+      screen: 'BookSession',
+      params: { trainerId: trainer.id },
+    });
   };
 
   const connectLabel =
@@ -73,7 +93,11 @@ export function TrainerProfileScreen() {
             </Text>
           </View>
           <View style={styles.metaRow}>
-            <Ionicons name="location-outline" size={14} color={colors.textMuted} />
+            <Ionicons
+              name="location-outline"
+              size={14}
+              color={colors.textMuted}
+            />
             <Text style={styles.metaText}>{trainer.location}</Text>
           </View>
         </View>
@@ -87,9 +111,17 @@ export function TrainerProfileScreen() {
             variant={trainer.connection === 'none' ? 'primary' : 'outline'}
             style={styles.actionBtn}
           />
-          <Button title="Message" variant="outline" onPress={handleMessage} style={styles.actionBtn} />
+          <Button
+            title="Message"
+            variant="outline"
+            onPress={handleMessage}
+            style={styles.actionBtn}
+          />
         </View>
-        <Button title={`Request a session · ${trainer.pricePerSession}`} onPress={handleRequestSession} />
+        <Button
+          title={`Request a session · ${trainer.pricePerSession}`}
+          onPress={handleRequestSession}
+        />
 
         {/* About */}
         <SectionTitle>About</SectionTitle>
@@ -106,7 +138,11 @@ export function TrainerProfileScreen() {
         {/* Details */}
         <SectionTitle>Details</SectionTitle>
         <View style={styles.detailCard}>
-          <DetailRow icon="time-outline" label="Experience" value={`${trainer.experienceYears} years`} />
+          <DetailRow
+            icon="time-outline"
+            label="Experience"
+            value={`${trainer.experienceYears} years`}
+          />
           <DetailRow
             icon="ribbon-outline"
             label="Certifications"
@@ -144,19 +180,41 @@ function DetailRow({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing['2xl'] + spacing.tabBarInset, gap: spacing.md },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing['2xl'] + spacing.tabBarInset,
+    gap: spacing.md,
+  },
   emptyWrap: { flex: 1, justifyContent: 'center' },
   header: { alignItems: 'center', gap: 4 },
-  name: { fontSize: typography.sizes['2xl'], fontWeight: typography.weights.bold, color: colors.text, marginTop: spacing.sm },
+  name: {
+    fontSize: typography.sizes['2xl'],
+    fontWeight: typography.weights.bold,
+    color: colors.text,
+    marginTop: spacing.sm,
+  },
   headline: { fontSize: typography.sizes.base, color: colors.textSecondary },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaText: { fontSize: typography.sizes.sm, color: colors.textMuted },
   actionsRow: { flexDirection: 'row', gap: spacing.sm },
   actionBtn: { flex: 1 },
-  bio: { fontSize: typography.sizes.sm, color: colors.textSecondary, lineHeight: 22 },
+  bio: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+    lineHeight: 22,
+  },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
-  detailCard: { backgroundColor: colors.cardBg, borderRadius: radius.md, padding: spacing.md, gap: spacing.md },
+  detailCard: {
+    backgroundColor: colors.cardBg,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    gap: spacing.md,
+  },
   detailRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  detailLabel: { fontSize: typography.sizes.sm, color: colors.textSecondary, width: 110 },
+  detailLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+    width: 110,
+  },
   detailValue: { fontSize: typography.sizes.sm, color: colors.text, flex: 1 },
 });

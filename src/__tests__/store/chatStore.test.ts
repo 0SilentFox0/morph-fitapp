@@ -1,10 +1,13 @@
+import type { ChatMessage, Conversation } from '../../store/chatStore';
 import { useChatStore } from '../../store/chatStore';
-import type { Conversation, ChatMessage } from '../../store/chatStore';
 
 const initialConversations = useChatStore.getState().conversations;
+
 const initialMessages = useChatStore.getState().messagesByConversation;
 
-function conv(partial: Partial<Conversation> & Pick<Conversation, 'id'>): Conversation {
+function conv(
+  partial: Partial<Conversation> & Pick<Conversation, 'id'>
+): Conversation {
   return {
     participant: { id: partial.id, name: 'Test' },
     lastMessagePreview: null,
@@ -53,6 +56,7 @@ describe('useChatStore', () => {
 
   it('getOrCreateConversation returns the existing conversation for a known participant', () => {
     const before = useChatStore.getState().conversations.length;
+
     const existing = useChatStore
       .getState()
       .getOrCreateConversation('1', { id: '1', name: 'Brooklyn Simmons' });
@@ -63,6 +67,7 @@ describe('useChatStore', () => {
 
   it('getOrCreateConversation creates a new conversation for an unknown participant', () => {
     const before = useChatStore.getState().conversations.length;
+
     const created = useChatStore
       .getState()
       .getOrCreateConversation('999', { id: '999', name: 'New Person' });
@@ -84,7 +89,10 @@ describe('useChatStore', () => {
     expect(msg.status).toBe('sent');
     expect(useChatStore.getState().messagesByConversation.c1).toHaveLength(1);
 
-    const updated = useChatStore.getState().conversations.find((c) => c.id === 'c1')!;
+    const updated = useChatStore
+      .getState()
+      .conversations.find((c) => c.id === 'c1')!;
+
     expect(updated.lastMessagePreview).toBe('Hello there');
     expect(updated.lastMessageFromMe).toBe(true);
     expect(updated.lastMessageStatus).toBe('sent');
@@ -103,14 +111,25 @@ describe('useChatStore', () => {
   it('seeds a "Morning Warriors" thread with text, session and sessionStarted messages', () => {
     const groupConv = useChatStore
       .getState()
-      .conversations.find((c) => c.participant.name === 'Brooklyn Simmons' && c.id === 'c3');
+      .conversations.find(
+        (c) => c.participant.name === 'Brooklyn Simmons' && c.id === 'c3'
+      );
+
     // The first conversation owns the rich Morning Warriors thread.
     const messages = useChatStore.getState().messagesByConversation.c1;
+
     expect(messages).toBeDefined();
+
     const kinds = messages!.map((m: ChatMessage) => m.kind);
+
     expect(kinds).toContain('session');
     expect(kinds).toContain('sessionStarted');
-    const session = messages!.find((m): m is Extract<ChatMessage, { kind: 'session' }> => m.kind === 'session');
+
+    const session = messages!.find(
+      (m): m is Extract<ChatMessage, { kind: 'session' }> =>
+        m.kind === 'session'
+    );
+
     expect(session!.session.participants).toBe(8);
     expect(groupConv === undefined || true).toBe(true);
   });

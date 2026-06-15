@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
+import { StyleSheet, Text, View } from 'react-native';
+
+import theme from '../../../theme';
+
+const { colors, typography } = theme;
 
 export function AddPlaceholderScreen() {
   return (

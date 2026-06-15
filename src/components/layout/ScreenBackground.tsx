@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../../theme/colors';
+
+import theme from '../../theme';
+
+const { colors } = theme;
 
 /**
  * Full-screen background: a smooth vertical gradient from a #791A1F tint at the

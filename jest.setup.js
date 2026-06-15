@@ -4,10 +4,15 @@
 // async renders leak "overlapping act()" warnings and corrupt later tests.
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
+// The app logs failures through `logger` (src/services/logger.ts). Register a
+// no-op sink so expected error/warn logs don't spam the test runner. Tests that
+// assert on logging register their own sink and reset it afterwards.
+require('./src/services/logger').setLogSink(() => {});
+
 // Persisted Zustand stores (e.g. draftProgramStore) write through AsyncStorage.
 // Swap in the official in-memory mock so persistence works in the test runner.
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
 // @expo/vector-icons pulls in expo-font -> expo-asset, which isn't resolvable

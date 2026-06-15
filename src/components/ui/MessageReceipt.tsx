@@ -1,6 +1,10 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
+
+import theme from '../../theme';
+
+const { colors } = theme;
+
 import type { MessageStatus } from '../../store/chatStore';
 
 interface MessageReceiptProps {
@@ -15,10 +19,17 @@ interface MessageReceiptProps {
  * - `delivered` -> double check (muted)
  * - `read`      -> double check (accent)
  */
-export function MessageReceipt({ status, size = 16, color }: MessageReceiptProps) {
+export function MessageReceipt({
+  status,
+  size = 16,
+  color,
+}: MessageReceiptProps) {
   if (status === 'sent') {
-    return <Ionicons name="checkmark" size={size} color={color ?? colors.neutral8} />;
+    return (
+      <Ionicons name="checkmark" size={size} color={color ?? colors.neutral8} />
+    );
   }
+
   return (
     <Ionicons
       name="checkmark-done"

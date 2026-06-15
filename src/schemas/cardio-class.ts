@@ -9,10 +9,7 @@ import { z } from 'zod';
  * is added these become z.date() and the form initializes with new Date().
  */
 export const cardioClassSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(2, 'Title must be at least 2 characters'),
+  title: z.string().trim().min(2, 'Title must be at least 2 characters'),
   type: z.string().min(1, 'Type is required'),
   description: z.string(),
   date: z.string(),

@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import type { TokenResponse } from '../../schemas/api/models';
 
 const STORAGE_KEY = 'fitconnect.tokens';
@@ -7,8 +8,11 @@ let cache: TokenResponse | null = null;
 
 async function readCache(): Promise<TokenResponse | null> {
   if (cache) return cache;
+
   const raw = await AsyncStorage.getItem(STORAGE_KEY);
+
   cache = raw ? (JSON.parse(raw) as TokenResponse) : null;
+
   return cache;
 }
 
@@ -20,6 +24,7 @@ async function readCache(): Promise<TokenResponse | null> {
 export const tokenStore = {
   async load(): Promise<void> {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
+
     cache = raw ? (JSON.parse(raw) as TokenResponse) : null;
   },
 

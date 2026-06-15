@@ -1,8 +1,10 @@
 // src/components/ui/PagerDots.tsx
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
+import { StyleSheet, View } from 'react-native';
+
+import theme from '../../theme';
+
+const { colors, radius } = theme;
 
 interface PagerDotsProps {
   count: number;
@@ -12,13 +14,17 @@ interface PagerDotsProps {
 /** Pagination dots for a carousel. Renders nothing when there is one page or fewer. */
 export function PagerDots({ count, activeIndex }: PagerDotsProps) {
   if (count <= 1) return null;
+
   return (
     <View style={styles.row}>
       {Array.from({ length: count }).map((_, i) => (
         <View
           key={i}
           testID="pager-dot"
-          style={[styles.dot, i === activeIndex ? styles.dotActive : styles.dotInactive]}
+          style={[
+            styles.dot,
+            i === activeIndex ? styles.dotActive : styles.dotInactive,
+          ]}
         />
       ))}
     </View>
