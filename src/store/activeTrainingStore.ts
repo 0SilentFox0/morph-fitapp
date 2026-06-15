@@ -1,15 +1,22 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import {
   finishWorkout as finishWorkoutApi,
   startWorkout as startWorkoutApi,
 } from '../services/repositories/workoutsRepository';
+import { zustandStorage } from '../services/storage';
 import type { ExerciseSet, ProgramExercise } from '../types';
 
 export type { ExerciseSet };
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Clamp a logged numeric value to a finite, non-negative number. */
+function nonNegative(value: number | undefined): number {
+  return Number.isFinite(value) && (value as number) > 0 ? (value as number) : 0;
+}
 
 /** Rest-timer state, tracked per participant so each can rest independently. */
 export interface RestState {
@@ -105,8 +112,9 @@ function mapParticipant(
   );
 }
 
-export const useActiveTrainingStore = create<ActiveTrainingState>(
-  (set, get) => ({
+export const useActiveTrainingStore = create<ActiveTrainingState>()(
+  persist(
+    (set, get) => ({
     participants: [],
     activeParticipantId: null,
     workoutLogId: null,
@@ -212,8 +220,16 @@ export const useActiveTrainingStore = create<ActiveTrainingState>(
 
           if (!sets || !sets[setIndex]) return c;
 
+          // Guard against garbage logged sets: weight/reps can never be
+          // negative or non-finite (a typo like "-5" or NaN becomes 0).
+          const safePatch = { ...patch };
+
+          if ('weight' in safePatch) safePatch.weight = nonNegative(safePatch.weight);
+
+          if ('reps' in safePatch) safePatch.reps = nonNegative(safePatch.reps);
+
           const nextSets = sets.map((s, i) =>
-            i === setIndex ? { ...s, ...patch } : s
+            i === setIndex ? { ...s, ...safePatch } : s
           );
 
           return { ...c, setLog: { ...c.setLog, [exerciseId]: nextSets } };
@@ -275,5 +291,17 @@ export const useActiveTrainingStore = create<ActiveTrainingState>(
           })
         ),
       })),
-  })
+    }),
+    {
+      name: 'active-training-storage',
+      storage: zustandStorage,
+      // Rest timers don't survive a reload (they reference wall-clock intent),
+      // but the logged sets / structure do — so a crash mid-session is recoverable.
+      partialize: (s) => ({
+        participants: s.participants,
+        activeParticipantId: s.activeParticipantId,
+        workoutLogId: s.workoutLogId,
+      }),
+    }
+  )
 );

@@ -22,7 +22,9 @@ import {
   RestTimerControl,
   SetSelector,
 } from '../../components/ui';
+import { useConfirmLeave } from '../../hooks/ui/useConfirmLeave';
 import type { LiveTrainingParamList } from '../../navigation/types';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import theme from '../../theme';
 import { SetEditor } from './ExerciseDetail/SetEditor';
 import { useActiveExercise } from './ExerciseDetail/useActiveExercise';
@@ -40,6 +42,15 @@ export function ExerciseDetailScreen() {
   const insets = useSafeAreaInsets();
 
   const vm = useActiveExercise(route.params ?? {});
+
+  // Guard against losing a live session to a stray back-swipe. Evaluated at
+  // fire time so finishing (which clears participants) leaves without a prompt.
+  useConfirmLeave(
+    React.useCallback(
+      () => useActiveTrainingStore.getState().participants.length > 0,
+      []
+    )
+  );
 
   if (!vm) {
     return (

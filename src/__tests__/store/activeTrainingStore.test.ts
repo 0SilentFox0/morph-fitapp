@@ -233,4 +233,29 @@ describe('useActiveTrainingStore', () => {
       useActiveTrainingStore.getState().participants[0]!.exercises
     ).toEqual(before);
   });
+
+  it('updateSet clamps negative or non-finite weight/reps to zero', () => {
+    useActiveTrainingStore.getState().startTraining([makeParticipant()]);
+
+    useActiveTrainingStore.getState().updateSet('c1', 1, 0, { weight: -5 });
+    useActiveTrainingStore.getState().updateSet('c1', 1, 0, { reps: NaN });
+
+    const set = useActiveTrainingStore.getState().participants[0]!.setLog[1]![0]!;
+
+    expect(set.weight).toBe(0);
+    expect(set.reps).toBe(0);
+  });
+
+  it('updateSet keeps valid positive values', () => {
+    useActiveTrainingStore.getState().startTraining([makeParticipant()]);
+
+    useActiveTrainingStore
+      .getState()
+      .updateSet('c1', 1, 0, { weight: 52.5, reps: 8 });
+
+    const set = useActiveTrainingStore.getState().participants[0]!.setLog[1]![0]!;
+
+    expect(set.weight).toBe(52.5);
+    expect(set.reps).toBe(8);
+  });
 });
