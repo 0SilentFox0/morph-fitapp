@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
@@ -19,118 +11,44 @@ import { DayStrip } from './Schedule/DayStrip';
 import { WeekStrip } from './Schedule/WeekStrip';
 import { MonthGrid } from './Schedule/MonthGrid';
 import { WeekColumns } from './Schedule/WeekColumns';
-import { buildDaysFromToday, type ScheduleViewMode } from './Schedule/scheduleUtils';
-import { useVerticalSwipeCycle } from '../../../hooks/ui/useVerticalSwipeCycle';
-import type { SessionOptionAction } from '../../../components/ui';
-import theme from '../../../theme';
-const { colors, typography, spacing } = theme;
-import { useSessionsStore } from '../../../store/sessionsStore';
+import { useSchedule } from './Schedule/useSchedule';
 import type { Session } from '../../../types';
+import theme from '../../../theme';
+
+const { colors, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
-const VIEW_MODES: readonly ScheduleViewMode[] = ['day', 'week', 'month'];
-
 export function ScheduleScreen() {
   const navigation = useNavigation<Nav>();
-  const days = React.useMemo(() => buildDaysFromToday(), []);
-  const sessions = useSessionsStore((s) => s.sessions);
-  const deleteSession = useSessionsStore((s) => s.deleteSession);
-  const getSessionsByDateKey = useSessionsStore((s) => s.getSessionsByDateKey);
-  const searchSessions = useSessionsStore((s) => s.searchSessions);
-  const [selectedDayIndex, setSelectedDayIndex] = React.useState(0);
-  const [search, setSearch] = React.useState('');
-  const [optionsSession, setOptionsSession] = React.useState<Session | null>(null);
-  const [viewMode, setViewMode] = React.useState<ScheduleViewMode>('day');
-  // Month view: the day whose session list is shown — only set when a day is tapped.
-  const [monthSelectedKey, setMonthSelectedKey] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (viewMode !== 'month') setMonthSelectedKey(null);
-  }, [viewMode]);
-
-  const handleSessionPress = React.useCallback(
+  const openSession = React.useCallback(
     (s: Session) => navigation.navigate('SessionForm', { session: s }),
-    [navigation]
-  );
-  const handleSessionOptions = React.useCallback((s: Session) => setOptionsSession(s), []);
-
-  const shiftMonth = React.useCallback(
-    (dir: 1 | -1) => {
-      const current = days[selectedDayIndex];
-      if (!current) return;
-      // Normalize to the 1st of the target month, then find the first matching day.
-      const target = new Date(current.year, current.month + dir, 1);
-      const targetYear = target.getFullYear();
-      const targetMonth = target.getMonth();
-      const idx = days.findIndex((d) => d.year === targetYear && d.month === targetMonth);
-      if (idx >= 0) {
-        setSelectedDayIndex(idx);
-        setMonthSelectedKey(null);
-      }
-    },
-    [days, selectedDayIndex]
+    [navigation],
   );
 
-  const swipeHandlers = useVerticalSwipeCycle(VIEW_MODES, viewMode, setViewMode);
-
-  const handleSessionOption = (action: SessionOptionAction) => {
-    if (!optionsSession) return;
-    if (action === 'edit' || action === 'reschedule') {
-      navigation.navigate('SessionForm', { session: optionsSession });
-    } else if (action === 'cancel') {
-      Alert.alert('Cancel session', `Cancel "${optionsSession.title}"?`, [
-        { text: 'No', style: 'cancel', onPress: () => setOptionsSession(null) },
-        {
-          text: 'Yes, cancel',
-          style: 'destructive',
-          onPress: () => {
-            deleteSession(optionsSession.id);
-            setOptionsSession(null);
-          },
-        },
-      ]);
-      return;
-    }
-    setOptionsSession(null);
-  };
-
-  const selectedDateKey = days[selectedDayIndex]?.dateKey ?? '';
-
-  const qTrim = search.trim();
-  const matchedIds = qTrim ? new Set(searchSessions(qTrim).map((x) => x.id)) : null;
-  const matchesSearch = (s: Session) => !matchedIds || matchedIds.has(s.id);
-  const daySessions = getSessionsByDateKey(selectedDateKey).filter(matchesSearch);
-
-  const weekDays = React.useMemo(
-    () => days.slice(selectedDayIndex, selectedDayIndex + 7),
-    [days, selectedDayIndex]
-  );
-
-  const monthStart = React.useMemo(() => {
-    const sel = days[selectedDayIndex];
-    return sel ? new Date(sel.year, sel.month, 1) : new Date();
-  }, [days, selectedDayIndex]);
-
-  const monthDays = React.useMemo(() => {
-    const year = monthStart.getFullYear();
-    const month = monthStart.getMonth();
-    const first = new Date(year, month, 1);
-    const last = new Date(year, month + 1, 0);
-    const startPad = first.getDay();
-    const total = last.getDate();
-    const pad: { dateKey: string; date: number; empty: boolean }[] = [];
-    for (let i = 0; i < startPad; i++) pad.push({ dateKey: '', date: 0, empty: true });
-    for (let d = 1; d <= total; d++) {
-      const dateKey = new Date(year, month, d).toISOString().slice(0, 10);
-      pad.push({ dateKey, date: d, empty: false });
-    }
-    return pad;
-  }, [monthStart]);
-
-  const { width } = Dimensions.get('window');
-  const availWidth = width - spacing.lg * 2;
-  const monthCellSize = Math.floor((availWidth - spacing.xs * 6) / 7);
+  const {
+    days,
+    sessions,
+    selectedDayIndex,
+    setSelectedDayIndex,
+    search,
+    setSearch,
+    viewMode,
+    monthSelectedKey,
+    optionsSession,
+    setOptionsSession,
+    getSessionsByDateKey,
+    swipeHandlers,
+    shiftMonth,
+    selectMonthDate,
+    handleSessionOption,
+    matchesSearch,
+    daySessions,
+    weekDays,
+    monthDays,
+    weekCellWidth,
+    monthCellSize,
+  } = useSchedule(openSession);
 
   const renderDayEmptyState = () => (
     <EmptyState
@@ -177,7 +95,7 @@ export function ScheduleScreen() {
             baseIndex={selectedDayIndex}
             onSelect={setSelectedDayIndex}
             getCount={(dateKey) => getSessionsByDateKey(dateKey).length}
-            cellWidth={(width - spacing.lg * 2 - spacing.sm * 6) / 7}
+            cellWidth={weekCellWidth}
           />
         )}
 
@@ -186,11 +104,7 @@ export function ScheduleScreen() {
             monthDays={monthDays}
             cellSize={monthCellSize}
             getCount={(dateKey) => getSessionsByDateKey(dateKey).length}
-            onSelectDate={(dateKey) => {
-              setMonthSelectedKey(dateKey);
-              const idx = days.findIndex((d) => d.dateKey === dateKey);
-              if (idx >= 0) setSelectedDayIndex(idx);
-            }}
+            onSelectDate={selectMonthDate}
           />
         )}
 
@@ -217,15 +131,15 @@ export function ScheduleScreen() {
                 <ScheduleCard
                   key={session.id}
                   session={session}
-                  onPress={handleSessionPress}
-                  onOptionsPress={handleSessionOptions}
+                  onPress={openSession}
+                  onOptionsPress={setOptionsSession}
                 />
               )))}
         {viewMode === 'week' && (
           <WeekColumns
             weekDays={weekDays}
             getSessions={(dateKey) => getSessionsByDateKey(dateKey).filter(matchesSearch)}
-            onSessionPress={handleSessionPress}
+            onSessionPress={openSession}
           />
         )}
         {viewMode === 'month' &&
@@ -244,8 +158,8 @@ export function ScheduleScreen() {
                       <ScheduleCard
                         key={session.id}
                         session={session}
-                        onPress={handleSessionPress}
-                        onOptionsPress={handleSessionOptions}
+                        onPress={openSession}
+                        onOptionsPress={setOptionsSession}
                       />
                     ))}
               </View>
