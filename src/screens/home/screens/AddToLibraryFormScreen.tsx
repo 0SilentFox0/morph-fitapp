@@ -6,18 +6,12 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller } from 'react-hook-form';
 import { ScreenHeader } from '../../../components/layout';
 import { Input, Button, DropdownSelect } from '../../../components/ui';
-import { useProgramsStore } from '../../../store/programsStore';
-import { useDraftProgramStore } from '../../../store/draftProgramStore';
-import { useShallow } from 'zustand/react/shallow';
-import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
 import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
 import { TagPickerModal } from './AddToLibraryForm/TagPickerModal';
-import { useDisclosure } from '../../../hooks/ui/useDisclosure';
-import { useMirror } from '../../../hooks/ui/useMirror';
+import { useProgramDraftForm } from './AddToLibraryForm/useProgramDraftForm';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;
@@ -26,125 +20,24 @@ export function AddToLibraryFormScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const program = route.params?.program;
-  const isEdit = !!program;
 
-  const addProgramFromDraft = useProgramsStore((s) => s.addProgramFromDraft);
-  const updateProgram = useProgramsStore((s) => s.updateProgram);
-
-  const {
-    title: storeTitle,
-    setTitle: setStoreTitle,
-    tag: storeTag,
-    setTag: setStoreTag,
-    description: storeDescription,
-    setDescription: setStoreDescription,
-    exercises,
-    setExercises,
-    resetDraft,
-  } = useDraftProgramStore(
-    useShallow((s) => ({
-      title: s.title,
-      setTitle: s.setTitle,
-      tag: s.tag,
-      setTag: s.setTag,
-      description: s.description,
-      setDescription: s.setDescription,
-      exercises: s.exercises,
-      setExercises: s.setExercises,
-      resetDraft: s.reset,
-    }))
-  );
-
-  const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-    getValues,
-  } = useForm<ProgramDraftValues>({
-    resolver: zodResolver(programDraftSchema),
-    defaultValues: {
-      title: isEdit ? (program?.name ?? '') : storeTitle,
-      tag: isEdit ? (program?.tag ?? 'Cardio') : storeTag,
-      description: isEdit ? (program?.description ?? '') : storeDescription,
-    },
-    mode: 'onBlur',
-  });
-
-  // Edit mode: hydrate the form + draft exercises from the route param.
-  React.useEffect(() => {
-    if (isEdit && program) {
-      reset({
-        title: program.name,
-        tag: program.tag,
-        description: program.description ?? '',
-      });
-      setExercises(program.exercises ?? []);
-    }
-  }, [isEdit, program?.id, reset, setExercises]);
-
-  // Mirror form changes back into draftProgramStore so the persisted draft
-  // stays current if the user navigates away mid-edit.
-  const watchedTitle = watch('title');
-  useMirror(watchedTitle, !isEdit, setStoreTitle);
-  useMirror(watch('tag'), !isEdit, setStoreTag);
-  useMirror(watch('description'), !isEdit, setStoreDescription);
-
-  const tagModal = useDisclosure();
-
-  const onContinue = (data: ProgramDraftValues) => {
-    if (isEdit && program) {
-      updateProgram(program.id, {
-        name: data.title,
-        tag: data.tag,
-        description: data.description,
-        exercises,
-        videoCount: exercises.length,
-      });
-      resetDraft();
-      navigation.goBack();
-    } else {
-      navigation.navigate('Gallery');
-    }
-  };
-
-  // Save as Draft skips full validation — empty title becomes a placeholder.
-  const handleSaveDraft = () => {
-    const data = getValues();
-    if (isEdit && program) {
-      updateProgram(program.id, {
-        name: data.title || program.name,
-        tag: data.tag,
-        description: data.description,
-        exercises,
-        videoCount: exercises.length,
-      });
-    } else {
-      addProgramFromDraft({
-        title: data.title,
-        tag: data.tag,
-        description: data.description,
-        exercises,
-      });
-    }
-    resetDraft();
-    navigation.navigate('TrainingLibrary');
-  };
+  const { control, errors, exercises, tagModal, watchedTitle, isEdit, submit, saveDraft, handleBack } =
+    useProgramDraftForm(program, {
+      goBack: () => navigation.goBack(),
+      goToGallery: () => navigation.navigate('Gallery'),
+      goToLibrary: () => navigation.navigate('TrainingLibrary'),
+    });
 
   return (
     <View style={styles.container}>
       <ScreenHeader
         title={watchedTitle || (isEdit ? (program?.name ?? 'Edit') : 'Name')}
         rightElement={
-          <TouchableOpacity onPress={handleSaveDraft}>
+          <TouchableOpacity onPress={saveDraft}>
             <Ionicons name="bookmark-outline" size={22} color={colors.text} />
           </TouchableOpacity>
         }
-        onBack={() => {
-          if (!isEdit) resetDraft();
-          navigation.goBack();
-        }}
+        onBack={handleBack}
       />
 
       <ScrollView
@@ -211,12 +104,12 @@ export function AddToLibraryFormScreen() {
 
         <Button
           title={isEdit ? 'Save' : 'Continue'}
-          onPress={handleSubmit(onContinue)}
+          onPress={submit}
           style={styles.button}
         />
         <Button
           title="Save as Draft"
-          onPress={handleSaveDraft}
+          onPress={saveDraft}
           variant="outline"
           style={styles.buttonSecondary}
         />
