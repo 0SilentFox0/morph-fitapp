@@ -42,11 +42,19 @@ export function HomeScreen() {
   const loadPrograms = useProgramsStore((s) => s.loadPrograms);
 
   // Populate the programs carousel (store starts empty; no-ops if already loaded).
+  // A failed load just leaves the carousel empty — not worth interrupting Home.
   React.useEffect(() => {
-    loadPrograms();
+    void loadPrograms().catch(() => {});
   }, [loadPrograms]);
 
   const sessions = useSessionsStore((s) => s.sessions);
+
+  const loadSessions = useSessionsStore((s) => s.loadSessions);
+
+  // Pull the trainer's real sessions (store starts empty; no-ops if loaded).
+  React.useEffect(() => {
+    void loadSessions().catch(() => {});
+  }, [loadSessions]);
 
   const [refreshing, setRefreshing] = React.useState(false);
 

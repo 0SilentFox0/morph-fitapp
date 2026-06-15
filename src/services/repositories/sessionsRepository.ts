@@ -1,7 +1,8 @@
 import { apiReadiness } from '../../config/apiReadiness';
 import { mockSessions } from '../../mocks';
 import type { Session as ApiSession } from '../../schemas/api/models';
-import type { Session } from '../../types';
+import type { Session, SessionStatus } from '../../types';
+import { formatTime } from '../../utils';
 import type { SessionInput } from '../api/sessions';
 import * as sessionsApi from '../api/sessions';
 import { withMockFallback } from '../mockFallback';
@@ -13,6 +14,86 @@ import { withMockFallback } from '../mockFallback';
  */
 export function getSeedSessions(): Session[] {
   return mockSessions;
+}
+
+// The 5-value backend lifecycle collapses onto the UI's 3 display states.
+const STATUS_FROM_API: Record<ApiSession['status'], SessionStatus> = {
+  planned: 'pending',
+  in_progress: 'pending',
+  completed: 'completed',
+  canceled: 'canceled',
+  no_show: 'canceled',
+};
+
+const dateKeyOf = (d: Date): string =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate()
+  ).padStart(2, '0')}`;
+
+/**
+ * Render an ISO instant the way the rest of the app expects a session date:
+ * 'Today' / 'Tomorrow' for the next two days, else a YYYY-MM-DD key. This keeps
+ * the store's date queries (getTodaySessions / getSessionsByDateKey) working
+ * unchanged.
+ */
+function relativeDateLabel(iso: string, now: Date): string {
+  const key = dateKeyOf(new Date(iso));
+
+  const today = new Date(now);
+
+  today.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date(today);
+
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  if (key === dateKeyOf(today)) return 'Today';
+
+  if (key === dateKeyOf(tomorrow)) return 'Tomorrow';
+
+  return key;
+}
+
+/** Adapt a backend session to the UI session shape used by Home / Schedule. */
+export function apiSessionToUi(s: ApiSession, now: Date = new Date()): Session {
+  return {
+    id: s.id,
+    title: s.title,
+    type: s.type ?? '',
+    date: s.start_at ? relativeDateLabel(s.start_at, now) : '',
+    time: s.start_at ? formatTime(s.start_at) : '',
+    status: STATUS_FROM_API[s.status],
+    participants: s.participants.map((p) => {
+      const client = (p.client ?? null) as {
+        name?: string;
+        avatar_url?: string | null;
+      } | null;
+
+      return {
+        id: p.client_id,
+        name: client?.name ?? 'Client',
+        avatar: client?.avatar_url ?? undefined,
+      };
+    }),
+    programId: s.program_id ?? undefined,
+  };
+}
+
+/**
+ * Load the trainer's sessions. Behind the `sessions` readiness flag. Trainer-
+ * scoped (`GET /sessions`); there is no client-self endpoint yet, so the client
+ * experience keeps its locally-booked sessions instead of calling this.
+ */
+export async function loadSessions(): Promise<Session[]> {
+  return withMockFallback(
+    apiReadiness.sessions,
+    async () => {
+      const res = await sessionsApi.listSessions({ per_page: 100 });
+
+      return res.data.map((s) => apiSessionToUi(s));
+    },
+    () => mockSessions
+  );
 }
 
 /** Raw values the session form provides for a create/update. */

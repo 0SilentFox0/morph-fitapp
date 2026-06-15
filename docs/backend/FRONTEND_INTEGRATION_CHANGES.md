@@ -210,11 +210,21 @@ all trigger it. Library shows loading/error/empty via `AsyncBoundary`.
 - Full exercise mapping (API count-based `sets` vs UI set arrays + catalog join) is deferred;
   the list only needs `exercises.length`.
 
-### Remaining stores — NOT migrated yet (blocked / larger refactor)
-- **sessions** — needs a UI date-model rework: the UI `Session` uses `'Today'`/`'Tomorrow'`
-  display strings and a 3-value status (`pending|completed|canceled`), while the API uses ISO
-  `start_at`/`end_at` and `planned|in_progress|completed|canceled|no_show`. Migrating requires
-  adapting both. (Trainer `GET /sessions` exists; client-as-participant listing does not — see below.)
+### Sessions (trainer side) — DONE (`GET /sessions`)  ⚠️ verify
+`sessionsRepository.loadSessions` → `apiSessionToUi`; the store starts empty and loads once
+(guarded), Home + Schedule trigger it. The adapter maps ISO `start_at` → the app's
+`'Today'`/`'Tomorrow'`/`YYYY-MM-DD` label + `h:mmam` time, and collapses the 5-value status
+(`planned|in_progress|completed|canceled|no_show`) onto the UI's 3 (`pending|completed|canceled`),
+so the existing schedule queries keep working.
+
+**Backend actions / gaps:**
+- Embed a **participant summary** in the session payload: `SessionParticipant.client` is
+  `z.unknown()`; the UI needs `{ name, avatar_url }` to show real names (falls back to "Client").
+- `GET /sessions` is **trainer-scoped**. The **client** side is NOT migrated — it keeps locally-
+  booked sessions because there is **no `GET /me/sessions`** (sessions where I'm a participant).
+  Add that endpoint to migrate the client carousel.
+
+### Remaining stores — NOT migrated (backend-blocked)
 - **trainers** — **no backend endpoint exists** for a trainer catalog or discovery; the
   `Trainer` model is frontend-only. Blocked on **B2** (`GET /v1/trainers`, `TrainerPublic`).
 - **measurements / training history / client sessions** — these are **client-facing** screens, but

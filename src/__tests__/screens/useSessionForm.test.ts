@@ -11,6 +11,8 @@ describe('useSessionForm', () => {
       programs: [
         { id: 'p1', name: 'Leg Day', tag: 'HIIT', exercises: [] },
       ] as never,
+      // The form pre-loads programs on mount; keep that off the network in tests.
+      loadPrograms: jest.fn().mockResolvedValue([]) as never,
     });
     jest
       .spyOn(sessionsRepository, 'createSession')
