@@ -59,7 +59,19 @@ export function AddTransactionScreen() {
     datePicker,
     timePicker,
     preview,
+    submit,
+    submitting,
+    error,
   } = useTransactionForm();
+
+  const handleSave = async () => {
+    try {
+      await submit();
+      navigation.navigate('YouGotPaid');
+    } catch {
+      // error is surfaced inline via the `error` state; stay on the form.
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -182,9 +194,11 @@ export function AddTransactionScreen() {
           },
         ]}
       >
+        {error && <Text style={styles.error}>{error}</Text>}
         <Button
           title="Save Transaction"
-          onPress={() => navigation.navigate('YouGotPaid')}
+          onPress={handleSave}
+          loading={submitting}
         />
       </View>
     </View>
@@ -246,5 +260,11 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
+  },
+  error: {
+    color: colors.Error,
+    fontSize: typography.sizes.sm,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
   },
 });

@@ -5,6 +5,7 @@ import { ScreenBackground } from '../components/layout';
 import {
   AddToLibraryFormScreen,
   CardioClassFormScreen,
+  EditProfileScreen,
   GalleryScreen,
   HomeScreen,
   ProfileScreen,
@@ -33,6 +34,7 @@ export function HomeStackNavigator() {
     >
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="Schedule" component={ScheduleScreen} />
       <Stack.Screen name="SessionForm" component={SessionFormScreen} />
       <Stack.Screen

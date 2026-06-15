@@ -7,6 +7,10 @@ import {
   type SessionFormValues,
   sessionSchema,
 } from '../../../../schemas/session';
+import {
+  createSession as createSessionApi,
+  updateSession as updateSessionApi,
+} from '../../../../services/repositories/sessionsRepository';
 import { useProgramsStore } from '../../../../store/programsStore';
 import { useSessionsStore } from '../../../../store/sessionsStore';
 import type { ExerciseSet, Session } from '../../../../types';
@@ -75,7 +79,11 @@ export function useSessionForm(
   const showProgression =
     isPersonal && (selectedProgram?.exercises?.length ?? 0) > 0;
 
-  const onSubmit = (data: SessionFormValues) => {
+  const [submitting, setSubmitting] = React.useState(false);
+
+  const [error, setError] = React.useState<string | null>(null);
+
+  const onSubmit = async (data: SessionFormValues) => {
     const common = {
       title: data.title.trim(),
       type: data.type,
@@ -86,13 +94,35 @@ export function useSessionForm(
       plannedSets: showProgression ? plannedSets : undefined,
     };
 
-    if (session) {
-      updateSession(session.id, common);
-    } else {
-      addSession({ ...common, status: 'pending' });
-    }
+    const apiForm = {
+      title: data.title,
+      type: data.type,
+      date: data.date,
+      time: data.time,
+      programId: data.programId,
+    };
 
-    onComplete();
+    setError(null);
+    setSubmitting(true);
+    try {
+      // Persist to the backend first; only mirror into the local display cache
+      // and navigate once the write actually succeeds.
+      if (session) {
+        await updateSessionApi(session.id, apiForm);
+        updateSession(session.id, common);
+      } else {
+        await createSessionApi(apiForm);
+        addSession({ ...common, status: 'pending' });
+      }
+
+      onComplete();
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : 'Could not save the session'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return {
@@ -101,6 +131,8 @@ export function useSessionForm(
     setValue,
     programs,
     submit: handleSubmit(onSubmit),
+    submitting,
+    error,
     typePicker,
     programPicker,
     plannedSets,

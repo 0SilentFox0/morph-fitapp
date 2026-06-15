@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { ScreenBackground } from '../components/layout';
 import { useRestTimer } from '../hooks/training/useRestTimer';
+import { AddEditClientScreen } from '../screens/clients/AddEditClientScreen';
 import { ClientProfileScreen } from '../screens/clients/ClientProfileScreen';
 import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
 import { ClientsProfileExtendedScreen } from '../screens/clients/ClientsProfileExtendedScreen';
@@ -31,6 +32,7 @@ export function ClientsStackNavigator() {
       }}
     >
       <Stack.Screen name="ClientsList" component={ClientsListScreen} />
+      <Stack.Screen name="AddEditClient" component={AddEditClientScreen} />
       <Stack.Screen name="Filters" component={FiltersScreen} />
       <Stack.Screen name="ClientProfile" component={ClientProfileScreen} />
       <Stack.Screen name="ProgramDetail" component={ProgramDetailScreen} />

@@ -70,6 +70,10 @@ export function TrainingSummaryScreen() {
 
   const endTraining = useActiveTrainingStore((s) => s.endTraining);
 
+  const finishServerWorkout = useActiveTrainingStore(
+    (s) => s.finishServerWorkout
+  );
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
 
   // label-only: exercises come from participant.exercises, this is just for the type tag
@@ -107,7 +111,7 @@ export function TrainingSummaryScreen() {
 
   const doneRef = React.useRef(false);
 
-  const handleDone = () => {
+  const handleDone = async () => {
     if (doneRef.current) return;
 
     doneRef.current = true;
@@ -123,6 +127,15 @@ export function TrainingSummaryScreen() {
           sets: (participant.setLog[ex.id] ?? ex.sets).map((s) => ({ ...s })),
         })),
       });
+    }
+
+    // Finalize the server workout log when one is open (real backend session);
+    // a no-op for ad-hoc/mock sessions. Never blocks leaving the screen.
+    try {
+      await finishServerWorkout();
+    } catch {
+      // The local summary is already recorded; a failed finish must not trap
+      // the trainer on this screen.
     }
 
     endTraining();

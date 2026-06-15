@@ -2,6 +2,7 @@ export { AddPlaceholderScreen } from './screens/AddPlaceholderScreen';
 export { AddToLibraryFormScreen } from './screens/AddToLibraryFormScreen';
 export { CardioClassFormScreen } from './screens/CardioClassFormScreen';
 export { ChatPlaceholderScreen } from './screens/ChatPlaceholderScreen';
+export { EditProfileScreen } from './screens/EditProfileScreen';
 export { GalleryScreen } from './screens/GalleryScreen';
 export { HomeScreen } from './screens/HomeScreen';
 export { ProfileScreen } from './screens/ProfileScreen';

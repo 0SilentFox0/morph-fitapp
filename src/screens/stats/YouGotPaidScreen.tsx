@@ -45,9 +45,7 @@ export function YouGotPaidScreen() {
             <Ionicons name="trophy" size={32} color={colors.neutral1} />
           </View>
           <Text style={styles.achievementLabel}>Achievement unlocked</Text>
-          <Text style={styles.achievementTitle}>
-            First Transaction Recorded
-          </Text>
+          <Text style={styles.achievementTitle}>Transaction Recorded</Text>
           <Text style={styles.achievementDesc}>
             Earn more achievements by uploading content or getting reviews
           </Text>

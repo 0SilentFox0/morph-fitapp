@@ -1,8 +1,15 @@
 import { create } from 'zustand';
 
+import {
+  finishWorkout as finishWorkoutApi,
+  startWorkout as startWorkoutApi,
+} from '../services/repositories/workoutsRepository';
 import type { ExerciseSet, ProgramExercise } from '../types';
 
 export type { ExerciseSet };
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Rest-timer state, tracked per participant so each can rest independently. */
 export interface RestState {
@@ -37,6 +44,12 @@ export interface SessionParticipant {
 interface ActiveTrainingState {
   participants: SessionParticipant[];
   activeParticipantId: string | null;
+  /**
+   * Server workout-log id for the active session, set once a real (UUID)
+   * session backs the training. Null for ad-hoc / mock sessions, in which case
+   * the server pipeline stays dormant. Activated by P1.1 (sessions API-backed).
+   */
+  workoutLogId: string | null;
 
   startTraining: (
     participants: SessionParticipant[],
@@ -44,6 +57,10 @@ interface ActiveTrainingState {
   ) => void;
   endTraining: () => void;
   setActiveParticipant: (participantId: string) => void;
+  /** Open a server workout log for a real (UUID) session; no-op otherwise. */
+  beginServerWorkout: (sessionId: string | null | undefined) => Promise<void>;
+  /** Finish the server workout log if one is open; safe to call always. */
+  finishServerWorkout: () => Promise<void>;
 
   setExerciseIndex: (participantId: string, index: number) => void;
   setSetIndex: (participantId: string, index: number) => void;
@@ -92,6 +109,7 @@ export const useActiveTrainingStore = create<ActiveTrainingState>(
   (set, get) => ({
     participants: [],
     activeParticipantId: null,
+    workoutLogId: null,
 
     startTraining: (participants, activeParticipantId) => {
       const fallback = participants[0]?.participantId ?? null;
@@ -103,10 +121,31 @@ export const useActiveTrainingStore = create<ActiveTrainingState>(
       set({
         participants,
         activeParticipantId: exists ? activeParticipantId! : fallback,
+        workoutLogId: null,
       });
     },
 
-    endTraining: () => set({ participants: [], activeParticipantId: null }),
+    endTraining: () =>
+      set({ participants: [], activeParticipantId: null, workoutLogId: null }),
+
+    beginServerWorkout: async (sessionId) => {
+      // Only meaningful for a real backend session; ad-hoc/mock sessions skip.
+      if (!sessionId || !UUID_RE.test(sessionId)) return;
+
+      const log = await startWorkoutApi(sessionId);
+
+      set({ workoutLogId: log.id });
+    },
+
+    finishServerWorkout: async () => {
+      const { workoutLogId } = get();
+
+      if (!workoutLogId) return;
+
+      await finishWorkoutApi(workoutLogId);
+
+      set({ workoutLogId: null });
+    },
 
     setActiveParticipant: (participantId) => {
       if (get().participants.some((c) => c.participantId === participantId)) {
