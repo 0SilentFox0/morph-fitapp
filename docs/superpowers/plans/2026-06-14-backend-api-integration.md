@@ -2172,6 +2172,17 @@ Navigate to an exercise list screen (still backed by wger). Expected: it loads a
 
 ---
 
+## Known follow-ups (deferred from this pass, surfaced by review)
+
+These were intentionally deferred — none destroy data; all belong with the screen-wiring / onboarding-backend work:
+
+1. **Backend-driven onboarding.** `isOnboarded` is still local-only (mock). Drive it from `user.onboarding_completed_at` so logout can safely `appStore.reset()` without forcing completed users to re-onboard, and so a second user on a shared device doesn't inherit the first user's onboarded state. (authStore `logout` carries a NOTE comment marking this.)
+2. **`assignProgram` body shape.** Live OpenAPI spec says `{ client_id: string }` (implemented); an internal doc `docs/backend/features/programs.md` shows plural `{ client_ids: [] }`. Verify against the running backend; switch if it rejects. (Comment in `programs.ts`.)
+3. **Cold-start transient error UX (`authStore.loadSession`).** On a non-401 error at launch the app goes `unauthenticated` (token preserved, recovers next launch) — but ideally shows an offline/retry state instead of bouncing to login. Needs a new status + UI.
+4. **`logout` refresh cascade.** `POST /auth/logout` uses `auth:true` (needed to revoke server-side); an already-expired token triggers a spurious refresh + possible double state-set. Consider a `skipRefresh` request option.
+5. **Concurrent non-idempotent retries.** The single-flight refresh dedupes the token fetch but not the retried mutation; two simultaneous POSTs that both 401 will both retry. Add `idempotency_key` to non-idempotent inputs (`SessionInput` already has one; `LogSetInput` etc. do not).
+6. **Minor:** redundant double `tokenStore.clear()` on the 401 path in `loadSession` (client already clears); module-level `setUnauthorizedHandler` side effect complicates test isolation; `progressApi`/`clientsApi` dual export path for measurement functions.
+
 ## Self-Review notes
 
 - **Spec coverage:** env (T1) ✓; auth-aware client + refresh + 422 (T5) ✓; token persistence (T4) ✓; auth store + role sync (T8) ✓; full 72-endpoint typed layer (T6–T7) ✓; Zod for 25 models (T3) ✓; login screen (T9) ✓; root gate (T10) ✓; wger isolation (T1) ✓; tests for client/tokenStore/authStore/representative service (T4,T5,T6,T8) ✓.
