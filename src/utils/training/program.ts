@@ -3,7 +3,7 @@
  * session form and the program picker.
  */
 
-import type { TrainingProgram, Session } from '../types';
+import type { TrainingProgram, Session } from '../../types';
 
 type SessionParticipant = Session['participants'][number];
 

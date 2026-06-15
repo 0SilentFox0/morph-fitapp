@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-native';
-import { useDisclosure } from '../../hooks/useDisclosure';
+import { useDisclosure } from '../../hooks/ui/useDisclosure';
 
 describe('useDisclosure', () => {
   it('defaults to closed', async () => {

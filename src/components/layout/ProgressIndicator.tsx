@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, spacing } = theme;
 
 interface ProgressIndicatorProps {
   total: number;

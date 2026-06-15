@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, ChoiceCard } from '../../../components/ui';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { spacing } = theme;
 import { useAppStore } from '../../../store/appStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';

@@ -1,4 +1,4 @@
-import { applyProgression, trainingMetric } from '../../utils/progression';
+import { applyProgression, trainingMetric } from '../../utils/training/progression';
 import type { CompletedTraining } from '../../types';
 
 describe('applyProgression', () => {

@@ -5,8 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getFocusedRouteNameFromRoute, type RouteProp } from '@react-navigation/native';
 import type { ClientTabParamList } from './types';
-import { colors } from '../theme/colors';
-import { radius } from '../theme';
+import theme from '../theme';
+const { colors, radius } = theme;
 import { HomeTabIcon, ProfileTabIcon, ChatTabIcon, StatsTabIcon, TrainTabIcon } from '../components/icons/TabBarIcons';
 
 import { ChatStackNavigator } from './ChatStackNavigator';

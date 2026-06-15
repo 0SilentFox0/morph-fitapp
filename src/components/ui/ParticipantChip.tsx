@@ -2,9 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from './Avatar';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, radius, typography } = theme;
 
 /**
  * Participant chip per Figma (Component 1): avatar + name in pill,

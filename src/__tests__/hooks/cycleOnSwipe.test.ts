@@ -1,4 +1,4 @@
-import { cycleOnSwipe } from '../../hooks/useVerticalSwipeCycle';
+import { cycleOnSwipe } from '../../hooks/ui/useVerticalSwipeCycle';
 
 const STATES = ['day', 'week', 'month'] as const;
 

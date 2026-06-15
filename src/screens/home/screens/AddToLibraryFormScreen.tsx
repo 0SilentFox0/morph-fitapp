@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { radius } from '../../../theme';
+import theme from '../../../theme';
+const { radius, colors, typography, spacing } = theme;
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../../navigation/types';
@@ -9,17 +10,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ScreenHeader } from '../../../components/layout';
 import { Input, Button, DropdownSelect } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
 import { useProgramsStore } from '../../../store/programsStore';
 import { useDraftProgramStore } from '../../../store/draftProgramStore';
 import { useShallow } from 'zustand/react/shallow';
 import { programDraftSchema, type ProgramDraftValues } from '../../../schemas/program';
 import { ExercisesSection } from './AddToLibraryForm/ExercisesSection';
 import { TagPickerModal } from './AddToLibraryForm/TagPickerModal';
-import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useMirror } from '../../../hooks/useMirror';
+import { useDisclosure } from '../../../hooks/ui/useDisclosure';
+import { useMirror } from '../../../hooks/ui/useMirror';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'AddToLibraryForm'>;
 type Route = RouteProp<HomeStackParamList, 'AddToLibraryForm'>;

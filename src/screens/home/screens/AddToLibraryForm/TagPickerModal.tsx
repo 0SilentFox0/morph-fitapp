@@ -1,10 +1,8 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Overlay } from '../../../../components/ui';
 import { TRAINING_TYPES } from '../../../../constants';
-import { colors } from '../../../../theme/colors';
-import { radius } from '../../../../theme';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 export interface TagPickerModalProps {
   visible: boolean;

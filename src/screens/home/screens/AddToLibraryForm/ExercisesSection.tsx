@@ -3,10 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ExerciseCard } from '../../../../components/ui';
 import { SET_NOTES } from '../../../../constants';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+const { colors, typography, spacing, radius } = theme;
 import type { ProgramExercise } from '../../../../types';
 
 export interface ExercisesSectionProps {

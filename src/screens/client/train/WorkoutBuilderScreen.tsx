@@ -5,11 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { TrainStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
 import { ChoiceCard, Button } from '../../../components/ui';
-import { buildExerciseCatalog } from '../../../utils/exerciseCatalog';
+import { buildExerciseCatalog } from '../../../utils/training/exerciseCatalog';
 import { mockTrainingPrograms } from '../../../mocks';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 
 type Nav = NavigationProp<TrainStackParamList, 'WorkoutBuilder'>;
 

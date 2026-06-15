@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { ClientsStackParamList } from './types';
 import { ScreenBackground } from '../components/layout';
-import { useRestTimer } from '../hooks/useRestTimer';
+import { useRestTimer } from '../hooks/training/useRestTimer';
 
 import { ClientsListScreen } from '../screens/clients/ClientsListScreen';
 import { FiltersScreen } from '../screens/clients/FiltersScreen';

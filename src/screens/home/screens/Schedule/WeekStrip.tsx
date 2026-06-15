@@ -1,8 +1,7 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors } from '../../../../theme/colors';
-import { radius } from '../../../../theme';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+const { colors, radius, spacing } = theme;
 import type { ScheduleDay } from './scheduleUtils';
 
 export interface WeekStripProps {

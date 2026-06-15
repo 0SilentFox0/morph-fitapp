@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getSeedSessions } from '../services/repositories';
 import type { Session, SessionStatus } from '../types';
-import { searchItems } from '../utils/search';
+import { searchItems } from '../utils/common/search';
 import { updateById, removeById } from './collection';
 
 export type { Session, SessionStatus };

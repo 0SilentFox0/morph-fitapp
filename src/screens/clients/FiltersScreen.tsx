@@ -5,10 +5,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ClientsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { Button, SectionTitle } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'Filters'>;
 

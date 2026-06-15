@@ -8,7 +8,7 @@ import {
   softCap,
   percentileOf,
   pointsFor,
-} from '../../utils/gamification';
+} from '../../utils/game/gamification';
 
 const NOW = new Date('2026-06-13T12:00:00Z');
 

@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, radius, typography } = theme;
 
 /**
  * Time picker input per Figma Session form: bg #141414, border #434343,

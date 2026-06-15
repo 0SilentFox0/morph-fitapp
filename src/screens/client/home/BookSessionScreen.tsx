@@ -8,15 +8,13 @@ import { ScreenHeader } from '../../../components/layout';
 import { Button, SectionTitle, Avatar, Overlay } from '../../../components/ui';
 import { DateTimePickerSection } from '../../home/screens/SessionForm/DateTimePickerSection';
 import { TypePickerModal } from '../../home/screens/SessionForm/TypePickerModal';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { TRAINING_TYPES } from '../../../constants';
 import { useTrainersStore } from '../../../store/trainersStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { formatDate, formatTime } from '../../../utils';
-import { useDisclosure } from '../../../hooks/useDisclosure';
+import { useDisclosure } from '../../../hooks/ui/useDisclosure';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'BookSession'>;
 type Route = RouteProp<ClientHomeStackParamList, 'BookSession'>;

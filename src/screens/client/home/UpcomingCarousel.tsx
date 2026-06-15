@@ -13,10 +13,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { ScheduleCard, PagerDots } from '../../../components/ui';
 import type { Session } from '../../../types';
-import { colors } from '../../../theme/colors';
-import { spacing } from '../../../theme/spacing';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
+import theme from '../../../theme';
+const { colors, spacing, radius, typography } = theme;
 
 interface UpcomingCarouselProps {
   sessions: Session[];

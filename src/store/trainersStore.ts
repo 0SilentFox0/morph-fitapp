@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getSeedTrainers } from '../services/repositories';
 import type { Trainer, ConnectionStatus } from '../types';
-import { searchItems } from '../utils/search';
+import { searchItems } from '../utils/common/search';
 
 export type { Trainer, ConnectionStatus };
 

@@ -2,13 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Checkbox } from './Checkbox';
+import { logger } from '../../../services/logger';
 
 /** Trainer experience step: "I have certifications" + certificate uploads. */
 export function CertificationUpload() {
@@ -36,7 +35,7 @@ export function CertificationUpload() {
         if (!existing.has(asset.uri)) addCertification({ name: asset.name, uri: asset.uri });
       });
     } catch (e) {
-      console.warn('[CertificationUpload] DocumentPicker failed:', e);
+      logger.warn('CertificationUpload: DocumentPicker failed', { error: String(e) });
       Alert.alert('Error', 'Could not pick document. Please try again.');
     }
   };

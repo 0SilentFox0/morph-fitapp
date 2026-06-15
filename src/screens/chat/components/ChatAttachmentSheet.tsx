@@ -3,10 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Overlay } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 interface ChatAttachmentSheetProps {
   visible: boolean;

@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-native';
-import { useDateRangePicker } from '../../hooks/useDateRangePicker';
+import { useDateRangePicker } from '../../hooks/datetime/useDateRangePicker';
 
 const d = (iso: string) => new Date(iso);
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { TrainStackParamList } from '../types';
 import { ScreenBackground } from '../../components/layout';
-import { useRestTimer } from '../../hooks/useRestTimer';
+import { useRestTimer } from '../../hooks/training/useRestTimer';
 
 import { TrainHomeScreen } from '../../screens/client/train/TrainHomeScreen';
 import { WorkoutOverviewScreen } from '../../screens/client/train/WorkoutOverviewScreen';

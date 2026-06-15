@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { searchItems } from '../utils/search';
+import { searchItems } from '../utils/common/search';
 
 /** Avatar tint pairs (background + foreground) for initials placeholders, per Figma. */
 export type AvatarTint = 'primary' | 'blue' | 'success';

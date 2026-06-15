@@ -1,5 +1,5 @@
 import { Dimensions } from 'react-native';
-import { getChartWidth } from '../../utils/layout';
+import { getChartWidth } from '../../utils/common/layout';
 import { spacing } from '../../theme/spacing';
 
 describe('getChartWidth', () => {

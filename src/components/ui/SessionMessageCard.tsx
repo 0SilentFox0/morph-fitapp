@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, typography, spacing } = theme;
 import { formatRelativeTime } from '../../utils';
 
 interface SessionMessageCardProps {

@@ -1,5 +1,5 @@
-import type { Session, TrainingProgram, ProgramExercise, ExerciseSet } from '../types';
-import type { SessionParticipant } from '../store/activeTrainingStore';
+import type { Session, TrainingProgram, ProgramExercise, ExerciseSet } from '../../types';
+import type { SessionParticipant } from '../../store/activeTrainingStore';
 
 type Participant = Session['participants'][number];
 

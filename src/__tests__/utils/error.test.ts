@@ -1,4 +1,4 @@
-import { toErrorMessage } from '../../utils/error';
+import { toErrorMessage } from '../../utils/format/error';
 
 describe('toErrorMessage', () => {
   it('returns the message of an Error instance', () => {

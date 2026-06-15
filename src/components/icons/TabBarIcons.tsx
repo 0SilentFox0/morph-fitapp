@@ -1,7 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import Svg, { Path, G } from 'react-native-svg';
-import { colors } from '../../theme/colors';
+import theme from '../../theme';
+const { colors } = theme;
 
 const SIZE = 32;
 

@@ -2,12 +2,10 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+const { colors, typography, spacing, radius } = theme;
 import { mockClients } from '../../../../mocks';
 import { searchByName } from '../../../../utils';
-import { radius } from '../../../../theme';
 
 export interface ParticipantsSectionProps {
   value: string[];

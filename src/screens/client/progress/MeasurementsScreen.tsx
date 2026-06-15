@@ -1,31 +1,17 @@
 import React from 'react';
+import { numericDate } from '../../../utils';
 import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
-import { getChartWidth } from '../../../utils/layout';
+import { getChartWidth } from '../../../utils/common/layout';
 import { LineChart } from 'react-native-chart-kit';
 import { ScreenHeader } from '../../../components/layout';
 import { Button, SectionTitle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 import { useMeasurementsStore } from '../../../store/measurementsStore';
 import { formatDate } from '../../../utils';
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 1,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
+const chartConfig = createChartConfig(1);
 
-const shortLabel = (date: string) => {
-  const d = new Date(date);
-  return Number.isNaN(d.getTime()) ? date : `${d.getMonth() + 1}/${d.getDate()}`;
-};
 
 export function MeasurementsScreen() {
   const entries = useMeasurementsStore((s) => s.entries);
@@ -67,7 +53,7 @@ export function MeasurementsScreen() {
         {series.length >= 2 && (
           <View style={styles.chartCard}>
             <LineChart
-              data={{ labels: series.map((p) => shortLabel(p.date)), datasets: [{ data: series.map((p) => p.value) }] }}
+              data={{ labels: series.map((p) => numericDate(p.date)), datasets: [{ data: series.map((p) => p.value) }] }}
               width={chartWidth}
               height={200}
               yAxisLabel=""

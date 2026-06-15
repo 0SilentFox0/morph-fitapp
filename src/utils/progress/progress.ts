@@ -4,9 +4,9 @@
  * shown on the progress dashboard.
  */
 
-import type { MuscleGroup } from '../constants/muscles';
-import { MUSCLE_GROUPS } from '../constants/muscles';
-import type { CompletedTraining } from '../types';
+import type { MuscleGroup } from '../../constants/muscles';
+import { MUSCLE_GROUPS } from '../../constants/muscles';
+import type { CompletedTraining } from '../../types';
 import {
   computeMuscleStats,
   toIntensities,

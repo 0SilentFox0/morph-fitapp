@@ -2,10 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { ScreenHeader } from '../../../components/layout';
 import { Avatar } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { spacing } from '../../../theme/spacing';
-import { radius } from '../../../theme/radius';
-import { typography } from '../../../theme/typography';
+import theme from '../../../theme';
+const { colors, spacing, radius, typography } = theme;
 import { useGamificationStore } from '../../../store/gamificationStore';
 import type { LeaderboardEntry } from '../../../services/gamificationApi';
 

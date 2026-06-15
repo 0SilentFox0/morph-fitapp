@@ -1,18 +1,16 @@
 import React from 'react';
+import { formatKg } from '../../../utils';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { Avatar, Button, SectionTitle, Tag } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
-import { computeTotals } from '../../../utils/muscleStats';
+import { computeTotals } from '../../../utils/progress/muscleStats';
 
-const formatKg = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`);
 
 export function ClientProfileScreen() {
   const userName = useAppStore((s) => s.userName);

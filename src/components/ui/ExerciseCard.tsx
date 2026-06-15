@@ -1,13 +1,11 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, typography, spacing, radius } = theme;
 import { useDraftProgramStore } from '../../store/draftProgramStore';
 import type { ProgramExercise, ExerciseSet } from '../../types';
 import { SET_NOTES, SET_NOTE_CYCLE } from '../../constants';
-import { radius } from '../../theme';
 
 export interface ExerciseCardProps {
   exercise: ProgramExercise;

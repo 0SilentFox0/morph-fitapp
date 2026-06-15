@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../../theme/colors';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, spacing } = theme;
 
 interface CheckboxProps {
   checked: boolean;

@@ -6,13 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
 import { EmptyState } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseCatalog } from '../../../mocks';
-import { listExerciseProgress } from '../../../utils/exerciseProgress';
+import { listExerciseProgress } from '../../../utils/progress/exerciseProgress';
 
 type Nav = NativeStackNavigationProp<ProgressStackParamList, 'ExerciseProgress'>;
 

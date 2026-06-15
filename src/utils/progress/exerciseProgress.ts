@@ -1,4 +1,4 @@
-import type { CompletedTraining, ExerciseInfo } from '../types';
+import type { CompletedTraining, ExerciseInfo } from '../../types';
 
 export type ProgressMetric = 'weight' | 'volume';
 

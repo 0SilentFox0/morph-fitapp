@@ -1,5 +1,5 @@
 import type { ClientTabParamList } from '../../navigation/types';
-import { useTabNavigation } from '../../hooks/useTabNavigation';
+import { useTabNavigation } from '../../hooks/ui/useTabNavigation';
 
 /** Tabs reachable by horizontal swipe, left → right (the central "+" is excluded). */
 const SWIPE_ORDER: (keyof ClientTabParamList)[] = ['ClientHomeTab', 'TrainersTab', 'ProgressTab'];

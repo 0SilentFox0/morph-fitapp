@@ -5,13 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import type { TrainersStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
 import { Button, Avatar, Tag, SectionTitle, EmptyState } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useTrainersStore } from '../../../store/trainersStore';
 import { useChatStore } from '../../../store/chatStore';
-import { useTabNavigation } from '../../../hooks/useTabNavigation';
+import { useTabNavigation } from '../../../hooks/ui/useTabNavigation';
 
 type Route = RouteProp<TrainersStackParamList, 'TrainerProfile'>;
 

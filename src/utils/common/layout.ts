@@ -1,5 +1,6 @@
 import { Dimensions } from 'react-native';
-import { spacing } from '../theme/spacing';
+import theme from '../../theme';
+const { spacing } = theme;
 
 /**
  * Width for a chart that fills a screen padded by `spacing.lg` on each side.

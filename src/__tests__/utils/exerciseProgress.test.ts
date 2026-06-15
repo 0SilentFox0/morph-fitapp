@@ -2,7 +2,7 @@ import {
   listExerciseProgress,
   exerciseSessionSeries,
   overallVolumeSeries,
-} from '../../utils/exerciseProgress';
+} from '../../utils/progress/exerciseProgress';
 import type { CompletedTraining, ExerciseInfo } from '../../types';
 
 const catalog: Record<number, ExerciseInfo> = {

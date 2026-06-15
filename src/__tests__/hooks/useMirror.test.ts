@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-native';
-import { useMirror } from '../../hooks/useMirror';
+import { useMirror } from '../../hooks/ui/useMirror';
 
 describe('useMirror', () => {
   it('pushes the value to the setter when enabled', async () => {

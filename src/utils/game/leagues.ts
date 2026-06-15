@@ -1,4 +1,5 @@
-import { colors } from '../theme/colors';
+import theme from '../../theme';
+const { colors } = theme;
 import type { Ionicons } from '@expo/vector-icons';
 
 /**

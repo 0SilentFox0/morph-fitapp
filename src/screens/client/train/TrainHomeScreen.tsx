@@ -7,9 +7,8 @@ import { ScreenHeader } from '../../../components/layout';
 import { Card, SectionTitle, Tag, Button, EmptyState } from '../../../components/ui';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { mockTrainingPrograms } from '../../../mocks';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 
 type Nav = NavigationProp<TrainStackParamList, 'TrainHome'>;
 

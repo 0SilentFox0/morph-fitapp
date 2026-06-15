@@ -1,5 +1,5 @@
-import { computeProgressOverview, rankMuscles } from '../../utils/progress';
-import { computeMuscleStats } from '../../utils/muscleStats';
+import { computeProgressOverview, rankMuscles } from '../../utils/progress/progress';
+import { computeMuscleStats } from '../../utils/progress/muscleStats';
 import type { MuscleGroup } from '../../constants/muscles';
 import type { CompletedTraining } from '../../types';
 

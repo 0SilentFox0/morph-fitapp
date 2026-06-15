@@ -1,8 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
+import theme from '../../theme';
+const { colors, radius } = theme;
 
 interface IconButtonProps {
   icon: keyof typeof Ionicons.glyphMap;

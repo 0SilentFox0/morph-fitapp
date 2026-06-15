@@ -12,10 +12,8 @@ import type { ChatStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { SearchInput, Avatar, EmptyState, MessageReceipt } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useChatStore } from '../../store/chatStore';
 import { formatRelativeTime } from '../../utils';
 

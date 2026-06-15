@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, typography } = theme;
 
 /** Tinted initials placeholders used by the chat list, per Figma node 2006:10239. */
 export type AvatarTint = 'primary' | 'blue' | 'success';

@@ -1,4 +1,5 @@
-import { colors } from '../theme/colors';
+import theme from '../theme';
+const { colors } = theme;
 import type { TransactionStatus, TransactionType } from '../types';
 
 export const TRANSACTION_TYPES: TransactionType[] = ['Training', 'Subscription'];

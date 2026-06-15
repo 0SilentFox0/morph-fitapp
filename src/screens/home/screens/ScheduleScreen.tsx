@@ -20,11 +20,10 @@ import { WeekStrip } from './Schedule/WeekStrip';
 import { MonthGrid } from './Schedule/MonthGrid';
 import { WeekColumns } from './Schedule/WeekColumns';
 import { buildDaysFromToday, type ScheduleViewMode } from './Schedule/scheduleUtils';
-import { useVerticalSwipeCycle } from '../../../hooks/useVerticalSwipeCycle';
+import { useVerticalSwipeCycle } from '../../../hooks/ui/useVerticalSwipeCycle';
 import type { SessionOptionAction } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 import { useSessionsStore } from '../../../store/sessionsStore';
 import type { Session } from '../../../types';
 

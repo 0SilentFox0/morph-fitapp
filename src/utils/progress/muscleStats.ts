@@ -1,5 +1,5 @@
-import { MUSCLE_GROUPS, type MuscleGroup } from '../constants/muscles';
-import type { CompletedTraining } from '../types';
+import { MUSCLE_GROUPS, type MuscleGroup } from '../../constants/muscles';
+import type { CompletedTraining } from '../../types';
 
 export interface MuscleStat {
   /** Total tonnage = Σ (weight × reps) over every set hitting this muscle. */

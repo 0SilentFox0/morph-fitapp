@@ -1,7 +1,7 @@
 import { mockTrainingHistory, mockSessions, mockClients, CURRENT_USER_NAME } from './data';
 import type { CompletedTraining } from '../types';
-import { computePRs } from '../utils/personalRecords';
-import { computeWeekStreak } from '../utils/achievements';
+import { computePRs } from '../utils/progress/personalRecords';
+import { computeWeekStreak } from '../utils/game/achievements';
 import {
   computeConsistency,
   computeComposite,
@@ -9,8 +9,8 @@ import {
   percentileOf,
   pointsFor,
   GAMIFICATION_CONFIG,
-} from '../utils/gamification';
-import { resolveTier, nextTier, tierProgress } from '../utils/leagues';
+} from '../utils/game/gamification';
+import { resolveTier, nextTier, tierProgress } from '../utils/game/leagues';
 import type {
   CanonicalExercise,
   GamificationState,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, spacing } = theme;
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { CertificationUpload } from '../components/CertificationUpload';

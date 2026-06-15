@@ -7,10 +7,8 @@ import type { StatsStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/layout';
 import { SearchInput } from '../../components/ui';
 import { TransactionCard } from './Analytics/TransactionCard';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { exportTransactions, searchItems } from '../../utils';
 import { mockTransactions } from '../../mocks';
 

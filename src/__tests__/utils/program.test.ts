@@ -1,4 +1,4 @@
-import { programMeta, participantIdForName, buildParticipants } from '../../utils/program';
+import { programMeta, participantIdForName, buildParticipants } from '../../utils/training/program';
 
 describe('programMeta', () => {
   it('uses the exercise count when exercises are present', () => {

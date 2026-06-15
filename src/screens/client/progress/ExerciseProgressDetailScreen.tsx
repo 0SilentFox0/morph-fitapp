@@ -1,15 +1,14 @@
 import React from 'react';
+import { numericDate } from '../../../utils';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { getChartWidth } from '../../../utils/layout';
+import { getChartWidth } from '../../../utils/common/layout';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseCatalog } from '../../../mocks';
 import type { ExerciseSet } from '../../../types';
@@ -17,25 +16,12 @@ import {
   exerciseSessionSeries,
   listExerciseProgress,
   type ProgressMetric,
-} from '../../../utils/exerciseProgress';
+} from '../../../utils/progress/exerciseProgress';
 
 type Route = RouteProp<ProgressStackParamList, 'ExerciseProgressDetail'>;
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
+const chartConfig = createChartConfig();
 
-const shortLabel = (date: string) => {
-  const d = new Date(date);
-  return Number.isNaN(d.getTime()) ? date : `${d.getMonth() + 1}/${d.getDate()}`;
-};
 const summarizeSets = (sets: ExerciseSet[]) =>
   sets.map((s) => (s.weight > 0 ? `${s.weight}×${s.reps}` : `${s.reps} reps`)).join(', ');
 
@@ -103,7 +89,7 @@ export function ExerciseProgressDetailScreen() {
         {series.length >= 2 ? (
           <View style={styles.chartCard}>
             <LineChart
-              data={{ labels: series.map((p) => shortLabel(p.date)), datasets: [{ data: series.map((p) => p.value) }] }}
+              data={{ labels: series.map((p) => numericDate(p.date)), datasets: [{ data: series.map((p) => p.value) }] }}
               width={chartWidth}
               height={210}
               yAxisLabel=""
@@ -121,7 +107,7 @@ export function ExerciseProgressDetailScreen() {
         <View style={styles.list}>
           {sessionLogs.map((s, i) => (
             <View key={`${s.date}-${i}`} style={styles.logRow}>
-              <Text style={styles.logDate}>{shortLabel(s.date)}</Text>
+              <Text style={styles.logDate}>{numericDate(s.date)}</Text>
               <Text style={styles.logSets}>{summarizeSets(s.logged!.sets)}</Text>
             </View>
           ))}

@@ -3,10 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'rea
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { SectionTitle } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+const { colors, typography, spacing, radius } = theme;
 import type { TrainingProgram } from '../../../../types';
 
 export interface TrainingProgramsRowProps {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatKg } from '../../../utils';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -6,13 +7,11 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
 import { EmptyState } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { mockTrainingPrograms } from '../../../mocks';
-import { computeTotals } from '../../../utils/muscleStats';
+import { computeTotals } from '../../../utils/progress/muscleStats';
 import { formatDate } from '../../../utils';
 
 type Nav = NativeStackNavigationProp<ProgressStackParamList, 'TrainingHistory'>;
@@ -20,7 +19,6 @@ type Nav = NativeStackNavigationProp<ProgressStackParamList, 'TrainingHistory'>;
 const programName = (id: string) =>
   mockTrainingPrograms.find((p) => p.id === id)?.name ?? 'Training';
 
-const formatKg = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`);
 const labelDate = (d: string) => formatDate(d) || d;
 
 export function TrainingHistoryScreen() {

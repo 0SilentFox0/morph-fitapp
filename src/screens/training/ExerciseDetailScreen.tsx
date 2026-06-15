@@ -27,10 +27,8 @@ import { SetEditor } from './ExerciseDetail/SetEditor';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { mockTrainingPrograms } from '../../mocks';
 import { formatClock } from '../../utils';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 type Route = RouteProp<LiveTrainingParamList, 'ExerciseDetail'>;
 type Nav = NativeStackNavigationProp<LiveTrainingParamList, 'ExerciseDetail'>;

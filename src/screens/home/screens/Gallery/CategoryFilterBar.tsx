@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { SearchInput } from '../../../../components/ui';
-import { colors } from '../../../../theme/colors';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
-import { radius } from '../../../../theme';
+import theme from '../../../../theme';
+const { colors, typography, spacing, radius } = theme;
 import type { ExerciseCategory } from '../../../../services/exerciseApi';
 
 export interface CategoryFilterBarProps {

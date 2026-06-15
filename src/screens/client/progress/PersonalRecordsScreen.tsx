@@ -3,13 +3,11 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../../components/layout';
 import { EmptyState } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseCatalog } from '../../../mocks';
-import { computePRs } from '../../../utils/personalRecords';
+import { computePRs } from '../../../utils/progress/personalRecords';
 
 export function PersonalRecordsScreen() {
   const getCurrentUserHistory = useTrainingHistoryStore((s) => s.getCurrentUserHistory);

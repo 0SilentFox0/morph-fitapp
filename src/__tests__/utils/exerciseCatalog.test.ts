@@ -1,4 +1,4 @@
-import { buildExerciseCatalog } from '../../utils/exerciseCatalog';
+import { buildExerciseCatalog } from '../../utils/training/exerciseCatalog';
 import type { TrainingProgram } from '../../types';
 
 const programs: TrainingProgram[] = [

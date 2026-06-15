@@ -7,7 +7,8 @@ import {
   MUSCLE_GROUPS,
   type MuscleGroup,
 } from '../../constants/muscles';
-import { colors, heatColors } from '../../theme/colors';
+import theme from '../../theme';
+const { colors, heatColors } = theme;
 
 const BANDS = heatColors.length;
 

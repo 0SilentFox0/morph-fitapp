@@ -22,10 +22,8 @@ import {
   Card,
 } from '../../components/ui';
 import { TransactionCard } from './Analytics/TransactionCard';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { formatDate, formatTime } from '../../utils';
 import type { Transaction, TransactionType } from '../../types';
 import {
@@ -33,8 +31,8 @@ import {
   TRANSACTION_STATUSES,
   PAYMENT_METHODS,
 } from '../../constants/transactions';
-import { useDisclosure } from '../../hooks/useDisclosure';
-import { useDateTimePicker } from '../../hooks/useDateTimePicker';
+import { useDisclosure } from '../../hooks/ui/useDisclosure';
+import { useDateTimePicker } from '../../hooks/datetime/useDateTimePicker';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'AddTransaction'>;
 

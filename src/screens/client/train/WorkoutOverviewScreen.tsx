@@ -12,9 +12,8 @@ import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { seedParticipant, seedCustomParticipant } from '../../../utils';
 import { getCurrentUser } from '../../../services/repositories';
 import { mockTrainingPrograms } from '../../../mocks';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 
 type Nav = NavigationProp<TrainStackParamList, 'WorkoutOverview'>;
 type Route = RouteProp<TrainStackParamList, 'WorkoutOverview'>;

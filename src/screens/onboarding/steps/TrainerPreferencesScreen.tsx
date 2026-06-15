@@ -1,8 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { TRAINER_GENDER_PREFS, TRAINING_FORMATS } from '../../../constants';
 import { useShallow } from 'zustand/react/shallow';

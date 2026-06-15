@@ -4,7 +4,7 @@ import {
   formatShortDate,
   formatRelativeTime,
   DAY_MS,
-} from '../../utils/date';
+} from '../../utils/format/date';
 
 describe('formatDate', () => {
   it('formats a valid date as "Mon D, YYYY"', () => {

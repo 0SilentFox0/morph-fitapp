@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
-import { useDisclosure, type Disclosure } from './useDisclosure';
+import { useDisclosure, type Disclosure } from '../ui/useDisclosure';
 
 export interface DateTimePicker extends Disclosure {
   /**

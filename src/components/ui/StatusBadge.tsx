@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { radius } from '../../theme';
+import theme from '../../theme';
+const { colors, typography, radius } = theme;
 
 export type StatusBadgeColor = 'success' | 'warning' | 'error' | 'accent' | 'neutral';
 

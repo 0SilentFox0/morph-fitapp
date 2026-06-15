@@ -1,4 +1,4 @@
-import type { CompletedTraining } from '../types';
+import type { CompletedTraining } from '../../types';
 
 export interface PersonalRecord {
   exerciseId: number;

@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native';
 import { Platform } from 'react-native';
-import { useDateTimePicker } from '../../hooks/useDateTimePicker';
+import { useDateTimePicker } from '../../hooks/datetime/useDateTimePicker';
 
 describe('useDateTimePicker', () => {
   it('starts closed and exposes disclosure controls', async () => {

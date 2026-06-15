@@ -5,16 +5,14 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { useAppStore } from '../../../store/appStore';
 import { useGamificationStore } from '../../../store/gamificationStore';
-import { activeDayKeys, computeWeekStreak, computeBadges } from '../../../utils/achievements';
-import { LEAGUE_TIERS } from '../../../utils/leagues';
+import { activeDayKeys, computeWeekStreak, computeBadges } from '../../../utils/game/achievements';
+import { LEAGUE_TIERS } from '../../../utils/game/leagues';
 
 type Nav = NativeStackNavigationProp<ProgressStackParamList, 'Achievements'>;
 

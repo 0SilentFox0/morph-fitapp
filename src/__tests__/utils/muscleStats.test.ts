@@ -5,7 +5,7 @@ import {
   computeTotals,
   muscleTrend,
   filterByTimeframe,
-} from '../../utils/muscleStats';
+} from '../../utils/progress/muscleStats';
 import type { MuscleGroup } from '../../constants/muscles';
 import type { CompletedTraining } from '../../types';
 

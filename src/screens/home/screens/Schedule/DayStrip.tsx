@@ -1,9 +1,7 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors } from '../../../../theme/colors';
-import { radius } from '../../../../theme';
-import { typography } from '../../../../theme/typography';
-import { spacing } from '../../../../theme/spacing';
+import theme from '../../../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 const DAY_CELL_WIDTH = 48;
 const DAY_CELL_HEIGHT = 56;

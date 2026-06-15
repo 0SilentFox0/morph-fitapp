@@ -2,14 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Card } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { buildOnboardingProfile, submitOnboardingProfile } from '../../../services/onboardingApi';
-import { toErrorMessage } from '../../../utils/error';
+import { toErrorMessage } from '../../../utils/format/error';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 
 export function YoureAllSetScreen() {

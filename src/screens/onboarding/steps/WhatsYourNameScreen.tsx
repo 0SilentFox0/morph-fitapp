@@ -1,9 +1,8 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { Input } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, typography, spacing } = theme;
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { useAppStore } from '../../../store/appStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';

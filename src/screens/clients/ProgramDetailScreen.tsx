@@ -7,9 +7,8 @@ import { ScreenHeader } from '../../components/layout';
 import { ProgramExerciseList } from '../../components/ui';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 import { mockTrainingPrograms } from '../../mocks';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ProgramDetail'>;
 type Route = RouteProp<ClientsStackParamList, 'ProgramDetail'>;

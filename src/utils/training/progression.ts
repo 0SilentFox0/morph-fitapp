@@ -1,4 +1,4 @@
-import type { ExerciseSet, CompletedTraining } from '../types';
+import type { ExerciseSet, CompletedTraining } from '../../types';
 
 /** Progression percentages offered at session creation. */
 export const PROGRESSION_STEPS = [0, 5, 10, 15] as const;

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { TrainingProgram, ProgramExercise } from '../types';
-import { searchItems } from '../utils/search';
+import { searchItems } from '../utils/common/search';
 import { updateById, removeById } from './collection';
 
 export interface DraftProgramData {

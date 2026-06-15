@@ -5,10 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { ProgressIndicator } from '../../../components/layout';
 import { HorizontalSwipe } from '../../../components/ui';
 import { FitnessLogo } from '../../../components/icons/FitnessLogo';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 const DEFAULT_TOTAL_STEPS = 7;
 

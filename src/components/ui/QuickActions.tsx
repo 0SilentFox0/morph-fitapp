@@ -2,10 +2,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, spacing, radius, typography } = theme;
 
 interface QuickActionsProps {
   onBook: () => void;

@@ -1,7 +1,7 @@
 // src/components/ui/AnimatedCounter.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Text, type TextProps } from 'react-native';
-import { useReduceMotion } from '../../hooks/useReduceMotion';
+import { useReduceMotion } from '../../hooks/ui/useReduceMotion';
 
 interface AnimatedCounterProps extends TextProps {
   value: number;

@@ -3,12 +3,10 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenHeader } from '../../components/layout';
 import { SectionTitle, Avatar } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
-import { radius } from '../../theme/radius';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, spacing, radius, typography } = theme;
 import { useGamificationStore } from '../../store/gamificationStore';
-import { LEAGUE_TIERS } from '../../utils/leagues';
+import { LEAGUE_TIERS } from '../../utils/game/leagues';
 
 const topPercent = (percentile: number) => Math.max(1, Math.round((1 - percentile) * 100));
 

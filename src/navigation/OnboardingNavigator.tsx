@@ -3,7 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from './types';
-import { colors } from '../theme/colors';
+import theme from '../theme';
+const { colors } = theme;
 import { useOnboardingStore } from '../store/onboardingStore';
 
 import {

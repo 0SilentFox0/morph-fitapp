@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '../../store/authStore';
 import { ApiError } from '../../services/api/client';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, spacing } = theme;
 
 export function LoginScreen() {
   const login = useAuthStore((s) => s.login);

@@ -1,4 +1,4 @@
-import { deriveActiveGroup, seedParticipant, seedCustomParticipant } from '../../utils/activeTraining';
+import { deriveActiveGroup, seedParticipant, seedCustomParticipant } from '../../utils/training/activeTraining';
 import type { Session, TrainingProgram, ProgramExercise } from '../../types';
 
 const programs: TrainingProgram[] = [

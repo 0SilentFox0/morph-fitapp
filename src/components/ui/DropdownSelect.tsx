@@ -1,9 +1,8 @@
 import React from 'react';
 import { Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, radius, typography } = theme;
 
 /**
  * Dropdown trigger per Figma (Dropdown / Trigger / Button Basic):

@@ -1,4 +1,4 @@
-import type { TrainingProgram, ProgramExercise } from '../types';
+import type { TrainingProgram, ProgramExercise } from '../../types';
 
 /**
  * Flattens all program exercises into a deduped catalog (by exercise id, first

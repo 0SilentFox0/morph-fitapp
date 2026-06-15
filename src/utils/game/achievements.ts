@@ -1,5 +1,5 @@
-import type { CompletedTraining } from '../types';
-import { computeTotals } from './muscleStats';
+import type { CompletedTraining } from '../../types';
+import { computeTotals } from '../progress/muscleStats';
 
 /** Local YYYY-MM-DD key for a parseable training date, or null. */
 function dayKey(date: string): string | null {

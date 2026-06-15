@@ -12,10 +12,8 @@ import { useSessionsStore } from '../../store/sessionsStore';
 import { deriveActiveGroup, formatClock } from '../../utils';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { mockTrainingPrograms } from '../../mocks';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientProfile'>;
 type Route = RouteProp<ClientsStackParamList, 'ClientProfile'>;

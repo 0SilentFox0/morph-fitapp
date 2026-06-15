@@ -1,4 +1,4 @@
-import { computePRs } from '../../utils/personalRecords';
+import { computePRs } from '../../utils/progress/personalRecords';
 import type { CompletedTraining } from '../../types';
 
 const history: CompletedTraining[] = [

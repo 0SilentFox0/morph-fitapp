@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useActiveTrainingStore } from '../store/activeTrainingStore';
+import { useActiveTrainingStore } from '../../store/activeTrainingStore';
 
 /**
  * Drives rest countdowns for the whole session: while ANY participant's timer

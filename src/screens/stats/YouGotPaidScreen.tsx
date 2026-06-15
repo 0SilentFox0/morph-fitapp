@@ -6,10 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { StatsStackParamList } from '../../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../components/ui';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, radius, typography, spacing } = theme;
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'YouGotPaid'>;
 

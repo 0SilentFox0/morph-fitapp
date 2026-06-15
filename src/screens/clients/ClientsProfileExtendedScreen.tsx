@@ -21,28 +21,17 @@ import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useProgramsStore } from '../../store/programsStore';
 import { seedParticipant, trainingMetric, buildLineChart, getChartWidth } from '../../utils';
-import { useDisclosure } from '../../hooks/useDisclosure';
+import { useDisclosure } from '../../hooks/ui/useDisclosure';
 import { mockClients, mockTrainingPrograms } from '../../mocks';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import theme from '../../theme';
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 
 type Route = RouteProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 type Nav = NativeStackNavigationProp<ClientsStackParamList, 'ClientsProfileExtended'>;
 
 const CHART_WIDTH = getChartWidth(20);
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
+const chartConfig = createChartConfig();
 
 export function ClientsProfileExtendedScreen() {
   const route = useRoute<Route>();

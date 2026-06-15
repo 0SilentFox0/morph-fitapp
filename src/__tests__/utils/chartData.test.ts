@@ -1,4 +1,4 @@
-import { buildLineChart } from '../../utils/chartData';
+import { buildLineChart } from '../../utils/progress/chartData';
 
 describe('buildLineChart', () => {
   it('returns null for an empty list', () => {

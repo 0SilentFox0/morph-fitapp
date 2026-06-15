@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import theme from '../../theme';
+const { colors } = theme;
 
 export interface OverlayProps {
   visible: boolean;

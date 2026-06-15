@@ -1,6 +1,7 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
+import theme from '../../theme';
+const { colors } = theme;
 import type { MessageStatus } from '../../store/chatStore';
 
 interface MessageReceiptProps {

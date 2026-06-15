@@ -4,7 +4,7 @@ import {
   nextTier,
   tierProgress,
   tierByKey,
-} from '../../utils/leagues';
+} from '../../utils/game/leagues';
 
 describe('resolveTier', () => {
   it('maps percentiles to the band that contains them (min inclusive, max exclusive)', () => {

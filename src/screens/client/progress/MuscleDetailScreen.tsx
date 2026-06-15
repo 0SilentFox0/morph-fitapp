@@ -1,41 +1,25 @@
 import React from 'react';
+import { numericDate, formatKg } from '../../../utils';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { getChartWidth } from '../../../utils/layout';
+import { getChartWidth } from '../../../utils/common/layout';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import theme from '../../../theme';
+const { colors, createChartConfig, radius, typography, spacing } = theme;
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { exerciseMuscleMap, exerciseCatalog } from '../../../mocks';
 import type { ExerciseSet } from '../../../types';
-import { computeMuscleStats, muscleTrend } from '../../../utils/muscleStats';
+import { computeMuscleStats, muscleTrend } from '../../../utils/progress/muscleStats';
 import { MUSCLE_LABELS } from '../../../constants/muscles';
 
 type Route = RouteProp<ProgressStackParamList, 'MuscleDetail'>;
 
-const chartConfig = {
-  backgroundColor: colors.neutral1,
-  backgroundGradientFrom: colors.neutral1,
-  backgroundGradientTo: colors.neutral1,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(174, 69, 31, ${opacity})`,
-  labelColor: () => colors.neutral7,
-  propsForBackgroundLines: { stroke: colors.neutral5, strokeDasharray: '' },
-  style: { borderRadius: radius.sm },
-};
+const chartConfig = createChartConfig();
 
-const shortLabel = (date: string) => {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return date; // already a short label like "Dec 6"
-  return `${d.getMonth() + 1}/${d.getDate()}`;
-};
 
-const formatKg = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`);
 
 function summarizeSets(sets: ExerciseSet[]): string {
   return sets
@@ -91,7 +75,7 @@ export function MuscleDetailScreen() {
           <View style={styles.chartCard}>
             <LineChart
               data={{
-                labels: trend.map((p) => shortLabel(p.date)),
+                labels: trend.map((p) => numericDate(p.date)),
                 datasets: [{ data: trend.map((p) => p.tonnage) }],
               }}
               width={chartWidth}

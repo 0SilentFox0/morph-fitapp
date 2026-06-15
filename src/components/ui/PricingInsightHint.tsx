@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
-import { radius } from '../../theme/radius';
-import { typography } from '../../theme/typography';
+import theme from '../../theme';
+const { colors, spacing, radius, typography } = theme;
 import { fetchPricingInsight, type PricingInsight, type PackageKind } from '../../services/gamificationApi';
 
 interface PricingInsightHintProps {

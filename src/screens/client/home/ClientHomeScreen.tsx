@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatKg } from '../../../utils';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,23 +18,20 @@ import {
 } from '../../../components/ui';
 import { UpcomingCarousel } from './UpcomingCarousel';
 import { useClientTabSwipe } from '../useClientTabSwipe';
-import { useTabNavigation } from '../../../hooks/useTabNavigation';
-import { colors } from '../../../theme/colors';
-import { radius } from '../../../theme';
-import { typography } from '../../../theme/typography';
-import { spacing } from '../../../theme/spacing';
+import { useTabNavigation } from '../../../hooks/ui/useTabNavigation';
+import theme from '../../../theme';
+const { colors, radius, typography, spacing } = theme;
 import { useAppStore } from '../../../store/appStore';
 import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { useSessionsStore } from '../../../store/sessionsStore';
 import { useTrainersStore } from '../../../store/trainersStore';
 import { exerciseMuscleMap } from '../../../mocks';
-import { computeMuscleStats, toIntensities, computeTotals, filterByTimeframe } from '../../../utils/muscleStats';
-import { computeWeekStreak } from '../../../utils/achievements';
+import { computeMuscleStats, toIntensities, computeTotals, filterByTimeframe } from '../../../utils/progress/muscleStats';
+import { computeWeekStreak } from '../../../utils/game/achievements';
 import { MUSCLE_GROUPS, MUSCLE_LABELS } from '../../../constants/muscles';
 
 type Nav = NativeStackNavigationProp<ClientHomeStackParamList, 'ClientHome'>;
 
-const formatKg = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}t` : `${Math.round(n)}kg`);
 
 export function ClientHomeScreen() {
   const navigation = useNavigation<Nav>();

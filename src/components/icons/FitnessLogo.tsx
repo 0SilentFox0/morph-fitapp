@@ -1,6 +1,7 @@
 import React from 'react';
 import Svg, { Path, G, ClipPath, Rect, Defs } from 'react-native-svg';
-import { colors } from '../../theme/colors';
+import theme from '../../theme';
+const { colors } = theme;
 
 interface FitnessLogoProps {
   width?: number;

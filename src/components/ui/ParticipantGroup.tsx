@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar } from './Avatar';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
-import { radius } from '../../theme';
+import theme from '../../theme';
+const { colors, typography, spacing, radius } = theme;
 
 export interface ParticipantInfo {
   id: string;

@@ -1,7 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
+import theme from '../../theme';
+const { colors } = theme;
 
 interface ToggleProps {
   value: boolean;

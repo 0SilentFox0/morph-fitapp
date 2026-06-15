@@ -5,13 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenHeader } from '../../../components/layout';
 import { SectionTitle } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { spacing } from '../../../theme/spacing';
-import { radius } from '../../../theme/radius';
-import { typography } from '../../../theme/typography';
+import theme from '../../../theme';
+const { colors, spacing, radius, typography } = theme;
 import type { ProgressStackParamList } from '../../../navigation/types';
 import { useGamificationStore } from '../../../store/gamificationStore';
-import { LEAGUE_TIERS } from '../../../utils/leagues';
+import { LEAGUE_TIERS } from '../../../utils/game/leagues';
 
 type Nav = NativeStackNavigationProp<ProgressStackParamList, 'League'>;
 

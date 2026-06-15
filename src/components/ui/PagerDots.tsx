@@ -1,8 +1,8 @@
 // src/components/ui/PagerDots.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme';
+import theme from '../../theme';
+const { colors, radius } = theme;
 
 interface PagerDotsProps {
   count: number;

@@ -44,6 +44,15 @@ export function formatShortDate(d: Date | string): string {
 }
 
 /**
+ * Compact "M/D" axis label for charts. Unparseable input is returned as-is, so
+ * values that are already short labels (e.g. "Dec 6") pass through untouched.
+ */
+export function numericDate(date: string): string {
+  const d = new Date(date);
+  return Number.isNaN(d.getTime()) ? date : `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+/**
  * Chat-style relative timestamp: clock time today, weekday within the last
  * week, otherwise a short month/day. `now` is injectable for tests.
  */

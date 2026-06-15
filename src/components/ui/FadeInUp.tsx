@@ -1,7 +1,7 @@
 // src/components/ui/FadeInUp.tsx
 import React, { useEffect, useState } from 'react';
 import { Animated, type ViewProps } from 'react-native';
-import { useReduceMotion } from '../../hooks/useReduceMotion';
+import { useReduceMotion } from '../../hooks/ui/useReduceMotion';
 
 interface FadeInUpProps extends ViewProps {
   /** Stagger delay (ms) before this element animates in. */

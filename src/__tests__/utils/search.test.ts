@@ -1,4 +1,4 @@
-import { normalizeQuery, searchItems, searchByName } from '../../utils/search';
+import { normalizeQuery, searchItems, searchByName } from '../../utils/common/search';
 
 describe('normalizeQuery', () => {
   it('trims and lowercases', () => {
