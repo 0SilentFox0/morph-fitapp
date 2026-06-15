@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { ScreenHeader } from '../../../components/layout';
 import {
@@ -23,11 +24,14 @@ const { colors, radius, typography, spacing } = theme;
 
 import { useShallow } from 'zustand/react/shallow';
 
+import type { HomeStackParamList } from '../../../navigation/types';
 import { useAppStore } from '../../../store/appStore';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 
+type Nav = NativeStackNavigationProp<HomeStackParamList, 'Profile'>;
+
 export function ProfileScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
 
   const userName = useAppStore((s) => s.userName);
 
@@ -121,6 +125,7 @@ export function ProfileScreen() {
           <TouchableOpacity
             accessibilityRole="button"
             accessibilityLabel="Edit profile"
+            onPress={() => navigation.navigate('EditProfile')}
           >
             <Ionicons name="pencil" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -195,6 +200,13 @@ export function ProfileScreen() {
             <Tag key={c} label={c} variant="default" />
           ))}
         </View>
+
+        <Button
+          title="Settings"
+          variant="outline"
+          onPress={() => navigation.navigate('Settings')}
+          style={styles.settingsBtn}
+        />
 
         {__DEV__ && (
           <>
@@ -287,5 +299,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
+  settingsBtn: { marginTop: spacing.lg },
   devResetBtn: { marginTop: spacing.md },
 });

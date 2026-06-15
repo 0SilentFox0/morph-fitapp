@@ -61,6 +61,29 @@ describe('authStore', () => {
     expect(useAuthStore.getState().user).toBeNull();
   });
 
+  it('deleteAccount calls the API, clears the token and logs out', async () => {
+    const spy = jest
+      .spyOn(authApi, 'deleteAccount')
+      .mockResolvedValue(undefined as never);
+
+    await tokenStore.setTokens({
+      access_token: 'a',
+      refresh_token: 'r',
+      expires_at: 'x',
+      token_type: 'Bearer',
+    });
+    useAuthStore.setState({ status: 'authenticated', user: user as never });
+
+    await act(async () => {
+      await useAuthStore.getState().deleteAccount();
+    });
+
+    expect(spy).toHaveBeenCalled();
+    expect(useAuthStore.getState().status).toBe('unauthenticated');
+    expect(useAuthStore.getState().user).toBeNull();
+    expect(await tokenStore.getAccessToken()).toBeNull();
+  });
+
   it('loadSession becomes offline (not unauthenticated) and preserves token on a transient error', async () => {
     await tokenStore.setTokens({
       access_token: 'a',

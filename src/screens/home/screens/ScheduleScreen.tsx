@@ -18,6 +18,7 @@ import {
   SessionOptionsMenu,
 } from '../../../components/ui';
 import type { HomeStackParamList } from '../../../navigation/types';
+import { useSessionsStore } from '../../../store/sessionsStore';
 import theme from '../../../theme';
 import type { Session } from '../../../types';
 import { DayStrip } from './Schedule/DayStrip';
@@ -33,6 +34,13 @@ type Nav = NativeStackNavigationProp<HomeStackParamList, 'Schedule'>;
 
 export function ScheduleScreen() {
   const navigation = useNavigation<Nav>();
+
+  const loadSessions = useSessionsStore((s) => s.loadSessions);
+
+  // Trainer's sessions come from the API; the store starts empty.
+  React.useEffect(() => {
+    void loadSessions().catch(() => {});
+  }, [loadSessions]);
 
   const openSession = React.useCallback(
     (s: Session) => navigation.navigate('SessionForm', { session: s }),

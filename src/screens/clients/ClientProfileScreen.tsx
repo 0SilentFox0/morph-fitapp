@@ -21,9 +21,11 @@ import {
   ClientSwitcherStrip,
   ProgramExerciseList,
 } from '../../components/ui';
+import { useTabNavigation } from '../../hooks/ui/useTabNavigation';
 import { mockTrainingPrograms } from '../../mocks';
 import type { ClientsStackParamList } from '../../navigation/types';
 import { useActiveTrainingStore } from '../../store/activeTrainingStore';
+import { useChatStore } from '../../store/chatStore';
 import { useSessionsStore } from '../../store/sessionsStore';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import theme from '../../theme';
@@ -42,6 +44,12 @@ export function ClientProfileScreen() {
   const navigation = useNavigation<Nav>();
 
   const route = useRoute<Route>();
+
+  const tabNav = useTabNavigation();
+
+  const getOrCreateConversation = useChatStore(
+    (s) => s.getOrCreateConversation
+  );
 
   const requestedClientId = route.params?.clientId;
 
@@ -139,7 +147,23 @@ export function ClientProfileScreen() {
             >
               <Ionicons name="person-outline" size={22} color={colors.text} />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                const conv = getOrCreateConversation(
+                  activeClient.participantId,
+                  {
+                    id: activeClient.participantId,
+                    name: activeClient.name,
+                    avatar: activeClient.avatar ?? null,
+                  }
+                );
+
+                tabNav?.navigate('ChatTab', {
+                  screen: 'ChatThread',
+                  params: { conversationId: conv.id },
+                });
+              }}
+            >
               <Ionicons
                 name="chatbubble-outline"
                 size={22}

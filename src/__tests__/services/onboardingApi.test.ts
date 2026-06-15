@@ -1,8 +1,12 @@
+import * as usersApi from '../../services/api/users';
 import {
   buildOnboardingProfile,
+  profileToUpdateInput,
   submitOnboardingProfile,
 } from '../../services/onboardingApi';
 import type { OnboardingState } from '../../store/onboardingStore';
+
+afterEach(() => jest.restoreAllMocks());
 
 const baseState = {
   name: '  Alex  ',
@@ -74,14 +78,48 @@ describe('buildOnboardingProfile', () => {
   });
 });
 
+describe('profileToUpdateInput', () => {
+  it('maps a trainer profile to UpdateProfileInput (certs → names)', () => {
+    const input = profileToUpdateInput(
+      buildOnboardingProfile(baseState, 'trainer')
+    );
+
+    expect(input).toMatchObject({
+      name: 'Alex',
+      experience: '4-6 years',
+      certifications: ['cert.pdf'],
+      training_types: ['Strength', 'Yoga'],
+      client_types: ['Beginners'],
+      work_schedule_days: ['Monday', 'Wednesday'],
+    });
+  });
+
+  it('maps a client level to the backend fitness_level enum', () => {
+    const input = profileToUpdateInput(
+      buildOnboardingProfile(baseState, 'client')
+    );
+
+    expect(input.fitness_level).toBe('intermediate'); // Amateur → intermediate
+    expect(input.training_types).toEqual(['Strength', 'Yoga']);
+  });
+});
+
 describe('submitOnboardingProfile', () => {
-  it('resolves with a created id for a valid profile', async () => {
+  it('PUTs /me with the mapped profile and returns the user id', async () => {
+    const spy = jest
+      .spyOn(usersApi, 'updateMe')
+      .mockResolvedValue({
+        data: { id: 'u9', created_at: '2026-06-15T00:00:00Z' },
+      } as never);
+
     const result = await submitOnboardingProfile(
       buildOnboardingProfile(baseState, 'client')
     );
 
-    expect(result.id).toMatch(/^mock-client-/);
-    expect(typeof result.createdAt).toBe('string');
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Alex' })
+    );
+    expect(result.id).toBe('u9');
   });
 
   it('rejects when the profile has no name', async () => {

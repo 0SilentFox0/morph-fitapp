@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { AsyncBoundary, Avatar, Card, Tag } from '../../components/ui';
@@ -32,6 +32,13 @@ export function ClientsListScreen() {
     loadClients()
   );
 
+  // Pick up a client created/edited on the Add/Edit screen when returning here.
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
   const clients = React.useMemo(
     () => searchItems(search, data ?? [], (c) => [c.name, c.tag]),
     [search, data]
@@ -41,9 +48,17 @@ export function ClientsListScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Clients</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Filters')}>
-          <Ionicons name="search" size={24} color={colors.text} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={() => navigation.navigate('Filters')}>
+            <Ionicons name="search" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('AddEditClient')}
+            accessibilityLabel="Add client"
+          >
+            <Ionicons name="add" size={26} color={colors.text} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.searchWrapper}>
@@ -126,6 +141,11 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes['2xl'],
     fontWeight: typography.weights.bold,
     color: colors.text,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
   },
   searchWrapper: {
     marginHorizontal: spacing.lg,

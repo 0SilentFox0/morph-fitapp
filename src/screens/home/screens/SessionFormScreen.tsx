@@ -46,6 +46,8 @@ export function SessionFormScreen() {
     setValue,
     programs,
     submit,
+    submitting,
+    error,
     typePicker,
     programPicker,
     setPlannedSets,
@@ -57,7 +59,9 @@ export function SessionFormScreen() {
     participantsValue,
     selectedProgram,
     showProgression,
-  } = useSessionForm(session, () => navigation.navigate('RequestSubmitted'));
+  } = useSessionForm(session, (counterpartName) =>
+    navigation.navigate('RequestSubmitted', { counterpartName })
+  );
 
   return (
     <View style={styles.container}>
@@ -177,7 +181,13 @@ export function SessionFormScreen() {
           />
         ) : null}
 
-        <Button title="Apply" onPress={submit} style={styles.applyButton} />
+        {error ? <Text style={styles.submitError}>{error}</Text> : null}
+        <Button
+          title="Apply"
+          onPress={submit}
+          loading={submitting}
+          style={styles.applyButton}
+        />
       </ScrollView>
 
       <TypePickerModal
@@ -287,5 +297,11 @@ const styles = StyleSheet.create({
   },
   applyButton: {
     marginTop: spacing.xl,
+  },
+  submitError: {
+    fontSize: typography.sizes.sm,
+    color: colors.Error,
+    marginTop: spacing.md,
+    textAlign: 'center',
   },
 });

@@ -14,25 +14,29 @@ type Nav = NativeStackNavigationProp<
   'ProgressOverview'
 >;
 
-const QUICK_LINKS: {
+type QuickLink = {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   route: keyof ProgressStackParamList;
-}[] = [
-  { label: 'My league', icon: 'ribbon-outline', route: 'League' },
-  { label: 'Leaderboards', icon: 'podium-outline', route: 'Leaderboard' },
+};
+
+// Grouped so the core tracking tools come first and the (motivational, but
+// secondary) gamification links don't crowd the top — addressing the
+// "7 equal-weight links, league before history" overwhelm.
+const PROGRESS_LINKS: QuickLink[] = [
   {
     label: 'Exercise progress',
     icon: 'barbell-outline',
     route: 'ExerciseProgress',
   },
   { label: 'Training history', icon: 'time-outline', route: 'TrainingHistory' },
-  {
-    label: 'Personal records',
-    icon: 'trophy-outline',
-    route: 'PersonalRecords',
-  },
+  { label: 'Personal records', icon: 'trophy-outline', route: 'PersonalRecords' },
   { label: 'Measurements', icon: 'analytics-outline', route: 'Measurements' },
+];
+
+const GAMIFICATION_LINKS: QuickLink[] = [
+  { label: 'My league', icon: 'ribbon-outline', route: 'League' },
+  { label: 'Leaderboards', icon: 'podium-outline', route: 'Leaderboard' },
   { label: 'Achievements', icon: 'medal-outline', route: 'Achievements' },
 ];
 
@@ -40,24 +44,41 @@ const QUICK_LINKS: {
 export function ProgressQuickLinks() {
   const navigation = useNavigation<Nav>();
 
+  const renderGroup = (title: string, links: QuickLink[]) => (
+    <View style={styles.group}>
+      <Text style={styles.groupTitle}>{title}</Text>
+      <View style={styles.linksGrid}>
+        {links.map((link) => (
+          <TouchableOpacity
+            key={link.route}
+            style={styles.linkCard}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate(link.route as never)}
+          >
+            <Ionicons name={link.icon} size={22} color={colors.accent} />
+            <Text style={styles.linkLabel}>{link.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+
   return (
-    <View style={styles.linksGrid}>
-      {QUICK_LINKS.map((link) => (
-        <TouchableOpacity
-          key={link.route}
-          style={styles.linkCard}
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate(link.route as never)}
-        >
-          <Ionicons name={link.icon} size={22} color={colors.accent} />
-          <Text style={styles.linkLabel}>{link.label}</Text>
-        </TouchableOpacity>
-      ))}
+    <View>
+      {renderGroup('Progress', PROGRESS_LINKS)}
+      {renderGroup('Achievements & rankings', GAMIFICATION_LINKS)}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  group: { marginTop: spacing.lg },
+  groupTitle: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+  },
   linksGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   linkCard: {
     width: '48%',

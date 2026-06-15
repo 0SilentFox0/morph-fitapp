@@ -25,8 +25,6 @@ export function YoureAllSetScreen() {
 
   const isClient = role === 'client';
 
-  const resetOnboarding = useOnboardingStore((s) => s.reset);
-
   const [submitting, setSubmitting] = React.useState(false);
 
   const handleComplete = async () => {
@@ -40,9 +38,11 @@ export function YoureAllSetScreen() {
         role ?? 'trainer'
       );
 
+      // Publish the profile to the backend, then mark onboarding complete.
+      // The onboarding store is intentionally NOT reset here: the Profile screen
+      // reads it for display, so wiping it would blank a freshly-created profile.
       await submitOnboardingProfile(profile);
       addPoints(20);
-      resetOnboarding();
       setOnboarded(true);
     } catch (e) {
       setSubmitting(false);

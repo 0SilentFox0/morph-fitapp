@@ -74,7 +74,7 @@ export function BookSessionScreen() {
         { id: trainer.id, name: trainer.name, avatar: trainer.avatar },
       ],
     });
-    navigation.navigate('RequestSubmitted');
+    navigation.navigate('RequestSubmitted', { counterpartName: trainer.name });
   };
 
   return (

@@ -1,6 +1,10 @@
+import { apiReadiness } from '../config/apiReadiness';
 import type { UserRole } from '../store/appStore';
 import type { OnboardingState } from '../store/onboardingStore';
+import type { UpdateProfileInput } from './api/users';
+import * as usersApi from './api/users';
 import { logger } from './logger';
+import { withMockFallback } from './mockFallback';
 
 /**
  * Consolidated profiles the backend receives at the end of onboarding. These
@@ -99,30 +103,77 @@ export function buildOnboardingProfile(
   };
 }
 
-const delay = (ms: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, ms));
+/** Self-classification → backend fitness_level enum. */
+const LEVEL_MAP: Record<string, string> = {
+  Beginner: 'beginner',
+  Amateur: 'intermediate',
+  Advanced: 'advanced',
+  Professional: 'elite',
+};
 
 /**
- * Mock backend submission for a finished onboarding profile. Simulates network
- * latency and returns the created user id. Swap the body for a real
- * `apiFetch('/users', { method: 'POST', body: JSON.stringify(profile) })`
- * once the backend exists — callers already handle the promise + errors.
+ * Map a consolidated onboarding profile to the `PUT /me` payload. Pure — unit
+ * tested. Only the fields the backend `UpdateProfileInput` understands are sent.
+ */
+export function profileToUpdateInput(
+  profile: OnboardingProfile
+): UpdateProfileInput {
+  if (profile.role === 'client') {
+    return {
+      name: profile.name,
+      experience: profile.trainingDuration,
+      fitness_level: LEVEL_MAP[profile.level] ?? undefined,
+      training_types: profile.interests,
+      locations: profile.preferredLocations,
+      work_schedule_days: profile.availability.days,
+      work_schedule_start: profile.availability.from,
+      work_schedule_end: profile.availability.to,
+    };
+  }
+
+  return {
+    name: profile.name,
+    experience: profile.experience,
+    certifications: profile.certifications.files.map((f) => f.name),
+    training_types: profile.trainingTypes,
+    client_types: profile.clientTypes,
+    locations: profile.locations,
+    work_schedule_days: profile.schedule.days,
+    work_schedule_start: profile.schedule.from,
+    work_schedule_end: profile.schedule.to,
+  };
+}
+
+/**
+ * Persist a finished onboarding profile via `PUT /me` (behind the `users`
+ * readiness flag). Returns the user id. Callers handle the promise + errors;
+ * onboarding completion is then marked locally (and, once `/me/onboarding/
+ * complete` ships — see B8 — server-side).
  */
 export async function submitOnboardingProfile(
   profile: OnboardingProfile
 ): Promise<SubmitOnboardingResult> {
-  await delay(800);
-
   if (!profile.name) {
     throw new Error('Please enter your name before finishing.');
   }
 
   if (__DEV__) {
-    logger.debug('onboardingApi: (mock) submitting profile', { profile });
+    logger.debug('onboardingApi: submitting profile', { profile });
   }
 
-  return {
-    id: `mock-${profile.role}-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
+  return withMockFallback(
+    apiReadiness.users,
+    async () => {
+      const { data } = await usersApi.updateMe(profileToUpdateInput(profile));
+
+      return {
+        id: data.id,
+        createdAt: data.created_at ?? new Date().toISOString(),
+      };
+    },
+    () => ({
+      id: `mock-${profile.role}-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    })
+  );
 }

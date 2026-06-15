@@ -20,6 +20,7 @@ import { TrainingProgramsRow } from './Home/TrainingProgramsRow';
 
 const { colors, typography, spacing } = theme;
 
+import { loadUnreadCount } from '../../../services/repositories/notificationsRepository';
 import { useActiveTrainingStore } from '../../../store/activeTrainingStore';
 import { useAppStore } from '../../../store/appStore';
 import { useProgramsStore } from '../../../store/programsStore';
@@ -39,7 +40,31 @@ export function HomeScreen() {
 
   const programs = useProgramsStore((s) => s.programs);
 
+  const loadPrograms = useProgramsStore((s) => s.loadPrograms);
+
+  // Populate the programs carousel (store starts empty; no-ops if already loaded).
+  // A failed load just leaves the carousel empty — not worth interrupting Home.
+  React.useEffect(() => {
+    void loadPrograms().catch(() => {});
+  }, [loadPrograms]);
+
   const sessions = useSessionsStore((s) => s.sessions);
+
+  const loadSessions = useSessionsStore((s) => s.loadSessions);
+
+  // Pull the trainer's real sessions (store starts empty; no-ops if loaded).
+  React.useEffect(() => {
+    void loadSessions().catch(() => {});
+  }, [loadSessions]);
+
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  // Real unread-notifications badge for the bell.
+  React.useEffect(() => {
+    void loadUnreadCount()
+      .then(setUnreadCount)
+      .catch(() => {});
+  }, []);
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -56,11 +81,6 @@ export function HomeScreen() {
 
   const upcomingSessions = React.useMemo(
     () => sessions.filter((s) => s.status !== 'canceled'),
-    [sessions]
-  );
-
-  const todayCount = React.useMemo(
-    () => sessions.filter((s) => s.date === 'Today').length,
     [sessions]
   );
 
@@ -105,8 +125,9 @@ export function HomeScreen() {
       <HomeHeader
         userName={userName}
         points={points}
-        showNotifDot={todayCount > 0}
+        showNotifDot={unreadCount > 0}
         onProfilePress={() => navigation.navigate('Profile')}
+        onNotificationsPress={() => navigation.navigate('Notifications')}
       />
 
       <ScrollView

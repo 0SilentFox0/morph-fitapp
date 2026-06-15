@@ -1,3 +1,4 @@
+import * as workoutsRepository from '../../services/repositories/workoutsRepository';
 import {
   type SessionParticipant,
   useActiveTrainingStore,
@@ -37,6 +38,53 @@ beforeEach(() => {
   useActiveTrainingStore.setState({
     participants: [],
     activeParticipantId: null,
+    workoutLogId: null,
+  });
+});
+
+afterEach(() => jest.restoreAllMocks());
+
+describe('server workout lifecycle', () => {
+  it('beginServerWorkout is a no-op for ad-hoc / non-UUID session ids', async () => {
+    const spy = jest.spyOn(workoutsRepository, 'startWorkout');
+
+    await useActiveTrainingStore.getState().beginServerWorkout('p1');
+    await useActiveTrainingStore.getState().beginServerWorkout(null);
+
+    expect(spy).not.toHaveBeenCalled();
+    expect(useActiveTrainingStore.getState().workoutLogId).toBeNull();
+  });
+
+  it('beginServerWorkout opens a log for a real UUID session', async () => {
+    jest
+      .spyOn(workoutsRepository, 'startWorkout')
+      .mockResolvedValue({ id: 'log1' } as never);
+
+    await useActiveTrainingStore
+      .getState()
+      .beginServerWorkout('11111111-1111-4111-8111-111111111111');
+
+    expect(useActiveTrainingStore.getState().workoutLogId).toBe('log1');
+  });
+
+  it('finishServerWorkout finishes an open log and clears it', async () => {
+    const spy = jest
+      .spyOn(workoutsRepository, 'finishWorkout')
+      .mockResolvedValue({ id: 'log1' } as never);
+
+    useActiveTrainingStore.setState({ workoutLogId: 'log1' });
+    await useActiveTrainingStore.getState().finishServerWorkout();
+
+    expect(spy).toHaveBeenCalledWith('log1');
+    expect(useActiveTrainingStore.getState().workoutLogId).toBeNull();
+  });
+
+  it('finishServerWorkout is a no-op when no log is open', async () => {
+    const spy = jest.spyOn(workoutsRepository, 'finishWorkout');
+
+    await useActiveTrainingStore.getState().finishServerWorkout();
+
+    expect(spy).not.toHaveBeenCalled();
   });
 });
 
@@ -184,5 +232,30 @@ describe('useActiveTrainingStore', () => {
     expect(
       useActiveTrainingStore.getState().participants[0]!.exercises
     ).toEqual(before);
+  });
+
+  it('updateSet clamps negative or non-finite weight/reps to zero', () => {
+    useActiveTrainingStore.getState().startTraining([makeParticipant()]);
+
+    useActiveTrainingStore.getState().updateSet('c1', 1, 0, { weight: -5 });
+    useActiveTrainingStore.getState().updateSet('c1', 1, 0, { reps: NaN });
+
+    const set = useActiveTrainingStore.getState().participants[0]!.setLog[1]![0]!;
+
+    expect(set.weight).toBe(0);
+    expect(set.reps).toBe(0);
+  });
+
+  it('updateSet keeps valid positive values', () => {
+    useActiveTrainingStore.getState().startTraining([makeParticipant()]);
+
+    useActiveTrainingStore
+      .getState()
+      .updateSet('c1', 1, 0, { weight: 52.5, reps: 8 });
+
+    const set = useActiveTrainingStore.getState().participants[0]!.setLog[1]![0]!;
+
+    expect(set.weight).toBe(52.5);
+    expect(set.reps).toBe(8);
   });
 });

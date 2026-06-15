@@ -1,7 +1,9 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Toggle } from '../../../components/ui';
+import { useAppStore } from '../../../store/appStore';
 import theme from '../../../theme';
+import { displayToKg, kgToDisplay, weightUnitLabel } from '../../../utils';
 
 const { colors, radius, typography, spacing } = theme;
 
@@ -23,6 +25,9 @@ export function SetEditor({
   onRepsChange,
   onToggleFailure,
 }: SetEditorProps) {
+  // Weights are stored in kg; show/enter them in the user's preferred unit.
+  const units = useAppStore((s) => s.units);
+
   return (
     <>
       <View style={styles.field}>
@@ -31,10 +36,10 @@ export function SetEditor({
           keyboardType="decimal-pad"
           inputMode="decimal"
           selectTextOnFocus
-          value={String(weight)}
-          onChangeText={(t) => onWeightChange(Number(t) || 0)}
+          value={String(kgToDisplay(weight, units))}
+          onChangeText={(t) => onWeightChange(displayToKg(Number(t) || 0, units))}
         />
-        <Text style={styles.fieldSuffix}>kg</Text>
+        <Text style={styles.fieldSuffix}>{weightUnitLabel(units)}</Text>
       </View>
       <View style={styles.field}>
         <TextInput

@@ -33,9 +33,12 @@ export type MainTabParamList = {
 export type HomeStackParamList = {
   Home: undefined;
   Profile: undefined;
+  EditProfile: undefined;
+  Settings: undefined;
+  Notifications: undefined;
   Schedule: undefined;
   SessionForm: { session?: Session } | undefined;
-  RequestSubmitted: undefined;
+  RequestSubmitted: { counterpartName?: string } | undefined;
   TrainingLibrary: undefined;
   AddToLibraryForm:
     | { program?: TrainingProgram; selectedExercises?: ProgramExercise[] }
@@ -71,6 +74,7 @@ export type ClientsStackParamList = LiveTrainingParamList & {
   ClientProfile: { clientId?: string } | undefined;
   ProgramDetail: { programId: string };
   ClientsProfileExtended: { clientId?: string } | undefined;
+  AddEditClient: { clientId?: string } | undefined;
 };
 
 export type StatsStackParamList = {
@@ -110,7 +114,7 @@ export type ClientHomeStackParamList = {
   ClientHome: undefined;
   ClientProfile: undefined;
   BookSession: { trainerId?: string } | undefined;
-  RequestSubmitted: undefined;
+  RequestSubmitted: { counterpartName?: string } | undefined;
 };
 
 export type TrainersStackParamList = {

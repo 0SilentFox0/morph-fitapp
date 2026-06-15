@@ -1,6 +1,12 @@
 import type { Client as ApiClient } from '../../schemas/api/models';
 import * as clientsApi from '../../services/api/clients';
-import { apiClientToUi, loadClients } from '../../services/clientsService';
+import {
+  apiClientToUi,
+  buildClientInput,
+  createClient,
+  loadClients,
+  updateClient,
+} from '../../services/clientsService';
 
 const apiClient: ApiClient = {
   id: 'c1',
@@ -56,5 +62,45 @@ describe('loadClients', () => {
     expect(clientsApi.listClients).toHaveBeenCalled();
     expect(result.map((c) => c.id)).toEqual(['c1']);
     expect(result[0]!.tag).toBe('Personal');
+  });
+});
+
+describe('buildClientInput', () => {
+  it('trims the name and drops empty optional fields', () => {
+    expect(
+      buildClientInput({ name: '  Bob  ', type: 'group', email: '   ' })
+    ).toEqual({ name: 'Bob', type: 'group' });
+  });
+
+  it('throws when the name is blank', () => {
+    expect(() => buildClientInput({ name: '   ', type: 'personal' })).toThrow();
+  });
+});
+
+describe('createClient / updateClient', () => {
+  it('createClient posts the built input and maps the result to UI', async () => {
+    const spy = jest
+      .spyOn(clientsApi, 'createClient')
+      .mockResolvedValue({ data: { ...apiClient, name: 'Bob' } } as never);
+
+    const result = await createClient({ name: 'Bob', type: 'personal' });
+
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Bob', type: 'personal' })
+    );
+    expect(result).toMatchObject({ name: 'Bob', tag: 'Personal' });
+  });
+
+  it('updateClient puts to the client id', async () => {
+    const spy = jest
+      .spyOn(clientsApi, 'updateClient')
+      .mockResolvedValue({ data: apiClient } as never);
+
+    await updateClient('c1', { name: 'Brooklyn Simmons', type: 'personal' });
+
+    expect(spy).toHaveBeenCalledWith(
+      'c1',
+      expect.objectContaining({ name: 'Brooklyn Simmons' })
+    );
   });
 });
