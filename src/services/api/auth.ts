@@ -1,8 +1,10 @@
+import { apiReadiness } from '../../config/apiReadiness';
 import { dataEnvelope } from '../../schemas/api/envelope';
 import {
   type TokenResponse,
   TokenResponseSchema,
 } from '../../schemas/api/models';
+import { withMockFallback } from '../mockFallback';
 import { api, request } from './client';
 import { tokenStore } from './tokenStore';
 
@@ -44,6 +46,61 @@ export async function register(input: RegisterInput): Promise<TokenResponse> {
   await tokenStore.setTokens(data);
 
   return data;
+}
+
+export interface GoogleLoginInput {
+  /** Google-issued OIDC id_token obtained on-device (see services/auth/googleAuth.ts). */
+  id_token: string;
+  /** Role to assign on first sign-up via Google. Ignored for returning users. */
+  role?: 'client' | 'trainer';
+}
+
+/**
+ * Exchange a Google id_token for our Sanctum tokens. Lives behind
+ * `apiReadiness.google`: until the backend ships `POST /auth/google`, the mock
+ * path returns a dev token so the flow stays navigable in development. The
+ * caller (authStore) synthesizes a local user in mock mode — see loginWithGoogle.
+ */
+export async function loginWithGoogle(
+  input: GoogleLoginInput
+): Promise<TokenResponse> {
+  const data = await withMockFallback(
+    apiReadiness.google,
+    async () => {
+      const res = await request('POST', '/auth/google', {
+        body: input,
+        auth: false,
+        schema: tokenEnvelope,
+      });
+
+      return res.data;
+    },
+    (): TokenResponse => ({
+      access_token: 'mock-google-access-token',
+      refresh_token: 'mock-google-refresh-token',
+      expires_at: new Date(Date.now() + 3600_000).toISOString(),
+      token_type: 'Bearer',
+    })
+  );
+
+  await tokenStore.setTokens(data);
+
+  return data;
+}
+
+/**
+ * Link a Google account to the signed-in user (so they can later sign in with
+ * Google). Gated by `apiReadiness.google`; the mock path is a no-op until the
+ * backend ships `POST /me/auth/google`.
+ */
+export async function linkGoogle(idToken: string): Promise<void> {
+  await withMockFallback(
+    apiReadiness.google,
+    async () => {
+      await api.post('/me/auth/google', { body: { id_token: idToken } });
+    },
+    () => undefined
+  );
 }
 
 export async function logout(): Promise<void> {

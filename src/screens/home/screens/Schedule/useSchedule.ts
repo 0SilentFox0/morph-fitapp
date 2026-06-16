@@ -22,7 +22,7 @@ export function useSchedule(onOpenSession: (s: Session) => void) {
 
   const sessions = useSessionsStore((s) => s.sessions);
 
-  const deleteSession = useSessionsStore((s) => s.deleteSession);
+  const cancelSession = useSessionsStore((s) => s.cancelSession);
 
   const getSessionsByDateKey = useSessionsStore((s) => s.getSessionsByDateKey);
 
@@ -85,7 +85,7 @@ export function useSchedule(onOpenSession: (s: Session) => void) {
           text: 'Yes, cancel',
           style: 'destructive',
           onPress: () => {
-            deleteSession(optionsSession.id);
+            void cancelSession(optionsSession.id);
             setOptionsSession(null);
           },
         },

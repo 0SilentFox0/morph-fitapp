@@ -35,7 +35,7 @@ export function WhatsYourNameScreen() {
     if (!isValid) return;
 
     setUserName(trimmed);
-    navigation.navigate('Experience');
+    navigation.navigate(isClient ? 'Goals' : 'Experience');
   };
 
   return (
@@ -50,7 +50,7 @@ export function WhatsYourNameScreen() {
       }
       onNext={handleNext}
       onBack={() => navigation.goBack()}
-      onSkip={() => navigation.navigate('Experience')}
+      onSkip={() => navigation.navigate(isClient ? 'Goals' : 'Experience')}
       nextDisabled={!isValid}
     >
       <Input

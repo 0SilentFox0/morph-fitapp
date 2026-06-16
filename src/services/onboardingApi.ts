@@ -19,6 +19,8 @@ export interface ClientProfile {
   trainingDuration: string;
   /** Self-classification: Beginner / Amateur / Advanced / Professional. */
   level: string;
+  /** What the client wants to achieve — drives matching + goal-based progress. */
+  goals: string[];
   /** Training types the client is interested in. */
   interests: string[];
   injuries: { has: boolean; note: string };
@@ -66,6 +68,7 @@ export function buildOnboardingProfile(
       name: state.name.trim(),
       trainingDuration: state.experienceYears,
       level: state.selfLevel,
+      goals: state.goals,
       interests: state.trainingTypes,
       injuries: { has: state.hasInjuries, note: state.injuriesNote.trim() },
       preferredLocations: state.locations,
@@ -123,6 +126,7 @@ export function profileToUpdateInput(
       name: profile.name,
       experience: profile.trainingDuration,
       fitness_level: LEVEL_MAP[profile.level] ?? undefined,
+      goals: profile.goals,
       training_types: profile.interests,
       locations: profile.preferredLocations,
       work_schedule_days: profile.availability.days,

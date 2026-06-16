@@ -1,9 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { type NavigationProp, useNavigation } from '@react-navigation/native';
 
 import { ScreenHeader } from '../../../components/layout';
 import { Avatar, Button, SectionTitle, Tag } from '../../../components/ui';
+import type { ClientHomeStackParamList } from '../../../navigation/types';
 import theme from '../../../theme';
 import { formatKg } from '../../../utils';
 
@@ -15,6 +17,9 @@ import { useTrainingHistoryStore } from '../../../store/trainingHistoryStore';
 import { computeTotals } from '../../../utils/progress/muscleStats';
 
 export function ClientProfileScreen() {
+  const navigation =
+    useNavigation<NavigationProp<ClientHomeStackParamList>>();
+
   const userName = useAppStore((s) => s.userName);
 
   const points = useAppStore((s) => s.points);
@@ -74,6 +79,24 @@ export function ClientProfileScreen() {
           </>
         )}
 
+        <View style={styles.actions}>
+          <ProfileRow
+            icon="create-outline"
+            label="Edit profile"
+            onPress={() => navigation.navigate('EditProfile')}
+          />
+          <ProfileRow
+            icon="notifications-outline"
+            label="Notifications"
+            onPress={() => navigation.navigate('Notifications')}
+          />
+          <ProfileRow
+            icon="settings-outline"
+            label="Settings"
+            onPress={() => navigation.navigate('Settings')}
+          />
+        </View>
+
         {__DEV__ && (
           <View style={styles.devSection}>
             <Button
@@ -101,6 +124,33 @@ function StatTile({ label, value }: { label: string; value: string }) {
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
+  );
+}
+
+function ProfileRow({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={styles.row}
+      onPress={onPress}
+    >
+      <Ionicons name={icon} size={20} color={colors.text} />
+      <Text style={styles.rowLabel}>{label}</Text>
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={colors.textSecondary}
+      />
+    </Pressable>
   );
 }
 
@@ -137,6 +187,22 @@ const styles = StyleSheet.create({
   },
   statLabel: { fontSize: typography.sizes.xs, color: colors.textSecondary },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  actions: { marginTop: spacing.md, gap: spacing.xs },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.cardBg,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  rowLabel: {
+    flex: 1,
+    fontSize: typography.sizes.base,
+    color: colors.text,
+    fontWeight: typography.weights.medium,
+  },
   devSection: { gap: spacing.sm, marginTop: spacing.lg },
   devBtn: {},
 });

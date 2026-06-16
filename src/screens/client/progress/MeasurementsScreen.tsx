@@ -10,10 +10,23 @@ import { getChartWidth } from '../../../utils/common/layout';
 
 const { colors, createChartConfig, radius, typography, spacing } = theme;
 
+import { useAppStore } from '../../../store/appStore';
 import { useMeasurementsStore } from '../../../store/measurementsStore';
 import { formatDate } from '../../../utils';
+import {
+  displayToKg,
+  kgToDisplay,
+  weightUnitLabel,
+} from '../../../utils/format/units';
 
 const chartConfig = createChartConfig(1);
+
+/** Parse a positive number from a free-text field; null if blank/invalid. */
+function parsePositive(text: string): number | null {
+  const value = parseFloat(text.replace(',', '.'));
+
+  return Number.isNaN(value) || value <= 0 ? null : value;
+}
 
 export function MeasurementsScreen() {
   const entries = useMeasurementsStore((s) => s.entries);
@@ -24,7 +37,19 @@ export function MeasurementsScreen() {
 
   const latest = useMeasurementsStore((s) => s.latest());
 
+  const units = useAppStore((s) => s.units);
+
+  const unitLabel = weightUnitLabel(units);
+
   const [weightInput, setWeightInput] = React.useState('');
+
+  const [chestInput, setChestInput] = React.useState('');
+
+  const [waistInput, setWaistInput] = React.useState('');
+
+  const [armInput, setArmInput] = React.useState('');
+
+  const [error, setError] = React.useState<string | null>(null);
 
   const series = getSeries('weightKg');
 
@@ -35,15 +60,36 @@ export function MeasurementsScreen() {
   const delta = first != null && current != null ? current - first : null;
 
   const handleAdd = () => {
-    const value = parseFloat(weightInput.replace(',', '.'));
+    setError(null);
 
-    if (Number.isNaN(value) || value <= 0) return;
+    const weight = parsePositive(weightInput);
+
+    const chest = parsePositive(chestInput);
+
+    const waist = parsePositive(waistInput);
+
+    const arm = parsePositive(armInput);
+
+    if (weight == null && chest == null && waist == null && arm == null) {
+      setError('Enter at least one measurement.');
+
+      return;
+    }
 
     addEntry({
       date: new Date().toISOString(),
-      weightKg: Math.round(value * 10) / 10,
+      // Weight is entered in the user's unit but always stored in kg.
+      ...(weight != null
+        ? { weightKg: Math.round(displayToKg(weight, units) * 10) / 10 }
+        : {}),
+      ...(chest != null ? { chestCm: chest } : {}),
+      ...(waist != null ? { waistCm: waist } : {}),
+      ...(arm != null ? { armCm: arm } : {}),
     });
     setWeightInput('');
+    setChestInput('');
+    setWaistInput('');
+    setArmInput('');
   };
 
   const chartWidth = getChartWidth(spacing.md * 2);
@@ -55,7 +101,9 @@ export function MeasurementsScreen() {
         <View style={styles.headlineCard}>
           <Text style={styles.headlineLabel}>Current weight</Text>
           <Text style={styles.headlineValue}>
-            {current != null ? `${current} kg` : '—'}
+            {current != null
+              ? `${kgToDisplay(current, units)} ${unitLabel}`
+              : '—'}
           </Text>
           {delta != null && (
             <Text
@@ -65,7 +113,7 @@ export function MeasurementsScreen() {
               ]}
             >
               {delta > 0 ? '+' : ''}
-              {delta.toFixed(1)} kg since start
+              {kgToDisplay(delta, units).toFixed(1)} {unitLabel} since start
             </Text>
           )}
         </View>
@@ -75,12 +123,14 @@ export function MeasurementsScreen() {
             <LineChart
               data={{
                 labels: series.map((p) => numericDate(p.date)),
-                datasets: [{ data: series.map((p) => p.value) }],
+                datasets: [
+                  { data: series.map((p) => kgToDisplay(p.value, units)) },
+                ],
               }}
               width={chartWidth}
               height={200}
               yAxisLabel=""
-              yAxisSuffix="kg"
+              yAxisSuffix={unitLabel}
               chartConfig={chartConfig}
               bezier
               style={styles.chart}
@@ -88,18 +138,45 @@ export function MeasurementsScreen() {
           </View>
         )}
 
-        <SectionTitle>Log weight</SectionTitle>
+        <SectionTitle>Log measurements</SectionTitle>
         <View style={styles.addRow}>
           <TextInput
             style={styles.input}
             value={weightInput}
             onChangeText={setWeightInput}
             keyboardType="decimal-pad"
-            placeholder="e.g. 79.5"
+            placeholder={`Weight (${unitLabel})`}
             placeholderTextColor={colors.textMuted}
           />
           <Button title="Add" onPress={handleAdd} style={styles.addBtn} />
         </View>
+        <View style={styles.measuresRow}>
+          <TextInput
+            style={[styles.input, styles.measureInput]}
+            value={chestInput}
+            onChangeText={setChestInput}
+            keyboardType="decimal-pad"
+            placeholder="Chest (cm)"
+            placeholderTextColor={colors.textMuted}
+          />
+          <TextInput
+            style={[styles.input, styles.measureInput]}
+            value={waistInput}
+            onChangeText={setWaistInput}
+            keyboardType="decimal-pad"
+            placeholder="Waist (cm)"
+            placeholderTextColor={colors.textMuted}
+          />
+          <TextInput
+            style={[styles.input, styles.measureInput]}
+            value={armInput}
+            onChangeText={setArmInput}
+            keyboardType="decimal-pad"
+            placeholder="Arm (cm)"
+            placeholderTextColor={colors.textMuted}
+          />
+        </View>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <SectionTitle>History</SectionTitle>
         <View style={styles.list}>
@@ -108,7 +185,18 @@ export function MeasurementsScreen() {
               <Text style={styles.entryDate}>
                 {formatDate(e.date) || e.date}
               </Text>
-              <Text style={styles.entryWeight}>{e.weightKg} kg</Text>
+              <Text style={styles.entryWeight}>
+                {[
+                  e.weightKg != null
+                    ? `${kgToDisplay(e.weightKg, units)} ${unitLabel}`
+                    : null,
+                  e.chestCm != null ? `chest ${e.chestCm}` : null,
+                  e.waistCm != null ? `waist ${e.waistCm}` : null,
+                  e.armCm != null ? `arm ${e.armCm}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </Text>
             </View>
           ))}
         </View>
@@ -147,6 +235,9 @@ const styles = StyleSheet.create({
   },
   chart: { borderRadius: radius.sm },
   addRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
+  measuresRow: { flexDirection: 'row', gap: spacing.sm },
+  measureInput: { flex: 1, paddingVertical: spacing.sm },
+  error: { color: colors.Error, fontSize: typography.sizes.sm },
   input: {
     flex: 1,
     backgroundColor: colors.inputBg,

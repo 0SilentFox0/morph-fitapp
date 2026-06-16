@@ -5,7 +5,12 @@ import { ScreenBackground } from '../../components/layout';
 import { BookSessionScreen } from '../../screens/client/home/BookSessionScreen';
 import { ClientHomeScreen } from '../../screens/client/home/ClientHomeScreen';
 import { ClientProfileScreen } from '../../screens/client/home/ClientProfileScreen';
-import { RequestSubmittedScreen } from '../../screens/home';
+import {
+  EditProfileScreen,
+  NotificationsScreen,
+  RequestSubmittedScreen,
+  SettingsScreen,
+} from '../../screens/home';
 import type { ClientHomeStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<ClientHomeStackParamList>();
@@ -26,6 +31,9 @@ export function ClientHomeStackNavigator() {
     >
       <Stack.Screen name="ClientHome" component={ClientHomeScreen} />
       <Stack.Screen name="ClientProfile" component={ClientProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="BookSession" component={BookSessionScreen} />
       <Stack.Screen
         name="RequestSubmitted"

@@ -17,6 +17,8 @@ export function RootNavigator() {
 
   const isOnboarded = useAppStore((state) => state.isOnboarded);
 
+  const signupMode = useAppStore((state) => state.signupMode);
+
   const userRole = useAppStore((state) => state.userRole);
 
   if (status === 'loading') {
@@ -36,8 +38,12 @@ export function RootNavigator() {
     return <ConnectionErrorScreen />;
   }
 
+  // A brand-new user signing up runs onboarding before the account exists; the
+  // account is created at the end. Rendering OnboardingNavigator here (and again
+  // in the authenticated-but-not-onboarded branch below) keeps the SAME component
+  // mounted across the register-driven auth transition, so there's no flash/remount.
   if (status === 'unauthenticated') {
-    return <AuthNavigator />;
+    return signupMode ? <OnboardingNavigator /> : <AuthNavigator />;
   }
 
   // Authenticated. Existing onboarding flow still gates first-run setup.

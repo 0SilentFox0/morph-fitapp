@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 
 import { ScreenHeader } from '../../../components/layout';
 import { Button, Segmented } from '../../../components/ui';
+import * as authApi from '../../../services/api/auth';
+import { getGoogleIdToken } from '../../../services/auth/googleAuth';
 import { useAppStore } from '../../../store/appStore';
 import { useAuthStore } from '../../../store/authStore';
 import theme from '../../../theme';
@@ -25,7 +27,33 @@ export function SettingsScreen() {
 
   const setUnits = useAppStore((s) => s.setUnits);
 
+  const googleLinked = useAppStore((s) => s.googleLinked);
+
+  const setGoogleLinked = useAppStore((s) => s.setGoogleLinked);
+
   const [busy, setBusy] = React.useState(false);
+
+  const [linkingGoogle, setLinkingGoogle] = React.useState(false);
+
+  const handleGoogle = async () => {
+    if (googleLinked) {
+      setGoogleLinked(false);
+
+      return;
+    }
+
+    setLinkingGoogle(true);
+    try {
+      const idToken = await getGoogleIdToken();
+
+      await authApi.linkGoogle(idToken);
+      setGoogleLinked(true);
+    } catch (e) {
+      Alert.alert("Couldn't connect Google", toErrorMessage(e));
+    } finally {
+      setLinkingGoogle(false);
+    }
+  };
 
   const handleLogout = async () => {
     setBusy(true);
@@ -83,6 +111,23 @@ export function SettingsScreen() {
           value={units === 'imperial' ? 1 : 0}
           onChange={(i) => setUnits(i === 1 ? 'imperial' : 'metric')}
         />
+
+        <Text style={[styles.sectionLabel, styles.sectionGap]}>
+          Sign-in methods
+        </Text>
+        <Button
+          title={googleLinked ? 'Disconnect Google' : 'Connect Google account'}
+          variant="outline"
+          onPress={handleGoogle}
+          loading={linkingGoogle}
+          disabled={busy}
+          style={styles.btn}
+        />
+        <Text style={styles.hint}>
+          {googleLinked
+            ? 'You can now log in with Google.'
+            : 'Connect Google to enable signing in with your Google account.'}
+        </Text>
 
         <Text style={[styles.sectionLabel, styles.sectionGap]}>Account</Text>
 

@@ -30,6 +30,24 @@ export const apiReadiness = {
   workouts: true,
   /** No /analytics/* endpoints on the server yet — dashboard aggregates stay on mock data. */
   analytics: false,
+  /**
+   * Google OAuth sign-in. The frontend plumbing (button → store → authApi) is in
+   * place behind `withMockFallback`; flip to true once the backend exposes
+   * `POST /auth/google` (exchange a Google id_token for our Sanctum tokens) and
+   * the expo-auth-session client IDs are configured. See services/auth/googleAuth.ts.
+   */
+  google: false,
+  /**
+   * Client-initiated session booking. There is no client-self booking endpoint
+   * yet (see FRONTEND_INTEGRATION_CHANGES.md — no `POST /me/sessions`), so the
+   * request is mirrored locally for now. Flip once the self-scoped endpoint ships.
+   */
+  clientBooking: false,
+  /**
+   * Client → trainer connection requests. No endpoint yet; the request stays
+   * local (status `pending`) until the backend adds connection requests.
+   */
+  trainerConnect: false,
 } as const;
 
 export type ApiFeature = keyof typeof apiReadiness;

@@ -76,6 +76,8 @@ export function TrainingSummaryScreen() {
 
   const units = useAppStore((s) => s.units);
 
+  const addPoints = useAppStore((s) => s.addPoints);
+
   const getClientHistory = useTrainingHistoryStore((s) => s.getClientHistory);
 
   // label-only: exercises come from participant.exercises, this is just for the type tag
@@ -129,6 +131,10 @@ export function TrainingSummaryScreen() {
           sets: (participant.setLog[ex.id] ?? ex.sets).map((s) => ({ ...s })),
         })),
       });
+
+      // Reward completing a workout so the points balance reflects real
+      // activity (previously it only ever moved at onboarding).
+      addPoints(50);
     }
 
     // Finalize the server workout log when one is open (real backend session);

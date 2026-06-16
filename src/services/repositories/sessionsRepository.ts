@@ -107,6 +107,8 @@ export interface SessionFormInput {
   programId?: string;
   /** Session length; defaults to 60 minutes. */
   durationMinutes?: number;
+  /** Real client UUIDs to attach as participants. Non-UUIDs are dropped. */
+  clientIds?: string[];
 }
 
 const UUID_RE =
@@ -126,14 +128,16 @@ function mergeDateTime(date: Date, time: Date): Date {
  * Known limitations until the matching screens are API-backed (P1.1):
  * - `program_id` is only forwarded when it is a real UUID; mock program ids
  *   ("p1") are dropped so a live create doesn't 422.
- * - participants are collected as free-text names with no client id, so
- *   `client_ids` is omitted; the trainer attaches clients once a real picker
- *   lands. The session is still created server-side.
+ * - participants collected as free-text names carry no client id and are
+ *   dropped; pass real client UUIDs via `clientIds` (from a real client picker)
+ *   to attach them. Non-UUID ids are filtered out so a live create doesn't 422.
  */
 export function buildSessionInput(form: SessionFormInput): SessionInput {
   const start = mergeDateTime(form.date, form.time);
 
   const end = new Date(start.getTime() + (form.durationMinutes ?? 60) * 60_000);
+
+  const clientIds = (form.clientIds ?? []).filter((id) => UUID_RE.test(id));
 
   return {
     title: form.title.trim(),
@@ -143,6 +147,7 @@ export function buildSessionInput(form: SessionFormInput): SessionInput {
     ...(form.programId && UUID_RE.test(form.programId)
       ? { program_id: form.programId }
       : {}),
+    ...(clientIds.length > 0 ? { client_ids: clientIds } : {}),
   };
 }
 
@@ -177,6 +182,25 @@ export async function createSession(
     apiReadiness.sessions,
     async () => (await sessionsApi.createSession(input)).data,
     () => echoSession(input)
+  );
+}
+
+/**
+ * Cancel a session on the backend so the other party sees it. No-op for local/
+ * mock sessions (non-UUID ids), which only ever lived in the local store.
+ */
+export async function cancelSession(
+  id: string,
+  reason = 'Canceled by trainer'
+): Promise<void> {
+  if (!UUID_RE.test(id)) return;
+
+  await withMockFallback(
+    apiReadiness.sessions,
+    async () => {
+      await sessionsApi.cancelSession(id, reason);
+    },
+    () => undefined
   );
 }
 

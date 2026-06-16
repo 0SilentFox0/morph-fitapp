@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 
+import { apiReadiness } from '../config/apiReadiness';
 import type { User } from '../schemas/api/models';
 import * as authApi from '../services/api/auth';
 import { ApiError, setUnauthorizedHandler } from '../services/api/client';
 import { tokenStore } from '../services/api/tokenStore';
 import * as usersApi from '../services/api/users';
+import { getGoogleIdToken } from '../services/auth/googleAuth';
 import { useAppStore } from './appStore';
 
 export type AuthStatus =
@@ -19,6 +21,13 @@ interface AuthState {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (input: authApi.RegisterInput) => Promise<void>;
+  loginWithGoogle: (role?: 'client' | 'trainer') => Promise<void>;
+  /**
+   * DEV ONLY: drop into the app as a ready-made, onboarded test user without a
+   * backend account. API-backed screens will show empty/error states (no token),
+   * but mock-fallback screens work — enough to navigate the UI while testing.
+   */
+  loginAsTestUser: (role?: 'client' | 'trainer') => void;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   loadSession: () => Promise<void>;
@@ -63,6 +72,62 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ status: 'authenticated', user: data });
   },
 
+  loginWithGoogle: async (role) => {
+    const idToken = await getGoogleIdToken();
+
+    await authApi.loginWithGoogle({ id_token: idToken, role });
+
+    // Live mode: the real /me reflects the Google-linked account. Mock mode: the
+    // dev token can't satisfy /me, so synthesize a navigable local user instead
+    // of faking a success screen over a broken session.
+    if (apiReadiness.google) {
+      const { data } = await usersApi.getMe();
+
+      syncUser(data);
+      set({ status: 'authenticated', user: data });
+
+      return;
+    }
+
+    const mockUser: User = {
+      id: 'mock-google-user',
+      email: 'google.user@example.com',
+      name: 'Google User',
+      role: role ?? 'client',
+      certifications: [],
+      training_types: [],
+      client_types: [],
+      locations: [],
+      work_schedule_days: [],
+      goals: [],
+      created_at: new Date().toISOString(),
+    };
+
+    syncUser(mockUser);
+    set({ status: 'authenticated', user: mockUser });
+  },
+
+  loginAsTestUser: (role = 'client') => {
+    const testUser: User = {
+      id: 'dev-test-user',
+      email: 'test@fitconnect.dev',
+      name: role === 'trainer' ? 'Test Trainer' : 'Test Client',
+      role,
+      certifications: [],
+      training_types: [],
+      client_types: [],
+      locations: [],
+      work_schedule_days: [],
+      goals: [],
+      created_at: new Date().toISOString(),
+    };
+
+    syncUser(testUser);
+    // Skip onboarding and land straight in the app for testing.
+    useAppStore.setState({ isOnboarded: true, signupMode: false });
+    set({ status: 'authenticated', user: testUser });
+  },
+
   // NOTE (follow-up): we still do NOT call useAppStore.reset() here. loadSession
   // now derives isOnboarded from the backend's onboarding_completed_at, but only
   // when it is set true — completion isn't persisted to the backend yet (the
@@ -73,6 +138,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await authApi.logout();
     } finally {
+      // Clear any in-progress signup so logout always lands on the login screen.
+      useAppStore.setState({ signupMode: false });
       set({ status: 'unauthenticated', user: null });
     }
   },

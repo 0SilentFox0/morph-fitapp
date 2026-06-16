@@ -53,6 +53,10 @@ export function WorkoutOverviewScreen() {
 
   const startTraining = useActiveTrainingStore((s) => s.startTraining);
 
+  const beginServerWorkout = useActiveTrainingStore(
+    (s) => s.beginServerWorkout
+  );
+
   const getLastSets = useTrainingHistoryStore((s) => s.getLastSets);
 
   const sessions = useSessionsStore((s) => s.sessions);
@@ -117,6 +121,14 @@ export function WorkoutOverviewScreen() {
     }
 
     startTraining([participant]);
+
+    // Open a server workout log for a real (API-backed) assigned session so the
+    // completed workout persists on finish. No-op for mock/program/custom flows
+    // (the store guards on a UUID session id).
+    if (params.source === 'assigned') {
+      void beginServerWorkout(params.sessionId);
+    }
+
     navigation.navigate('ExerciseDetail', {
       participantId: me.id,
       programId: participant.programId,
