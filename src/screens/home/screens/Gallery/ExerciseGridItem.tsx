@@ -6,10 +6,21 @@ import theme from '../../../../theme';
 
 const { colors, radius, typography, spacing } = theme;
 
-import type { Exercise } from '../../../../services/exerciseApi';
+/**
+ * Minimal shape the grid card renders. Both the trainer gallery's `Exercise`
+ * and the client catalog's `ProgramExercise` satisfy it, so the same card
+ * powers exercise picking on both sides.
+ */
+export interface GridExercise {
+  id: number;
+  name: string;
+  category: string;
+  imageUrl: string | null;
+  durationLabel?: string;
+}
 
 export interface ExerciseGridItemProps {
-  item: Exercise;
+  item: GridExercise;
   isSelected: boolean;
   isExisting: boolean;
   onPress: () => void;
@@ -58,7 +69,7 @@ function ExerciseGridItemBase({
           <View style={styles.gridMeta}>
             <View style={styles.metaChip}>
               <Ionicons name="time-outline" size={10} color={colors.neutral9} />
-              <Text style={styles.metaText}>12m</Text>
+              <Text style={styles.metaText}>{item.durationLabel ?? '12m'}</Text>
             </View>
             <View style={styles.metaChip}>
               <Text style={styles.metaText}>{item.category}</Text>

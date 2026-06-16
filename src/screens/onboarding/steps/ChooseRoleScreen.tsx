@@ -1,12 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button, ChoiceCard } from '../../../components/ui';
 import theme from '../../../theme';
 
-const { spacing } = theme;
+const { colors, spacing, typography } = theme;
 
 import { useAppStore } from '../../../store/appStore';
+import { useAuthStore } from '../../../store/authStore';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
@@ -14,6 +15,12 @@ export function ChooseRoleScreen() {
   const { navigation } = useOnboardingScreen('ChooseRole');
 
   const setUserRole = useAppStore((s) => s.setUserRole);
+
+  const setSignupMode = useAppStore((s) => s.setSignupMode);
+
+  // During sign-up the user reached onboarding from the login screen; offer a
+  // way back. (No-op for the authenticated first-run onboarding path.)
+  const isSigningUp = useAuthStore((s) => s.status) !== 'authenticated';
 
   const [selected, setSelected] = React.useState<'client' | 'trainer'>(
     'trainer'
@@ -54,6 +61,17 @@ export function ChooseRoleScreen() {
         onPress={() => handleApply(selected)}
         style={styles.button}
       />
+
+      {isSigningUp && (
+        <Pressable
+          accessibilityRole="button"
+          style={styles.loginRow}
+          onPress={() => setSignupMode(false)}
+        >
+          <Text style={styles.loginMuted}>Already have an account? </Text>
+          <Text style={styles.loginLink}>Log in</Text>
+        </Pressable>
+      )}
     </OnboardingLayout>
   );
 }
@@ -64,5 +82,16 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: spacing['2xl'],
+  },
+  loginRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: spacing.lg,
+  },
+  loginMuted: { color: colors.textMuted, fontSize: typography.sizes.sm },
+  loginLink: {
+    color: colors.accent,
+    fontWeight: typography.weights.semibold,
+    fontSize: typography.sizes.sm,
   },
 });

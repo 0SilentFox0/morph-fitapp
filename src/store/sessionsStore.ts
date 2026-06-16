@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 
-import { loadSessions as loadSessionsFromApi } from '../services/repositories/sessionsRepository';
+import {
+  cancelSession as cancelSessionApi,
+  loadSessions as loadSessionsFromApi,
+} from '../services/repositories/sessionsRepository';
 import type { Session, SessionStatus } from '../types';
 import { searchItems } from '../utils/common/search';
 import { removeById, updateById } from './collection';
@@ -20,6 +23,12 @@ interface SessionsState {
   addSession: (session: Omit<Session, 'id'>) => void;
   updateSession: (id: string, updates: Partial<Omit<Session, 'id'>>) => void;
   deleteSession: (id: string) => void;
+  /**
+   * Cancel a session: tell the backend (so the other party sees it) and then
+   * drop it from the local list. Falls back to a local-only removal for
+   * mock/local sessions. Never throws to the caller.
+   */
+  cancelSession: (id: string, reason?: string) => Promise<void>;
   getSessionsByDateKey: (dateKey: string) => Session[];
   searchSessions: (query: string) => Session[];
   getTodaySessions: () => Session[];
@@ -57,6 +66,16 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
 
   deleteSession: (id) => {
     set((state) => ({ sessions: removeById(state.sessions, id) }));
+  },
+
+  cancelSession: async (id, reason) => {
+    try {
+      await cancelSessionApi(id, reason);
+    } finally {
+      // Drop locally regardless: the user asked to cancel, and a failed remote
+      // call shouldn't leave a "canceled" session lingering in their view.
+      set((state) => ({ sessions: removeById(state.sessions, id) }));
+    }
   },
 
   getSessionsByDateKey: (dateKey) => {

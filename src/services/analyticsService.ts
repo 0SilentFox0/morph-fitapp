@@ -21,8 +21,14 @@ export interface BusinessAnalytics {
  * revenue split) have no `/analytics/*` endpoint yet, so they fall back to mock
  * data — flip `apiReadiness.analytics` once the backend ships them.
  */
-export async function loadBusinessAnalytics(): Promise<BusinessAnalytics> {
-  const transactions = await withMockFallback(
+/**
+ * Load the trainer's transactions in UI shape from the live `/transactions`
+ * endpoint (client names resolved from `/clients`), or mock data until ready.
+ * Shared by the analytics dashboard and the Transactions list so both read the
+ * same source.
+ */
+export async function loadTransactions(): Promise<Transaction[]> {
+  return withMockFallback(
     apiReadiness.transactions,
     async () => {
       const [txRes, clientsRes] = await Promise.all([
@@ -38,6 +44,10 @@ export async function loadBusinessAnalytics(): Promise<BusinessAnalytics> {
     },
     () => mockTransactions
   );
+}
+
+export async function loadBusinessAnalytics(): Promise<BusinessAnalytics> {
+  const transactions = await loadTransactions();
 
   const aggregates = await withMockFallback(
     apiReadiness.analytics,

@@ -16,18 +16,22 @@ describe('stepFor', () => {
     });
   });
 
-  it('numbers the client flow (8 steps, includes TrainerPreferences)', () => {
+  it('numbers the client flow (9 steps, includes Goals + TrainerPreferences)', () => {
     expect(stepFor('WhatsYourName', 'client')).toEqual({
       step: 1,
-      totalSteps: 8,
+      totalSteps: 9,
+    });
+    expect(stepFor('Goals', 'client')).toEqual({
+      step: 2,
+      totalSteps: 9,
     });
     expect(stepFor('TrainerPreferences', 'client')).toEqual({
-      step: 7,
-      totalSteps: 8,
+      step: 8,
+      totalSteps: 9,
     });
     expect(stepFor('ProfilePhoto', 'client')).toEqual({
-      step: 8,
-      totalSteps: 8,
+      step: 9,
+      totalSteps: 9,
     });
   });
 
@@ -38,7 +42,7 @@ describe('stepFor', () => {
   it('returns an undefined step for screens outside the numbered flow', () => {
     expect(stepFor('Welcome', 'client')).toEqual({
       step: undefined,
-      totalSteps: 8,
+      totalSteps: 9,
     });
     expect(stepFor('PreviewProfile', 'trainer')).toEqual({
       step: undefined,

@@ -1,14 +1,16 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { type NavigationProp, useNavigation } from '@react-navigation/native';
 
 import { ScreenHeader } from '../../../components/layout';
-import { Button, ChoiceCard } from '../../../components/ui';
+import { Button } from '../../../components/ui';
 import { mockTrainingPrograms } from '../../../mocks';
 import type { TrainStackParamList } from '../../../navigation/types';
 import theme from '../../../theme';
+import type { ProgramExercise } from '../../../types';
 import { buildExerciseCatalog } from '../../../utils/training/exerciseCatalog';
+import { ExerciseGridItem } from '../../home/screens/Gallery/ExerciseGridItem';
 
 const { colors, typography, spacing } = theme;
 
@@ -34,30 +36,41 @@ export function WorkoutBuilderScreen() {
     navigation.navigate('WorkoutOverview', { source: 'custom', exercises });
   };
 
+  const renderExercise = React.useCallback(
+    ({ item }: { item: ProgramExercise }) => (
+      <ExerciseGridItem
+        item={item}
+        isSelected={selected.includes(item.id)}
+        isExisting={false}
+        onPress={() => toggle(item.id)}
+      />
+    ),
+    [selected]
+  );
+
   return (
     <View style={styles.container}>
       <ScreenHeader title="Build workout" onBack={() => navigation.goBack()} />
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: spacing['2xl'] + insets.bottom + 64 },
-        ]}
+      <FlatList
+        data={CATALOG}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={2}
+        columnWrapperStyle={styles.gridRow}
+        renderItem={renderExercise}
+        ListHeaderComponent={
+          <Text style={styles.hint}>Pick the exercises for your session.</Text>
+        }
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.hint}>Pick the exercises for your session.</Text>
-        {CATALOG.map((ex) => (
-          <View key={ex.id} style={styles.cardWrap}>
-            <ChoiceCard
-              title={ex.name}
-              subtitle={ex.category}
-              selected={selected.includes(ex.id)}
-              onPress={() => toggle(ex.id)}
-            />
-          </View>
-        ))}
-      </ScrollView>
+      />
       <View
-        style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}
+        style={[
+          styles.footer,
+          {
+            paddingBottom:
+              Math.max(insets.bottom, spacing.md) + spacing.tabBarInset,
+          },
+        ]}
       >
         <Button
           title={
@@ -73,13 +86,19 @@ export function WorkoutBuilderScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  content: { padding: spacing.lg },
+  listContent: {
+    padding: spacing.lg,
+    paddingBottom: spacing.tabBarInset + spacing['3xl'],
+  },
+  gridRow: {
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
   hint: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
-  cardWrap: { marginBottom: spacing.sm },
   footer: {
     position: 'absolute',
     left: 0,

@@ -1,6 +1,7 @@
 export { ChooseRoleScreen } from './steps/ChooseRoleScreen';
 export { ClientTypesScreen } from './steps/ClientTypesScreen';
 export { ExperienceScreen } from './steps/ExperienceScreen';
+export { GoalsScreen } from './steps/GoalsScreen';
 export { PreviewProfileScreen } from './steps/PreviewProfileScreen';
 export { ProfilePhotoScreen } from './steps/ProfilePhotoScreen';
 export { TrainerPreferencesScreen } from './steps/TrainerPreferencesScreen';

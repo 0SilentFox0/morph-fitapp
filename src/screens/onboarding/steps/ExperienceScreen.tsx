@@ -12,13 +12,20 @@ import { OnboardingLayout } from '../components/OnboardingLayout';
 import { useOnboardingScreen } from '../hooks/useOnboardingScreen';
 
 const EXPERIENCE_OPTIONS = [
+  { label: '<1', sub: 'year' },
   { label: '1–3', sub: 'years' },
   { label: '4–6', sub: 'years' },
   { label: '7–9', sub: 'years' },
   { label: '10+', sub: 'years' },
 ];
 
-const EXPERIENCE_VALUES = ['1-3 years', '4-6 years', '7-9 years', '10+ years'];
+const EXPERIENCE_VALUES = [
+  'Less than 1 year',
+  '1-3 years',
+  '4-6 years',
+  '7-9 years',
+  '10+ years',
+];
 
 export function ExperienceScreen() {
   const { navigation, isClient, step, totalSteps } =

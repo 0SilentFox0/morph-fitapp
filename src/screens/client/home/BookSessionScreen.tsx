@@ -23,6 +23,7 @@ import { TypePickerModal } from '../../home/screens/SessionForm/TypePickerModal'
 
 const { colors, radius, typography, spacing } = theme;
 
+import { isApiReady } from '../../../config/apiReadiness';
 import { TRAINING_TYPES } from '../../../constants';
 import { useDisclosure } from '../../../hooks/ui/useDisclosure';
 import { useSessionsStore } from '../../../store/sessionsStore';
@@ -125,8 +126,9 @@ export function BookSessionScreen() {
           style={styles.submit}
         />
         <Text style={styles.hint}>
-          Your trainer will confirm the session. You can track its status on
-          your home screen.
+          {isApiReady('clientBooking')
+            ? 'Your trainer will confirm the session. You can track its status on your home screen.'
+            : 'Saved to your schedule as pending. Trainer confirmation turns on once booking is connected — for now, message your trainer to agree the time.'}
         </Text>
       </ScrollView>
 

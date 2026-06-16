@@ -1,11 +1,13 @@
 import React from 'react';
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 import theme from '../../../theme';
 
@@ -32,6 +34,28 @@ export function AddToLibraryFormScreen() {
   const route = useRoute<Route>();
 
   const program = route.params?.program;
+
+  const [coverUri, setCoverUri] = React.useState<string | null>(null);
+
+  // Cover preview is local for now; it persists with the program once the
+  // create/update goes through `POST /programs` (see programs migration).
+  const pickCover = async () => {
+    const permission =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setCoverUri(result.assets[0].uri);
+    }
+  };
 
   const {
     control,
@@ -113,12 +137,22 @@ export function AddToLibraryFormScreen() {
         />
 
         <Text style={styles.sectionLabel}>Preview</Text>
-        <TouchableOpacity style={styles.uploadArea}>
-          <View style={styles.uploadIconBox}>
-            <Ionicons name="image-outline" size={22} color={colors.textMuted} />
-          </View>
+        <TouchableOpacity style={styles.uploadArea} onPress={pickCover}>
+          {coverUri ? (
+            <Image source={{ uri: coverUri }} style={styles.coverImage} />
+          ) : (
+            <View style={styles.uploadIconBox}>
+              <Ionicons
+                name="image-outline"
+                size={22}
+                color={colors.textMuted}
+              />
+            </View>
+          )}
           <View style={styles.uploadTextBox}>
-            <Text style={styles.uploadTitle}>Tap to upload photo</Text>
+            <Text style={styles.uploadTitle}>
+              {coverUri ? 'Tap to change photo' : 'Tap to upload photo'}
+            </Text>
             <Text style={styles.uploadHint}>
               Recommended size: square,{'\n'}min 500x500px
             </Text>
@@ -207,6 +241,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral3,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  coverImage: {
+    width: 84,
+    height: 84,
+    borderRadius: radius.sm,
   },
   uploadTextBox: {
     flex: 1,

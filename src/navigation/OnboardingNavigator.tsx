@@ -12,6 +12,7 @@ import {
   ChooseRoleScreen,
   ClientTypesScreen,
   ExperienceScreen,
+  GoalsScreen,
   PreviewProfileScreen,
   ProfilePhotoScreen,
   TrainerPreferencesScreen,
@@ -30,6 +31,7 @@ const RESUMABLE_ROUTES: readonly (keyof OnboardingStackParamList)[] = [
   'ChooseRole',
   'Welcome',
   'WhatsYourName',
+  'Goals',
   'Experience',
   'TrainingTypes',
   'ClientTypes',
@@ -91,6 +93,7 @@ export function OnboardingNavigator() {
         <Stack.Screen name="ChooseRole" component={ChooseRoleScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="WhatsYourName" component={WhatsYourNameScreen} />
+        <Stack.Screen name="Goals" component={GoalsScreen} />
         <Stack.Screen name="Experience" component={ExperienceScreen} />
         <Stack.Screen name="TrainingTypes" component={TrainingTypesScreen} />
         <Stack.Screen name="ClientTypes" component={ClientTypesScreen} />

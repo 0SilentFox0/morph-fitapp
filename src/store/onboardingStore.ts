@@ -32,6 +32,8 @@ export interface OnboardingState {
   // mirrored questions; the shared fields above double as the client's
   // training duration / interests / preferred locations / availability).
   selfLevel: string;
+  /** Client fitness goals (e.g. "Lose weight"); drives matching + goal progress. */
+  goals: string[];
   hasInjuries: boolean;
   injuriesNote: string;
   preferredTrainerGender: string;
@@ -46,6 +48,7 @@ export interface OnboardingState {
   toggleClientType: (type: string) => void;
   toggleLocation: (location: string) => void;
   toggleWorkDay: (day: string) => void;
+  toggleGoal: (goal: string) => void;
   togglePreferredFormat: (format: string) => void;
   addCertification: (cert: Certification) => void;
   removeCertification: (uri: string) => void;
@@ -77,6 +80,7 @@ const initialState = {
   sameSlotsEveryWeek: true,
   profilePhotoUri: null as string | null,
   selfLevel: '',
+  goals: [] as string[],
   hasInjuries: false,
   injuriesNote: '',
   preferredTrainerGender: '',
@@ -120,6 +124,12 @@ export const useOnboardingStore = create<OnboardingState>()(
             ? state.preferredFormat.filter((f) => f !== format)
             : [...state.preferredFormat, format],
         })),
+      toggleGoal: (goal) =>
+        set((state) => ({
+          goals: state.goals.includes(goal)
+            ? state.goals.filter((g) => g !== goal)
+            : [...state.goals, goal],
+        })),
       addCertification: (cert) =>
         set((state) => ({
           certifications: [...state.certifications, cert],
@@ -152,6 +162,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         sameSlotsEveryWeek: state.sameSlotsEveryWeek,
         profilePhotoUri: state.profilePhotoUri,
         selfLevel: state.selfLevel,
+        goals: state.goals,
         hasInjuries: state.hasInjuries,
         injuriesNote: state.injuriesNote,
         preferredTrainerGender: state.preferredTrainerGender,

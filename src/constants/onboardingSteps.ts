@@ -23,6 +23,7 @@ const TRAINER_STEPS: readonly StepRoute[] = [
 
 const CLIENT_STEPS: readonly StepRoute[] = [
   'WhatsYourName',
+  'Goals',
   'Experience',
   'TrainingTypes',
   'ClientTypes',

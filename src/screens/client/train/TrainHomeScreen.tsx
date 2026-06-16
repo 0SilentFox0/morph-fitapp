@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ScrollView,
   StyleSheet,
@@ -33,8 +32,6 @@ const PROGRAMS = mockTrainingPrograms.filter(
 export function TrainHomeScreen() {
   const navigation = useNavigation<Nav>();
 
-  const insets = useSafeAreaInsets();
-
   const sessions = useSessionsStore((s) => s.sessions);
 
   // Assigned workouts = pending sessions that carry a program.
@@ -48,7 +45,7 @@ export function TrainHomeScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: spacing['2xl'] + insets.bottom },
+          { paddingBottom: spacing['2xl'] + spacing.tabBarInset },
         ]}
         showsVerticalScrollIndicator={false}
       >

@@ -5,12 +5,15 @@ import type { ProgramExercise, Session, TrainingProgram } from '../types';
 
 export type AuthStackParamList = {
   Login: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: { token?: string } | undefined;
 };
 
 export type OnboardingStackParamList = {
   ChooseRole: undefined;
   Welcome: undefined;
   WhatsYourName: undefined;
+  Goals: undefined;
   Experience: undefined;
   TrainingTypes: undefined;
   ClientTypes: undefined;
@@ -113,6 +116,9 @@ export type TrainStackParamList = LiveTrainingParamList & {
 export type ClientHomeStackParamList = {
   ClientHome: undefined;
   ClientProfile: undefined;
+  EditProfile: undefined;
+  Settings: undefined;
+  Notifications: undefined;
   BookSession: { trainerId?: string } | undefined;
   RequestSubmitted: { counterpartName?: string } | undefined;
 };

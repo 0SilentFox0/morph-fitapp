@@ -18,7 +18,8 @@ import { TransactionCard } from './Analytics/TransactionCard';
 
 const { colors, radius, typography, spacing } = theme;
 
-import { mockTransactions } from '../../mocks';
+import { loadTransactions } from '../../services/analyticsService';
+import type { Transaction } from '../../types';
 import { exportTransactions, searchItems } from '../../utils';
 
 type Nav = NativeStackNavigationProp<StatsStackParamList, 'Transactions'>;
@@ -32,8 +33,34 @@ export function TransactionsScreen() {
 
   const [search, setSearch] = React.useState('');
 
+  const [allTransactions, setAllTransactions] = React.useState<Transaction[]>(
+    []
+  );
+
+  // Reload on focus so a newly-added transaction shows without a manual refresh.
+  const reload = React.useCallback(() => {
+    let active = true;
+
+    loadTransactions()
+      .then((tx) => {
+        if (active) setAllTransactions(tx);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  React.useEffect(
+    () => navigation.addListener('focus', reload),
+    [navigation, reload]
+  );
+
+  React.useEffect(() => reload(), [reload]);
+
   const transactions = React.useMemo(() => {
-    const byFilter = mockTransactions.filter((t) => {
+    const byFilter = allTransactions.filter((t) => {
       if (activeFilter === 1) return t.type === 'Training';
 
       if (activeFilter === 2) return t.type === 'Subscription';
@@ -42,7 +69,7 @@ export function TransactionsScreen() {
     });
 
     return searchItems(search, byFilter, (t) => [t.clientName]);
-  }, [activeFilter, search]);
+  }, [allTransactions, activeFilter, search]);
 
   return (
     <View style={styles.container}>

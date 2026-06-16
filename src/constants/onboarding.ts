@@ -46,3 +46,15 @@ export const TRAINER_GENDER_PREFS: readonly string[] = [
 ];
 
 export const TRAINING_FORMATS: readonly string[] = ['Online', 'In-person'];
+
+/** What a client wants to achieve — drives trainer matching and goal-based progress. */
+export const CLIENT_GOALS: readonly string[] = [
+  'Lose weight',
+  'Build muscle',
+  'Get stronger',
+  'Improve endurance',
+  'Improve mobility',
+  'General health',
+  'Sport-specific',
+  'Other',
+];
