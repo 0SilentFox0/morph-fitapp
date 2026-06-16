@@ -137,7 +137,10 @@ export function EditProfileScreen() {
       <View
         style={[
           styles.footer,
-          { paddingBottom: Math.max(insets.bottom, spacing.md) },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, spacing.md) + spacing.tabBarInset,
+          },
         ]}
       >
         {error ? <Text style={styles.error}>{error}</Text> : null}

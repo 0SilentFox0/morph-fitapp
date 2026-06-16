@@ -145,7 +145,7 @@ export function WorkoutOverviewScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: spacing['2xl'] + insets.bottom + 64 },
+          { paddingBottom: spacing.tabBarInset + spacing['3xl'] },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -159,7 +159,13 @@ export function WorkoutOverviewScreen() {
         )}
       </ScrollView>
       <View
-        style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}
+        style={[
+          styles.footer,
+          {
+            paddingBottom:
+              Math.max(insets.bottom, spacing.md) + spacing.tabBarInset,
+          },
+        ]}
       >
         <Button
           title="Start training"

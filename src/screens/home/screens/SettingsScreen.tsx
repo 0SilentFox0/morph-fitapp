@@ -101,7 +101,10 @@ export function SettingsScreen() {
         style={styles.scroll}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: Math.max(insets.bottom, spacing.lg) },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, spacing.lg) + spacing.tabBarInset,
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >

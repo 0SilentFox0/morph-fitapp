@@ -23,11 +23,12 @@ interface AuthState {
   register: (input: authApi.RegisterInput) => Promise<void>;
   loginWithGoogle: (role?: 'client' | 'trainer') => Promise<void>;
   /**
-   * DEV ONLY: drop into the app as a ready-made, onboarded test user without a
-   * backend account. API-backed screens will show empty/error states (no token),
-   * but mock-fallback screens work — enough to navigate the UI while testing.
+   * DEV ONLY: drop into the app as a ready-made, onboarded test user. Logs into
+   * a real backend account for the role (creating it on first run) so API-backed
+   * screens work with a live token. If the backend is unreachable, falls back to
+   * a synthetic local user — mock-fallback screens still navigate offline.
    */
-  loginAsTestUser: (role?: 'client' | 'trainer') => void;
+  loginAsTestUser: (role?: 'client' | 'trainer') => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   loadSession: () => Promise<void>;
@@ -107,25 +108,65 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ status: 'authenticated', user: mockUser });
   },
 
-  loginAsTestUser: (role = 'client') => {
-    const testUser: User = {
-      id: 'dev-test-user',
-      email: 'test@fitconnect.dev',
-      name: role === 'trainer' ? 'Test Trainer' : 'Test Client',
-      role,
-      certifications: [],
-      training_types: [],
-      client_types: [],
-      locations: [],
-      work_schedule_days: [],
-      goals: [],
-      created_at: new Date().toISOString(),
-    };
+  loginAsTestUser: async (role = 'client') => {
+    const email =
+      role === 'trainer'
+        ? 'test-trainer@fitconnect.dev'
+        : 'test-client@fitconnect.dev';
 
-    syncUser(testUser);
-    // Skip onboarding and land straight in the app for testing.
-    useAppStore.setState({ isOnboarded: true, signupMode: false });
-    set({ status: 'authenticated', user: testUser });
+    const password = 'Password123!';
+
+    const name = role === 'trainer' ? 'Test Trainer' : 'Test Client';
+
+    try {
+      // Prefer a real backend session so API-backed screens (programs,
+      // sessions, notifications…) work with a live token. Log into the dev
+      // account if it exists; create it on the first run (login fails with an
+      // ApiError, register seeds it).
+      try {
+        await authApi.login({ email, password });
+      } catch (err) {
+        if (!(err instanceof ApiError)) throw err;
+
+        await authApi.register({
+          name,
+          email,
+          password,
+          password_confirmation: password,
+          role,
+        });
+      }
+
+      const { data } = await usersApi.getMe();
+
+      syncUser(data);
+      // Skip onboarding and land straight in the app for testing.
+      useAppStore.setState({ isOnboarded: true, signupMode: false });
+      set({ status: 'authenticated', user: data });
+
+      return;
+    } catch {
+      // Backend unreachable (network/timeout) — fall back to a synthetic local
+      // user so the UI is still navigable offline. API-backed screens will show
+      // empty/error states (no token), but mock-fallback screens work.
+      const testUser: User = {
+        id: 'dev-test-user',
+        email,
+        name,
+        role,
+        certifications: [],
+        training_types: [],
+        client_types: [],
+        locations: [],
+        work_schedule_days: [],
+        goals: [],
+        created_at: new Date().toISOString(),
+      };
+
+      syncUser(testUser);
+      useAppStore.setState({ isOnboarded: true, signupMode: false });
+      set({ status: 'authenticated', user: testUser });
+    }
   },
 
   // NOTE (follow-up): we still do NOT call useAppStore.reset() here. loadSession

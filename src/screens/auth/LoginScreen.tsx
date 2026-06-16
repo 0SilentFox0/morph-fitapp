@@ -144,14 +144,22 @@ export function LoginScreen({ navigation }: Partial<Props>) {
       </Pressable>
 
       {__DEV__ && (
-        <Pressable
-          testID="login-dev-test"
-          accessibilityRole="button"
-          style={styles.devRow}
-          onPress={() => loginAsTestUser('client')}
-        >
-          <Text style={styles.devText}>Log in as test user (dev)</Text>
-        </Pressable>
+        <View style={styles.devRow}>
+          <Pressable
+            testID="login-dev-test"
+            accessibilityRole="button"
+            onPress={() => loginAsTestUser('client')}
+          >
+            <Text style={styles.devText}>Log in as test client (dev)</Text>
+          </Pressable>
+          <Pressable
+            testID="login-dev-test-trainer"
+            accessibilityRole="button"
+            onPress={() => loginAsTestUser('trainer')}
+          >
+            <Text style={styles.devText}>Log in as test trainer (dev)</Text>
+          </Pressable>
+        </View>
       )}
     </View>
   );
@@ -200,6 +208,6 @@ const styles = StyleSheet.create({
   },
   linkMuted: { color: colors.textMuted },
   link: { color: colors.accent, fontWeight: '600' },
-  devRow: { alignItems: 'center', marginTop: spacing.sm },
+  devRow: { alignItems: 'center', marginTop: spacing.sm, gap: spacing.sm },
   devText: { color: colors.textMuted, fontSize: 13 },
 });
