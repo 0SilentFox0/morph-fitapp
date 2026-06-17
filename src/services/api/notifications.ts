@@ -5,8 +5,15 @@ import { NotificationSchema } from '../../schemas/api/models';
 import type { Query } from './client';
 import { api } from './client';
 
-// The backend returns `{ data: { unread_count: number } }`.
-const UnreadCountSchema = z.object({ unread_count: z.number() });
+// The live backend returns `{ data: { count: number } }`, while the OpenAPI
+// spec still documents `unread_count`. Accept either and normalize to
+// `unread_count` so consumers have one stable field regardless of which ships.
+const UnreadCountSchema = z
+  .object({
+    count: z.number().optional(),
+    unread_count: z.number().optional(),
+  })
+  .transform((v) => ({ unread_count: v.unread_count ?? v.count ?? 0 }));
 
 export interface DeviceTokenInput {
   token: string;
