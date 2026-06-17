@@ -1,4 +1,6 @@
 import { CURRENT_USER_NAME, mockClients, mockSessions } from '../../mocks';
+import * as meApi from '../../services/api/me';
+import { getCurrentUserName } from '../../services/repositories/trainingHistoryRepository';
 import { useTrainingHistoryStore } from '../../store/trainingHistoryStore';
 import type { CompletedTraining } from '../../types';
 
@@ -22,7 +24,8 @@ const sampleHistory: CompletedTraining[] = [
 ];
 
 afterEach(() => {
-  useTrainingHistoryStore.setState({ history: seed });
+  jest.restoreAllMocks();
+  useTrainingHistoryStore.setState({ history: seed, loaded: false });
 });
 
 describe('useTrainingHistoryStore', () => {
@@ -71,6 +74,38 @@ describe('useTrainingHistoryStore', () => {
     expect(useTrainingHistoryStore.getState().getLastSets('You', 9999)).toEqual(
       [{ weight: 77, reps: 5 }]
     );
+  });
+
+  it('load() pulls the client’s own workout logs from GET /me/workout-logs', async () => {
+    const spy = jest.spyOn(meApi, 'getMyWorkoutLogs').mockResolvedValue({
+      data: [
+        {
+          id: 'log1',
+          session_id: 'sess1',
+          finished_at: '2026-06-01T09:00:00Z',
+          exercises: [
+            {
+              id: 'wle1',
+              exercise_id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+              order: 0,
+              name_snapshot: 'Squat',
+              sets: [{ weight_kg: 100, reps: 5 }],
+            },
+          ],
+        },
+      ],
+    } as never);
+
+    await useTrainingHistoryStore.getState().load();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(useTrainingHistoryStore.getState().loaded).toBe(true);
+
+    // Tagged with the current-user join key, so getCurrentUserHistory resolves it.
+    const history = useTrainingHistoryStore.getState().getCurrentUserHistory();
+
+    expect(history).toHaveLength(1);
+    expect(history[0]).toMatchObject({ id: 'log1', clientName: getCurrentUserName() });
   });
 
   it('seeds history for every demo client so the progress chart always has data', () => {

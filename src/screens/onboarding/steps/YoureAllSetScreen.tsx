@@ -9,6 +9,7 @@ const { colors, radius, typography, spacing } = theme;
 
 import {
   buildOnboardingProfile,
+  markOnboardingComplete,
   submitOnboardingProfile,
 } from '../../../services/onboardingApi';
 import { useAppStore } from '../../../store/appStore';
@@ -94,6 +95,9 @@ export function YoureAllSetScreen() {
       const profile = buildOnboardingProfile(state, role ?? 'trainer');
 
       await submitOnboardingProfile(profile);
+      // Persist completion server-side (sets onboarding_completed_at) so a
+      // fresh session/device stays onboarded. A failure surfaces via catch.
+      await markOnboardingComplete();
       addPoints(20);
       setSignupMode(false);
       setOnboarded(true);

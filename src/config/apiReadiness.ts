@@ -4,11 +4,13 @@
  * data for any module whose endpoints aren't deployed yet — nothing breaks, and
  * we flip a flag here the moment an endpoint ships.
  *
- * Verified against the live OpenAPI spec at {API_BASE}/docs on 2026-06-15.
- * Present paths: /auth, /me, /clients, /client-packages, /package-templates,
- * /conversations, /exercises, /notifications, /programs, /sessions,
- * /transactions, /withdrawals, /workout-logs, /device-tokens.
- * Absent: /analytics/* (Phase 3 — not yet implemented).
+ * Verified against the live OpenAPI spec at {API_BASE}/docs on 2026-06-17.
+ * Present paths: /auth, /me, /me/onboarding/complete, /me/sessions,
+ * /me/measurements, /me/workout-logs, /clients, /client-packages,
+ * /package-templates, /conversations, /exercises, /notifications, /programs,
+ * /sessions, /transactions, /withdrawals, /workout-logs, /device-tokens.
+ * Absent: /analytics/* (Phase 3), /trainers (B2), POST /me/sessions (client
+ * self-booking — only GET shipped), /auth/google.
  */
 export const apiReadiness = {
   auth: true,
@@ -28,6 +30,12 @@ export const apiReadiness = {
   sessions: true,
   transactions: true,
   workouts: true,
+  /** Client's own sessions via `GET /me/sessions` (read). Booking write is still local — see `clientBooking`. */
+  clientSessions: true,
+  /** Client's own body measurements via `GET`/`POST /me/measurements`. */
+  measurements: true,
+  /** Client's own training history via `GET /me/workout-logs`. */
+  trainingHistory: true,
   /** No /analytics/* endpoints on the server yet — dashboard aggregates stay on mock data. */
   analytics: false,
   /**

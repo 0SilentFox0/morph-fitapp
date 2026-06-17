@@ -34,6 +34,14 @@ export const updateOnboardingStep = (
   data: Record<string, unknown>
 ) => api.put(`/me/onboarding/${step}`, { body: { data } });
 
+/**
+ * Mark onboarding complete server-side. Sets `users.onboarding_completed_at`,
+ * which `authStore.syncUser()` reads to keep `isOnboarded` backend-authoritative
+ * across sessions/devices. Returns the updated user.
+ */
+export const completeOnboarding = () =>
+  api.post('/me/onboarding/complete', { schema: dataEnvelope(UserSchema) });
+
 export const updateSettings = (body: {
   timezone?: string;
   locale?: string;

@@ -1,9 +1,11 @@
 import type { Session as ApiSession } from '../../schemas/api/models';
+import * as meApi from '../../services/api/me';
 import * as sessionsApi from '../../services/api/sessions';
 import {
   apiSessionToUi,
   buildSessionInput,
   createSession,
+  loadClientSessions,
 } from '../../services/repositories/sessionsRepository';
 
 afterEach(() => jest.restoreAllMocks());
@@ -126,5 +128,28 @@ describe('createSession', () => {
       expect.objectContaining({ title: 'Leg Day', type: 'Cardio' })
     );
     expect(result.id).toBe('s1');
+  });
+});
+
+describe('loadClientSessions', () => {
+  it('fetches GET /me/sessions and adapts to UI sessions', async () => {
+    const spy = jest.spyOn(meApi, 'getMySessions').mockResolvedValue({
+      data: [
+        {
+          id: 's7',
+          trainer_id: 'tr1',
+          title: 'My session',
+          type: 'Strength',
+          start_at: '2026-06-20T08:30:00.000Z',
+          status: 'planned',
+          participants: [],
+        },
+      ],
+    } as never);
+
+    const sessions = await loadClientSessions();
+
+    expect(spy).toHaveBeenCalledWith({ per_page: 100 });
+    expect(sessions[0]).toMatchObject({ id: 's7', title: 'My session', status: 'pending' });
   });
 });

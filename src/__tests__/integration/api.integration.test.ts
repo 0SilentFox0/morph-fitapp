@@ -15,6 +15,7 @@ import {
   ApiError,
   authApi,
   clientsApi,
+  meApi,
   notificationsApi,
   programsApi,
   sessionsApi,
@@ -147,6 +148,37 @@ d('FitConnect API integration', () => {
       const res = await notificationsApi.listNotifications({ per_page: 5 });
 
       expect(Array.isArray(res.data)).toBe(true);
+    });
+  });
+
+  // Self-scoped (/me/*) endpoints — the authenticated user's own data. Each call
+  // validates the live response against its Zod schema via the service layer; a
+  // shape mismatch throws and fails the test. Collections are (legitimately)
+  // empty for a brand-new account, which still exercises the envelope schema.
+  describe('contract: self-scoped (/me/*) endpoints parse against their schemas', () => {
+    it('GET /me/sessions → Session list', async () => {
+      const res = await meApi.getMySessions({ per_page: 5 });
+
+      expect(Array.isArray(res.data)).toBe(true);
+    });
+
+    it('GET /me/measurements → BodyMeasurement list', async () => {
+      const res = await meApi.getMyMeasurements({ per_page: 5 });
+
+      expect(Array.isArray(res.data)).toBe(true);
+    });
+
+    it('GET /me/workout-logs → WorkoutLog list', async () => {
+      const res = await meApi.getMyWorkoutLogs({ per_page: 5 });
+
+      expect(Array.isArray(res.data)).toBe(true);
+    });
+
+    it('POST /me/onboarding/complete → User with onboarding_completed_at set', async () => {
+      const { data } = await usersApi.completeOnboarding();
+
+      expect(data.id).toEqual(expect.any(String));
+      expect(typeof data.onboarding_completed_at).toBe('string');
     });
   });
 

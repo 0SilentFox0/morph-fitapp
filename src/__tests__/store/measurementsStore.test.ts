@@ -1,3 +1,4 @@
+import * as meApi from '../../services/api/me';
 import {
   type MeasurementEntry,
   useMeasurementsStore,
@@ -6,7 +7,8 @@ import {
 const seed = useMeasurementsStore.getState().entries;
 
 afterEach(() => {
-  useMeasurementsStore.setState({ entries: seed });
+  jest.restoreAllMocks();
+  useMeasurementsStore.setState({ entries: seed, loaded: false });
 });
 
 const sample: MeasurementEntry[] = [
@@ -48,5 +50,31 @@ describe('useMeasurementsStore', () => {
   it('latest returns the most recent entry', () => {
     useMeasurementsStore.setState({ entries: [...sample] });
     expect(useMeasurementsStore.getState().latest()?.id).toBe('b');
+  });
+
+  it('load() pulls from GET /me/measurements and sets loaded; no-ops after', async () => {
+    const spy = jest.spyOn(meApi, 'getMyMeasurements').mockResolvedValue({
+      data: [
+        {
+          id: 'r1',
+          client_id: 'c1',
+          metric_type: 'weight',
+          value: 77,
+          unit: 'kg',
+          measured_at: '2026-06-01T07:00:00Z',
+          recorded_by_user_id: 'u1',
+        },
+      ],
+    } as never);
+
+    await useMeasurementsStore.getState().load();
+
+    expect(useMeasurementsStore.getState().loaded).toBe(true);
+    expect(useMeasurementsStore.getState().entries).toEqual([
+      { id: 'm-2026-06-01', date: '2026-06-01T07:00:00Z', weightKg: 77 },
+    ]);
+
+    await useMeasurementsStore.getState().load();
+    expect(spy).toHaveBeenCalledTimes(1); // guarded after first success
   });
 });

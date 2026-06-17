@@ -57,11 +57,26 @@ export function ClientHomeScreen() {
     (s) => s.getCurrentUserHistory
   );
 
+  const loadHistory = useTrainingHistoryStore((s) => s.load);
+
   useTrainingHistoryStore((s) => s.history);
+
+  // Pull the client's own training history from GET /me/workout-logs on mount.
+  React.useEffect(() => {
+    void loadHistory().catch(() => {});
+  }, [loadHistory]);
 
   const getUpcomingSessions = useSessionsStore((s) => s.getUpcomingSessions);
 
+  const loadClientSessions = useSessionsStore((s) => s.loadClientSessions);
+
   useSessionsStore((s) => s.sessions);
+
+  // Pull the client's own sessions from GET /me/sessions once on mount; local
+  // bookings (clientBooking is still local) append afterward and survive.
+  React.useEffect(() => {
+    void loadClientSessions().catch(() => {});
+  }, [loadClientSessions]);
 
   const trainers = useTrainersStore((s) => s.trainers);
 

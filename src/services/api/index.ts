@@ -4,6 +4,7 @@ export { api, ApiError, request, setUnauthorizedHandler } from './client';
 export * as clientInvitationsApi from './clientInvitations';
 export * as clientsApi from './clients';
 export * as exercisesApi from './exercises';
+export * as meApi from './me';
 export * as notificationsApi from './notifications';
 export * as packagesApi from './packages';
 export * as programsApi from './programs';

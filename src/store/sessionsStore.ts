@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import {
   cancelSession as cancelSessionApi,
+  loadClientSessions as loadClientSessionsFromApi,
   loadSessions as loadSessionsFromApi,
 } from '../services/repositories/sessionsRepository';
 import type { Session, SessionStatus } from '../types';
@@ -20,6 +21,12 @@ interface SessionsState {
    * client screens keep their locally-booked sessions (no client-self endpoint).
    */
   loadSessions: (force?: boolean) => Promise<Session[]>;
+  /**
+   * Load the signed-in client's own sessions from `GET /me/sessions` (no-ops
+   * after first success unless forced, so locally-booked sessions added
+   * afterward aren't wiped). The client counterpart of `loadSessions`.
+   */
+  loadClientSessions: (force?: boolean) => Promise<Session[]>;
   addSession: (session: Omit<Session, 'id'>) => void;
   updateSession: (id: string, updates: Partial<Omit<Session, 'id'>>) => void;
   deleteSession: (id: string) => void;
@@ -46,6 +53,16 @@ export const useSessionsStore = create<SessionsState>((set, get) => ({
     if (get().loaded && !force) return get().sessions;
 
     const sessions = await loadSessionsFromApi();
+
+    set({ sessions, loaded: true });
+
+    return sessions;
+  },
+
+  loadClientSessions: async (force = false) => {
+    if (get().loaded && !force) return get().sessions;
+
+    const sessions = await loadClientSessionsFromApi();
 
     set({ sessions, loaded: true });
 

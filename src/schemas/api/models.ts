@@ -154,7 +154,9 @@ export const ClientProgramSchema = z.object({
 export const SessionParticipantSchema = z.object({
   session_id: uuid,
   client_id: uuid,
-  client: z.unknown().nullish(),
+  // The backend now embeds the full client (name + avatar) on each participant,
+  // so session rows can show who they're with instead of a "Client" fallback.
+  client: ClientSchema.nullish(),
 });
 
 export const SessionSchema = z.object({

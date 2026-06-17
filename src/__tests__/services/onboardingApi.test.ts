@@ -1,6 +1,7 @@
 import * as usersApi from '../../services/api/users';
 import {
   buildOnboardingProfile,
+  markOnboardingComplete,
   profileToUpdateInput,
   submitOnboardingProfile,
 } from '../../services/onboardingApi';
@@ -128,5 +129,17 @@ describe('submitOnboardingProfile', () => {
         buildOnboardingProfile({ ...baseState, name: '' }, 'trainer')
       )
     ).rejects.toThrow(/name/i);
+  });
+});
+
+describe('markOnboardingComplete', () => {
+  it('POSTs /me/onboarding/complete via the users API', async () => {
+    const spy = jest
+      .spyOn(usersApi, 'completeOnboarding')
+      .mockResolvedValue({ data: { id: 'u9' } } as never);
+
+    await markOnboardingComplete();
+
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });

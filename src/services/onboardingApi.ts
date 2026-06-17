@@ -151,8 +151,7 @@ export function profileToUpdateInput(
 /**
  * Persist a finished onboarding profile via `PUT /me` (behind the `users`
  * readiness flag). Returns the user id. Callers handle the promise + errors;
- * onboarding completion is then marked locally (and, once `/me/onboarding/
- * complete` ships — see B8 — server-side).
+ * completion is then persisted server-side via {@link markOnboardingComplete}.
  */
 export async function submitOnboardingProfile(
   profile: OnboardingProfile
@@ -179,5 +178,21 @@ export async function submitOnboardingProfile(
       id: `mock-${profile.role}-${Date.now()}`,
       createdAt: new Date().toISOString(),
     })
+  );
+}
+
+/**
+ * Mark onboarding complete on the backend (`POST /me/onboarding/complete`),
+ * behind the `users` readiness flag. Persisting `onboarding_completed_at`
+ * server-side lets `authStore.syncUser()` keep `isOnboarded` authoritative
+ * across logout / fresh devices. No-op in mock mode.
+ */
+export async function markOnboardingComplete(): Promise<void> {
+  await withMockFallback(
+    apiReadiness.users,
+    async () => {
+      await usersApi.completeOnboarding();
+    },
+    () => undefined
   );
 }

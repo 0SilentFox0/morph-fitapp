@@ -3,6 +3,7 @@ import { mockSessions } from '../../mocks';
 import type { Session as ApiSession } from '../../schemas/api/models';
 import type { Session, SessionStatus } from '../../types';
 import { formatTime } from '../../utils';
+import * as meApi from '../api/me';
 import type { SessionInput } from '../api/sessions';
 import * as sessionsApi from '../api/sessions';
 import { withMockFallback } from '../mockFallback';
@@ -63,18 +64,11 @@ export function apiSessionToUi(s: ApiSession, now: Date = new Date()): Session {
     date: s.start_at ? relativeDateLabel(s.start_at, now) : '',
     time: s.start_at ? formatTime(s.start_at) : '',
     status: STATUS_FROM_API[s.status],
-    participants: s.participants.map((p) => {
-      const client = (p.client ?? null) as {
-        name?: string;
-        avatar_url?: string | null;
-      } | null;
-
-      return {
-        id: p.client_id,
-        name: client?.name ?? 'Client',
-        avatar: client?.avatar_url ?? undefined,
-      };
-    }),
+    participants: s.participants.map((p) => ({
+      id: p.client_id,
+      name: p.client?.name ?? 'Client',
+      avatar: p.client?.avatar_url ?? undefined,
+    })),
     programId: s.program_id ?? undefined,
   };
 }
@@ -89,6 +83,24 @@ export async function loadSessions(): Promise<Session[]> {
     apiReadiness.sessions,
     async () => {
       const res = await sessionsApi.listSessions({ per_page: 100 });
+
+      return res.data.map((s) => apiSessionToUi(s));
+    },
+    () => mockSessions
+  );
+}
+
+/**
+ * Load the authenticated client's own sessions (`GET /me/sessions`), behind the
+ * `clientSessions` readiness flag. Self-scoped counterpart of {@link loadSessions}
+ * (which is trainer-only). Booking writes stay local until `POST /me/sessions`
+ * ships (see `apiReadiness.clientBooking`).
+ */
+export async function loadClientSessions(): Promise<Session[]> {
+  return withMockFallback(
+    apiReadiness.clientSessions,
+    async () => {
+      const res = await meApi.getMySessions({ per_page: 100 });
 
       return res.data.map((s) => apiSessionToUi(s));
     },

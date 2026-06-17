@@ -31,7 +31,14 @@ function parsePositive(text: string): number | null {
 export function MeasurementsScreen() {
   const entries = useMeasurementsStore((s) => s.entries);
 
+  const loadMeasurements = useMeasurementsStore((s) => s.load);
+
   const addEntry = useMeasurementsStore((s) => s.addEntry);
+
+  // Pull the client's own measurements from GET /me/measurements once on mount.
+  React.useEffect(() => {
+    void loadMeasurements().catch(() => {});
+  }, [loadMeasurements]);
 
   const getSeries = useMeasurementsStore((s) => s.getSeries);
 
